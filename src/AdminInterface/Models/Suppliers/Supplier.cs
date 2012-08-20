@@ -30,7 +30,7 @@ namespace AdminInterface.Models.Suppliers
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Поставщик")]
 	public class Supplier : Service, IChangesNotificationAware
 	{
-		private ContactGroupType[] _defaultGroups = new [] {
+		private ContactGroupType[] _defaultGroups = new[] {
 			ContactGroupType.ClientManagers,
 			ContactGroupType.OrderManagers
 		};
@@ -57,12 +57,12 @@ namespace AdminInterface.Models.Suppliers
 		public virtual uint SupplierId { get; set; }
 
 		[Property,
-			Auditable,
-			Notify,
-			Description("Краткое наименование"),
-			ValidateNonEmpty,
-			ValidateRegExpAttribute(@"^[\wа-яА-Я-Ёё\.,\(\)\+ ]+$",
-				"Поле может содержать только пробел, буквы, цифры и знаки('_', '-', '+', '.', ',', '(', ')')")]
+		Auditable,
+		Notify,
+		Description("Краткое наименование"),
+		ValidateNonEmpty,
+		ValidateRegExpAttribute(@"^[\wа-яА-Я-Ёё\.,\(\)\+ ]+$",
+			"Поле может содержать только пробел, буквы, цифры и знаки('_', '-', '+', '.', ',', '(', ')')")]
 		public override string Name { get; set; }
 
 		[Property, ValidateNonEmpty, Auditable, Notify, Description("Полное наименование")]
@@ -80,14 +80,10 @@ namespace AdminInterface.Models.Suppliers
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style]
 		public override bool Disabled
 		{
-			get
-			{
-				return _disabled;
-			}
+			get { return _disabled; }
 			set
 			{
-				if (_disabled != value)
-				{
+				if (_disabled != value) {
 					_disabled = value;
 					if (Payer != null)
 						Payer.UpdatePaymentSum();
@@ -96,7 +92,7 @@ namespace AdminInterface.Models.Suppliers
 		}
 
 		[Nested]
-		public virtual RegistrationInfo Registration { get; set;}
+		public virtual RegistrationInfo Registration { get; set; }
 
 		[BelongsTo(Cascade = CascadeEnum.All)]
 		public virtual Payer Payer { get; set; }
@@ -116,7 +112,7 @@ namespace AdminInterface.Models.Suppliers
 		[HasMany(Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<OrderSendRules> OrderRules { get; set; }
 
-		[HasAndBelongsToMany(typeof (CertificateSource),
+		[HasAndBelongsToMany(typeof(CertificateSource),
 			Lazy = true,
 			ColumnKey = "SupplierId",
 			Table = "SourceSuppliers",
@@ -145,7 +141,7 @@ namespace AdminInterface.Models.Suppliers
 			get
 			{
 				return ArHelper.WithSession(s => {
-					return new [] {
+					return new[] {
 						new ModelAction(this, "Delete", "Удалить", !CanDelete(s))
 					};
 				});
@@ -209,13 +205,11 @@ namespace AdminInterface.Models.Suppliers
 		{
 			var supplierRoot = Path.Combine(root, Id.ToString().PadLeft(3, '0'));
 			var dirs = new[] { "Orders", "Waybills", "Reports", "Rejects" };
-			try
-			{
+			try {
 				if (!Directory.Exists(supplierRoot))
 					Directory.CreateDirectory(supplierRoot);
 
-				foreach (var directoryToCreate in dirs.Select(d => Path.Combine(supplierRoot, d)))
-				{
+				foreach (var directoryToCreate in dirs.Select(d => Path.Combine(supplierRoot, d))) {
 					if (!Directory.Exists(directoryToCreate))
 						Directory.CreateDirectory(directoryToCreate);
 				}
@@ -223,8 +217,7 @@ namespace AdminInterface.Models.Suppliers
 				foreach (var user in Users)
 					SetAccessControl(user.Login, supplierRoot);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				LogManager.GetLogger(GetType()).Error(String.Format(@"
 Ошибка при создании папки на ftp для клиента, иди и создавай руками
 Нужно создать папку {0}
@@ -240,10 +233,8 @@ namespace AdminInterface.Models.Suppliers
 				return;
 
 			var index = 0;
-			while (true)
-			{
-				try
-				{
+			while (true) {
+				try {
 #if !DEBUG
 					username = String.Format(@"ANALIT\{0}", username);
 					var rootDirectorySecurity = Directory.GetAccessControl(root);
@@ -278,8 +269,7 @@ namespace AdminInterface.Models.Suppliers
 #endif
 					break;
 				}
-				catch(Exception e)
-				{
+				catch (Exception e) {
 					LogManager.GetLogger(GetType()).Error("Ошибка при назначении прав, пробую еще раз", e);
 					index++;
 					Thread.Sleep(500);

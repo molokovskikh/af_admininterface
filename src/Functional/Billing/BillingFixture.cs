@@ -11,7 +11,8 @@ using Integration.ForTesting;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using WatiN.Core.Native.Windows;
 using WatiN.CssSelectorExtensions;
 using Document = WatiN.Core.Document;
@@ -50,8 +51,7 @@ namespace Functional.Billing
 			Refresh();
 
 			Assert.That(browser.Text, Is.StringContaining("Адреса доставки"));
-			foreach (var address in client.Addresses)
-			{
+			foreach (var address in client.Addresses) {
 				var row = browser.TableRow("AddressRow" + address.Id);
 				Assert.That(row.ClassName, Is.StringContaining("disabled"));
 				var checkBox = row.Css("input[name=status]");
@@ -69,8 +69,7 @@ namespace Functional.Billing
 			Refresh();
 
 			Assert.That(browser.Text, Is.StringContaining("Пользователи"));
-			foreach (var item in client.Users)
-			{
+			foreach (var item in client.Users) {
 				var row = browser.TableRow("UserRow" + item.Id);
 				Assert.That(row.ClassName, Is.StringContaining("disabled"));
 				var checkBox = row.Css("input[name=status]");
@@ -227,7 +226,7 @@ namespace Functional.Billing
 			var selector = String.Format("tr#AddressRow{0}", address.Id);
 			var row = (TableRow)browser.Css(selector);
 			var checkbox = (CheckBox)browser.Css(String.Format("tr#AddressRow{0} input[name=status]", address.Id));
-				
+
 			Assert.IsTrue(checkbox.Checked);
 			Assert.That(row.ClassName, Is.Not.StringContaining("disabled"));
 			Assert.That(row.ClassName, Is.StringContaining("has-no-connected-users"));
@@ -339,8 +338,7 @@ namespace Functional.Billing
 
 		private void AddUsersAdnAddresses(Client client, int countUsers)
 		{
-			for (var i = 0; i < countUsers; i++)
-			{
+			for (var i = 0; i < countUsers; i++) {
 				client.AddUser("user");
 				var address = client.AddAddress("address");
 				address.Save();
@@ -389,8 +387,7 @@ namespace Functional.Billing
 			user.Enabled = true;
 			address.Enabled = false;
 			session.SaveOrUpdate(client);
-			foreach (var a in client.Addresses)
-			{
+			foreach (var a in client.Addresses) {
 				a.Accounting.ReadyForAccounting = true;
 				a.AvaliableForUsers = new List<User> { client.Users[0], client.Users[1] };
 				a.Save();
@@ -510,8 +507,7 @@ namespace Functional.Billing
 			browser.TextField(Find.ByName("userMessage.Message")).TypeText(message);
 			browser.Button(Find.ByValue("Отправить сообщение")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сообщение сохранено"));
-			foreach (var user in client.Users)
-			{
+			foreach (var user in client.Users) {
 				Assert.That(browser.Text,
 					Is.StringContaining(String.Format("Остались не показанные сообщения для пользователя {0}", user.GetLoginOrName())));
 
@@ -544,8 +540,7 @@ namespace Functional.Billing
 			// В таблице статистики вкл./откл. должны остаться видимыми только строки, относящиеся к выбранному пользователю
 			// остальные строки должны быть невидимы
 			var logRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("logRow"));
-			foreach (TableRow row in logRows)
-			{
+			foreach (TableRow row in logRows) {
 				if (row.Id.Equals("logRowUserLog" + user.Id))
 					Assert.That(row.Style.Display, Is.Not.StringContaining("none"));
 				else
@@ -590,8 +585,7 @@ namespace Functional.Billing
 			// В таблице, которая содержит всех пользователей плательщика должны быть видимыми только те строки,
 			// которые соответствуют пользователям, принадлежащим выделенному клиенту
 			var userRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("UserRow")).ToList();
-			foreach (var row in userRows)
-			{
+			foreach (var row in userRows) {
 				if (row.Id.Contains("UserRowHidden"))
 					continue;
 				if (row.Id.Equals("UserRow" + testUserId))
@@ -619,8 +613,7 @@ namespace Functional.Billing
 			// В таблице, которая содержит все адреса доставки плательщика должны быть видимыми только те строки,
 			// которые соответствуют адресам, принадлежащим выделенному клиенту
 			var addressRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("AddressRow")).ToList();
-			foreach (var row in addressRows)
-			{
+			foreach (var row in addressRows) {
 				if (row.Id.Contains("AddressRowHidden"))
 					continue;
 				if (row.Id.Equals("AddressRow" + testAddressId))
@@ -645,23 +638,23 @@ namespace Functional.Billing
 
 			Click(client2.Name);
 			var usersTable = browser.Table("users");
-			var countVisibleRows = usersTable.TableRows.Count(row => (row != null) && (row.Id != null) 
-				&& !row.Id.Contains("UserRowHidden") 
+			var countVisibleRows = usersTable.TableRows.Count(row => (row != null) && (row.Id != null)
+				&& !row.Id.Contains("UserRowHidden")
 				&& (row.Style.Display != "none"));
 
 			browser.Link(Find.ById("ShowOrHideUsers")).Click();
 			Thread.Sleep(1000);
 
-			var countVisibleRows2 = usersTable.TableRows.Count(row => (row != null) 
-				&& (row.Id != null) 
+			var countVisibleRows2 = usersTable.TableRows.Count(row => (row != null)
+				&& (row.Id != null)
 				&& !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"));
 
 			Assert.That(countVisibleRows, Is.LessThan(countVisibleRows2));
 			browser.Link(Find.ById("ShowOrHideUsers")).Click();
 			Thread.Sleep(1000);
 
-			var countVisibleRows3 = usersTable.TableRows.Count(row => (row != null) 
-				&& (row.Id != null) 
+			var countVisibleRows3 = usersTable.TableRows.Count(row => (row != null)
+				&& (row.Id != null)
 				&& !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"));
 			Assert.That(countVisibleRows, Is.EqualTo(countVisibleRows3));
 			browser.Link(Find.ById("ShowOrHideUsers")).Click();
@@ -776,7 +769,7 @@ namespace Functional.Billing
 
 		private Collapsible GetCollapsible(string selector)
 		{
-			var collapsible = ((Table) Css(selector)).Parents().First(p => p.ClassName != null && p.ClassName.ToLower().Contains("collapsible"));
+			var collapsible = ((Table)Css(selector)).Parents().First(p => p.ClassName != null && p.ClassName.ToLower().Contains("collapsible"));
 			var header = collapsible.CssSelect(".trigger");
 			var body = collapsible.CssSelect(".VisibleFolder");
 			return new Collapsible(header, body);

@@ -14,7 +14,10 @@ namespace AdminInterface.Models.Telephony
 			_filename = filename;
 		}
 
-		public string Name { get { return _filename; } }
+		public string Name
+		{
+			get { return _filename; }
+		}
 
 		public CallRecord Call { get; set; }
 
@@ -36,7 +39,7 @@ namespace AdminInterface.Models.Telephony
 					return String.Empty;
 				var hours = duration / 3600;
 				var minutes = duration / 60 - hours * 60;
-				var seconds = duration - hours*3600 - minutes*60;
+				var seconds = duration - hours * 3600 - minutes * 60;
 				var result = hours > 0 ? String.Format("{0}ч. ", hours) : String.Empty;
 				result += minutes > 0 ? String.Format("{0}м. ", minutes) : String.Empty;
 				result += seconds > 0 ? String.Format("{0}сек. ", seconds) : String.Empty;

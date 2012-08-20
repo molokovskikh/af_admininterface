@@ -10,7 +10,8 @@ namespace AdminInterface.Models
 	public class FullDocument : Document
 	{
 		public FullDocument()
-		{ }
+		{
+		}
 
 		public FullDocument(DocumentReceiveLog log)
 		{

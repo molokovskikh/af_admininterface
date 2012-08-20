@@ -18,11 +18,9 @@ namespace AdminInterface
 			var currentNode = e.Provider.CurrentNode.Clone(true);
 			if (currentNode.Url.EndsWith("/managep.aspx"))
 				currentNode.ParentNode.Url += e.Context.Request["cc"];
-			else if (currentNode.Url.EndsWith("/SenderProperties.aspx"))
-			{
+			else if (currentNode.Url.EndsWith("/SenderProperties.aspx")) {
 				uint firmCode;
-				using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-				{
+				using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
 					connection.Open();
 					var command = new MySqlCommand(@"
 select firmcode 
@@ -35,11 +33,9 @@ where osr.id = ?ruleId
 				currentNode.ParentNode.Url += "?cc=" + firmCode;
 				currentNode.ParentNode.ParentNode.Url += firmCode;
 			}
-			else if (currentNode.Url.EndsWith("/EditRegionalInfo.aspx"))
-			{
+			else if (currentNode.Url.EndsWith("/EditRegionalInfo.aspx")) {
 				uint firmCode;
-				using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-				{
+				using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
 					connection.Open();
 					var command = new MySqlCommand(@"
 SELECT FirmCode
@@ -51,11 +47,9 @@ WHERE RowID = ?Id", connection);
 				currentNode.ParentNode.Url += "?cc=" + firmCode;
 				currentNode.ParentNode.ParentNode.Url += firmCode;
 			}
-			else if (currentNode.Url.EndsWith("/managecosts.aspx"))
-			{
+			else if (currentNode.Url.EndsWith("/managecosts.aspx")) {
 				uint firmCode;
-				using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-				{
+				using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
 					connection.Open();
 					var command = new MySqlCommand(@"
 SELECT FirmCode

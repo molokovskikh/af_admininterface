@@ -8,7 +8,9 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord(DiscriminatorValue = "2")]
 	public class ReportAccount : Account
 	{
-		public ReportAccount() {}
+		public ReportAccount()
+		{
+		}
 
 		public ReportAccount(Report report)
 		{
@@ -52,22 +54,13 @@ namespace AdminInterface.Models.Billing
 
 		public override bool Status
 		{
-			get
-			{
-				return Report.Allow;
-			}
-			set
-			{
-				Report.Allow = value;
-			}
+			get { return Report.Allow; }
+			set { Report.Allow = value; }
 		}
 
 		public override string DefaultDescription
 		{
-			get
-			{
-				return "Статистический отчет по фармрынку за {0}";
-			}
+			get { return "Статистический отчет по фармрынку за {0}"; }
 		}
 	}
 }

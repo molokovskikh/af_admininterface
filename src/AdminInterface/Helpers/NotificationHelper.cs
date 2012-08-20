@@ -8,8 +8,8 @@ namespace AdminInterface.Helpers
 {
 	public class NotificationHelper
 	{
-		private const string _messageTemplateForBillingAfterPassordChange = 
-@"Добрый день.
+		private const string _messageTemplateForBillingAfterPassordChange =
+			@"Добрый день.
 
 Данное сообщение информирует Вас о необходимости начисления стоимости изменения пароля для следующего клиента: 
 
@@ -24,17 +24,17 @@ namespace AdminInterface.Helpers
 Сообщение создано автоматической системой изменения паролей {5}";
 
 		private const string _messageTemplateAfterFreePasswordChange =
-@"Оператор {0} с хоста {1} изменил пароль пользователя {2}, клиента {3} с кодом {4}
+			@"Оператор {0} с хоста {1} изменил пароль пользователя {2}, клиента {3} с кодом {4}
 Дата изменения {5}
 
 Причина: {6}";
 
-		public static void NotifyAboutPasswordChange(Administrator administrator, 
-													 User user,
-													 string password,
-													 bool isFree, 
-													 string host, 
-													 string reason)
+		public static void NotifyAboutPasswordChange(Administrator administrator,
+			User user,
+			string password,
+			bool isFree,
+			string host,
+			string reason)
 		{
 			if (isFree)
 				Func.Mail("register@analit.net",
@@ -48,7 +48,6 @@ namespace AdminInterface.Helpers
 						DateTime.Now,
 						reason),
 					"RegisterList@subscribe.analit.net");
-
 			else
 				Func.Mail("register@analit.net",
 					String.Format("Платное изменение пароля - {0}", user.RootService.FullName),

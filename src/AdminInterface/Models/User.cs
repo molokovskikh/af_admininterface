@@ -54,12 +54,16 @@ namespace AdminInterface.Models
 
 	public class LoginNotFoundException : Exception
 	{
-		public LoginNotFoundException(string message) : base(message) { }
+		public LoginNotFoundException(string message) : base(message)
+		{
+		}
 	}
 
 	public class CantChangePassword : Exception
 	{
-		public CantChangePassword(string message) : base(message) { }
+		public CantChangePassword(string message) : base(message)
+		{
+		}
 	}
 
 	public interface IEnablable
@@ -102,14 +106,12 @@ namespace AdminInterface.Models
 			: this()
 		{
 			RootService = service;
-			if (service is Client)
-			{
+			if (service is Client) {
 				Client = (Client)RootService;
 				WorkRegionMask = Client.MaskRegion;
 				OrderRegionMask = Client.Settings.OrderRegionMask;
 			}
-			else if (service is Supplier)
-			{
+			else if (service is Supplier) {
 				WorkRegionMask = ulong.MaxValue;
 			}
 			UserUpdateInfo = new UserUpdateInfo(this);
@@ -127,10 +129,7 @@ namespace AdminInterface.Models
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Комментарий"), Auditable, ValidateNonEmpty]
 		public virtual string Name
 		{
-			get
-			{
-				return _name;
-			}
+			get { return _name; }
 			set
 			{
 				_name = value;
@@ -142,14 +141,10 @@ namespace AdminInterface.Models
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Включен"), Auditable]
 		public virtual bool Enabled
 		{
-			get
-			{
-				return _enabled;
-			}
+			get { return _enabled; }
 			set
 			{
-				if (_enabled != value)
-				{
+				if (_enabled != value) {
 					_enabled = value;
 					if (Payer != null)
 						Payer.PaymentSum = Payer.TotalSum;
@@ -185,7 +180,7 @@ namespace AdminInterface.Models
 		public virtual bool ShowSupplierCost { get; set; }
 
 		[Nested]
-		public virtual RegistrationInfo Registration { get; set;}
+		public virtual RegistrationInfo Registration { get; set; }
 
 		[Property, Description("Регионы работы"), Auditable, NotifyBilling, SetForceReplication]
 		public virtual ulong WorkRegionMask { get; set; }
@@ -195,6 +190,7 @@ namespace AdminInterface.Models
 
 		[Property, Description("Проверять текущие цены и остатки пред отправкой заказов"), Auditable]
 		public virtual bool UseAdjustmentOrders { get; set; }
+
 /*
 		[Property, Description("Не проверять УИН"), Auditable]
 		public virtual bool DoNotCheckUin { get; set; }
@@ -207,7 +203,7 @@ namespace AdminInterface.Models
 		public virtual ContactGroup ContactGroup { get; set; }
 
 		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke),
-			Description("Наследовать настройки прайс листов"), Auditable, SetForceReplication]
+		 Description("Наследовать настройки прайс листов"), Auditable, SetForceReplication]
 		public virtual User InheritPricesFrom { get; set; }
 
 		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke), Description("Плательщик"), Auditable]
@@ -222,42 +218,39 @@ namespace AdminInterface.Models
 		public virtual UserUpdateInfo UserUpdateInfo { get; set; }
 
 		[
-			HasAndBelongsToMany(typeof (UserPermission),
+			HasAndBelongsToMany(typeof(UserPermission),
 				Lazy = true,
 				ColumnKey = "UserId",
 				Table = "AssignedPermissions",
 				Schema = "usersettings",
 				ColumnRef = "PermissionId"),
-
 			Auditable("Права доступа")
 		]
 		public virtual IList<UserPermission> AssignedPermissions { get; set; }
 
 		[
-			HasAndBelongsToMany(typeof (Address),
+			HasAndBelongsToMany(typeof(Address),
 				Lazy = true,
 				ColumnKey = "UserId",
 				Table = "UserAddresses",
 				Schema = "Customers",
 				ColumnRef = "AddressId"),
-
 			Auditable("список адресов доставки пользователя")
 		]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
 
 		[
-			HasAndBelongsToMany(typeof (User),
+			HasAndBelongsToMany(typeof(User),
 				Lazy = true,
 				ColumnKey = "PrimaryUserId",
 				Table = "Showusers",
 				Schema = "Customers",
 				ColumnRef = "ShowUserId"),
-
 			Auditable("Логины в видимости пользователя")
 		]
 		public virtual IList<User> ShowUsers { get; set; }
 
-		[HasAndBelongsToMany(typeof (User),
+		[HasAndBelongsToMany(typeof(User),
 			Lazy = true,
 			ColumnKey = "ShowUserId",
 			Table = "Showusers",
@@ -273,7 +266,8 @@ namespace AdminInterface.Models
 
 		public virtual List<string> AvalilableAnalitFVersions
 		{
-			get {
+			get
+			{
 				if (Id == 0)
 					return null;
 
@@ -292,7 +286,7 @@ namespace AdminInterface.Models
 					versions.Add(TargetVersion.Value);
 				versions.Add(UserUpdateInfo.AFAppVersion);
 				versions.Sort();
-				return new [] {"Любая версия"}.Concat(versions.Distinct().Select(v => v.ToString())).ToList();
+				return new[] { "Любая версия" }.Concat(versions.Distinct().Select(v => v.ToString())).ToList();
 			}
 		}
 
@@ -369,12 +363,10 @@ namespace AdminInterface.Models
 		{
 			get
 			{
-				try
-				{
+				try {
 					return !ADHelper.IsBelongsToOfficeContainer(Login);
 				}
-				catch(Exception)
-				{
+				catch (Exception) {
 					return false;
 				}
 			}
@@ -427,7 +419,7 @@ namespace AdminInterface.Models
 
 		public static string GetTempLogin()
 		{
-			 return Guid.NewGuid().ToString();
+			return Guid.NewGuid().ToString();
 		}
 
 		public virtual void Setup()
@@ -473,12 +465,10 @@ namespace AdminInterface.Models
 		{
 			get
 			{
-				try
-				{
+				try {
 					return (ADHelper.IsLoginExists(Login) && ADHelper.IsLocked(Login));
 				}
-				catch (Exception)
-				{
+				catch (Exception) {
 					return false;
 				}
 			}
@@ -486,19 +476,13 @@ namespace AdminInterface.Models
 
 		public virtual bool IsExists
 		{
-			get
-			{
-				return (ADHelper.IsLoginExists(Login));
-			}
+			get { return (ADHelper.IsLoginExists(Login)); }
 		}
 
 		[Style]
 		public virtual bool IsOldUserUpdate
 		{
-			get
-			{
-				return !(Logs.AFTime.HasValue && DateTime.Now.Subtract(Logs.AFTime.Value).Days <= 7);
-			}
+			get { return !(Logs.AFTime.HasValue && DateTime.Now.Subtract(Logs.AFTime.Value).Days <= 7); }
 		}
 
 		public virtual bool HavePreparedData()
@@ -530,9 +514,9 @@ namespace AdminInterface.Models
 			get
 			{
 				ContactGroupOwner groupOwner = null;
-				if (NHibernateUtil.GetClass(RootService) == typeof (Client))
+				if (NHibernateUtil.GetClass(RootService) == typeof(Client))
 					groupOwner = ActiveRecordMediator<Client>.FindByPrimaryKey(RootService.Id).ContactGroupOwner;
-				else if (NHibernateUtil.GetClass(RootService) == typeof (Supplier))
+				else if (NHibernateUtil.GetClass(RootService) == typeof(Supplier))
 					groupOwner = Supplier.Find(RootService.Id).ContactGroupOwner;
 				return groupOwner;
 			}
@@ -559,8 +543,7 @@ namespace AdminInterface.Models
 		{
 			if (persons.Length == 0)
 				return;
-			if (ContactGroup == null)
-			{
+			if (ContactGroup == null) {
 				AddContactGroup();
 				foreach (var person in persons)
 					ContactGroup.AddPerson(person.Name);
@@ -635,8 +618,7 @@ WHERE
 		{
 			if (String.IsNullOrEmpty(name))
 				return;
-			if (ContactGroup == null)
-			{
+			if (ContactGroup == null) {
 				var groupOwner = Client.ContactGroupOwner;
 				var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
 				group.Save();
@@ -656,17 +638,14 @@ WHERE
 			var regions = Region.FindAll();
 			// Если маски регионов не совпадают, добавляем записи в UserPrices для тех регионов,
 			// которых не было у старого клиента, но они есть у нового клиента
-			if (Client.MaskRegion != newOwner.MaskRegion)
-			{
-				foreach (var region in regions)
-				{
+			if (Client.MaskRegion != newOwner.MaskRegion) {
+				foreach (var region in regions) {
 					// Если этот регион есть у старого клиента, пропускаем его
 					if ((region.Id & Client.MaskRegion) > 0)
 						continue;
 					// Если региона нет у старого клиента, но он есть у нового,
 					// и для этого пользователя нет прайсов в этом регионе добавляем прайсы для этого региона
-					if ((region.Id & newOwner.MaskRegion) > 0)
-					{
+					if ((region.Id & newOwner.MaskRegion) > 0) {
 						if (!HavePricesInRegion(region))
 							AddPrices(newOwner, region);
 					}
@@ -696,14 +675,12 @@ WHERE
 		{
 			ContactGroupOwner owner = null;
 			var groups = new ContactGroupType[0];
-			if (RootService is Client)
-			{
-				groups = new[] {ContactGroupType.OrderManagers};
+			if (RootService is Client) {
+				groups = new[] { ContactGroupType.OrderManagers };
 				owner = ((Client)RootService).ContactGroupOwner;
 			}
-			else if (RootService is Supplier)
-			{
-				groups = new[] {ContactGroupType.OrderManagers, ContactGroupType.ClientManagers};
+			else if (RootService is Supplier) {
+				groups = new[] { ContactGroupType.OrderManagers, ContactGroupType.ClientManagers };
 				owner = ((Supplier)RootService).ContactGroupOwner;
 			}
 
@@ -744,7 +721,7 @@ WHERE
 			get
 			{
 				return ArHelper.WithSession(s => {
-					return new [] {
+					return new[] {
 						new ModelAction(this, "Unlock", "Разблокировать", !IsLocked),
 						new ModelAction(this, "DeletePreparedData", "Удалить подготовленные данные", !HavePreparedData()),
 						new ModelAction(this, "Delete", "Удалить", !CanDelete(s)),

@@ -17,7 +17,7 @@ namespace AdminInterface.Queries
 		public Address Address { get; set; }
 		public Supplier Supplier { get; set; }
 		public DatePeriod Period { get; set; }
-		public bool NotSent { get; set;}
+		public bool NotSent { get; set; }
 
 		public IList<User> Users
 		{
@@ -31,7 +31,7 @@ namespace AdminInterface.Queries
 
 		public OrderFilter()
 		{
-			Period = new DatePeriod{
+			Period = new DatePeriod {
 				Begin = DateTime.Today,
 				End = DateTime.Today
 			};
@@ -40,7 +40,6 @@ namespace AdminInterface.Queries
 		public List<OrderLog> Find()
 		{
 			return ArHelper.WithSession(s => {
-
 				var sqlFilter = "(oh.writetime >= :FromDate AND oh.writetime <= ADDDATE(:ToDate, INTERVAL 1 DAY))";
 				if (NotSent)
 					sqlFilter = "oh.Deleted = 0 and oh.Submited = 1 and oh.Processed = 0";

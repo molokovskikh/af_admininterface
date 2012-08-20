@@ -54,10 +54,7 @@ namespace AdminInterface.Models
 
 		public bool IsDrugstore
 		{
-			get
-			{
-				return ClientType == SearchClientType.Drugstore;
-			}
+			get { return ClientType == SearchClientType.Drugstore; }
 		}
 
 		[Style]
@@ -69,10 +66,7 @@ namespace AdminInterface.Models
 		[Style]
 		public bool SelfDisabled
 		{
-			get
-			{
-				return !UserEnabled;
-			}
+			get { return !UserEnabled; }
 		}
 
 		[Style]

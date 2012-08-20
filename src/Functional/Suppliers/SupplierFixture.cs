@@ -9,7 +9,7 @@ using Castle.ActiveRecord;
 using Common.Web.Ui.NHibernateExtentions;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; 
+using WatiN.Core;
 using Test.Support.Web;
 using Test.Support;
 
@@ -19,7 +19,7 @@ namespace Functional.Suppliers
 	{
 		private User user;
 		private Supplier supplier;
-		private Payer  payer;
+		private Payer payer;
 
 		[SetUp]
 		public void SetUp()

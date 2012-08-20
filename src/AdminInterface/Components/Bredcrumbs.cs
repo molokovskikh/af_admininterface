@@ -11,12 +11,10 @@ namespace AdminInterface.Components
 	{
 		public override void Render()
 		{
-			foreach (var key in ComponentParams.Keys)
-			{
+			foreach (var key in ComponentParams.Keys) {
 				Context.ContextVars[key] = ComponentParams[key];
 				Context.ContextVars[key + ".@bubbleUp"] = true;
 			}
 		}
-
 	}
 }

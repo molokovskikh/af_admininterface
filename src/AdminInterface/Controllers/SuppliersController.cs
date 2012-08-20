@@ -44,11 +44,9 @@ namespace AdminInterface.Controllers
 			PropertyBag["messages"] = filter.Execute(supplier, DbSession);
 
 			Sort.Make(this);
-			if (IsPost)
-			{
+			if (IsPost) {
 				BindObjectInstance(supplier, "supplier");
-				if (IsValid(supplier))
-				{
+				if (IsValid(supplier)) {
 					DbSession.SaveOrUpdate(supplier);
 					Notify("Сохранено");
 					RedirectToReferrer();
@@ -68,14 +66,13 @@ namespace AdminInterface.Controllers
 			suplier.ChangePayer(payer);
 
 			Notify("Изменено");
-			RedirectToAction("Show", new {id = suplier.Id});
+			RedirectToAction("Show", new { id = suplier.Id });
 		}
 
 		public void SendMessage(uint id, string message)
 		{
 			var supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
-			if (!string.IsNullOrWhiteSpace(message))
-			{
+			if (!string.IsNullOrWhiteSpace(message)) {
 				new AuditRecord(message, supplier).Save();
 				Notify("Сохранено");
 			}
@@ -93,7 +90,7 @@ namespace AdminInterface.Controllers
 				logMessage.AppendLine(string.Format("Удален источник сертификатов {0}", s.GetName()));
 				s.Save();
 			});
-			if (sertificateSourceId > 0) { 
+			if (sertificateSourceId > 0) {
 				var sertSource = CertificateSource.Find(sertificateSourceId);
 				sertSource.Suppliers.Add(supplier);
 				logMessage.AppendLine(string.Format("Установлен источник сертификатов {0}", sertSource.GetName()));
@@ -101,18 +98,18 @@ namespace AdminInterface.Controllers
 			}
 			Notify("Сохранено");
 
-			new AuditRecord(logMessage.ToString(), supplier) {MessageType = LogMessageType.System}.Save();
+			new AuditRecord(logMessage.ToString(), supplier) { MessageType = LogMessageType.System }.Save();
 
 			RedirectToReferrer();
 		}
 
-		[return : JSONReturnBinder]
+		[return: JSONReturnBinder]
 		public object[] GetCertificateSourses()
 		{
 			Func<CertificateSource, string> predicate = c => !string.IsNullOrEmpty(c.Name) ? c.Name : c.SourceClassName;
 			return CertificateSource.Queryable.ToList()
 				.OrderBy(predicate)
-				.Select(c => new {c.Id, Name = predicate(c)})
+				.Select(c => new { c.Id, Name = predicate(c) })
 				.ToArray();
 		}
 

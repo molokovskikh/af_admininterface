@@ -39,7 +39,7 @@ namespace Integration.Models
 				.Select(v => Convert.ToBoolean(v))
 				.ToList();
 			Assert.That(info.Count, Is.GreaterThan(0));
-			Assert.That(info, Is.EqualTo(new [] {true}));
+			Assert.That(info, Is.EqualTo(new[] { true }));
 		}
 
 		[Test(Description = "при изменении флага должно сбрасываться состояние поля ReclameDate")]

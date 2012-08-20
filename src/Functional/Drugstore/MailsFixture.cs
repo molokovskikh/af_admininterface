@@ -9,20 +9,21 @@ using AdminInterface.Models.Suppliers;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.Drugstore
 {
 	public class MailsFixture : WatinFixture2
 	{
-		Client client;
-		User user;
-		Supplier supplier;
+		private Client client;
+		private User user;
+		private Supplier supplier;
 
-		Mail mail;
-		MailSendLog log;
+		private Mail mail;
+		private MailSendLog log;
 
-		AppConfig config;
+		private AppConfig config;
 
 		[SetUp]
 		public void Setup()
@@ -55,7 +56,7 @@ namespace Functional.Drugstore
 			};
 			mail.AddRecipient(client);
 
-			log = new MailSendLog {User = user, Mail = mail, Recipient = mail.Recipients[0]};
+			log = new MailSendLog { User = user, Mail = mail, Recipient = mail.Recipients[0] };
 
 			session.Save(mail);
 			session.Save(log);
@@ -74,7 +75,7 @@ namespace Functional.Drugstore
 			attachment = new Attachment {
 				Filename = "test",
 				Extension = ".dbf",
-				Size = 10*1000,
+				Size = 10 * 1000,
 				Mail = mail
 			};
 			var updateLog = new UpdateLogEntity(user);
@@ -109,7 +110,7 @@ namespace Functional.Drugstore
 			AssertText("История сообщений минипочты");
 			//not implemented
 			//var element = Css("table.DataTable tbody tr > td:last-child");
-			var cell = ((TableRow) Css("table.DataTable tbody tr")).TableCells.Last();
+			var cell = ((TableRow)Css("table.DataTable tbody tr")).TableCells.Last();
 			Click(cell, "Показать");
 			browser.WaitUntilContainsText("test.txt");
 			AssertText("test.txt");
@@ -118,8 +119,7 @@ namespace Functional.Drugstore
 		[Test, Ignore("Тест что бы проверить нагрузку")]
 		public void Test()
 		{
-			for(var i = 0; i < 100; i++)
-			{
+			for (var i = 0; i < 100; i++) {
 				BuildMail();
 				BuildAttachments();
 			}

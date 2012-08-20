@@ -22,7 +22,8 @@ namespace AdminInterface.Helpers
 		}
 
 		public Pager()
-		{}
+		{
+		}
 
 		public Pager(int? page, int pageSize)
 		{
@@ -34,7 +35,7 @@ namespace AdminInterface.Helpers
 		public IEnumerable<T> DoPage<T>(IEnumerable<T> enumerable)
 		{
 			return enumerable
-				.Skip(Page*PageSize)
+				.Skip(Page * PageSize)
 				.Take(PageSize);
 		}
 	}

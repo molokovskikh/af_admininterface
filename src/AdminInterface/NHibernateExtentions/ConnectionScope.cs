@@ -11,7 +11,8 @@ namespace AdminInterface.NHibernateExtentions
 
 		public ConnectionScope(IDbConnection connection)
 			: this(connection, FlushAction.Auto)
-		{}
+		{
+		}
 
 		public ConnectionScope(IDbConnection connection, FlushAction flushAction)
 			: base(flushAction, SessionScopeType.Custom)

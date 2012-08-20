@@ -46,11 +46,9 @@ namespace AdminInterface.Controllers
 				new Tab(typeof(Nomenclature)),
 			};
 
-			if (IsPost)
-			{
+			if (IsPost) {
 				var setting = settings.FirstOrDefault(s => Form[s.Id] != null);
-				if (setting == null)
-				{
+				if (setting == null) {
 					RedirectToReferrer();
 					return;
 				}
@@ -58,22 +56,20 @@ namespace AdminInterface.Controllers
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.NewInstanceIfInvalidKey;
 				var forSave = (IList)BindObject(ParamStore.Form, setting.Type.MakeArrayType(), "items");
 
-				if (IsValid(forSave))
-				{
+				if (IsValid(forSave)) {
 					var items = setting.Items;
 					var forDelete = items.Cast<dynamic>().Where(r => !forSave.Cast<dynamic>().Any(n => n.Id == r.Id));
 					foreach (var deleted in forDelete)
 						ActiveRecordMediator.Delete(deleted);
 					foreach (var item in forSave)
 						ActiveRecordMediator.Save(item);
-						
+
 					Notify("Сохранено");
 					//ie не передает в referer hash по этому формируем вручную
 					//RedirectToReferrer();
 					RedirectToUrl(String.Format("~/References/#tab-{0}", setting.Id));
 				}
-				else
-				{
+				else {
 					setting.Items = forSave.Cast<object>().ToList();
 				}
 			}

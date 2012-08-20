@@ -10,9 +10,9 @@ namespace Unit.Models
 		[Test]
 		public void Message_on_status_change()
 		{
-			Assert.That(AuditRecord.StatusChange(new Client {Status = ClientStatus.Off}).Message,
+			Assert.That(AuditRecord.StatusChange(new Client { Status = ClientStatus.Off }).Message,
 				Is.EqualTo("$$$Клиент отключен"));
-			Assert.That(AuditRecord.StatusChange(new Client {Status = ClientStatus.On}).Message,
+			Assert.That(AuditRecord.StatusChange(new Client { Status = ClientStatus.On }).Message,
 				Is.EqualTo("$$$Клиент включен"));
 		}
 	}

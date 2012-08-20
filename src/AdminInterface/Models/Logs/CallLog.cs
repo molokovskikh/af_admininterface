@@ -55,7 +55,6 @@ namespace AdminInterface.Models.Logs
 				.SetMaxResults(5);
 
 			return ArHelper.WithSession(s => criteria.GetExecutableCriteria(s).List<string>().ToArray());
-
 		}
 	}
 }

@@ -24,27 +24,25 @@ namespace AdminInterface.Helpers
 		public void RegisterEditor()
 		{
 			Editors.Add(typeof(Period), (name, value, options) => {
-				var period = (Period) value;
+				var period = (Period)value;
 				if (period == null)
 					return null;
 
 				return "<label style='padding:2px'>Год</label>"
 					+ GetEdit(name + ".Year", typeof(int), period.Year, options)
-					+ "<label style='padding:2px'>Месяц</label>"
-					+ GetEdit(name + ".Interval", typeof(Interval), period.Interval, options);
+						+ "<label style='padding:2px'>Месяц</label>"
+							+ GetEdit(name + ".Interval", typeof(Interval), period.Interval, options);
 			});
 		}
 
 
 		protected override string GetBuiltinEdit(string name, Type valueType, object value, object options, PropertyInfo propertyInfo)
 		{
-			if (name.EndsWith(".Year"))
-			{
+			if (name.EndsWith(".Year")) {
 				if (valueType == typeof(int))
 					return helper.Select(name, Period.Years);
-				else if (valueType == typeof(int?))
-				{
-					var items = new[] {"Все"}.Concat(Period.Years.Select(y => y.ToString())).ToArray();
+				else if (valueType == typeof(int?)) {
+					var items = new[] { "Все" }.Concat(Period.Years.Select(y => y.ToString())).ToArray();
 					return helper.Select(name, items);
 				}
 			}

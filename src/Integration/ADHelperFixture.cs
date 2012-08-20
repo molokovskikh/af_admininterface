@@ -17,8 +17,7 @@ namespace Integration
 		public static void Log(DirectoryEntry entry)
 		{
 			Console.WriteLine(entry.Name);
-			foreach (var property in entry.Properties.PropertyNames)
-			{
+			foreach (var property in entry.Properties.PropertyNames) {
 				Console.WriteLine(String.Format("{0}={1}", property, String.Join("; ", GetValueArray(property.ToString(), entry))));
 			}
 
@@ -28,8 +27,7 @@ namespace Integration
 		public static string[] GetValueArray(string propertyName, DirectoryEntry entry)
 		{
 			var values = new List<string>();
-			foreach (var value in entry.Properties[propertyName])
-			{
+			foreach (var value in entry.Properties[propertyName]) {
 				values.Add(value.ToString());
 			}
 			return values.ToArray();
@@ -37,8 +35,7 @@ namespace Integration
 
 		private static DirectoryEntry FindDirectoryEntry(string login)
 		{
-			using (var searcher = new DirectorySearcher(String.Format(@"(name={0})", login)))
-			{
+			using (var searcher = new DirectorySearcher(String.Format(@"(name={0})", login))) {
 				var searchResult = searcher.FindOne();
 				if (searchResult != null)
 					return searcher.FindOne().GetDirectoryEntry();
@@ -55,10 +52,8 @@ namespace Integration
 
 		private static IEnumerable<DirectoryEntry> FindAll(string login)
 		{
-			using (var searcher = new DirectorySearcher(String.Format(@"(name={0})", login)))
-			{
-				foreach(SearchResult result in searcher.FindAll())
-				{
+			using (var searcher = new DirectorySearcher(String.Format(@"(name={0})", login))) {
+				foreach (SearchResult result in searcher.FindAll()) {
 					yield return result.GetDirectoryEntry();
 				}
 			}
@@ -66,8 +61,7 @@ namespace Integration
 
 		private static DateTime CreatedAt(string login)
 		{
-			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login)))
-			{
+			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login))) {
 				return Convert.ToDateTime(searcher.FindOne().Properties["whenCreated"][0]);
 			}
 		}
@@ -111,11 +105,10 @@ namespace Integration
 		[Test]
 		public void Add_accessible_computer()
 		{
-			var computers = new [] { "FMS", "SOLO" };
+			var computers = new[] { "FMS", "SOLO" };
 
 			var entry = FindDirectoryEntry("KvasovT");
-			if (entry.Properties["userWorkstations"].Count > 0)
-			{
+			if (entry.Properties["userWorkstations"].Count > 0) {
 				entry.Properties["userWorkstations"].Remove(entry.Properties["userWorkstations"][0]);
 				entry.CommitChanges();
 			}
@@ -151,14 +144,13 @@ namespace Integration
 			ADHelper.RenameUser(newTestLogin, testLogin);
 			user = ADHelper.FindDirectoryEntry(testLogin);
 			Assert.IsNotNull(user, "Не найдена запись в AD, хотя должна быть");
-		}		
+		}
 
 		[Test]
 		public void Get_last_password_change()
 		{
 			var begin = DateTime.Now;
-			using (var user = new TestADUser())
-			{
+			using (var user = new TestADUser()) {
 				ADHelper.ChangePassword(user.Login, "123456789");
 				Assert.That(ADHelper.GetLastPasswordChange(user.Login), Is.GreaterThanOrEqualTo(begin));
 			}
@@ -167,8 +159,7 @@ namespace Integration
 		[Test]
 		public void If_login_exists_but_not_belog_to_admin_group_than_add_user_to_admin_group()
 		{
-			using (var user = new TestADUser())
-			{
+			using (var user = new TestADUser()) {
 				var storage = new ActiveDirectoryUserStorage();
 				storage.CreateAdmin(user.Login, "test", "123456789");
 				Assert.That(TestADUser.IsMemberOf(user.Login,
@@ -181,8 +172,7 @@ namespace Integration
 		public void Create_login_if_not_exists()
 		{
 			var login = "test" + new Random().Next();
-			try
-			{
+			try {
 				var storage = new ActiveDirectoryUserStorage();
 				storage.CreateAdmin(login, "test", "123456789");
 				Assert.That(TestADUser.IsLoginExists(login));
@@ -190,8 +180,7 @@ namespace Integration
 					new DirectoryEntry("LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net")),
 					Is.True);
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				TestADUser.Delete(login);
 				throw;
 			}
@@ -200,8 +189,7 @@ namespace Integration
 		[Test]
 		public void Block_user()
 		{
-			using (var user = new TestADUser())
-			{
+			using (var user = new TestADUser()) {
 				ADHelper.Block(user.Login);
 				Assert.That(ADHelper.IsLocked(user.Login));
 			}
@@ -217,28 +205,26 @@ namespace Integration
 				Assert.That(ADHelper.IsBelongsToOfficeContainer(user.Login), Is.True);
 		}
 
-		[Test] 
+		[Test]
 		public void BadPasswordTimeTest()
 		{
-			using (var user = new TestADUser())
-			{
-				Assert.That(ADHelper.GetBadPasswordDate(user.Login), Is.Null);	
-				try
-				{
+			using (var user = new TestADUser()) {
+				Assert.That(ADHelper.GetBadPasswordDate(user.Login), Is.Null);
+				try {
 					var directoryEntity = FindDirectoryEntry(user.Login);
 					var directoryEntry = new DirectoryEntry(directoryEntity.Path, user.Login, "1234");
 					Assert.Fail("странно но пароль почему то подошел");
 				}
-				catch {}
-				Assert.That(ADHelper.GetBadPasswordDate(user.Login), Is.GreaterThanOrEqualTo(CreatedAt(user.Login)));	
+				catch {
+				}
+				Assert.That(ADHelper.GetBadPasswordDate(user.Login), Is.GreaterThanOrEqualTo(CreatedAt(user.Login)));
 			}
 		}
 
 		[Test]
 		public void Enable_disable_test()
 		{
-			using (var testUser = new TestADUser())
-			{
+			using (var testUser = new TestADUser()) {
 				var login = testUser.Login;
 				Assert.That(ADHelper.IsDisabled(login), Is.False);
 				ADHelper.Disable(login);
@@ -253,8 +239,7 @@ namespace Integration
 	{
 		private static DirectoryEntry FindDirectoryEntry(string login)
 		{
-			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(sAMAccountName={0}))", login)))
-			{
+			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(sAMAccountName={0}))", login))) {
 				var searchResult = searcher.FindOne();
 				if (searchResult != null)
 					return searcher.FindOne().GetDirectoryEntry();
@@ -286,8 +271,7 @@ namespace Integration
 		public static bool IsMemberOf(string login, DirectoryEntry entry)
 		{
 			var loginEntry = FindDirectoryEntry(login);
-			foreach (var property in loginEntry.Properties["memberOf"])
-			{
+			foreach (var property in loginEntry.Properties["memberOf"]) {
 				if (property.ToString() == entry.Path.Replace("LDAP://", ""))
 					return true;
 			}
@@ -295,12 +279,14 @@ namespace Integration
 		}
 
 		public TestADUser() : this("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net")
-		{}
+		{
+		}
 
 		public TestADUser(string container) : this("test" + new Random().Next(), container)
-		{}
+		{
+		}
 
-		public TestADUser(string userName, string container) 
+		public TestADUser(string userName, string container)
 		{
 			Login = userName;
 			if (IsLoginExists(Login))
@@ -325,6 +311,5 @@ namespace Integration
 			if (IsLoginExists(Login))
 				throw new Exception("тестовая учетная запись {0} не удалена");
 		}
-
 	}
 }

@@ -28,8 +28,8 @@ namespace Integration.Models
 select PriceId
 from Customers.UserPrices
 where UserId = :id")
-				.SetParameter("id", parent.Id)
-				.List();
+					.SetParameter("id", parent.Id)
+					.List();
 
 				Assert.That(prices, Is.Not.Empty);
 				s.CreateSQLQuery(@"
@@ -47,16 +47,16 @@ where UserId = :userId and priceId = :priceId")
 				s.CreateSQLQuery(@"
 call Customers.GetPrices(:id);
 select PriceCode from Usersettings.Prices;")
-				.SetParameter("id", parent.Id)
-				.List());
+					.SetParameter("id", parent.Id)
+					.List());
 
 			var pricesForChild = ArHelper.WithSession(s =>
 				s.CreateSQLQuery(@"
 drop temporary table Usersettings.Prices;
 call Customers.GetPrices(:id);
 select PriceCode from Usersettings.Prices")
-				.SetParameter("id", child.Id)
-				.List());
+					.SetParameter("id", child.Id)
+					.List());
 
 			Assert.That(pricesForParent.Count, Is.EqualTo(pricesForChild.Count));
 			Assert.That(pricesForParent.Cast<uint>().ToArray(), Is.EquivalentTo(pricesForChild.Cast<uint>().ToArray()));

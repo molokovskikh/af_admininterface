@@ -13,7 +13,7 @@ namespace Functional.ForTesting
 		[Test]
 		public void Transform_expression_to_id()
 		{
-			Assert.That(Helper.GetElementName<TestClass>(test => test.Id), 
+			Assert.That(Helper.GetElementName<TestClass>(test => test.Id),
 				Is.EqualTo("test_Id"));
 		}
 

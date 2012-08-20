@@ -36,10 +36,7 @@ namespace AdminInterface.Models
 
 		public bool Mail
 		{
-			get
-			{
-				return SendToEmail || SendToMinimail;
-			}
+			get { return SendToEmail || SendToMinimail; }
 		}
 
 		public string To
@@ -50,8 +47,7 @@ namespace AdminInterface.Models
 					return User.GetEmailForBilling();
 
 				var mails = Enumerable.Empty<string>();
-				if (SendToEmail)
-				{
+				if (SendToEmail) {
 					mails = mails
 						.Concat(Payer.Clients
 							.SelectMany(c => c.ContactGroupOwner.GetEmails(ContactGroupType.Billing)));

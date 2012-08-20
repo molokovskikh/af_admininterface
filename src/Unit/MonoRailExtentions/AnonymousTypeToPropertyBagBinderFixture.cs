@@ -6,11 +6,10 @@ using NUnit.Framework;
 
 namespace Unit.MonoRailExtentions
 {
-
 	[TestFixture]
 	public class AnonymousTypeToPropertyBagBinderFixture : BaseControllerTest
 	{
-		TestController _controller;
+		private TestController _controller;
 
 		private class TestController : SmartDispatcherController
 		{

@@ -25,30 +25,25 @@ namespace AdminInterface.Models.Billing
 		{
 			CellStyle rowStyle = null;
 			var cellIndex = 0;
-			foreach (var value in values)
-			{
-				if (value is Merge)
-				{
-					var merge = ((Merge) value);
+			foreach (var value in values) {
+				if (value is Merge) {
+					var merge = ((Merge)value);
 					var count = merge.Count - 1;
-					for(var i = 0; i < count; i++)
-						_worksheet.Cells[begin, cellIndex + i] = new Cell(""){Style = rowStyle};
+					for (var i = 0; i < count; i++)
+						_worksheet.Cells[begin, cellIndex + i] = new Cell("") { Style = rowStyle };
 					_worksheet.Merge(begin, cellIndex - 1, begin, cellIndex - 1 + count);
 					cellIndex += count;
-				} 
-				else if (value is CellStyle)
-				{
+				}
+				else if (value is CellStyle) {
 					if (cellIndex > 0)
 						_worksheet.Cells[begin, cellIndex - 1].Style = (CellStyle)value;
 					else
 						rowStyle = (CellStyle)value;
 				}
-				else
-				{
-					_worksheet.Cells[begin, cellIndex] = new Cell(value){Style = rowStyle};
+				else {
+					_worksheet.Cells[begin, cellIndex] = new Cell(value) { Style = rowStyle };
 					cellIndex++;
 				}
-				
 			}
 			begin++;
 			return _worksheet.Cells.Rows[begin - 1];
@@ -98,7 +93,7 @@ namespace AdminInterface.Models.Billing
 			};
 
 			var underScrore = new CellStyle {
-				Borders = new Borders{Bottom = BorderStyle.Thin}
+				Borders = new Borders { Bottom = BorderStyle.Thin }
 			};
 
 			var table = new CellStyle {
@@ -107,14 +102,14 @@ namespace AdminInterface.Models.Billing
 			};
 
 			Row(h1, "Акт сверки", new Merge(8));
-			var row = Row(mark, 
-				String.Format("взаимных расчетов по состоянию на {0} между {1} и {2} по договору № {3}", 
+			var row = Row(mark,
+				String.Format("взаимных расчетов по состоянию на {0} между {1} и {2} по договору № {3}",
 					act.EndDate.ToShortDateString(),
 					act.Payer.Recipient.FullName,
 					act.Payer.JuridicalName,
 					act.Payer.Id),
 				new Merge(8));
-			row.Height = 1440/72*43;
+			row.Height = 1440 / 72 * 43;
 			row = Row(longWord,
 				String.Format("Мы, нижеподписавшиеся, __________________ {0} _________________________,"
 					+ "с одной стороны, и ________________________ {1} __________________________, "
@@ -122,16 +117,16 @@ namespace AdminInterface.Models.Billing
 					act.Payer.Recipient.FullName,
 					act.Payer.JuridicalName),
 				new Merge(8));
-			row.Height = 1440/72*62;
+			row.Height = 1440 / 72 * 62;
 			Row(table,
 				String.Format("По данным {0}, руб.", act.Payer.Recipient.FullName), new Merge(4),
 				String.Format("По данным {0}, руб.", act.Payer.JuridicalName), new Merge(4));
-			Row(table, 
+			Row(table,
 				"№ п/п", "Наименование операции, документы", "Дебет", "Кредит",
 				"№ п/п", "Наименование операции, документы", "Дебет", "Кредит");
 			var index = 1;
 			foreach (var move in act.Movements) {
-				Row(table, 
+				Row(table,
 					index, move.Name, move.Debit.ToString("#.#"), move.Credit.ToString("#.#"),
 					"", "", "", "");
 				index++;
@@ -139,7 +134,7 @@ namespace AdminInterface.Models.Billing
 			Skip();
 			Row(String.Format("По данным {0}", act.Payer.Recipient.FullName), new Merge(4));
 			row = Row(h2, act.Result, new Merge(4));
-			row.Height = 1440/72*29;
+			row.Height = 1440 / 72 * 29;
 			Skip();
 			Row(String.Format("От {0}", act.Payer.Recipient.FullName), new Merge(4),
 				String.Format("От {0}", act.Payer.JuridicalName), new Merge(4));
@@ -149,19 +144,18 @@ namespace AdminInterface.Models.Billing
 			Skip();
 			Row("М.П.", "", "", "",
 				"М.П.", "", "", "");
-			_worksheet.Cells[0, 0] = new Cell("Акт сверки") {Style = h1};
+			_worksheet.Cells[0, 0] = new Cell("Акт сверки") { Style = h1 };
 			return _worksheet;
 		}
 
 		public static void ToResponse(IResponse response, Worksheet worksheet)
 		{
 			response.Clear();
-			response.AppendHeader("Content-Disposition", 
+			response.AppendHeader("Content-Disposition",
 				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString(String.Format("{0}.xls", worksheet.Name))));
 			response.ContentType = "application/vnd.ms-excel";
-			
-			using(var stream = new MemoryStream())
-			{
+
+			using (var stream = new MemoryStream()) {
 				var book = new Workbook();
 				book.Worksheets.Add(worksheet);
 				book.Save(stream);

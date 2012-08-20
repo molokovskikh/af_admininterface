@@ -220,7 +220,7 @@ namespace Integration.ForTesting
 			var invoice2 = new Invoice(payer,
 				new Period(2011, Interval.January),
 				new DateTime(2011, 1, 20),
-				new List<InvoicePart> { new InvoicePart(null, "Мониторинг оптового фармрынка за декабрь", 1000, 1, DateTime.Now)});
+				new List<InvoicePart> { new InvoicePart(null, "Мониторинг оптового фармрынка за декабрь", 1000, 1, DateTime.Now) });
 			var act2 = new Act(invoice2.Date, invoice2);
 
 			return new RevisionAct(payer,
@@ -241,9 +241,7 @@ namespace Integration.ForTesting
 			};
 			ActiveRecordMediator.Save(user);
 			user.Setup();
-			ArHelper.WithSession(s => {
-				user.AssignDefaultPermission(s);
-			});
+			ArHelper.WithSession(s => { user.AssignDefaultPermission(s); });
 			ActiveRecordMediator.Save(user);
 			return user;
 		}
@@ -257,7 +255,7 @@ namespace Integration.ForTesting
 				FullName = "Тестовый поставщик",
 				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
 			};
-			supplier.RegionalData.Add(new RegionalData{Region = homeRegion, Supplier = supplier});
+			supplier.RegionalData.Add(new RegionalData { Region = homeRegion, Supplier = supplier });
 			supplier.AddPrice("Базовый", PriceType.Regular);
 			if (action != null)
 				action(supplier);
@@ -268,8 +266,7 @@ namespace Integration.ForTesting
 		{
 			var random = new Random();
 			var inn = "";
-			while (inn.Length < 12)
-			{
+			while (inn.Length < 12) {
 				inn += random.Next(0, 9);
 			}
 			return inn;

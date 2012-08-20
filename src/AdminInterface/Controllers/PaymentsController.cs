@@ -28,7 +28,8 @@ namespace AdminInterface.Controllers
 	}
 
 	public class SessionExpiredException : Exception
-	{}
+	{
+	}
 
 	[
 		Rescue(typeof(PaymentsController), "SessionExpired", typeof(SessionExpiredException)),
@@ -50,16 +51,14 @@ namespace AdminInterface.Controllers
 
 		public void New()
 		{
-			if (IsPost)
-			{
+			if (IsPost) {
 				var payment = new Payment();
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.OnlyNested);
 				payment.RegisterPayment();
 				payment.Save();
 				RedirectToReferrer();
 			}
-			else
-			{
+			else {
 				PropertyBag["recipients"] = DbSession.Query<Recipient>().OrderBy(r => r.Name).ToList();
 				PropertyBag["payments"] = Payment.Queryable
 					.Where(p => p.RegistredOn >= DateTime.Today)
@@ -71,8 +70,7 @@ namespace AdminInterface.Controllers
 		{
 			var payments = TempPayments();
 			Session["payments"] = null;
-			foreach (var payment in payments)
-			{
+			foreach (var payment in payments) {
 				//если зайти в два платежа и отредактировать их
 				//то получим двух плательщиков из разных сесей
 				//правим это
@@ -84,9 +82,9 @@ namespace AdminInterface.Controllers
 			}
 
 			RedirectToAction("Index",
-				new Dictionary<string, string>{
-					{"filter.Period.Begin", payments.Min(p => p.PayedOn).ToShortDateString() },
-					{"filter.Period.End", payments.Max(p => p.PayedOn).ToShortDateString() }
+				new Dictionary<string, string> {
+					{ "filter.Period.Begin", payments.Min(p => p.PayedOn).ToShortDateString() },
+					{ "filter.Period.End", payments.Max(p => p.PayedOn).ToShortDateString() }
 				});
 		}
 
@@ -98,11 +96,9 @@ namespace AdminInterface.Controllers
 
 		public void ProcessPayments()
 		{
-			if (IsPost)
-			{
+			if (IsPost) {
 				var file = Request.Files["inputfile"] as HttpPostedFile;
-				if (file == null || file.ContentLength == 0)
-				{
+				if (file == null || file.ContentLength == 0) {
 					PropertyBag["Message"] = Message.Error("Нужно выбрать файл для загрузки");
 					return;
 				}
@@ -110,8 +106,7 @@ namespace AdminInterface.Controllers
 				Session["payments"] = Payment.Parse(file.FileName, file.InputStream);
 				RedirectToReferrer();
 			}
-			else
-			{
+			else {
 				PropertyBag["payments"] = Session["payments"];
 			}
 		}
@@ -119,15 +114,13 @@ namespace AdminInterface.Controllers
 		public void EditTemp(uint id)
 		{
 			var payment = FindTempPayment(id);
-			if (IsPost)
-			{
+			if (IsPost) {
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
 				payment.UpdateInn();
 				Flash["Message"] = Message.Notify("Сохранено");
 				RedirectToReferrer();
 			}
-			else
-			{
+			else {
 				PropertyBag["payment"] = payment;
 				PropertyBag["recipients"] = DbSession.Query<Recipient>().OrderBy(r => r.Name).ToList();
 				RenderView("Edit");
@@ -170,15 +163,13 @@ namespace AdminInterface.Controllers
 		public void Edit(uint id)
 		{
 			var payment = Payment.TryFind(id);
-			if (IsPost)
-			{
+			if (IsPost) {
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
 				payment.DoUpdate();
 				Flash["Message"] = Message.Notify("Сохранено");
 				RedirectToReferrer();
 			}
-			else
-			{
+			else {
 				PropertyBag["payment"] = payment;
 				PropertyBag["recipients"] = DbSession.Query<Recipient>().OrderBy(r => r.Name).ToList();
 			}

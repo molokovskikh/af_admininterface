@@ -19,9 +19,9 @@ namespace Unit.Extentions
 			var sort = "i";
 			var direction = "";
 			var sorted = new List<ForSortTest> {
-				new ForSortTest {i = 1},
-				new ForSortTest {i = 3},
-				new ForSortTest {i = 2},
+				new ForSortTest { i = 1 },
+				new ForSortTest { i = 3 },
+				new ForSortTest { i = 2 },
 			}
 				.Sort(ref sort, ref direction, "i")
 				.ToList();
@@ -29,6 +29,5 @@ namespace Unit.Extentions
 			Assert.That(sorted[1].i, Is.EqualTo(2));
 			Assert.That(sorted[2].i, Is.EqualTo(3));
 		}
-		
 	}
 }

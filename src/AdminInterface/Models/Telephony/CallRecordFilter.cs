@@ -24,12 +24,12 @@ namespace AdminInterface.Models.Telephony
 			SortBy = "WriteTime";
 			SortDirection = "Desc";
 			SortKeyMap = new Dictionary<string, string> {
-				{"WriteTime", "WriteTime"},
-				{"From", "From"},
-				{"NameFrom", "NameFrom"},
-				{"To", "To"},
-				{"NameTo", "NameTo"},
-				{"CallType", "CallType"}
+				{ "WriteTime", "WriteTime" },
+				{ "From", "From" },
+				{ "NameFrom", "NameFrom" },
+				{ "To", "To" },
+				{ "NameTo", "NameTo" },
+				{ "CallType", "CallType" }
 			};
 
 			BeginDate = DateTime.Today.AddDays(-1);
@@ -46,9 +46,9 @@ namespace AdminInterface.Models.Telephony
 			var limit = String.Format("limit {0}, {1}", Page * pageSize, pageSize);
 			var searchCondition = String.IsNullOrEmpty(searchText) ? String.Empty :
 				" and (LOWER({CallRecord}.`From`) like \"%" + searchText +
-				"%\" or LOWER({CallRecord}.`To`) like \"%" + searchText +
-				"%\" or LOWER({CallRecord}.NameFrom) like \"%" + searchText +
-				"%\" or LOWER({CallRecord}.NameTo) like \"%" + searchText + "%\") ";
+					"%\" or LOWER({CallRecord}.`To`) like \"%" + searchText +
+					"%\" or LOWER({CallRecord}.NameFrom) like \"%" + searchText +
+					"%\" or LOWER({CallRecord}.NameTo) like \"%" + searchText + "%\") ";
 			if (CallType != null)
 				searchCondition += " and {CallRecord}.CallType = " + Convert.ToInt32(CallType);
 

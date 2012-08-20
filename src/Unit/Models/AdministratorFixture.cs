@@ -25,16 +25,16 @@ namespace Unit.Models
 		public void ClientTypeFilterTest()
 		{
 			var adm = new Administrator {
-				AllowedPermissions = new List<Permission> {new Permission {Type = PermissionType.ViewDrugstore}}
+				AllowedPermissions = new List<Permission> { new Permission { Type = PermissionType.ViewDrugstore } }
 			};
 			Assert.That(adm.GetClientFilterByType("cd"), Is.EqualTo(" and cd.FirmType = 1 "));
 
 			adm.AllowedPermissions.Clear();
 
-			adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewSuppliers});
+			adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewSuppliers });
 			Assert.That(adm.GetClientFilterByType("cd"), Is.EqualTo(" and cd.FirmType = 0 "));
 
-			adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewDrugstore});
+			adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewDrugstore });
 			Assert.That(adm.GetClientFilterByType("cd"), Is.EqualTo(" "));
 		}
 
@@ -42,13 +42,13 @@ namespace Unit.Models
 		public void Do_not_create_alias_if_not_set()
 		{
 			var adm = new Administrator {
-				AllowedPermissions = new List<Permission> {new Permission {Type = PermissionType.ViewDrugstore}}
+				AllowedPermissions = new List<Permission> { new Permission { Type = PermissionType.ViewDrugstore } }
 			};
 			Assert.That(adm.GetClientFilterByType(null), Is.EqualTo(" and FirmType = 1 "));
 
 			adm.AllowedPermissions.Clear();
 
-			adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewSuppliers});
+			adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewSuppliers });
 			Assert.That(adm.GetClientFilterByType(null), Is.EqualTo(" and FirmType = 0 "));
 		}
 
@@ -67,8 +67,8 @@ namespace Unit.Models
 		{
 			var adm = new Administrator {
 				AllowedPermissions = new List<Permission> {
-					new Permission {Type = PermissionType.Billing},
-					new Permission {Type = PermissionType.ManageAdministrators},
+					new Permission { Type = PermissionType.Billing },
+					new Permission { Type = PermissionType.ManageAdministrators },
 				}
 			};
 			adm.CheckPermisions(PermissionType.Billing, PermissionType.ManageAdministrators);
@@ -79,7 +79,7 @@ namespace Unit.Models
 		{
 			var adm = new Administrator {
 				AllowedPermissions = new List<Permission> {
-					new Permission {Type = PermissionType.Billing},
+					new Permission { Type = PermissionType.Billing },
 				}
 			};
 			Assert.That(() => adm.CheckPermisions(PermissionType.Billing, PermissionType.ManageAdministrators),
@@ -91,7 +91,7 @@ namespace Unit.Models
 		{
 			var adm = new Administrator {
 				AllowedPermissions = new List<Permission> {
-					new Permission {Type = PermissionType.Billing},
+					new Permission { Type = PermissionType.Billing },
 				}
 			};
 			adm.CheckAnyOfPermissions(PermissionType.Billing, PermissionType.ManageAdministrators);
@@ -110,7 +110,7 @@ namespace Unit.Models
 		[Test]
 		public void FailCheckForDrugstorePermissionForViewClient()
 		{
-			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewSuppliers});
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewSuppliers });
 			Assert.That(() => _adm.CheckType(ServiceType.Drugstore),
 				Throws.InstanceOf<NotHavePermissionException>());
 		}
@@ -118,7 +118,7 @@ namespace Unit.Models
 		[Test]
 		public void FailCheckForSupplierPermissionForViewClient()
 		{
-			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewDrugstore});
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewDrugstore });
 
 			Assert.That(() => _adm.CheckType(ServiceType.Supplier),
 				Throws.InstanceOf<NotHavePermissionException>());
@@ -142,7 +142,7 @@ namespace Unit.Models
 		[Test]
 		public void CheckForSupplierPermissionForViewClient()
 		{
-			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewSuppliers});
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewSuppliers });
 			_adm.CheckType(ServiceType.Supplier);
 		}
 
@@ -150,11 +150,11 @@ namespace Unit.Models
 		public void HavePermissions()
 		{
 			Assert.That(_adm.HavePermisions(PermissionType.ManageDrugstore), Is.False);
-			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ManageDrugstore});
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ManageDrugstore });
 			Assert.That(_adm.HavePermisions(PermissionType.ManageDrugstore), Is.True);
 
 			Assert.That(_adm.HavePermisions(PermissionType.ManageDrugstore, PermissionType.RegisterDrugstore), Is.False);
-			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.RegisterDrugstore});
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.RegisterDrugstore });
 			Assert.That(_adm.HavePermisions(PermissionType.ManageDrugstore, PermissionType.RegisterDrugstore), Is.True);
 		}
 
@@ -162,11 +162,11 @@ namespace Unit.Models
 		public void HaveAnyOfPermissions()
 		{
 			Assert.That(_adm.HaveAnyOfPermissions(PermissionType.ManageDrugstore), Is.False);
-			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ManageDrugstore});
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ManageDrugstore });
 			Assert.That(_adm.HaveAnyOfPermissions(PermissionType.ManageDrugstore), Is.True);
 
 			Assert.That(_adm.HaveAnyOfPermissions(PermissionType.ManageDrugstore, PermissionType.RegisterDrugstore), Is.True);
-			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.RegisterDrugstore});
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.RegisterDrugstore });
 			Assert.That(_adm.HaveAnyOfPermissions(PermissionType.ManageDrugstore, PermissionType.RegisterDrugstore), Is.True);
 		}
 
@@ -174,7 +174,7 @@ namespace Unit.Models
 		public void AllowChangePassword()
 		{
 			Assert.That(_adm.AlowChangePassword, Is.False);
-			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ChangePassword});
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ChangePassword });
 			Assert.That(_adm.AlowChangePassword, Is.True);
 		}
 
@@ -182,7 +182,7 @@ namespace Unit.Models
 		public void CanRegisterClientWhoWorkForFree()
 		{
 			Assert.That(_adm.CanRegisterClientWhoWorkForFree, Is.False);
-			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.CanRegisterClientWhoWorkForFree});
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.CanRegisterClientWhoWorkForFree });
 			Assert.That(_adm.CanRegisterClientWhoWorkForFree, Is.True);
 		}
 
@@ -190,32 +190,32 @@ namespace Unit.Models
 		public void Check_client_permission()
 		{
 			var client = new Client {
-				HomeRegion = new Region {Id = 1},
+				HomeRegion = new Region { Id = 1 },
 				Type = ServiceType.Drugstore,
 			};
 			_adm.RegionMask = 1;
-			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewDrugstore});
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewDrugstore });
 			_adm.CheckClientPermission(client);
 		}
 
 		[Test]
-		[ExpectedException(typeof (NotHavePermissionException))]
+		[ExpectedException(typeof(NotHavePermissionException))]
 		public void In_client_check_home_region_must_be_checked()
 		{
 			var client = new Client {
-				HomeRegion = new Region {Id = 1},
+				HomeRegion = new Region { Id = 1 },
 				Type = ServiceType.Drugstore,
 			};
-			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewDrugstore});
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewDrugstore });
 			_adm.CheckClientPermission(client);
 		}
 
 		[Test]
-		[ExpectedException(typeof (NotHavePermissionException))]
+		[ExpectedException(typeof(NotHavePermissionException))]
 		public void In_client_check_client_type_must_be_checked()
 		{
 			var client = new Client {
-				HomeRegion = new Region {Id = 1},
+				HomeRegion = new Region { Id = 1 },
 				Type = ServiceType.Drugstore,
 			};
 			_adm.RegionMask = 1;

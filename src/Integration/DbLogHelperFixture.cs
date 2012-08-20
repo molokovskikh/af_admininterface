@@ -12,8 +12,7 @@ namespace Integration
 		[Test]
 		public void Set_up_transaction_parameters()
 		{
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				DbLogHelper.SetupParametersForTriggerLogging(
 					"test",
 					"localhost");
@@ -31,8 +30,7 @@ namespace Integration
 		[Test]
 		public void Set_up_transaction_parameters_from_ananymous_object()
 		{
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				DbLogHelper.SetupParametersForTriggerLogging(new {
 					InUser = "test",
 					InHost = "localhost"

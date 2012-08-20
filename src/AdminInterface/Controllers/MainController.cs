@@ -18,7 +18,7 @@ using System.Linq;
 namespace AdminInterface.Controllers
 {
 	[
-		Helper(typeof (BindingHelper)),
+		Helper(typeof(BindingHelper)),
 		Secure
 	]
 	public class MainController : AdminInterfaceController
@@ -30,9 +30,7 @@ namespace AdminInterface.Controllers
 
 		public void Index(DateTime? from, DateTime? to, bool full = false)
 		{
-			RemoteServiceHelper.Try(() => {
-				PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(Admin.UserName);
-			});
+			RemoteServiceHelper.Try(() => { PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(Admin.UserName); });
 
 			if (from == null || to == null) {
 				from = DateTime.Today;
@@ -47,7 +45,7 @@ namespace AdminInterface.Controllers
 			var query = new StatQuery();
 			query.Full = full;
 			BindObjectInstance(query, "query");
-			
+
 			var data = query.Load(fromDate, toDate);
 #if !DEBUG
 			RemoteServiceHelper.RemotingCall(s => {
@@ -62,18 +60,15 @@ namespace AdminInterface.Controllers
 			PropertyBag["PriceProcessorMasterStatus"] = "";
 #endif
 
-			foreach (var pair in data.ToKeyValuePairs())
-			{
+			foreach (var pair in data.ToKeyValuePairs()) {
 				var column = pair.Key;
 				var value = pair.Value;
 				value = TryToFixProkenDateTimeValue(value);
-				if (value != DBNull.Value && column.DataType == typeof(DateTime))
-				{
-					var dateTimeValue = ((DateTime) value);
+				if (value != DBNull.Value && column.DataType == typeof(DateTime)) {
+					var dateTimeValue = ((DateTime)value);
 					value = dateTimeValue.ToLongTimeString();
 				}
 				PropertyBag[column.ColumnName] = value;
-
 			}
 
 			Size("MaxMailSize");
@@ -98,7 +93,7 @@ namespace AdminInterface.Controllers
 				return null;
 			if (!(value is string))
 				return value;
-			var stringValue = (string) value;
+			var stringValue = (string)value;
 			DateTime dateValue;
 			if (!DateTime.TryParseExact(stringValue, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out dateValue))
 				return value;
@@ -110,7 +105,7 @@ namespace AdminInterface.Controllers
 			var value = PropertyBag[key];
 			if (value == null || value == DBNull.Value)
 				return;
-			PropertyBag[key] = convert((T)Convert.ChangeType(value, typeof (T)));
+			PropertyBag[key] = convert((T)Convert.ChangeType(value, typeof(T)));
 		}
 
 		private void Size(string key)
@@ -137,8 +132,7 @@ namespace AdminInterface.Controllers
 		public void Settings()
 		{
 			var defaults = Defaults;
-			if (IsPost)
-			{
+			if (IsPost) {
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 				BindObjectInstance(defaults, ParamStore.Form, "defaults");
 				if (IsValid(defaults)) {
@@ -152,8 +146,7 @@ namespace AdminInterface.Controllers
 					PropertyBag["Senders"] = OrderHandler.Senders();
 				}
 			}
-			else
-			{
+			else {
 				PropertyBag["Defaults"] = defaults;
 				PropertyBag["Formaters"] = OrderHandler.Formaters();
 				PropertyBag["Senders"] = OrderHandler.Senders();

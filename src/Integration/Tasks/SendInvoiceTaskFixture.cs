@@ -15,7 +15,7 @@ namespace Integration.Tasks
 	{
 		private SendInvoiceTask task;
 
-		List<MailMessage> messages;
+		private List<MailMessage> messages;
 
 		[SetUp]
 		public void Setup()

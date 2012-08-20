@@ -30,13 +30,13 @@ namespace AdminInterface.Controllers.Filters
 		{
 			SortBy = "PayerName";
 			SortKeyMap = new Dictionary<string, string> {
-				{"Id", "Id"},
-				{"Payer", "Payer"},
-				{"Recipient", "Recipient"},
-				{"PayerName", "p.Name"},
-				{"Sum", "Sum"},
-				{"Period", "Period"},
-				{"Date", "Date"}
+				{ "Id", "Id" },
+				{ "Payer", "Payer" },
+				{ "Recipient", "Recipient" },
+				{ "PayerName", "p.Name" },
+				{ "Sum", "Sum" },
+				{ "Period", "Period" },
+				{ "Date", "Date" }
 			};
 		}
 
@@ -60,17 +60,16 @@ namespace AdminInterface.Controllers.Filters
 			if (Recipient != null)
 				criteria.Add(Expression.Eq("Recipient", Recipient));
 
-			if (!String.IsNullOrEmpty(SearchText))
-			{
-				var parts = SearchText.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries);
+			if (!String.IsNullOrEmpty(SearchText)) {
+				var parts = SearchText.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 				var ids = parts
-				.Select(p => {
-					uint id;
-					uint.TryParse(p, out id);
-					return id;
-				})
-				.Where(p => p > 0)
-				.ToArray();
+					.Select(p => {
+						uint id;
+						uint.TryParse(p, out id);
+						return id;
+					})
+					.Where(p => p > 0)
+					.ToArray();
 
 				if (ids.Length == parts.Length)
 					criteria.Add(Expression.In("p.PayerID", ids));

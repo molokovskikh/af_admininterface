@@ -54,32 +54,29 @@ namespace AdminInterface.Controllers.Filters
 				.CreateAlias("sl.ForUser", "u", JoinType.LeftOuterJoin)
 				.CreateAlias("sl.SendedInUpdate", "su", JoinType.LeftOuterJoin)
 				.SetProjection(
-					Projections.ProjectionList()
-						.Add(Projections.Property<DocumentReceiveLog>(d => d.Id).As("Id"))
-						.Add(Projections.Property<DocumentReceiveLog>(d => d.LogTime).As("LogTime"))
-						.Add(Projections.Property<DocumentReceiveLog>(d => d.DocumentType).As("DocumentType"))
-						.Add(Projections.Property<DocumentReceiveLog>(d => d.FileName).As("FileName"))
-						.Add(Projections.Property<DocumentReceiveLog>(d => d.Addition).As("Addition"))
-						.Add(Projections.Property<DocumentReceiveLog>(d => d.DocumentSize).As("DocumentSize"))
-						.Add(Projections.Property("ru.Id").As("SendUpdateId"))
-						.Add(Projections.Property("d.Id").As("DocumentId"))
-						.Add(Projections.Property("d.ProviderDocumentId").As("ProviderDocumentId"))
-						.Add(Projections.Property("d.DocumentDate").As("DocumentDate"))
-						.Add(Projections.Property("d.WriteTime").As("DocumentWriteTime"))
-						.Add(Projections.Property("fs.Name").As("Supplier"))
-						.Add(Projections.Property("fs.Id").As("SupplierId"))
-						.Add(Projections.Property("fc.Name").As("Client"))
-						.Add(Projections.Property("fc.Id").As("ClientId"))
-						.Add(Projections.Property("a.Value").As("Address"))
-						.Add(Projections.Property("u.Login").As("Login"))
-
-						.Add(Projections.Property("u.Id").As("LoginId"))
-
-						.Add(Projections.Property("su.RequestTime").As("RequestTime"))
-						.Add(Projections.Property("sl.Id").As("DeliveredId"))
-						.Add(Projections.Property("sl.FileDelivered").As("FileDelivered"))
-						.Add(Projections.Property("sl.DocumentDelivered").As("DocumentDelivered"))
-				)
+				Projections.ProjectionList()
+					.Add(Projections.Property<DocumentReceiveLog>(d => d.Id).As("Id"))
+					.Add(Projections.Property<DocumentReceiveLog>(d => d.LogTime).As("LogTime"))
+					.Add(Projections.Property<DocumentReceiveLog>(d => d.DocumentType).As("DocumentType"))
+					.Add(Projections.Property<DocumentReceiveLog>(d => d.FileName).As("FileName"))
+					.Add(Projections.Property<DocumentReceiveLog>(d => d.Addition).As("Addition"))
+					.Add(Projections.Property<DocumentReceiveLog>(d => d.DocumentSize).As("DocumentSize"))
+					.Add(Projections.Property("ru.Id").As("SendUpdateId"))
+					.Add(Projections.Property("d.Id").As("DocumentId"))
+					.Add(Projections.Property("d.ProviderDocumentId").As("ProviderDocumentId"))
+					.Add(Projections.Property("d.DocumentDate").As("DocumentDate"))
+					.Add(Projections.Property("d.WriteTime").As("DocumentWriteTime"))
+					.Add(Projections.Property("fs.Name").As("Supplier"))
+					.Add(Projections.Property("fs.Id").As("SupplierId"))
+					.Add(Projections.Property("fc.Name").As("Client"))
+					.Add(Projections.Property("fc.Id").As("ClientId"))
+					.Add(Projections.Property("a.Value").As("Address"))
+					.Add(Projections.Property("u.Login").As("Login"))
+					.Add(Projections.Property("u.Id").As("LoginId"))
+					.Add(Projections.Property("su.RequestTime").As("RequestTime"))
+					.Add(Projections.Property("sl.Id").As("DeliveredId"))
+					.Add(Projections.Property("sl.FileDelivered").As("FileDelivered"))
+					.Add(Projections.Property("sl.DocumentDelivered").As("DocumentDelivered")))
 				.Add(Expression.Ge("LogTime", begin))
 				.Add(Expression.Le("LogTime", end.AddDays(1)))
 				.AddOrder(Order.Desc("LogTime"));
@@ -110,8 +107,8 @@ namespace AdminInterface.Controllers.Filters
 		public string Login { get; set; }
 		public string LoginId { get; set; }
 		public DateTime? RequestTime { get; set; }
-		public uint DeliveredId { get; set; } 
-		public bool? FileDelivered { get; set;}
+		public uint DeliveredId { get; set; }
+		public bool? FileDelivered { get; set; }
 		public bool? DocumentDelivered { get; set; }
 
 		public bool DocumentProcessedSuccessfully()

@@ -24,20 +24,16 @@ namespace Unit.Models
 						new ContactGroup {
 							Type = ContactGroupType.General,
 							Persons = new List<Person>(),
-							Contacts = new List<Contact>
-							{
-								new Contact
-								{
+							Contacts = new List<Contact> {
+								new Contact {
 									Type = ContactType.Email,
 									ContactText = "g1@mail.ru",
 								},
-								new Contact
-								{
+								new Contact {
 									Type = ContactType.Email,
 									ContactText = "g2@mail.ru",
 								},
-								new Contact
-								{
+								new Contact {
 									Type = ContactType.Phone,
 									ContactText = "4732-456213",
 								},
@@ -76,20 +72,16 @@ namespace Unit.Models
 
 			var orderGroup = client.ContactGroupOwner.ContactGroups[1];
 
-			orderGroup.Contacts = new List<Contact>
-			{
-				new Contact
-				{
+			orderGroup.Contacts = new List<Contact> {
+				new Contact {
 					Type = ContactType.Email,
 					ContactText = "o1@mail.ru",
 				},
-				new Contact
-				{
+				new Contact {
 					Type = ContactType.Email,
 					ContactText = "o2@mail.ru",
 				},
-				new Contact
-				{
+				new Contact {
 					Type = ContactType.Phone,
 					ContactText = "4732-456213",
 				},
@@ -107,40 +99,32 @@ namespace Unit.Models
 			var orderGroup = supplier.ContactGroupOwner.ContactGroups[1];
 			var clientGroup = supplier.ContactGroupOwner.ContactGroups[2];
 
-			clientGroup.Contacts = new List<Contact>
-			{
-				new Contact
-				{
+			clientGroup.Contacts = new List<Contact> {
+				new Contact {
 					Type = ContactType.Email,
 					ContactText = "c1@mail.ru",
 				},
-				new Contact
-				{
+				new Contact {
 					Type = ContactType.Email,
 					ContactText = "c2@mail.ru",
 				},
-				new Contact
-				{
+				new Contact {
 					Type = ContactType.Phone,
 					ContactText = "4732-456213",
 				},
 			};
 
 
-			orderGroup.Contacts = new List<Contact>
-			{
-				new Contact
-				{
+			orderGroup.Contacts = new List<Contact> {
+				new Contact {
 					Type = ContactType.Email,
 					ContactText = "o1@mail.ru",
 				},
-				new Contact
-				{
+				new Contact {
 					Type = ContactType.Email,
 					ContactText = "o2@mail.ru",
 				},
-				new Contact
-				{
+				new Contact {
 					Type = ContactType.Phone,
 					ContactText = "4732-456213",
 				},

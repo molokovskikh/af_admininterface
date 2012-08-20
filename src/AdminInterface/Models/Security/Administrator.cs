@@ -65,11 +65,11 @@ namespace AdminInterface.Models.Security
 		[Property]
 		public Department Department { get; set; }
 
-		[HasAndBelongsToMany(typeof(Permission), 
-			Table = "AdminsPermissions", 
+		[HasAndBelongsToMany(typeof(Permission),
+			Table = "AdminsPermissions",
 			Schema = "accessright",
-			ColumnKey = "AdminId", 
-			ColumnRef = "PermissionId", 
+			ColumnKey = "AdminId",
+			ColumnRef = "PermissionId",
 			Lazy = true)]
 		public IList<Permission> AllowedPermissions { get; set; }
 
@@ -77,7 +77,7 @@ namespace AdminInterface.Models.Security
 		{
 			//удаляем имя домена, например было analit\kvasov стало kvasov
 			if (name.IndexOf(@"\") > 0)
-				name = name.Split(new [] {@"\"}, StringSplitOptions.RemoveEmptyEntries).Last();
+				name = name.Split(new[] { @"\" }, StringSplitOptions.RemoveEmptyEntries).Last();
 			var admin = ActiveRecordLinq.AsQueryable<Administrator>().FirstOrDefault(a => a.UserName == name);
 			if (admin != null)
 				NHibernateUtil.Initialize(admin.AllowedPermissions);
@@ -98,8 +98,7 @@ namespace AdminInterface.Models.Security
 		public void Delete()
 		{
 			var user = ActiveRecordLinqBase<RedmineUser>.Queryable.Where(r => r.Login == UserName).FirstOrDefault();
-			if (user != null)
-			{
+			if (user != null) {
 				user.Status = 3;
 				user.Update();
 			}
@@ -189,7 +188,7 @@ namespace AdminInterface.Models.Security
 
 		public bool CanRegisterClientWhoWorkForFree
 		{
-			get { return HavePermisions(PermissionType.CanRegisterClientWhoWorkForFree);  }
+			get { return HavePermisions(PermissionType.CanRegisterClientWhoWorkForFree); }
 		}
 
 		public bool ManageDrugstore
@@ -242,11 +241,9 @@ namespace AdminInterface.Models.Security
 		{
 			// Делаем полноразмерную матрицу 7x24
 			var logonHours = new bool[7, 24];
-			for (var i = 0; i < 7; i++)
-			{
+			for (var i = 0; i < 7; i++) {
 				var index = 0;
-				for (var j = 0; j < 24; j += 2)
-				{
+				for (var j = 0; j < 24; j += 2) {
 					logonHours[i, j] = weekLogonHours[i * 12 + index];
 					logonHours[i, j + 1] = weekLogonHours[i * 12 + index];
 					index++;
@@ -269,7 +266,7 @@ namespace AdminInterface.Models.Security
 				RegionMask = UInt64.MaxValue,
 				ManagerName = "Для тестирования",
 			};
-			admin.AllowedPermissions = Enum.GetValues(typeof (PermissionType))
+			admin.AllowedPermissions = Enum.GetValues(typeof(PermissionType))
 				.Cast<PermissionType>()
 				.Select(t => Permission.Find(t))
 				.ToList();

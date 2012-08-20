@@ -27,7 +27,7 @@ namespace AdminInterface.Models.Suppliers
 		public virtual Cost Cost { get; set; }
 
 		[Property]
-		public virtual bool AvailableForClient { get; set;}
+		public virtual bool AvailableForClient { get; set; }
 	}
 
 	[ActiveRecord("AddressIntersection", Schema = "Customers", Lazy = true)]
@@ -40,6 +40,6 @@ namespace AdminInterface.Models.Suppliers
 		public virtual Intersection Intersection { get; set; }
 
 		[Property]
-		public virtual string SupplierDeliveryId { get; set;}
+		public virtual string SupplierDeliveryId { get; set; }
 	}
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -53,7 +53,7 @@ namespace AdminInterface.Models.Audit
 		{
 			var item = @event.AffectedOwnerOrNull;
 			if (item != null) {
-				var itemStringTypes = @event.Collection.Role.Split(new []{'.'});
+				var itemStringTypes = @event.Collection.Role.Split(new[] { '.' });
 				var propertyName = itemStringTypes.Last();
 				var auditables = item.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetCustomAttributes(typeof(Auditable), true);
 				if (auditables.Length > 0) {
@@ -89,9 +89,9 @@ namespace AdminInterface.Models.Audit
 			if (removed.Length > 0 || added.Length > 0)
 				AuditListener.LoadData(@event.Session, () =>
 					@event.Session.Save(new AuditRecord(message, @event.AffectedOwnerOrNull) {
-					MessageType = LogMessageType.System,
-					IsHtml = true
-				}));
+						MessageType = LogMessageType.System,
+						IsHtml = true
+					}));
 		}
 
 		public static string GetListString(IEnumerable<object> item)

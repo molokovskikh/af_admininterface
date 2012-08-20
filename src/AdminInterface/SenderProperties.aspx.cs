@@ -29,8 +29,7 @@ namespace AdminInterface
 				.Administrator
 				.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
 
-			if (!IsPostBack)
-			{
+			if (!IsPostBack) {
 				RuleId = Int32.Parse(Request["RuleId"]);
 				GetData();
 				ConnectDataSource();
@@ -60,8 +59,7 @@ from ordersendrules.handler_properties hp
 where OrderSendRuleId = ?RuleId
 order by hp.name;";
 
-			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-			{
+			using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
 				connection.Open();
 				var dataAdapter = new MySqlDataAdapter("", connection);
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?RuleId", RuleId);
@@ -78,19 +76,17 @@ order by hp.name;";
 			}
 
 			Header.Text = String.Format("Настройка свойств для отправщика {0} и форматера {1}",
-			                            Data.Tables["RuleInfo"].Rows[0]["Sender"],
-			                            Data.Tables["RuleInfo"].Rows[0]["Formater"]);
+				Data.Tables["RuleInfo"].Rows[0]["Sender"],
+				Data.Tables["RuleInfo"].Rows[0]["Formater"]);
 		}
 
 		protected void Save_Click(object sender, EventArgs e)
 		{
 			ProcessChanges();
-			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-			{
+			using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
 				connection.Open();
 				var transaction = connection.BeginTransaction(IsolationLevel.RepeatableRead);
-				try
-				{
+				try {
 					var dataAdapter = new MySqlDataAdapter("", connection);
 					dataAdapter.InsertCommand = new MySqlCommand(@"
 insert into ordersendrules.handler_properties(name, value, OrderSendRuleId)
@@ -120,8 +116,7 @@ where id = ?id;", connection);
 
 					transaction.Commit();
 				}
-				catch (Exception)
-				{
+				catch (Exception) {
 					if (transaction != null)
 						transaction.Rollback();
 
@@ -136,13 +131,12 @@ where id = ?id;", connection);
 
 		private void ProcessChanges()
 		{
-			for (var i = 0; i < Properties.Rows.Count; i++)
-			{
+			for (var i = 0; i < Properties.Rows.Count; i++) {
 				var row = Properties.Rows[i];
 				var dataRow = Data.Tables["Properties"].DefaultView[i];
 
 				if (((TextBox)row.FindControl("Name")).Text != dataRow["Name"].ToString())
-					dataRow["Name"] = ((TextBox) row.FindControl("Name")).Text;
+					dataRow["Name"] = ((TextBox)row.FindControl("Name")).Text;
 
 				if (((TextBox)row.FindControl("Value")).Text != dataRow["Value"].ToString())
 					dataRow["Value"] = ((TextBox)row.FindControl("Value")).Text;
@@ -152,13 +146,12 @@ where id = ?id;", connection);
 		protected void Properties_RowDeleting(object sender, GridViewDeleteEventArgs e)
 		{
 			Data.Tables["Properties"].DefaultView[e.RowIndex].Delete();
-			((GridView)sender).DataBind();	
+			((GridView)sender).DataBind();
 		}
 
 		protected void Properties_RowCommand(object sender, GridViewCommandEventArgs e)
 		{
-			switch (e.CommandName)
-			{
+			switch (e.CommandName) {
 				case "Add":
 					var row = Data.Tables["Properties"].NewRow();
 					Data.Tables["Properties"].Rows.Add(row);

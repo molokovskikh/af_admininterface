@@ -23,12 +23,11 @@ namespace AdminInterface.Helpers
 			bool isRegistration,
 			DefaultValues defaults)
 		{
-			var report = new LocalReport
-			{
+			var report = new LocalReport {
 				ReportEmbeddedResource = "AdminInterface.ClientCard.rdlc",
 			};
 			var deviceInfo =
-  @"<DeviceInfo>
+				@"<DeviceInfo>
 	<DpiX>150</DpiX>
 	<DpiY>150</DpiY>
     <OutputFormat>JPEG</OutputFormat>
@@ -44,7 +43,7 @@ namespace AdminInterface.Helpers
 				+ "Телефоны:\r\n"
 				+ phones + "\r\n"
 				+ "e-mail: tech@analit.net";
-			
+
 			report.SetParameters(new List<ReportParameter> {
 				new ReportParameter("ClientCode", clientCode.ToString()),
 				new ReportParameter("BillingCode", billingCode.ToString()),
@@ -89,18 +88,16 @@ namespace AdminInterface.Helpers
 				DateTime.Now,
 				isRegistration,
 				defaults))
-			using (var message = new MailMessage
-			{
-				From = new MailAddress("tech@analit.net"),
-				Subject = "Регистрационная карта для работы в системе АналитФармация",
-				Body = defaults.AppendFooter(body),
-				Attachments = { new Attachment(stream, "Регистрационная карта.jpg"), new Attachment(Path.Combine(Global.Config.DocsPath, "Инструкция по установке.doc")) },
-			})
-			{
-				foreach (var mail in mails)
-					EmailHelper.BuildAttachementFromString(mail, message);
+				using (var message = new MailMessage {
+					From = new MailAddress("tech@analit.net"),
+					Subject = "Регистрационная карта для работы в системе АналитФармация",
+					Body = defaults.AppendFooter(body),
+					Attachments = { new Attachment(stream, "Регистрационная карта.jpg"), new Attachment(Path.Combine(Global.Config.DocsPath, "Инструкция по установке.doc")) },
+				}) {
+					foreach (var mail in mails)
+						EmailHelper.BuildAttachementFromString(mail, message);
 
-				return Func.Send(message);
+					return Func.Send(message);
 			}
 		}
 	}

@@ -45,17 +45,17 @@ namespace AdminInterface.Controllers.Filters
 			SortBy = "c.Name";
 			SortDirection = "Desc";
 			SortKeyMap = new Dictionary<string, string> {
-				{"ClientCode", "c.id"},
-				{"UserId", "u.UserId"},
-				{"ClientName", "c.Name"},
-				{"ClientRegion", "r1.Region"},
-				{"SupplierName", "s.Name"},
-				{"SupplierRegion", "r2.Region"},
-				{"ProcuctCode", "db.Code"},
-				{"RequestTime", "u.RequestTime"},
-				{"ProductName", "db.Product"},
-				{"ProductId", "db.ProductId"},
-				{"Producer", "db.Producer"}
+				{ "ClientCode", "c.id" },
+				{ "UserId", "u.UserId" },
+				{ "ClientName", "c.Name" },
+				{ "ClientRegion", "r1.Region" },
+				{ "SupplierName", "s.Name" },
+				{ "SupplierRegion", "r2.Region" },
+				{ "ProcuctCode", "db.Code" },
+				{ "RequestTime", "u.RequestTime" },
+				{ "ProductName", "db.Product" },
+				{ "ProductId", "db.ProductId" },
+				{ "Producer", "db.Producer" }
 			};
 		}
 

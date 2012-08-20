@@ -12,8 +12,7 @@ namespace AdminInterface.Helpers
 			if (String.IsNullOrEmpty(to))
 				return;
 
-			foreach (var email in to.Split(','))
-			{
+			foreach (var email in to.Split(',')) {
 				var normilizedEmail = NormalizeEmailOrPhone(email);
 				if (normilizedEmail.Length == 0)
 					continue;

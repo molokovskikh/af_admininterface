@@ -71,14 +71,10 @@ namespace AdminInterface.Models
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Включен"), Auditable]
 		public virtual bool Enabled
 		{
-			get
-			{
-				return _enabled;
-			}
+			get { return _enabled; }
 			set
 			{
-				if (_enabled != value)
-				{
+				if (_enabled != value) {
 					if (Payer != null)
 						Payer.PaymentSum = Payer.TotalSum;
 					_enabled = value;
@@ -98,7 +94,7 @@ namespace AdminInterface.Models
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Account Accounting { get; set; }
 
-		[HasAndBelongsToMany(typeof (User),
+		[HasAndBelongsToMany(typeof(User),
 			Lazy = true,
 			ColumnKey = "AddressId",
 			Table = "UserAddresses",
@@ -139,10 +135,7 @@ namespace AdminInterface.Models
 		/// </summary>
 		public virtual bool AvaliableForEnabledUsers
 		{
-			get
-			{
-				return AvaliableForUsers.Any(user => user.Enabled && (user.Client.Status == ClientStatus.On));
-			}
+			get { return AvaliableForUsers.Any(user => user.Enabled && (user.Client.Status == ClientStatus.On)); }
 		}
 
 		[Style]
@@ -203,8 +196,7 @@ set @skip = 0;
 
 		public virtual void CreateFtpDirectory(string addressRoot)
 		{
-			try
-			{
+			try {
 				Directory.CreateDirectory(addressRoot);
 
 				Directory.CreateDirectory(Path.Combine(addressRoot, "Orders"));
@@ -212,8 +204,7 @@ set @skip = 0;
 				Directory.CreateDirectory(Path.Combine(addressRoot, "Rejects"));
 				Directory.CreateDirectory(Path.Combine(addressRoot, "Waybills"));
 			}
-			catch(Exception e)
-			{
+			catch (Exception e) {
 				LogManager.GetLogger(GetType()).Error(String.Format(@"
 Ошибка при создании папки на ftp для клиента, иди и создавай руками
 Нужно создать папку {0}
@@ -239,10 +230,8 @@ set @skip = 0;
 				return;
 
 			var index = 0;
-			while (true)
-			{
-				try
-				{
+			while (true) {
+				try {
 #if !DEBUG
 					username = String.Format(@"ANALIT\{0}", username);
 					var rootDirectorySecurity = Directory.GetAccessControl(root);
@@ -281,8 +270,7 @@ set @skip = 0;
 #endif
 					break;
 				}
-				catch(Exception e)
-				{
+				catch (Exception e) {
 					LogManager.GetLogger(typeof(Address)).Error("Ошибка при назначении прав, пробую еще раз", e);
 					index++;
 					Thread.Sleep(500);
@@ -332,7 +320,7 @@ set @skip = 0;
 			return new AuditRecord(message, this);
 		}
 
-		public virtual void MoveAddressIntersection(Client newClient, LegalEntity newLegalEntity, 
+		public virtual void MoveAddressIntersection(Client newClient, LegalEntity newLegalEntity,
 			Client oldClient, LegalEntity oldLegalEntity)
 		{
 			ArHelper.WithSession(session => session.CreateSQLQuery(@"

@@ -19,12 +19,11 @@ namespace AdminInterface.Mailers
 
 		public static void RegionalAdminCreated(Administrator admin)
 		{
-			try
-			{
+			try {
 				Func.Mail("register@analit.net",
 					"Новый сотрудник",
 					String.Format(
-@"В системе зарегистрирован новый сотрудник
+						@"В системе зарегистрирован новый сотрудник
 Ф.И.О.: {0}
 Телефон: {1}
 Email: {2}
@@ -35,28 +34,25 @@ Email: {2}
 						admin.Department.GetDescription()),
 					"RegisterList@subscribe.analit.net");
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}
 
 		public static void RegionalAdminBlocked(Administrator admin)
 		{
-			try
-			{
+			try {
 				Func.Mail("register@analit.net",
 					String.Format("Запрет работы для {0}, {1}", admin.ManagerName, admin.Department.GetDescription()),
 					String.Format(
-@"В системе ЗАПРЕЩЕНА работа сотрудника
+						@"В системе ЗАПРЕЩЕНА работа сотрудника
 Ф.И.О.: {0}
 Подразделение: {1}
-",					admin.ManagerName,
+", admin.ManagerName,
 						admin.Department.GetDescription()),
 					"RegisterList@subscribe.analit.net");
 			}
-			catch(Exception e)
-			{
+			catch (Exception e) {
 				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}
@@ -66,22 +62,21 @@ Email: {2}
 			Func.Mail("register@analit.net",
 				String.Format("Возобновление работы для {0}, {1}", admin.ManagerName, admin.Department.GetDescription()),
 				String.Format(
-@"В системе ВОЗОБНОВЛЕНА работа сотрудника
+					@"В системе ВОЗОБНОВЛЕНА работа сотрудника
 Ф.И.О.: {0}
 Подразделение: {1}
-",					admin.ManagerName,
+", admin.ManagerName,
 					admin.Department.GetDescription()),
 				"RegisterList@subscribe.analit.net");
 		}
 
 		public static void ClientRegistrationResened(Client client)
 		{
-			try
-			{
+			try {
 				Func.Mail("register@analit.net",
 					"Разослано повторное уведомление о регистрации",
 					String.Format(
-@"Оператор: {0}
+						@"Оператор: {0}
 Хост: {1}
 Краткое наименование: {2}
 Полное наименование: {3}
@@ -93,21 +88,19 @@ Email: {2}
 						client.HomeRegion.Name),
 					"RegisterList@subscribe.analit.net");
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}
 
 		public static void AddressRegistrationResened(Address address)
 		{
-			try
-			{
+			try {
 				var client = address.Client;
 				Func.Mail("register@analit.net",
 					"Разослано повторное уведомление о регистрации адреса",
 					String.Format(
-@"Оператор: {0}
+						@"Оператор: {0}
 Хост: {1}
 Краткое наименование: {2}
 Полное наименование: {3}
@@ -121,33 +114,29 @@ Email: {2}
 						address.Value),
 					"RegisterList@subscribe.analit.net");
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}
 
 		private static void SupplierRegistred(string shortname, string homeregion)
 		{
-			try
-			{
+			try {
 				Func.Mail("register@analit.net",
 					"Зарегистрирован новый поставщик",
 					String.Format(
-	@"Краткое наименование: {0}
+						@"Краткое наименование: {0}
 Домашний регион: {1}", shortname, homeregion),
 					"farm@analit.net");
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}
 
 		public static void Registred(object item, string billingMessage, DefaultValues defaults)
 		{
-			try
-			{
+			try {
 				Client client;
 				string body;
 				string subject;
@@ -155,8 +144,7 @@ Email: {2}
 				if (!String.IsNullOrWhiteSpace(billingMessage))
 					billingMessage = "Сообщение в биллинг: " + billingMessage;
 
-				if (item is User)
-				{
+				if (item is User) {
 					var user = ((User)item);
 					account = user.Accounting;
 					var comment = "Комментарий: " + user.Name;
@@ -169,8 +157,7 @@ Email: {2}
 					if (!String.IsNullOrEmpty(billingMessage))
 						new AuditRecord(billingMessage, item).Save();
 				}
-				else
-				{
+				else {
 					var address = ((Address)item);
 					account = address.Accounting;
 					body = "Зарегистрирован новый адрес доставки " + address.Value;
@@ -182,8 +169,7 @@ Email: {2}
 							new AuditRecord(billingMessage, user).Save();
 				}
 
-				if (!String.IsNullOrEmpty(billingMessage))
-				{
+				if (!String.IsNullOrEmpty(billingMessage)) {
 					body += "\r\n" + billingMessage;
 				}
 
@@ -195,53 +181,46 @@ Email: {2}
 					String.Format(@"Для клиента {0} код {1} регион {2}
 {3}
 Регистратор {4}",
-					client.Name,
-					client.Id,
-					client.HomeRegion.Name,
-					body,
-					SecurityContext.Administrator.ManagerName),
+						client.Name,
+						client.Id,
+						client.HomeRegion.Name,
+						body,
+						SecurityContext.Administrator.ManagerName),
 					"RegisterList@subscribe.analit.net, billing@analit.net");
 
 
-				if (item is Address)
-				{
+				if (item is Address) {
 					NotifySupplierAboutAddressRegistration((Address)item, defaults);
 				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}
 
 		public static void SendMessageFromBillingToClient(UserMessage message)
 		{
-			try
-			{
+			try {
 				Func.Mail("billing@analit.net", message.Subject, message.Message, message.To);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}
 
 		public static void NotifySupplierAboutAddressRegistration(Address address, DefaultValues defaults)
 		{
-			try
-			{
+			try {
 				new NotificationService(defaults).NotifySupplierAboutAddressRegistration(address);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}
 
 		public static void SupplierRegistred(Supplier supplier, string billingMessage)
 		{
-			try
-			{
+			try {
 				SupplierRegistred(supplier.Name, supplier.HomeRegion.Name);
 				var body = String.Format(
 					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\nТип: {4}",
@@ -261,16 +240,14 @@ Email: {2}
 					String.Format("\"{0}\" - успешная регистрация", supplier.FullName),
 					body);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}
 
 		public static void ClientRegistred(Client client, string billingMessage, DefaultValues defaults)
 		{
-			try
-			{
+			try {
 				new NotificationService(defaults).NotifySupplierAboutDrugstoreRegistration(client, false);
 
 				var user = client.Users.FirstOrDefault();
@@ -291,8 +268,7 @@ Email: {2}
 					String.Format("\"{0}\" - успешная регистрация", client.FullName),
 					body.ToString());
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}

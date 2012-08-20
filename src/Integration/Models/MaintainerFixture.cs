@@ -29,17 +29,14 @@ namespace Integration.Models
 			var count = ArHelper.WithSession(s =>
 				s.CreateSQLQuery(@"select count(*) from Customers.Intersection where LegalEntityId = :LegalEntityId")
 					.SetParameter("LegalEntityId", org.Id)
-					.UniqueResult<long>()
-			);
+					.UniqueResult<long>());
 			Assert.That(count, Is.GreaterThan(0));
 		}
 
 		[Test]
 		public void Copy_cost_settings_from_root()
 		{
-			var supplier = DataMother.CreateSupplier(s => {
-				s.Prices.First().AddCost();
-			});
+			var supplier = DataMother.CreateSupplier(s => { s.Prices.First().AddCost(); });
 			Save(supplier);
 
 			var client = DataMother.TestClient();

@@ -47,8 +47,7 @@ namespace AdminInterface.Controllers
 		public void BuildInvoice(uint id)
 		{
 			var ad = Advertising.Find(id);
-			if (ad.Invoice != null)
-			{
+			if (ad.Invoice != null) {
 				Error("Для рекламы уже сформирован счет");
 				RedirectToReferrer();
 				return;
@@ -62,8 +61,7 @@ namespace AdminInterface.Controllers
 		public void BuildAct(uint id)
 		{
 			var ad = Advertising.Find(id);
-			if (ad.Act != null)
-			{
+			if (ad.Act != null) {
 				Error("Для рекламы уже сформирован счет");
 				RedirectToReferrer();
 				return;
@@ -91,11 +89,9 @@ namespace AdminInterface.Controllers
 			RenderView("/Payers/NewAd");
 
 			var ad = Advertising.Find(id);
-			if (IsPost)
-			{
+			if (IsPost) {
 				BindObjectInstance(ad, "ad");
-				if (!HasValidationError(ad))
-				{
+				if (!HasValidationError(ad)) {
 					ad.Save();
 					RedirectTo("Advertisings", "Index");
 				}

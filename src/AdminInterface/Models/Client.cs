@@ -44,7 +44,8 @@ namespace AdminInterface.Models
 	public class RegistrationInfo
 	{
 		public RegistrationInfo()
-		{}
+		{
+		}
 
 		public RegistrationInfo(Administrator administrator)
 		{
@@ -62,7 +63,7 @@ namespace AdminInterface.Models
 		{
 			if (String.IsNullOrEmpty(Registrant))
 				return null;
-			
+
 			return Administrator.GetByName(Registrant);
 		}
 	}
@@ -104,18 +105,14 @@ namespace AdminInterface.Models
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Включен"), Auditable]
 		public virtual ClientStatus Status
 		{
-			get
-			{
-				return _status;
-			}
+			get { return _status; }
 
 			set
 			{
 				var updatePayer = _status != value;
 				_status = value;
 				_disabled = _status == ClientStatus.Off;
-				if (updatePayer)
-				{
+				if (updatePayer) {
 					foreach (var payer in Payers)
 						payer.PaymentSum = payer.TotalSum;
 				}
@@ -125,18 +122,14 @@ namespace AdminInterface.Models
 		[Style]
 		public override bool Disabled
 		{
-			get
-			{
-				return _disabled;
-			}
+			get { return _disabled; }
 			set
 			{
 				var updatePayer = _disabled != value;
 				_disabled = value;
 				_status = _disabled ? ClientStatus.Off : ClientStatus.On;
 
-				if (updatePayer)
-				{
+				if (updatePayer) {
 					foreach (var payer in Payers)
 						payer.PaymentSum = payer.TotalSum;
 				}
@@ -153,7 +146,7 @@ namespace AdminInterface.Models
 		public virtual UInt64 MaskRegion { get; set; }
 
 		[Nested]
-		public virtual RegistrationInfo Registration { get; set;}
+		public virtual RegistrationInfo Registration { get; set; }
 
 		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual DrugstoreSettings Settings { get; set; }
@@ -170,13 +163,13 @@ namespace AdminInterface.Models
 		[HasMany(ColumnKey = "ClientId", Inverse = true, Lazy = true, OrderBy = "Name")]
 		public virtual IList<User> Users { get; set; }
 
-		[HasAndBelongsToMany(typeof (Payer),
+		[HasAndBelongsToMany(typeof(Payer),
 			Lazy = true,
 			ColumnKey = "ClientId",
 			Table = "PayerClients",
 			Schema = "Billing",
 			ColumnRef = "PayerId")]
-		public virtual IList<Payer>  Payers { get; set; }
+		public virtual IList<Payer> Payers { get; set; }
 
 		public override bool Enabled
 		{
@@ -185,16 +178,13 @@ namespace AdminInterface.Models
 
 		public virtual bool CanChangePayer
 		{
-			get
-			{
-				return Payers.Count == 1 && Payers[0].JuridicalOrganizations.Count == 1;
-			}
+			get { return Payers.Count == 1 && Payers[0].JuridicalOrganizations.Count == 1; }
 		}
 
 		public static Client FindClietnForBilling(uint clientCode)
 		{
 			return ArHelper.WithSession(
-				session => session.CreateCriteria(typeof (Client))
+				session => session.CreateCriteria(typeof(Client))
 					.Add(Restrictions.Eq("Id", clientCode))
 					.SetFetchMode("BillingInstance", FetchMode.Join)
 					.SetFetchMode("HomeRegion", FetchMode.Join)
@@ -272,15 +262,14 @@ group by u.ClientId")
 
 		public virtual Address AddAddress(string address)
 		{
-			return AddAddress(new Address {Value = address});
+			return AddAddress(new Address { Value = address });
 		}
 
 		public virtual Address AddAddress(Address address)
 		{
 			if (Addresses == null)
 				Addresses = new List<Address>();
-			if (address.LegalEntity == null)
-			{
+			if (address.LegalEntity == null) {
 				address.LegalEntity = Orgs().Single();
 				address.Payer = address.LegalEntity.Payer;
 			}
@@ -307,36 +296,28 @@ group by u.ClientId")
 
 		public virtual void UpdateRegionSettings(RegionSettings[] regionSettings)
 		{
-			foreach (var setting in regionSettings)
-			{
-				if (setting.IsAvaliableForBrowse)
-				{
-					if ((MaskRegion & setting.Id) == 0)
-					{
+			foreach (var setting in regionSettings) {
+				if (setting.IsAvaliableForBrowse) {
+					if ((MaskRegion & setting.Id) == 0) {
 						MaskRegion |= setting.Id;
 						Users.Each(u => u.WorkRegionMask |= setting.Id);
 					}
-					if ((Settings.WorkRegionMask & setting.Id) == 0)
-					{
+					if ((Settings.WorkRegionMask & setting.Id) == 0) {
 						Settings.WorkRegionMask |= setting.Id;
 					}
 				}
-				else
-				{
+				else {
 					MaskRegion &= ~setting.Id;
 					Settings.WorkRegionMask &= ~setting.Id;
 					Users.Each(u => u.WorkRegionMask &= ~setting.Id);
 				}
-				if (setting.IsAvaliableForOrder)
-				{
-					if ((Settings.OrderRegionMask & setting.Id) == 0)
-					{
+				if (setting.IsAvaliableForOrder) {
+					if ((Settings.OrderRegionMask & setting.Id) == 0) {
 						Settings.OrderRegionMask |= setting.Id;
 						Users.Each(u => u.OrderRegionMask |= setting.Id);
 					}
 				}
-				else
-				{
+				else {
 					Settings.OrderRegionMask &= ~setting.Id;
 					Users.Each(u => u.OrderRegionMask &= ~setting.Id);
 				}
@@ -371,7 +352,7 @@ group by u.ClientId")
 
 		public virtual User AddUser(string name)
 		{
-			var user = new User(this) {Name = name};
+			var user = new User(this) { Name = name };
 			AddUser(user);
 			user.Setup();
 			return user;
@@ -405,15 +386,13 @@ group by u.ClientId")
 			var oldPayers = Payers.ToArray();
 			Payers.Clear();
 			Payers.Add(payer);
-			foreach (var user in Users)
-			{
+			foreach (var user in Users) {
 				user.Payer.Users.Remove(user);
 				user.Payer = payer;
 				user.Payer.Users.Add(user);
 			}
 
-			foreach (var address in Addresses)
-			{
+			foreach (var address in Addresses) {
 				address.Payer.Addresses.Remove(address);
 				address.Payer = payer;
 				address.LegalEntity = org;
@@ -502,7 +481,7 @@ where ClientId = :clientId")
 			get
 			{
 				return ArHelper.WithSession(s => {
-					return new [] {
+					return new[] {
 						new ModelAction(this, "Delete", "Удалить", !CanDelete(s))
 					};
 				});

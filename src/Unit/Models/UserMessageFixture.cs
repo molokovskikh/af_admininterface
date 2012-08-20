@@ -11,7 +11,7 @@ namespace Unit.Models
 		public void Send_to_minimail()
 		{
 			var payer = new Payer("Тестовый поставщик");
-			payer.Clients.Add(new Client(payer, Data.DefaultRegion){Id = 1});
+			payer.Clients.Add(new Client(payer, Data.DefaultRegion) { Id = 1 });
 			var message = new UserMessage {
 				Payer = payer,
 				SendToMinimail = true

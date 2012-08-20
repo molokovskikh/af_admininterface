@@ -14,7 +14,6 @@ using log4net;
 
 namespace AdminInterface.Helpers
 {
-
 	/*
 	 * заметки на полях обращение к конкретному хосту 
 	 * LDAP://acdcserv/OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net 
@@ -22,6 +21,7 @@ namespace AdminInterface.Helpers
 	 * using (var searcher = new DirectorySearcher(new DirectoryEntry("LDAP://acdcserv")))
 	 * searcher.Filter = string.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
 	 */
+
 	[Flags]
 	public enum AccountControl
 	{
@@ -62,22 +62,16 @@ namespace AdminInterface.Helpers
 	{
 		private int GetIndexByLogin(string login)
 		{
-			for(int i = 0; i < Count; i++)
-				if(String.Equals(this[i].Login, login, StringComparison.InvariantCultureIgnoreCase))
+			for (int i = 0; i < Count; i++)
+				if (String.Equals(this[i].Login, login, StringComparison.InvariantCultureIgnoreCase))
 					return i;
 			throw new ArgumentException("Не найдены настройки AD для пользователя " + login, "login");
 		}
 
 		public ADUserInformation this[string login]
 		{
-			get
-			{
-				return this[GetIndexByLogin(login)];
-			}
-			set
-			{
-				this[GetIndexByLogin(login)] = value;
-			}
+			get { return this[GetIndexByLogin(login)]; }
+			set { this[GetIndexByLogin(login)] = value; }
 		}
 	}
 
@@ -102,8 +96,8 @@ namespace AdminInterface.Helpers
 				return false;
 
 			users.Add(userName, new Dictionary<string, object> {
-				{"computers", new List<string>()},
-				{"logonHours", new bool[7, 24]}
+				{ "computers", new List<string>() },
+				{ "logonHours", new bool[7, 24] }
 			});
 
 			return true;
@@ -152,8 +146,7 @@ namespace AdminInterface.Helpers
 			var adminGroupPath = "LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net";
 			var root = new DirectoryEntry("LDAP://OU=Офис,DC=adc,DC=analit,DC=net");
 
-			if (entry != null)
-			{
+			if (entry != null) {
 				entry.Properties["userAccountControl"][0] = AccountControl.NormalAccount;
 				// установить pwdLastSet в текущую дату
 				entry.Properties["pwdLastSet"][0] = -1;
@@ -165,8 +158,7 @@ namespace AdminInterface.Helpers
 					.OfType<string>()
 					.FirstOrDefault(mebmer => mebmer.Equals(adminGroupPath));
 
-				if (String.IsNullOrEmpty(member))
-				{
+				if (String.IsNullOrEmpty(member)) {
 					var adminGroup = new DirectoryEntry(adminGroupPath);
 					adminGroup.Invoke("Add", entry.Path);
 					adminGroup.CommitChanges();
@@ -241,18 +233,16 @@ namespace AdminInterface.Helpers
 		public static ADUserInformationCollection GetPartialUsersInformation(IEnumerable<string> logins)
 		{
 			var result = new ADUserInformationCollection();
-			result.AddRange(logins.Select(user => new ADUserInformation {Login = user}));
-			try
-			{
+			result.AddRange(logins.Select(user => new ADUserInformation { Login = user }));
+			try {
 				var filter = new StringBuilder();
 				foreach (var login in logins)
 					filter.Append("(sAMAccountName=" + login + ")");
 				return GetInformation(result, filter);
 			}
-			catch (Exception ex)
-			{
+			catch (Exception ex) {
 				log.Error(String.Format("Не смогли получить информацию о пользователе AD. Admin={0}, Users=({1})",
-						SecurityContext.Administrator.UserName, logins.Implode()), ex);
+					SecurityContext.Administrator.UserName, logins.Implode()), ex);
 			}
 			return result;
 		}
@@ -264,11 +254,9 @@ namespace AdminInterface.Helpers
 			if (usersInfo.Count > 1)
 				filter.Insert(0, "|");
 
-			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)({0}))", filter)))
-			{
+			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)({0}))", filter))) {
 				var searchResults = searcher.FindAll();
-				foreach (SearchResult searchResult in searchResults)
-				{
+				foreach (SearchResult searchResult in searchResults) {
 					var info = GetInformationBySearchResult(searchResult);
 					if (info == null)
 						continue;
@@ -299,8 +287,7 @@ namespace AdminInterface.Helpers
 			var result = new ADUserInformation {
 				LastLogOnDate = user.Logs.LastLogon
 			};
-			try
-			{
+			try {
 				result.Login = login;
 				result.IsLoginExists = IsLoginExists(login);
 				if (result.IsLoginExists) {
@@ -313,8 +300,7 @@ namespace AdminInterface.Helpers
 				}
 				return result;
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				return result;
 			}
 		}
@@ -346,7 +332,7 @@ namespace AdminInterface.Helpers
 			user.Properties["samAccountName"].Value = newLogin;
 			user.CommitChanges();
 #endif
-		}		
+		}
 
 		public static bool IsLoginExists(string login)
 		{
@@ -375,7 +361,7 @@ namespace AdminInterface.Helpers
 		public static bool IsLocked(string login)
 		{
 #if !DEBUG
-			return Convert.ToBoolean(GetDirectoryEntry(login).InvokeGet("IsAccountLocked")); 
+			return Convert.ToBoolean(GetDirectoryEntry(login).InvokeGet("IsAccountLocked"));
 #else
 			return false;
 #endif
@@ -391,7 +377,7 @@ namespace AdminInterface.Helpers
 		public static bool IsDisabled(string login)
 		{
 #if !DEBUG
-			return Convert.ToBoolean(GetDirectoryEntry(login).InvokeGet("AccountDisabled")); 
+			return Convert.ToBoolean(GetDirectoryEntry(login).InvokeGet("AccountDisabled"));
 #else
 			return false;
 #endif
@@ -415,9 +401,8 @@ namespace AdminInterface.Helpers
 		{
 			var entry = GetDirectoryEntry(login);
 			var week = new List<bool>();
-			var logonHours = (byte[]) entry.Properties["logonHours"].Value;
-			if (logonHours == null)
-			{
+			var logonHours = (byte[])entry.Properties["logonHours"].Value;
+			if (logonHours == null) {
 				var matrix = new bool[7, 24];
 				for (var i = 0; i < 7; i++)
 					for (var j = 0; j < 24; j++)
@@ -425,16 +410,13 @@ namespace AdminInterface.Helpers
 				return matrix;
 			}
 
-			for (var i = 0; i < logonHours.Length; i += 3)
-			{
-				for (var j = 0; j < 3; j++)
-				{
+			for (var i = 0; i < logonHours.Length; i += 3) {
+				for (var j = 0; j < 3; j++) {
 					var currByte = logonHours[j + i];
 					var hoursBoolIndex = 7;
 					var hourBools = new bool[8];
 
-					for (var k = 128; k > 0; k /= 2)
-					{
+					for (var k = 128; k > 0; k /= 2) {
 						hourBools[hoursBoolIndex] = ((currByte & k) != 0);
 						hoursBoolIndex--;
 					}
@@ -448,8 +430,7 @@ namespace AdminInterface.Helpers
 			var hourIndex = 21;
 
 			for (var i = 0; i < 7; i++)
-				for (var j = 0; j < 24; j++)
-				{
+				for (var j = 0; j < 24; j++) {
 					logonHoursMatrix[i, j] = week[hourIndex % 168];
 					hourIndex++;
 				}
@@ -462,22 +443,19 @@ namespace AdminInterface.Helpers
 			var week = new bool[168]; // массив часов в неделе
 
 			for (var i = 0; i < 7; i++)
-				for (var j = 0; j < 24; j++)
-				{
+				for (var j = 0; j < 24; j++) {
 					week[hourIndex % 168] = logonHoursMatrix[i, j];
 					hourIndex++;
 				}
 
 			var totalBytes = new List<byte>();
-			for (var i = 0; i < 3 * 7; i += 3)
-			{
+			for (var i = 0; i < 3 * 7; i += 3) {
 				var bytes = new List<byte>();
-				for (var j = 0; j < 3; j++)
-				{
+				for (var j = 0; j < 3; j++) {
 					var hourBools = new bool[8];
 					var index = 0;
 					for (var k = 7; k >= 0; k--)
-						hourBools[index++] = week[(i + j)*8 + k];
+						hourBools[index++] = week[(i + j) * 8 + k];
 					bytes.Add(ConvertToByte(hourBools));
 				}
 				totalBytes.AddRange(bytes);
@@ -505,8 +483,7 @@ namespace AdminInterface.Helpers
 
 		public static DirectoryEntry FindDirectoryEntry(string login)
 		{
-			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(sAMAccountName={0}))", login)))
-			{
+			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(sAMAccountName={0}))", login))) {
 				var searchResult = searcher.FindOne();
 				if (searchResult != null)
 					return searcher.FindOne().GetDirectoryEntry();
@@ -525,27 +502,25 @@ namespace AdminInterface.Helpers
 		private static TimeSpan GetMaxPasswordAge()
 		{
 			using (var searcher = new DirectorySearcher("(objectClass=domainDNS)"))
-				return TimeSpan.FromTicks(Math.Abs((long) searcher.FindOne().Properties["maxPwdAge"][0]));
+				return TimeSpan.FromTicks(Math.Abs((long)searcher.FindOne().Properties["maxPwdAge"][0]));
 		}
 
 		public static void Block(string login)
 		{
-			for (var i = 0; i < 10; i++)
-			{
-				try
-				{
+			for (var i = 0; i < 10; i++) {
+				try {
 					var en = new DirectoryEntry("LDAP://DC=adc,DC=analit,DC=net", login, "123");
 					var n = en.NativeObject;
 				}
-				catch {}
+				catch {
+				}
 			}
 		}
 
 		public static IList<string> GetDomainComputers()
 		{
 			var computers = new List<string>();
-			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=computer))")))
-			{
+			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=computer))"))) {
 				var searchResult = searcher.FindAll();
 				if (searchResult == null)
 					return computers;
@@ -616,25 +591,21 @@ namespace AdminInterface.Helpers
 		{
 			DateTime? resultDate = null;
 			var controllers = GetDomainControllers();
-			foreach (var serverName in controllers)
-			{
-				try
-				{
-					using (var searcher = new DirectorySearcher(new DirectoryEntry(String.Format("LDAP://{0}", serverName))))
-					{
+			foreach (var serverName in controllers) {
+				try {
+					using (var searcher = new DirectorySearcher(new DirectoryEntry(String.Format("LDAP://{0}", serverName)))) {
 						searcher.Filter = string.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
 						var result = searcher.FindOne();
 						if (result == null || result.Properties[name].Count == 0)
 							continue;
-						var date = DateTime.FromFileTime((long) searcher.FindOne().Properties[name][0]);
+						var date = DateTime.FromFileTime((long)searcher.FindOne().Properties[name][0]);
 						if (date == _adDateInitValue)
 							continue;
 						if (!resultDate.HasValue || date.CompareTo(resultDate.Value) > 0)
 							resultDate = date;
 					}
 				}
-				catch(Exception e)
-				{
+				catch (Exception e) {
 					log.Warn(String.Format("Ошибка при запросе к контролеру домена {0}", serverName), e);
 				}
 			}

@@ -28,16 +28,16 @@ namespace AdminInterface.Controllers.Filters
 		{
 			SortDirection = "Desc";
 			SortKeyMap = new Dictionary<string, string> {
-				{"RequestTime", "RequestTime"},
+				{ "RequestTime", "RequestTime" },
 				//хак, тк HomeRegion перегружен хибер не может разобраться по какому полю сортировать
 				//по этому сортировка будет в ручную
-				{"Region", "Id"},
-				{"ClientName", "c.Name"},
-				{"UpdateType", "UpdateType"},
-				{"Login", "u.Login"},
-				{"ResultSize", "ResultSize"},
-				{"Addition", "Addition"},
-				{"AppVersion", "AppVersion"}
+				{ "Region", "Id" },
+				{ "ClientName", "c.Name" },
+				{ "UpdateType", "UpdateType" },
+				{ "Login", "u.Login" },
+				{ "ResultSize", "ResultSize" },
+				{ "Addition", "Addition" },
+				{ "AppVersion", "AppVersion" }
 			};
 		}
 
@@ -57,26 +57,27 @@ namespace AdminInterface.Controllers.Filters
 				Projections.Property("u.Login").As("Login"),
 				Projections.Property("c.Id").As("ClientId"),
 				Projections.Property("c.Name").As("ClientName"),
-				Projections.SqlProjection("c2_.RegionCode as RegionId", new[] {"RegionId"}, new [] {NHibernateUtil.String})
+				Projections.SqlProjection("c2_.RegionCode as RegionId", new[] { "RegionId" }, new[] { NHibernateUtil.String })
 			};
 
 			if (UpdateType == Models.Logs.UpdateType.AccessError) {
 				projectionsList.Add(Projections.ProjectionList().Add(Projections.Alias(Projections.SubQuery(DetachedCriteria.For<UpdateLogEntity>("ule")
-						.Add(Expression.EqProperty("ue.User", "ule.User"))
-						.Add(Expression.Eq("ule.Commit", true))
-						.Add(Expression.In("ule.UpdateType", new object[] {
-							Models.Logs.UpdateType.Accumulative,
-							Models.Logs.UpdateType.Cumulative,
-							Models.Logs.UpdateType.LimitedCumulative,
-							Models.Logs.UpdateType.AutoOrder,
-							Models.Logs.UpdateType.LoadingDocuments
-						} ))
-						.Add(Expression.GtProperty("ule.RequestTime", "ue.RequestTime"))
-						.SetProjection(Projections.ProjectionList()
-							.Add(Projections.Conditional(Expression.Gt(
-								Projections.Count(Projections.Property("ule.Id")) , 0),
-								Projections.Constant(1),
-								Projections.Constant(0))))), "OkUpdate")));
+					.Add(Expression.EqProperty("ue.User", "ule.User"))
+					.Add(Expression.Eq("ule.Commit", true))
+					.Add(Expression.In("ule.UpdateType", new object[] {
+						Models.Logs.UpdateType.Accumulative,
+						Models.Logs.UpdateType.Cumulative,
+						Models.Logs.UpdateType.LimitedCumulative,
+						Models.Logs.UpdateType.AutoOrder,
+						Models.Logs.UpdateType.LoadingDocuments
+					}))
+					.Add(Expression.GtProperty("ule.RequestTime", "ue.RequestTime"))
+					.SetProjection(Projections.ProjectionList()
+						.Add(Projections.Conditional(Expression.Gt(
+							Projections.Count(Projections.Property("ule.Id")), 0),
+							Projections.Constant(1),
+							Projections.Constant(0))))),
+					"OkUpdate")));
 			}
 
 			var items = ArHelper.WithSession(s => {
@@ -121,8 +122,7 @@ namespace AdminInterface.Controllers.Filters
 				i.Region = region.Name;
 			});
 
-			if (String.Equals(SortBy, "Region", StringComparison.OrdinalIgnoreCase))
-			{
+			if (String.Equals(SortBy, "Region", StringComparison.OrdinalIgnoreCase)) {
 				if (IsDesc())
 					items = items.OrderByDescending(i => i.Region).ToList();
 				else

@@ -6,7 +6,8 @@ using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.Billing
 {
@@ -25,8 +26,7 @@ namespace Functional.Billing
 
 			client.AddAddress(new Address { Client = client, Value = "test address for billing", });
 			session.SaveOrUpdate(client);
-			foreach (var address in client.Addresses)
-			{
+			foreach (var address in client.Addresses) {
 				address.Enabled = false;
 				address.UpdateAndFlush();
 			}

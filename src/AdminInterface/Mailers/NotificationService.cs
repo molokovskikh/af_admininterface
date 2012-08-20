@@ -20,7 +20,7 @@ namespace AdminInterface.Services
 		}
 
 		private readonly string _messageTemplateForSupplierAboutDrugstoreRegistration =
-@"Добрый день.
+			@"Добрый день.
 
 В информационной системе 'АналитФАРМАЦИЯ', участником которой является Ваша организация, зарегистрирован новый клиент: {0} ( {1} ) по адресу {2} в регионе(городе) {3}.
 Пожалуйста произведите настройки для данного клиента (Раздел 'Для зарегистрированных пользователей' на сайте www.analit.net ).
@@ -30,7 +30,7 @@ namespace AdminInterface.Services
 ".Replace('\'', '\"');
 
 		private readonly string _messageTemplateForSupplierAfterAddressRegistration =
-@"Добрый день.
+			@"Добрый день.
 
 В информационной системе 'АналитФАРМАЦИЯ', участником которой является Ваша организация, для клиента: {0} ( {1} ) в регионе(городе) {2} зарегистрирован новый адрес доставки {3}.
 Пожалуйста при необходимости произведите настройку кодов доставки (Раздел 'Для зарегистрированных пользователей' на сайте www.analit.net ).
@@ -74,10 +74,8 @@ namespace AdminInterface.Services
 				return;
 
 			var emails = GetEmailsForNotification(client);
-			foreach (var address in client.Addresses.Where(a => a.Enabled))
-			{
-				foreach (var email in emails)
-				{
+			foreach (var address in client.Addresses.Where(a => a.Enabled)) {
+				foreach (var email in emails) {
 					Func.Mail("tech@analit.net",
 						"Аналитическая Компания Инфорум",
 						"Новый клиент в системе \"АналитФАРМАЦИЯ\"",
@@ -100,8 +98,7 @@ namespace AdminInterface.Services
 
 		private List<string> GetEmailsForNotification(Client client)
 		{
-			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-			{
+			using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
 				connection.Open();
 				var dataAdapter = new MySqlDataAdapter(@"
 select c.contactText
@@ -135,7 +132,7 @@ where length(c.contactText) > 0
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?Region", client.HomeRegion.Id);
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactGroupType", ContactGroupType.ClientManagers);
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactType", ContactType.Email);
-				var data  = new DataSet();
+				var data = new DataSet();
 				dataAdapter.Fill(data);
 				return data.Tables[0].Rows.Cast<DataRow>().Select(r => r["ContactText"].ToString()).ToList();
 			}

@@ -3,5 +3,6 @@
 namespace AdminInterface.Rescue
 {
 	public partial class NotAuthorized : Page
-	{}
+	{
+	}
 }

@@ -10,7 +10,8 @@ using Integration.ForTesting;
 using NHibernate.Linq;
 using log4net.Config;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using Common.Web.Ui.Models;
 using System.Threading;
 
@@ -250,9 +251,9 @@ FROM Customers.AddressIntersection AS ai
 	JOIN Customers.Intersection AS i ON i.ClientId = :ClientId AND ai.IntersectionId = i.Id
 WHERE AddressId = :AddressId
 ")
-					.SetParameter("AddressId", addressId)
-					.SetParameter("ClientId", clientId)
-					.UniqueResult()));
+				.SetParameter("AddressId", addressId)
+				.SetParameter("ClientId", clientId)
+				.UniqueResult()));
 		}
 	}
 }

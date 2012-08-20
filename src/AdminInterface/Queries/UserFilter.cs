@@ -77,16 +77,16 @@ namespace AdminInterface.Queries
 			SearchBy = SearchUserBy.Auto;
 			SortBy = "UserName";
 			SortKeyMap = new Dictionary<string, string> {
-				{"PayerId", "PayerId"},
-				{"ClientId", "ClientId"},
-				{"UserId", "UserId"},
-				{"ClientName", "ClientName"},
-				{"Login", "Login"},
-				{"UserName", "UserName"},
-				{"RegionName", "RegionName"},
-				{"UpdateDate", "UpdateDate"},
-				{"AFVersion", "AFVersion"},
-				{"ClientType", "ClientType"},
+				{ "PayerId", "PayerId" },
+				{ "ClientId", "ClientId" },
+				{ "UserId", "UserId" },
+				{ "ClientName", "ClientName" },
+				{ "Login", "Login" },
+				{ "UserName", "UserName" },
+				{ "RegionName", "RegionName" },
+				{ "UpdateDate", "UpdateDate" },
+				{ "AFVersion", "AFVersion" },
+				{ "ClientType", "ClientType" },
 			};
 		}
 
@@ -157,8 +157,7 @@ GROUP BY u.Id
 
 			var adInfo = ADHelper.GetPartialUsersInformation(logins);
 
-			for (var i = 0; i < result.Count; i++)
-			{
+			for (var i = 0; i < result.Count; i++) {
 				if (adInfo == null)
 					continue;
 				result[i].DisabledInAd = adInfo[result[i].Login].DisabledInAd;
@@ -220,8 +219,7 @@ u.Id in ({1})
 		private static string GetTypeFilter(SearchClientType type)
 		{
 			var filter = String.Empty;
-			switch (type)
-			{
+			switch (type) {
 				case SearchClientType.Drugstore:
 					filter = AddFilterCriteria(filter, " s.Type = 1 ");
 					break;
@@ -235,8 +233,7 @@ u.Id in ({1})
 		private static string GetStatusFilter(SearchClientStatus status)
 		{
 			var filter = String.Empty;
-			switch (status)
-			{
+			switch (status) {
 				case SearchClientStatus.Enabled: {
 					filter = AddFilterCriteria(filter, " u.Enabled = 1 and s.Disabled = 0");
 					break;
@@ -260,8 +257,7 @@ u.Id in ({1})
 			var searchTextIsNumber = info.SearchTextIsNumber;
 			var searchTextIsPhone = info.SearchTextIsPhone;
 
-			switch (SearchBy)
-			{
+			switch (SearchBy) {
 				case SearchUserBy.Auto: {
 					if (searchTextIsNumber)
 						filter += String.Format(@" u.Id = {0} or s.Id = {0} ", searchText);

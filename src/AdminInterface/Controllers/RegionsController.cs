@@ -21,11 +21,9 @@ namespace AdminInterface.Controllers
 		public void Edit(ulong id)
 		{
 			var region = Region.Find(id);
-			if (IsPost)
-			{
+			if (IsPost) {
 				BindObjectInstance(region, "region");
-				if (IsValid(region))
-				{
+				if (IsValid(region)) {
 					region.Save();
 					Notify("Сохранено");
 					RedirectToReferrer();
@@ -42,8 +40,7 @@ namespace AdminInterface.Controllers
 		public void ShowRegions(uint? clientId, ulong? homeRegionId, bool showDefaultRegions, bool showNonDefaultRegions)
 		{
 			var allRegions = Region.FindAll();
-			if (homeRegionId.HasValue)
-			{
+			if (homeRegionId.HasValue) {
 				var homeRegion = Region.Find(homeRegionId.Value);
 				if (showDefaultRegions)
 					PropertyBag["defaultRegions"] = allRegions.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0);
@@ -51,19 +48,18 @@ namespace AdminInterface.Controllers
 					PropertyBag["nonDefaultRegions"] = allRegions.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) <= 0);
 				PropertyBag["homeRegion"] = Region.Find(homeRegionId);
 			}
-			else if (clientId.HasValue)
-			{
+			else if (clientId.HasValue) {
 				var client = DbSession.Load<Client>(clientId.Value);
 				var drugstore = client.Settings;
 
 				if (showDefaultRegions)
 					PropertyBag["defaultRegions"] = allRegions.Where(region =>
 						(region.Id & client.MaskRegion) > 0 ||
-						(region.Id & drugstore.OrderRegionMask) > 0);
+							(region.Id & drugstore.OrderRegionMask) > 0);
 				if (showNonDefaultRegions)
 					PropertyBag["nonDefaultRegions"] = allRegions.Where(region =>
 						(region.Id & client.MaskRegion) <= 0 ||
-						(region.Id & drugstore.OrderRegionMask) <= 0);
+							(region.Id & drugstore.OrderRegionMask) <= 0);
 				PropertyBag["homeRegion"] = client.HomeRegion;
 				PropertyBag["drugstore"] = drugstore;
 			}

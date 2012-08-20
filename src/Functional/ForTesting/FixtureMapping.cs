@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.ForTesting
 {
@@ -11,6 +12,7 @@ namespace Functional.ForTesting
 			return e => ((CheckBox)e).Checked == Convert.ToBoolean(value);
 		}
 	}
+
 	public class FixtureMapping
 	{
 		private static readonly Dictionary<Type, Mapping> mappings = new Dictionary<Type, Mapping>();
@@ -36,7 +38,7 @@ namespace Functional.ForTesting
 				if (!_map.ContainsKey(alias))
 					throw new Exception("Нет мапинга для алиаса: " + alias);
 
-				return _map[alias]((T) value);
+				return _map[alias]((T)value);
 			}
 
 			public override IEnumerable<string> Headers()
@@ -49,7 +51,7 @@ namespace Functional.ForTesting
 		{
 			var mapping = new Mapping<T>();
 			mappings.Add(typeof(T), mapping);
-			return mapping; 
+			return mapping;
 		}
 
 		public static IEnumerable<string> Headers<T>()
@@ -57,7 +59,7 @@ namespace Functional.ForTesting
 			if (!mappings.ContainsKey(typeof(T)))
 				throw new Exception("Нет меппинга для " + typeof(T));
 
-			return mappings[typeof (T)].Headers();
+			return mappings[typeof(T)].Headers();
 		}
 
 		public static object GetValue<T>(T value, string alias)

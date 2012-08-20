@@ -203,7 +203,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining("Изменено"));
 
 			session.Refresh(client);
-			Assert.That(client.Payers, Is.EquivalentTo(new [] { payer }));
+			Assert.That(client.Payers, Is.EquivalentTo(new[] { payer }));
 		}
 
 		[Test]
@@ -213,6 +213,5 @@ namespace Functional.Drugstore
 			Css("#filter_Types_1_").Click();
 			Assert.That(browser.Text, Is.Not.ContainsSubstring("$$$Изменено"));
 		}
-
 	}
 }

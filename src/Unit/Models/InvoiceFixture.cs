@@ -77,7 +77,7 @@ namespace Unit.Models
 		[Test]
 		public void Invoice_for_ad()
 		{
-			var ad = new Advertising(payer) {Cost = 800};
+			var ad = new Advertising(payer) { Cost = 800 };
 			var invoice = new Invoice(ad);
 			Assert.That(invoice.Payer, Is.EqualTo(payer));
 			Assert.That(invoice.Sum, Is.EqualTo(800));
@@ -95,7 +95,7 @@ namespace Unit.Models
 		{
 			payer.Users.Each(a => a.Accounting.ReadyForAccounting = false);
 
-			var ad = new Advertising(payer) {Cost = 1500};
+			var ad = new Advertising(payer) { Cost = 1500 };
 			payer.Ads.Add(ad);
 			var invoice = new Invoice(payer, DateTime.Now.ToPeriod(), DateTime.Now);
 			Assert.That(invoice.Sum, Is.EqualTo(1500));
@@ -148,7 +148,7 @@ namespace Unit.Models
 			Assert.That(invoice.Parts[0].Sum, Is.EqualTo(600));
 		}
 
-		
+
 		[Test]
 		public void Set_pay_date()
 		{

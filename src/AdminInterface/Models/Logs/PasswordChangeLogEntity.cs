@@ -11,7 +11,8 @@ namespace AdminInterface.Models.Logs
 	public class PasswordChangeLogEntity
 	{
 		public PasswordChangeLogEntity()
-		{}
+		{
+		}
 
 		public PasswordChangeLogEntity(string target)
 		{
@@ -58,10 +59,10 @@ namespace AdminInterface.Models.Logs
 select {PasswordChangeLogEntity.*} 
 from logs.passwordchange {PasswordChangeLogEntity}
 where LogTime >= :BeginDate and LogTime <= :EndDate and TargetUserName = :Login")
-					.AddEntity(typeof(PasswordChangeLogEntity))
-					.SetParameter("BeginDate", beginDate)
-					.SetParameter("EndDate", endDate)
-					.SetParameter("Login", login).List<PasswordChangeLogEntity>());
+				.AddEntity(typeof(PasswordChangeLogEntity))
+				.SetParameter("BeginDate", beginDate)
+				.SetParameter("EndDate", endDate)
+				.SetParameter("Login", login).List<PasswordChangeLogEntity>());
 			return entity;
 		}
 

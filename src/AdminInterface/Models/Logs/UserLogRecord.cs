@@ -51,9 +51,9 @@ where {UserLogRecord}.Enabled is not null
 		and {UserLogRecord}.UserId in ( :clientId )
 order by logtime desc
 limit 100")
-				.AddEntity(typeof(UserLogRecord))
-				.SetParameterList("clientId", users.Select(u => u.Id).ToList())
-				.List<UserLogRecord>(), null);
+						.AddEntity(typeof(UserLogRecord))
+						.SetParameterList("clientId", users.Select(u => u.Id).ToList())
+						.List<UserLogRecord>(), null);
 		}
 
 		public static UserLogRecord LastOff(uint userId)
@@ -67,10 +67,9 @@ where Enabled = 0
 		and UserId = :UserId
 order by logtime desc
 limit 1")
-				.AddEntity(typeof(UserLogRecord))
-				.SetParameter("UserId", userId)
-				.UniqueResult(), null);
+						.AddEntity(typeof(UserLogRecord))
+						.SetParameter("UserId", userId)
+						.UniqueResult(), null);
 		}
-
 	}
 }

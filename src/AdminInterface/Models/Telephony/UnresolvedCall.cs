@@ -12,7 +12,8 @@ namespace AdminInterface.Models.Telephony
 	public class UnresolvedCall
 	{
 		public UnresolvedCall()
-		{}
+		{
+		}
 
 		public UnresolvedCall(string phone)
 		{

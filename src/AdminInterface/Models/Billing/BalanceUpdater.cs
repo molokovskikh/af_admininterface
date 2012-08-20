@@ -75,8 +75,7 @@ namespace AdminInterface.Models.Billing
 			var oldPayer = this.OldValue(p => p.Payer);
 			var oldSum = this.OldValue(p => p.BalanceAmount);
 
-			if (this.IsChanged(p => p.Payer) || this.IsChanged(p => p.BalanceAmount))
-			{
+			if (this.IsChanged(p => p.Payer) || this.IsChanged(p => p.BalanceAmount)) {
 				Reset(oldPayer, oldSum);
 				Apply(Payer, BalanceAmount);
 

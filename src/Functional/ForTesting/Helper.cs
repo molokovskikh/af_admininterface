@@ -5,7 +5,8 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Test.Support.Web;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.ForTesting
 {
@@ -48,8 +49,7 @@ namespace Functional.ForTesting
 
 		public static void AssertEquality<T>(this TableRow row, T record)
 		{
-			foreach (var header in FixtureMapping.Headers<T>())
-			{
+			foreach (var header in FixtureMapping.Headers<T>()) {
 				var cell = GetCellByHeader(row, header);
 				cell.AssertEquality(record, header);
 			}
@@ -59,10 +59,8 @@ namespace Functional.ForTesting
 		{
 			var headerRow = row.ContainingTable.TableRows.First();
 			var index = 0;
-			foreach (var header in headerRow.Elements)
-			{
-				try
-				{
+			foreach (var header in headerRow.Elements) {
+				try {
 					if (header.TagName != "TD" && header.TagName != "TH")
 						continue;
 
@@ -70,8 +68,7 @@ namespace Functional.ForTesting
 						return row.TableCells[index];
 					index++;
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					throw new Exception(headerText, e);
 				}
 			}
@@ -132,8 +129,7 @@ namespace Functional.ForTesting
 				Is.EqualTo(activeRecords.Length));
 
 			var index = 0;
-			foreach (var row in dataRows)
-			{
+			foreach (var row in dataRows) {
 				row.AssertEquality(activeRecords[index]);
 				index++;
 			}
@@ -159,24 +155,22 @@ namespace Functional.ForTesting
 		public static void Input<T>(this IElementContainer container, Expression<Func<T, object>> input, object value)
 		{
 			var id = GetElementName(input);
-			if (value is DateTime)
-			{
+			if (value is DateTime) {
 				var calendareButton = TryFindCalendareButton(container, id);
 				if (calendareButton == null)
-					container.TextField(Find.ById((string) id)).Value = value.ToString();
+					container.TextField(Find.ById((string)id)).Value = value.ToString();
 				else
-					EnterIntoCalendar(calendareButton, (DateTime) value);
+					EnterIntoCalendar(calendareButton, (DateTime)value);
 			}
 			else if (value is bool)
-				container.CheckBox(Find.ById((string) id)).Checked = (bool) value;
-			else 
-				container.TextField(Find.ById((string) id)).Value = value.ToString();
+				container.CheckBox(Find.ById((string)id)).Checked = (bool)value;
+			else
+				container.TextField(Find.ById((string)id)).Value = value.ToString();
 		}
 
 		public static bool IsEqualTo<T>(this TableRow row, T recordBase)
 		{
-			foreach (var header in FixtureMapping.Headers<T>())
-			{
+			foreach (var header in FixtureMapping.Headers<T>()) {
 				var cell = GetCellByHeader(row, header);
 				if (!cell.IsEqual(recordBase, header))
 					return false;
@@ -226,7 +220,7 @@ namespace Functional.ForTesting
 		private static Button TryFindCalendareButton(IElementContainer container, string id)
 		{
 			var element = container.Element(Find.ById(id));
-			return ((IElementContainer) element.Parent).Button(Find.ByClass("CalendarInput"));
+			return ((IElementContainer)element.Parent).Button(Find.ByClass("CalendarInput"));
 		}
 
 		private static int GetMonth(string title)

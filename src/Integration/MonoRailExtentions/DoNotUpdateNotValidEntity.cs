@@ -44,8 +44,7 @@ namespace Integration.MonoRailExtentions
 		public void Check_proxy_for_validation_error()
 		{
 			uint id;
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				var supplier = DataMother.CreateSupplier();
 				Save(supplier);
 				id = supplier.Id;

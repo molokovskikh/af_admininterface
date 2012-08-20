@@ -36,15 +36,14 @@ namespace Integration.Models
 		]
 		public void Throw_cant_change_password_exception_if_user_from_office()
 		{
-			using (var testUser = new TestADUser("test546116879", "LDAP://OU=Офис,DC=adc,DC=analit,DC=net"))
-			{
+			using (var testUser = new TestADUser("test546116879", "LDAP://OU=Офис,DC=adc,DC=analit,DC=net")) {
 				user.CheckLogin();
 			}
 		}
 
 		[Test]
 		[ExpectedException(typeof(LoginNotFoundException), ExpectedMessage = "Учетная запись test546116879 не найдена"),
-		Ignore("Не работает, т.к. нет доступа к AD")]
+		 Ignore("Не работает, т.к. нет доступа к AD")]
 		public void Throw_not_found_exception_if_login_not_exists()
 		{
 			ADHelper.Delete(user.Login);
@@ -54,9 +53,9 @@ namespace Integration.Models
 		[Test]
 		public void IsPermissionAssignedTest()
 		{
-			var permission = new UserPermission {Shortcut = "AF"};
+			var permission = new UserPermission { Shortcut = "AF" };
 			Assert.That(user.IsPermissionAssigned(permission), Is.False);
-			user.AssignedPermissions.Add(new UserPermission { Shortcut = "AF"});
+			user.AssignedPermissions.Add(new UserPermission { Shortcut = "AF" });
 			Assert.That(user.IsPermissionAssigned(permission));
 		}
 
@@ -170,7 +169,7 @@ namespace Integration.Models
 				.Select(v => Convert.ToBoolean(v))
 				.ToList();
 			Assert.That(info.Count, Is.GreaterThan(0));
-			Assert.That(info, Is.EqualTo(new [] {true}));
+			Assert.That(info, Is.EqualTo(new[] { true }));
 		}
 
 		[Test]

@@ -8,15 +8,16 @@ using Integration.ForTesting;
 using NHibernate.Criterion;
 using NHibernate.Linq;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.Drugstore
 {
 	public class OrderFixture : WatinFixture2
 	{
-		Client client;
-		User user;
-		ClientOrder order;
+		private Client client;
+		private User user;
+		private ClientOrder order;
 
 		[SetUp]
 		public void Setup()
@@ -28,7 +29,7 @@ namespace Functional.Drugstore
 
 			order = new ClientOrder(user, supplier.Prices[0]);
 
-			
+
 			var product = new Product(session.Load<Catalog>(DataMother.CreateCatelogProduct()));
 			var line = new OrderLine(order, product, 100, 1);
 

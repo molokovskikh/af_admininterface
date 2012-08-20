@@ -18,11 +18,9 @@ namespace AdminInterface.Background
 		public void Process()
 		{
 			foreach (var ids in Page<Account>(a => !a.ReadyForAccounting, 100)) {
-				using(var scope = new TransactionScope(OnDispose.Rollback)) {
-					ArHelper.WithSession(s => {
-						Process(ids, s);
-					});
-					
+				using (var scope = new TransactionScope(OnDispose.Rollback)) {
+					ArHelper.WithSession(s => { Process(ids, s); });
+
 					scope.VoteCommit();
 				}
 			}
@@ -34,7 +32,7 @@ namespace AdminInterface.Background
 				var account = Account.TryFind(id);
 				if (account.ObjectType == LogObjectType.User) {
 					account = session.Load<UserAccount>(id);
-					var user = ((UserAccount) account).User;
+					var user = ((UserAccount)account).User;
 					var updateCount = session.Query<UpdateLogEntity>().Count(u => u.User == user
 						&& u.Commit
 						&& (u.UpdateType == UpdateType.Accumulative || u.UpdateType == UpdateType.Cumulative));
@@ -45,7 +43,7 @@ namespace AdminInterface.Background
 				}
 				else if (account.ObjectType == LogObjectType.Address) {
 					account = session.Load<AddressAccount>(id);
-					var address = ((AddressAccount) account).Address;
+					var address = ((AddressAccount)account).Address;
 					if (address.AvaliableForUsers.Any(u => u.Accounting.ReadyForAccounting)) {
 						account.ReadyForAccounting = true;
 						account.Save();
@@ -54,11 +52,10 @@ namespace AdminInterface.Background
 			}
 		}
 
-		public IEnumerable<uint[]> Page<T>(Expression<Func<T, bool>> expression, int size) where T : class 
+		public IEnumerable<uint[]> Page<T>(Expression<Func<T, bool>> expression, int size) where T : class
 		{
 			int total;
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				total = ArHelper.WithSession(s => {
 					return s.QueryOver<T>()
 						.Where(expression)
@@ -69,13 +66,11 @@ namespace AdminInterface.Background
 			}
 
 			var pages = total / size + (total % size == 0 ? 0 : 1);
-			for (var page = 0; page <= pages; page++)
-			{
+			for (var page = 0; page <= pages; page++) {
 				uint[] result;
-				using (new SessionScope())
-				{
+				using (new SessionScope()) {
 					result = ArHelper.WithSession(s => {
-						return s.QueryOver<T>().Where(expression).Select(Projections.Id()).Skip(page*size).Take(size)
+						return s.QueryOver<T>().Where(expression).Select(Projections.Id()).Skip(page * size).Take(size)
 							.List<uint>()
 							.ToArray();
 					});

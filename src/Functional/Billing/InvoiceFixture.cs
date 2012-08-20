@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Controllers;
@@ -8,7 +8,8 @@ using Castle.ActiveRecord;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using WatiN.CssSelectorExtensions;
 
 namespace Functional.Billing
@@ -37,7 +38,7 @@ namespace Functional.Billing
 			Assert.That(browser.Text, Is.StringContaining("Удалено"));
 
 			Reopen();
-			invoice =  Invoice.TryFind(invoice.Id);
+			invoice = Invoice.TryFind(invoice.Id);
 			Assert.That(invoice, Is.Null);
 		}
 

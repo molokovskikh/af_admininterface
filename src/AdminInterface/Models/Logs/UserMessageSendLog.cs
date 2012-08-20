@@ -9,7 +9,8 @@ namespace AdminInterface.Models.Logs
 	public class UserMessageSendLog
 	{
 		public UserMessageSendLog()
-		{}
+		{
+		}
 
 		public UserMessageSendLog(UserMessage message)
 		{

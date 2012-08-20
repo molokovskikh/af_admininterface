@@ -12,14 +12,16 @@ namespace AdminInterface.Models.Listeners
 	{
 		public ResetReclameDateAttribute()
 			: base(typeof(ResetReclameDate))
-		{}
+		{
+		}
 	}
 
 	public class SetForceReplicationAttribute : TriggerQueryAttribute
 	{
 		public SetForceReplicationAttribute()
 			: base(typeof(SetForceReplication))
-		{}
+		{
+		}
 	}
 
 	public class TriggerQueryAttribute : Attribute

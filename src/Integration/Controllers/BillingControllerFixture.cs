@@ -46,7 +46,7 @@ namespace Integration.Controllers
 
 			session.Refresh(supplier);
 			Assert.That(supplier.Disabled, Is.True);
-			
+
 			var message = notifications.First();
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), notifications.Implode(n => n.Subject));
 			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == supplier.Id).ToList();

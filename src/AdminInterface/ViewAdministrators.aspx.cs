@@ -35,34 +35,29 @@ public partial class ViewAdministrators : Page
 			path = "/" + path;
 		if (!path.EndsWith("/"))
 			path += "/";
-		switch (e.CommandName)
-		{
-			case "Create":
-				{
-					Response.Redirect(path + "RegionalAdmin/Add");
-					break;
-				}
-			case "Edit":
-				{
-					Response.Redirect(String.Format(path + "RegionalAdmin/{0}/Edit", e.CommandArgument));
-					break;
-				}
-			case "Disable":
-				{
-					var login = e.CommandArgument.ToString();
-					ADHelper.Disable(login);
-					Mailer.RegionalAdminBlocked(Administrator.GetByName(login));
-					Response.Redirect("ViewAdministrators.aspx");
-					break;
-				}
-			case "Enable":
-				{
-					var login = e.CommandArgument.ToString();
-					ADHelper.Enable(login);
-					Mailer.RegionalAdminUnblocked(Administrator.GetByName(login));
-					Response.Redirect("ViewAdministrators.aspx");
-					break;
-				}
+		switch (e.CommandName) {
+			case "Create": {
+				Response.Redirect(path + "RegionalAdmin/Add");
+				break;
+			}
+			case "Edit": {
+				Response.Redirect(String.Format(path + "RegionalAdmin/{0}/Edit", e.CommandArgument));
+				break;
+			}
+			case "Disable": {
+				var login = e.CommandArgument.ToString();
+				ADHelper.Disable(login);
+				Mailer.RegionalAdminBlocked(Administrator.GetByName(login));
+				Response.Redirect("ViewAdministrators.aspx");
+				break;
+			}
+			case "Enable": {
+				var login = e.CommandArgument.ToString();
+				ADHelper.Enable(login);
+				Mailer.RegionalAdminUnblocked(Administrator.GetByName(login));
+				Response.Redirect("ViewAdministrators.aspx");
+				break;
+			}
 			case "Del":
 				var administrator = Administrator.GetById(Convert.ToUInt32(e.CommandArgument));
 				administrator.Delete();
@@ -95,14 +90,14 @@ public partial class ViewAdministrators : Page
 	protected string GetPermissionShortcut(PermissionType permissionType)
 	{
 		return (from permission in permissions
-			   where permissionType == permission.Type
-			   select permission.Shortcut).First();
+			where permissionType == permission.Type
+			select permission.Shortcut).First();
 	}
 
 	protected string GetPermissionName(PermissionType permissionType)
 	{
 		return (from permission in permissions
-				where permissionType == permission.Type
-				select permission.Name).First();
+			where permissionType == permission.Type
+			select permission.Name).First();
 	}
 }

@@ -51,14 +51,12 @@ namespace AdminInterface.Controllers
 			var payer = DbSession.Load<Payer>(id);
 			var payment = new Payment(payer);
 			BindObjectInstance(payment, "payment");
-			if (!HasValidationError(payment))
-			{
+			if (!HasValidationError(payment)) {
 				Notify("Сохранено");
 				payment.RegisterPayment();
 				payment.Save();
 			}
-			else
-			{
+			else {
 				Error(GetFirstErrorWithProperty(payment));
 			}
 
@@ -72,13 +70,11 @@ namespace AdminInterface.Controllers
 			var payer = DbSession.Load<Payer>(id);
 			var operation = new BalanceOperation(payer);
 			BindObjectInstance(operation, "operation");
-			if (IsValid(operation))
-			{
+			if (IsValid(operation)) {
 				ActiveRecordMediator.Save(operation);
 				Notify("Сохранено");
 			}
-			else
-			{
+			else {
 				Error(GetFirstErrorWithProperty(operation));
 			}
 
@@ -101,8 +97,7 @@ namespace AdminInterface.Controllers
 		public void InvoicePreview(uint id, int group)
 		{
 			var payer = DbSession.Load<Payer>(id);
-			if (payer.Recipient == null)
-			{
+			if (payer.Recipient == null) {
 				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
@@ -122,20 +117,17 @@ namespace AdminInterface.Controllers
 			PropertyBag["invoice"] = invoice;
 			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
 
-			if (IsPost)
-			{
+			if (IsPost) {
 				BindObjectInstance(invoice, "invoice");
-				if (!HasValidationError(invoice))
-				{
+				if (!HasValidationError(invoice)) {
 					invoice.SetPayer(payer);
 					invoice.CalculateSum();
 					invoice.Save();
 					Notify("Счет сформирован");
-					Redirect("Billing", "Edit", new {BillingCode = payer.Id});
+					Redirect("Billing", "Edit", new { BillingCode = payer.Id });
 				}
 			}
-			else
-			{
+			else {
 				invoice.Parts.Add(new InvoicePart(invoice));
 			}
 		}
@@ -147,20 +139,17 @@ namespace AdminInterface.Controllers
 			PropertyBag["act"] = act;
 			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
 
-			if (IsPost)
-			{
+			if (IsPost) {
 				BindObjectInstance(act, "act");
-				if (IsValid(act))
-				{
+				if (IsValid(act)) {
 					act.SetPayer(payer);
 					act.CalculateSum();
 					act.Save();
 					Notify("Акт сформирован");
-					Redirect("Billing", "Edit", new {BillingCode = payer.Id});
+					Redirect("Billing", "Edit", new { BillingCode = payer.Id });
 				}
 			}
-			else
-			{
+			else {
 				act.Parts.Add(new ActPart(act));
 			}
 			RenderView("/Acts/Edit");
@@ -178,13 +167,11 @@ namespace AdminInterface.Controllers
 		{
 			var payer = DbSession.Load<Payer>(id);
 			var ad = new Advertising(payer);
-			if (IsPost)
-			{
+			if (IsPost) {
 				BindObjectInstance(ad, "ad");
-				if (!HasValidationError(ad))
-				{
+				if (!HasValidationError(ad)) {
 					ad.Save();
-					Redirect("Payers", "Ad", new{payer.Id});
+					Redirect("Payers", "Ad", new { payer.Id });
 				}
 			}
 			PropertyBag["ad"] = ad;
@@ -198,8 +185,7 @@ namespace AdminInterface.Controllers
 			if (payer.GetAccounts().Count() == 0)
 				Error("Нет ни одной позиции для формирования счета");
 
-			if (IsPost)
-			{
+			if (IsPost) {
 				SetBinder(new AccountBinder());
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 				var accounts = BindObject<Account[]>(ParamStore.Form, "accounts");

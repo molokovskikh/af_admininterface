@@ -75,7 +75,7 @@ namespace Unit.Models
 		[Test]
 		public void After_build_act_update_ad_act_reference()
 		{
-			var ad = new Advertising(payer) {Cost = 1500};
+			var ad = new Advertising(payer) { Cost = 1500 };
 			payer.Ads.Add(ad);
 			invoice = new Invoice(payer, DateTime.Now.ToPeriod(), DateTime.Now);
 			var act = new Act(DateTime.Now, invoice);

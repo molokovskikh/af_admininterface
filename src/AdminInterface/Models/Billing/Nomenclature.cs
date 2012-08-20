@@ -9,7 +9,8 @@ namespace AdminInterface.Models.Billing
 	public class Nomenclature : ActiveRecordLinqBase<Nomenclature>
 	{
 		public Nomenclature()
-		{}
+		{
+		}
 
 		public Nomenclature(string name)
 		{

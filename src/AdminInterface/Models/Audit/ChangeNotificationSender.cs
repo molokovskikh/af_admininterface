@@ -11,21 +11,24 @@ namespace AdminInterface.Models.Audit
 	{
 		public NotifyAttribute()
 			: base(typeof(ChangeNotificationSender), "RegisterList@subscribe.analit.net")
-		{}
+		{
+		}
 	}
 
 	public class NotifyBilling : SendEmail
 	{
 		public NotifyBilling()
 			: base(typeof(ChangeNotificationSender), "BillingList@analit.net")
-		{}
+		{
+		}
 	}
 
 	public class NotifyNews : SendEmail
 	{
 		public NotifyNews()
 			: base(typeof(ChangeNotificationSender), "AFNews@subscribe.analit.net")
-		{}
+		{
+		}
 	}
 
 	public interface IChangesNotificationAware
@@ -40,7 +43,7 @@ namespace AdminInterface.Models.Audit
 
 	public class ChangeNotificationSender : ISendNoticationChangesInterface
 	{
-		private static readonly ILog _log = LogManager.GetLogger(typeof (ChangeNotificationSender));
+		private static readonly ILog _log = LogManager.GetLogger(typeof(ChangeNotificationSender));
 
 		//для тестирования
 		public static IEmailSender Sender;

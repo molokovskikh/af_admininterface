@@ -13,7 +13,7 @@ namespace AdminInterface.Queries
 			if (entity is Client)
 				_client = (Client)entity;
 			else
-				_client = ((DrugstoreSettings) entity).Client;
+				_client = ((DrugstoreSettings)entity).Client;
 		}
 
 		public void Execute(ISession session)

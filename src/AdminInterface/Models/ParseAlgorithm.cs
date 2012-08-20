@@ -11,7 +11,7 @@ namespace AdminInterface.Models
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
-		
+
 		[Property]
 		public virtual string Name { get; set; }
 	}

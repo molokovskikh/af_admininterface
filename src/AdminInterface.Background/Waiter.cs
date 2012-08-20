@@ -31,7 +31,7 @@ namespace AdminInterface.Background
 				new ReportLogsProcessor().Process();
 				new InvoicePartProcessor().Process();
 
-				using(new SessionScope())
+				using (new SessionScope())
 					jobs.Each(j => j.Run());
 			};
 		}
@@ -40,8 +40,7 @@ namespace AdminInterface.Background
 		{
 			StandaloneInitializer.Init(typeof(SendInvoiceTask).Assembly);
 
-			using(new SessionScope())
-			{
+			using (new SessionScope()) {
 				var job = new ActiveRecordJob(new SendPaymentNotification());
 				jobs.Add(job);
 			}

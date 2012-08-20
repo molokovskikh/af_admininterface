@@ -11,8 +11,7 @@ namespace AdminInterface.Background
 	{
 		public void Process()
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
+			using (var scope = new TransactionScope(OnDispose.Rollback)) {
 				var state = ReportLogProcessorState.Queryable.FirstOrDefault();
 				if (state == null)
 					state = new ReportLogProcessorState();
@@ -39,8 +38,7 @@ where l.LogTime >= :begin and l.PayerId is not null")
 					return allowChanges.Concat(payerChanges).Distinct().ToArray();
 				});
 
-				foreach (var payerId in payerIds)
-				{
+				foreach (var payerId in payerIds) {
 					var payer = Payer.Find(payerId);
 					payer.UpdatePaymentSum();
 					payer.Save();

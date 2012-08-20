@@ -42,9 +42,9 @@ namespace AdminInterface.Controllers
 			if (result.Count == 1) {
 				var item = result.First();
 				if (item.ClientType == SearchClientType.Supplier)
-					RedirectUsingRoute("suppliers", "show", new {id = item.ClientId});
+					RedirectUsingRoute("suppliers", "show", new { id = item.ClientId });
 				else
-					RedirectUsingRoute("users", "edit", new {id = item.UserId});
+					RedirectUsingRoute("users", "edit", new { id = item.UserId });
 			}
 		}
 	}

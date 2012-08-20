@@ -8,7 +8,8 @@ using Functional.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using WatiN.Core.Native.Windows;
 
 namespace Functional.Drugstore
@@ -16,7 +17,7 @@ namespace Functional.Drugstore
 	[TestFixture]
 	public class DrugstoreFixture : WatinFixture2
 	{
-		Client testClient;
+		private Client testClient;
 
 		[SetUp]
 		public void Setup()
@@ -31,8 +32,7 @@ namespace Functional.Drugstore
 		public void Try_to_view_orders()
 		{
 			browser.Link(l => l.Text == "История заказов").Click();
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("История заказов")))
-			{
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("История заказов"))) {
 				Assert.That(openedWindow.Text, Is.StringContaining("История заказов"));
 			}
 		}
@@ -45,15 +45,14 @@ namespace Functional.Drugstore
 				RequestTime = DateTime.Now,
 				AppVersion = 833,
 				UpdateType = UpdateType.Accumulative,
-				ResultSize = 1*1024*1024,
+				ResultSize = 1 * 1024 * 1024,
 				Commit = true,
 				UserName = user.Login,
 				User = user,
 			};
 			Save(updateLogEnity);
 			browser.Link(l => l.Text == "История обновлений").Click();
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений"))))
-			{
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений")))) {
 				Assert.That(openedWindow.Text, Is.StringContaining("История обновлений"));
 				Assert.That(openedWindow.Text, Is.StringContaining(user.GetLoginOrName()));
 				Assert.That(openedWindow.Text, Is.StringContaining("833"));
@@ -76,8 +75,7 @@ namespace Functional.Drugstore
 			browser.Link(Find.ByText(user.Login)).Click();
 			Assert.That(browser.Text, Is.StringContaining("Пользователь"));
 			browser.Link(Find.ByText("Поиск предложений")).Click();
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("Поиск предложений для пользователя " + user.GetLoginOrName())))
-			{
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("Поиск предложений для пользователя " + user.GetLoginOrName()))) {
 				Assert.That(openedWindow.Text, Is.StringContaining("Введите наименование или форму выпуска"));
 			}
 		}

@@ -61,7 +61,7 @@ namespace AdminInterface.Models.Security
 
 		public static IList<Permission> FindAll()
 		{
-			return ActiveRecordMediator<Permission>.FindAll(new [] { Order.Asc("Name") });
+			return ActiveRecordMediator<Permission>.FindAll(new[] { Order.Asc("Name") });
 		}
 
 		public bool HaveAccessTo(string controller, string action)
@@ -74,9 +74,8 @@ namespace AdminInterface.Models.Security
 					|| Type == PermissionType.RegisterSupplier
 					|| Type == PermissionType.Billing;
 
-			if (Type == PermissionType.Billing)
-			{
-				var billingControllers = new [] {
+			if (Type == PermissionType.Billing) {
+				var billingControllers = new[] {
 					"payments",
 					"invoices",
 					"billing",
@@ -90,46 +89,40 @@ namespace AdminInterface.Models.Security
 				};
 				return billingControllers.Any(c => c == controller.ToLower());
 			}
-			if (Type == PermissionType.ViewDrugstore)
-			{
-				var drugstore = new [] {
+			if (Type == PermissionType.ViewDrugstore) {
+				var drugstore = new[] {
 					"clients", "users", "addresses", "mails", "monitoring", "logs", "news", "legalentity"
 				};
 				return drugstore.Any(c => c == controller.ToLower());
 			}
-			if (Type == PermissionType.RegisterSupplier)
-			{
+			if (Type == PermissionType.RegisterSupplier) {
 				if (controller.ToLower() == "register"
 					&& (action.ToLower() == "RegisterSupplier".ToLower() || action.ToLower() == "SearchPayers".ToLower()))
 					return true;
 			}
-			if (Type == PermissionType.ViewSuppliers)
-			{
-				var controllers = new [] {
+			if (Type == PermissionType.ViewSuppliers) {
+				var controllers = new[] {
 					"suppliers",
 					"users",
 					"mails",
 				};
 				return controllers.Any(c => c == controller.ToLower());
 			}
-			if (Type == PermissionType.ManageSuppliers)
-			{
-				var controllers = new [] {
+			if (Type == PermissionType.ManageSuppliers) {
+				var controllers = new[] {
 					"SpecialHandlers".ToLower(),
 				};
 				return controllers.Any(c => c == controller.ToLower());
 			}
-			if (Type == PermissionType.ViewSuppliers)
-			{
-				var controllers = new [] {
+			if (Type == PermissionType.ViewSuppliers) {
+				var controllers = new[] {
 					"clients",
 					"users",
 					"addresses",
 				};
 				return controllers.Any(c => c == controller.ToLower());
 			}
-			if (Type == PermissionType.RegisterDrugstore)
-			{
+			if (Type == PermissionType.RegisterDrugstore) {
 				if (controller.ToLower() == "register"
 					&& (action.ToLower() == "RegisterClient".ToLower()
 						|| action.ToLower() == "SearchSuppliers".ToLower()
@@ -137,11 +130,11 @@ namespace AdminInterface.Models.Security
 					return true;
 			}
 			if (Type == PermissionType.ManagerReport) {
-				var controllers = new[] {"ManagerReports"};
+				var controllers = new[] { "ManagerReports" };
 				return controllers.Any(c => c.ToLower() == controller.ToLower());
 			}
-			if(Type == PermissionType.CallHistory) {
-				if(controller.ToLower() == "callhistory"
+			if (Type == PermissionType.CallHistory) {
+				if (controller.ToLower() == "callhistory"
 					&& action.ToLower() == "toexcel") {
 					return true;
 				}
@@ -158,22 +151,19 @@ namespace AdminInterface.Models.Security
 			allExceptProcessing.AddRange(allExceptProcessingAndBilling);
 
 			var department = Department.Administration;
-			foreach (var item in BindingHelper.GetDescriptionsDictionary(typeof (Department)))
-			{
-				if (departmentDescription.Equals(item.Value))
-				{
-					department = (Department) Enum.ToObject(typeof (Department), item.Key);
+			foreach (var item in BindingHelper.GetDescriptionsDictionary(typeof(Department))) {
+				if (departmentDescription.Equals(item.Value)) {
+					department = (Department)Enum.ToObject(typeof(Department), item.Key);
 					break;
 				}
 			}
 
-			switch (Type)
-			{
+			switch (Type) {
 				case PermissionType.ConfigurerEditProducers:
 					return (department == Department.Administration);
 				case PermissionType.CanRegisterClientWhoWorkForFree:
 					return (new List<Department> {
-						Department.Administration, 
+						Department.Administration,
 						Department.Manager
 					}).Contains(department);
 				case PermissionType.ViewDrugstore:
@@ -219,18 +209,16 @@ namespace AdminInterface.Models.Security
 
 		public static bool CheckPermissionByAttribute(Administrator administrator, ICustomAttributeProvider action)
 		{
-			var attributes = action.GetCustomAttributes(typeof (RequiredPermissionAttribute), true);
+			var attributes = action.GetCustomAttributes(typeof(RequiredPermissionAttribute), true);
 
-			foreach (RequiredPermissionAttribute attribute in attributes)
-			{
+			foreach (RequiredPermissionAttribute attribute in attributes) {
 				bool isPermissionGranted;
 				if (attribute.Required == Required.All)
 					isPermissionGranted = administrator.HavePermisions(attribute.PermissionTypes);
 				else
 					isPermissionGranted = administrator.HaveAnyOfPermissions(attribute.PermissionTypes);
 
-				if (!isPermissionGranted)
-				{
+				if (!isPermissionGranted) {
 					return false;
 				}
 			}

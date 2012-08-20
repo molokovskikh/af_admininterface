@@ -38,16 +38,14 @@ namespace AdminInterface.Controllers
 			SetBinder(binder);
 			var invoices = BindObject<Invoice[]>("invoices");
 
-			if (Form["delete"] != null)
-			{
+			if (Form["delete"] != null) {
 				foreach (var act in invoices)
 					act.Delete();
 
 				Notify("Удалено");
 				RedirectToReferrer();
 			}
-			if (Form["print"] != null)
-			{
+			if (Form["print"] != null) {
 				var printer = Form["printer"];
 				var arguments = String.Format("invoice \"{0}\" \"{1}\"", printer, invoices.Implode(i => i.Id));
 				Printer.Execute(arguments);
@@ -55,8 +53,7 @@ namespace AdminInterface.Controllers
 				Notify("Отправлено на печать");
 				RedirectToReferrer();
 			}
-			if (Form["mail"] != null)
-			{
+			if (Form["mail"] != null) {
 				foreach (var invoice in invoices)
 					this.Mailer().InvoiceToEmail(invoice, true).Send();
 
@@ -95,17 +92,15 @@ namespace AdminInterface.Controllers
 			PropertyBag["invoice"] = invoice;
 			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
 
-			if (IsPost)
-			{
+			if (IsPost) {
 				RecreateOnlyIfNullBinder.Prepare(this, "invoice.Parts");
 
 				BindObjectInstance(invoice, "invoice");
-				if (!HasValidationError(invoice))
-				{
+				if (!HasValidationError(invoice)) {
 					invoice.CalculateSum();
 					invoice.Save();
 					Notify("Сохранено");
-					Redirect("Invoices", "Edit", new {invoice.Id});
+					Redirect("Invoices", "Edit", new { invoice.Id });
 				}
 			}
 		}

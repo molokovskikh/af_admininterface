@@ -7,7 +7,8 @@ using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.Billing
 {
@@ -94,7 +95,7 @@ namespace Functional.Billing
 		private Table GetLogTable()
 		{
 			var div = browser.Div(Find.ByText("История"));
-			var table = ((IElementContainer) div.Parent).Tables.First();
+			var table = ((IElementContainer)div.Parent).Tables.First();
 			return table;
 		}
 	}

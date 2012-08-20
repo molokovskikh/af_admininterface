@@ -56,8 +56,8 @@ namespace AdminInterface.Models.Billing
 		{
 			if (ReferenceEquals(null, obj)) return false;
 			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != typeof (Period)) return false;
-			return Equals((Period) obj);
+			if (obj.GetType() != typeof(Period)) return false;
+			return Equals((Period)obj);
 		}
 
 		public bool Equals(Period other)
@@ -69,9 +69,8 @@ namespace AdminInterface.Models.Billing
 
 		public override int GetHashCode()
 		{
-			unchecked
-			{
-				return (Year*397) ^ Interval.GetHashCode();
+			unchecked {
+				return (Year * 397) ^ Interval.GetHashCode();
 			}
 		}
 
@@ -109,7 +108,7 @@ namespace AdminInterface.Models.Billing
 			if (!int.TryParse(parts[0], out year))
 				return null;
 
-			var descriptions = BindingHelper.GetDescriptionsDictionary(typeof (Interval));
+			var descriptions = BindingHelper.GetDescriptionsDictionary(typeof(Interval));
 			var pair = descriptions.FirstOrDefault(p => String.Equals(p.Value, parts[1], StringComparison.CurrentCultureIgnoreCase));
 			if (pair.Key == null)
 				return null;
@@ -146,8 +145,7 @@ namespace AdminInterface.Models.Billing
 		public static DateTime GetPeriodBegin(this Period period)
 		{
 			int year = period.Year;
-			switch (period.Interval)
-			{
+			switch (period.Interval) {
 				case Interval.January:
 					return new DateTime(year, 1, 1);
 				case Interval.February:
@@ -203,8 +201,7 @@ namespace AdminInterface.Models.Billing
 
 		public static string GetPeriodName(this Period period)
 		{
-			switch (period.Interval)
-			{
+			switch (period.Interval) {
 				case Interval.January:
 					return "январе";
 				case Interval.February:
@@ -262,7 +259,7 @@ namespace AdminInterface.Models.Billing
 		public static Period[] Months(this Period period)
 		{
 			if (!quaterMap.ContainsKey(period.Interval))
-				return new[] {period};
+				return new[] { period };
 			return quaterMap[period.Interval].Select(i => new Period(period.Year, i)).ToArray();
 		}
 	}

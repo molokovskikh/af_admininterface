@@ -15,7 +15,7 @@
 							<asp:Button ID="Button2" runat="server" Text="Создать" CausesValidation="False" CommandName="Create" />
 						</HeaderTemplate>
 						<ItemTemplate>
-							<asp:Button ID="Button1" CommandArgument='<%# Bind("Id")%>' runat="server" CausesValidation="False" CommandName="Del"
+							<asp:Button ID="Button1" CommandArgument='<%# Bind("Id") %>' runat="server" CausesValidation="False" CommandName="Del"
 								Text="Удалить" Visible='<%# GetDeleteBlockButtonVisibiliti((Eval("UserName").ToString())) %>' />
 						</ItemTemplate>
 						<ItemStyle HorizontalAlign="Left" />
@@ -30,7 +30,7 @@
 					<asp:BoundField DataField="ManagerName" HeaderText="ФИО" />
 					<asp:TemplateField HeaderText="Имя пользователя" SortExpression="Login">
 						<ItemTemplate>
-							<asp:LinkButton CommandArgument='<%# Bind("Id")%>' ID="LinkButton1" Text='<%# Bind("UserName")%>' runat="server" CommandName="Edit">LinkButton</asp:LinkButton>
+							<asp:LinkButton CommandArgument='<%# Bind("Id") %>' ID="LinkButton1" Text='<%# Bind("UserName") %>' runat="server" CommandName="Edit">LinkButton</asp:LinkButton>
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="Email" HeaderText="E-mail" SortExpression="Email" />
@@ -155,30 +155,30 @@
 				</Columns>
 			</asp:GridView>
 			<ul class="Legend">
-				<li><%# GetPermissionShortcut(PermissionType.ViewDrugstore) %> - <%# GetPermissionName(PermissionType.ViewDrugstore)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.RegisterDrugstore) %> - <%# GetPermissionName(PermissionType.RegisterDrugstore)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.ManageDrugstore) %> - <%# GetPermissionName(PermissionType.ManageDrugstore)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.DrugstoreInterface) %> - <%# GetPermissionName(PermissionType.DrugstoreInterface)%></li>
+				<li><%# GetPermissionShortcut(PermissionType.ViewDrugstore) %> - <%# GetPermissionName(PermissionType.ViewDrugstore) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.RegisterDrugstore) %> - <%# GetPermissionName(PermissionType.RegisterDrugstore) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.ManageDrugstore) %> - <%# GetPermissionName(PermissionType.ManageDrugstore) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.DrugstoreInterface) %> - <%# GetPermissionName(PermissionType.DrugstoreInterface) %></li>
 
 
-				<li><%# GetPermissionShortcut(PermissionType.ViewSuppliers) %> - <%# GetPermissionName(PermissionType.ViewSuppliers)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.RegisterSupplier) %> - <%# GetPermissionName(PermissionType.RegisterSupplier)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.ManageSuppliers) %> - <%# GetPermissionName(PermissionType.ManageSuppliers)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.SupplierInterface) %> - <%# GetPermissionName(PermissionType.SupplierInterface)%></li>
+				<li><%# GetPermissionShortcut(PermissionType.ViewSuppliers) %> - <%# GetPermissionName(PermissionType.ViewSuppliers) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.RegisterSupplier) %> - <%# GetPermissionName(PermissionType.RegisterSupplier) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.ManageSuppliers) %> - <%# GetPermissionName(PermissionType.ManageSuppliers) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.SupplierInterface) %> - <%# GetPermissionName(PermissionType.SupplierInterface) %></li>
 
-				<li><%# GetPermissionShortcut(PermissionType.ManageAdministrators) %> - <%# GetPermissionName(PermissionType.ManageAdministrators)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.Billing) %> - <%# GetPermissionName(PermissionType.Billing)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.MonitorUpdates) %> - <%# GetPermissionName(PermissionType.MonitorUpdates)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.RegisterInvisible) %> - <%# GetPermissionName(PermissionType.RegisterInvisible)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.SendNotification) %> - <%# GetPermissionName(PermissionType.SendNotification)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.ChangePassword) %> - <%# GetPermissionName(PermissionType.ChangePassword)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.CopySynonyms) %> - <%# GetPermissionName(PermissionType.CopySynonyms)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.CanRegisterClientWhoWorkForFree)%> - <%# GetPermissionName(PermissionType.CanRegisterClientWhoWorkForFree)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.EditSettings)%> - <%# GetPermissionName(PermissionType.EditSettings)%></li>
+				<li><%# GetPermissionShortcut(PermissionType.ManageAdministrators) %> - <%# GetPermissionName(PermissionType.ManageAdministrators) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.Billing) %> - <%# GetPermissionName(PermissionType.Billing) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.MonitorUpdates) %> - <%# GetPermissionName(PermissionType.MonitorUpdates) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.RegisterInvisible) %> - <%# GetPermissionName(PermissionType.RegisterInvisible) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.SendNotification) %> - <%# GetPermissionName(PermissionType.SendNotification) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.ChangePassword) %> - <%# GetPermissionName(PermissionType.ChangePassword) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.CopySynonyms) %> - <%# GetPermissionName(PermissionType.CopySynonyms) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.CanRegisterClientWhoWorkForFree) %> - <%# GetPermissionName(PermissionType.CanRegisterClientWhoWorkForFree) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.EditSettings) %> - <%# GetPermissionName(PermissionType.EditSettings) %></li>
 				
-				<li><%# GetPermissionShortcut(PermissionType.ConfigurerEditProducers)%> - <%# GetPermissionName(PermissionType.ConfigurerEditProducers)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.CallHistory)%> - <%# GetPermissionName(PermissionType.CallHistory)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.ChangePayment)%> - <%# GetPermissionName(PermissionType.ChangePayment)%></li>
+				<li><%# GetPermissionShortcut(PermissionType.ConfigurerEditProducers) %> - <%# GetPermissionName(PermissionType.ConfigurerEditProducers) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.CallHistory) %> - <%# GetPermissionName(PermissionType.CallHistory) %></li>
+				<li><%# GetPermissionShortcut(PermissionType.ChangePayment) %> - <%# GetPermissionName(PermissionType.ChangePayment) %></li>
 			</ul>
 		</div>
 	</form>

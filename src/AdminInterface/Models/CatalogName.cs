@@ -6,7 +6,8 @@ namespace AdminInterface.Models
 	public class CatalogName
 	{
 		public CatalogName()
-		{}
+		{
+		}
 
 		public CatalogName(string name)
 		{
@@ -24,7 +25,8 @@ namespace AdminInterface.Models
 	public class CatalogForm
 	{
 		public CatalogForm()
-		{}
+		{
+		}
 
 		public CatalogForm(string name)
 		{
@@ -37,5 +39,4 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual string Form { get; set; }
 	}
-
 }

@@ -46,7 +46,7 @@ namespace Integration
 			ForTest.InitializeMailer();
 			mailer = ForTest.TestMailer(m => message = m);
 
-			payer = new Payer("Тестовый плательщик") {PayerID = 10};
+			payer = new Payer("Тестовый плательщик") { PayerID = 10 };
 			client = new Client(payer, Data.DefaultRegion) {
 				Id = 58,
 				Name = "Тестовый клиент",
@@ -77,7 +77,7 @@ namespace Integration
 		public void BillingNotificationTest()
 		{
 			payer.Comment = "";
-			var paymentOptions = new PaymentOptions{ WorkForFree = true, Comment = "Независимая копия" };
+			var paymentOptions = new PaymentOptions { WorkForFree = true, Comment = "Независимая копия" };
 			payer.AddComment(paymentOptions.GetCommentForPayer());
 
 			mailer.NotifyBillingAboutClientRegistration(client);
@@ -108,7 +108,7 @@ namespace Integration
 		[Test]
 		public void Billing_notification_for_client_with_basic_submission()
 		{
-			var paymentOptions = new PaymentOptions { PaymentPeriodBeginDate = new DateTime(2007, 1, 1), Comment = "Test comment"};
+			var paymentOptions = new PaymentOptions { PaymentPeriodBeginDate = new DateTime(2007, 1, 1), Comment = "Test comment" };
 			payer.AddComment(paymentOptions.GetCommentForPayer());
 
 			mailer.NotifyBillingAboutClientRegistration(client);
@@ -145,8 +145,7 @@ namespace Integration
 		[Test]
 		public void Send_invoice()
 		{
-			using(new SessionScope())
-			{
+			using (new SessionScope()) {
 				var invoice = CreateInvoice();
 
 				mailer.InvoiceToEmail(invoice, false);
@@ -159,8 +158,7 @@ namespace Integration
 		[Test]
 		public void Send_invoice_to_minimail_as_attachment()
 		{
-			using(new SessionScope())
-			{
+			using (new SessionScope()) {
 				var invoice = CreateInvoice();
 
 				mailer.SendInvoiceToMinimail(invoice);
@@ -174,8 +172,7 @@ namespace Integration
 		[Test]
 		public void Broken_invoice()
 		{
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				var invoice = CreateInvoice();
 
 				mailer.DoNotHaveInvoiceContactGroup(invoice);

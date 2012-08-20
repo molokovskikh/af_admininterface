@@ -15,8 +15,7 @@ namespace AdminInterface.Security
 			IControllerContext controllerContext)
 		{
 			var administrator = SecurityContext.Administrator;
-			if (administrator == null)
-			{
+			if (administrator == null) {
 				context.Response.RedirectToUrl("~/Rescue/NotAuthorized.aspx");
 				return false;
 			}
@@ -28,8 +27,7 @@ namespace AdminInterface.Security
 			else
 				isPermissionGranted = administrator.HaveAnyOfPermissions(_attribute.PermissionTypes);
 
-			if (!isPermissionGranted)
-			{
+			if (!isPermissionGranted) {
 				context.Response.RedirectToUrl("~/Rescue/NotAllowed.aspx");
 				return false;
 			}
@@ -37,15 +35,14 @@ namespace AdminInterface.Security
 			var mayBeActions = controllerContext.ControllerDescriptor.Actions[controllerContext.Action];
 			MethodInfo action;
 			if (mayBeActions is ArrayList)
-				action = (MethodInfo) ((ArrayList) mayBeActions)[0];
+				action = (MethodInfo)((ArrayList)mayBeActions)[0];
 			else
-				action = (MethodInfo) mayBeActions;
+				action = (MethodInfo)mayBeActions;
 
 			if (action == null)
 				return true;
 
-			if (!Permission.CheckPermissionByAttribute(administrator, action))
-			{
+			if (!Permission.CheckPermissionByAttribute(administrator, action)) {
 				context.Response.RedirectToUrl("~/Rescue/NotAllowed.aspx");
 				return false;
 			}
@@ -55,7 +52,7 @@ namespace AdminInterface.Security
 
 		public FilterAttribute Filter
 		{
-			set { _attribute = (SecureAttribute) value; }
+			set { _attribute = (SecureAttribute)value; }
 		}
 	}
 }

@@ -12,18 +12,20 @@ namespace KadeSoft
 	/// </summary>
 	public class WaveFileReader : IDisposable
 	{
-		BinaryReader reader;
+		private BinaryReader reader;
 
-		riffChunk mainfile;
-		fmtChunk format;
-		factChunk fact;
-		dataChunk data;
+		private riffChunk mainfile;
+		private fmtChunk format;
+		private factChunk fact;
+		private dataChunk data;
 
-#region General Utilities
+		#region General Utilities
+
 		/*
 		 * WaveFileReader(string) - 2004 July 28
 		 * A fairly standard constructor that opens a file using the filename supplied to it.
 		 */
+
 		public WaveFileReader(string filename)
 		{
 			reader = new BinaryReader(new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read));
@@ -33,6 +35,7 @@ namespace KadeSoft
 		 * long GetPosition() - 2004 July 28
 		 * Returns the current position of the reader's BaseStream.
 		 */
+
 		public long GetPosition()
 		{
 			return reader.BaseStream.Position;
@@ -43,6 +46,7 @@ namespace KadeSoft
 		 * Reads the next four bytes from the file, converts the 
 		 * char array into a string, and returns it.
 		 */
+
 		public string GetChunkName()
 		{
 			return new string(reader.ReadChars(4));
@@ -54,26 +58,31 @@ namespace KadeSoft
 		 * since we only really care about the fmt and data 
 		 * streams for now.
 		 */
+
 		public void AdvanceToNext()
 		{
-			long NextOffset = (long) reader.ReadUInt32(); //Get next chunk offset
+			long NextOffset = (long)reader.ReadUInt32(); //Get next chunk offset
 			//Seek to the next offset from current position
-			reader.BaseStream.Seek(NextOffset,SeekOrigin.Current);
+			reader.BaseStream.Seek(NextOffset, SeekOrigin.Current);
 		}
-#endregion
-#region Header Extraction Methods
+
+		#endregion
+
+		#region Header Extraction Methods
+
 		/*
 		 * WaveFileFormat ReadMainFileHeader - 2004 July 28
 		 * Read in the main file header.  Not much more to say, really.
 		 * For XML serialization purposes, I "correct" the dwFileLength
 		 * field to describe the whole file's length.
 		 */
+
 		public riffChunk ReadMainFileHeader()
 		{
 			mainfile = new riffChunk();
 
 			mainfile.sGroupID = new string(reader.ReadChars(4));
-			mainfile.dwFileLength = reader.ReadUInt32()+8;
+			mainfile.dwFileLength = reader.ReadUInt32() + 8;
 			mainfile.sRiffType = new string(reader.ReadChars(4));
 			return mainfile;
 		}
@@ -93,7 +102,7 @@ namespace KadeSoft
 			format.wBlockAlign = reader.ReadUInt16();
 			format.dwBitsPerSample = reader.ReadUInt32();
 			return format;
-		} 
+		}
 
 		//factChunk ReadFactHeader() - 2004 July 28
 		//Again, not much to say.
@@ -105,7 +114,7 @@ namespace KadeSoft
 			fact.dwChunkSize = reader.ReadUInt32();
 			fact.dwNumSamples = reader.ReadUInt32();
 			return fact;
-		} 
+		}
 
 
 		//dataChunk ReadDataHeader() - 2004 July 28
@@ -120,23 +129,23 @@ namespace KadeSoft
 			if (fact != null)
 				data.dwNumSamples = fact.dwNumSamples;
 			else
-				data.dwNumSamples = data.dwChunkSize / (format.dwBitsPerSample/8 * format.wChannels);
+				data.dwNumSamples = data.dwChunkSize / (format.dwBitsPerSample / 8 * format.wChannels);
 			//The above could be written as data.dwChunkSize / format.wBlockAlign, but I want to emphasize what the frames look like.
 			data.dwMinLength = (data.dwChunkSize / format.dwAvgBytesPerSec) / 60;
-			data.dSecLength = ((double)data.dwChunkSize / (double)format.dwAvgBytesPerSec) - (double)data.dwMinLength*60;
+			data.dSecLength = ((double)data.dwChunkSize / (double)format.dwAvgBytesPerSec) - (double)data.dwMinLength * 60;
 			return data;
-		} 
-#endregion
-#region IDisposable Members
+		}
 
-		public void Dispose() 
+		#endregion
+
+		#region IDisposable Members
+
+		public void Dispose()
 		{
-			if(reader != null) 
+			if (reader != null)
 				reader.Close();
 		}
 
-#endregion
-
-
+		#endregion
 	}
 }

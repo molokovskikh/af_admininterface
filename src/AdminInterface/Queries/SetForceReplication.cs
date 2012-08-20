@@ -49,7 +49,7 @@ where u.ClientId = :ClientId")
 		{
 			session.CreateSQLQuery(
 				@"update Usersettings.AnalitfReplicationInfo set ForceReplication = 1 where FirmCode = :supplierId")
-				.SetParameter("supplierId",id)
+				.SetParameter("supplierId", id)
 				.ExecuteUpdate();
 		}
 

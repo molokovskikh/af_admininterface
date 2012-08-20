@@ -80,7 +80,7 @@ namespace Integration.Models
 				.Select(v => Convert.ToBoolean(v))
 				.ToList();
 			Assert.That(info.Count, Is.GreaterThan(0));
-			Assert.That(info, Is.EqualTo(new [] {value}));
+			Assert.That(info, Is.EqualTo(new[] { value }));
 		}
 
 		private void ClearForceReplication(Supplier supplier)
@@ -90,6 +90,5 @@ namespace Integration.Models
 				.SetParameter("SupplierId", supplier.Id)
 				.ExecuteUpdate();
 		}
-
 	}
 }

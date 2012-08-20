@@ -24,18 +24,16 @@ namespace AdminInterface.NHibernateExtentions
 			var value = NHibernateUtil.String.NullSafeGet(rs, names);
 			if (value == null)
 				return null;
-			return new Period((string) value);
+			return new Period((string)value);
 		}
 
 		public void NullSafeSet(IDbCommand cmd, object value, int index)
 		{
-			if(value == null)
-			{
-				((IDataParameter) cmd.Parameters[index]).Value = DBNull.Value;
+			if (value == null) {
+				((IDataParameter)cmd.Parameters[index]).Value = DBNull.Value;
 			}
-			else
-			{
-				var ip = (Period) value;
+			else {
+				var ip = (Period)value;
 				((IDataParameter)cmd.Parameters[index]).Value = ip.ToSqlString();
 			}
 		}
@@ -62,7 +60,7 @@ namespace AdminInterface.NHibernateExtentions
 
 		public SqlType[] SqlTypes
 		{
-			get { return new[] {NHibernateUtil.Character.SqlType}; }
+			get { return new[] { NHibernateUtil.Character.SqlType }; }
 		}
 
 		public Type ReturnedType

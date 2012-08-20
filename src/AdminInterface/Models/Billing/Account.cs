@@ -35,14 +35,10 @@ namespace AdminInterface.Models.Billing
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Auditable("Платеж")]
 		public virtual decimal Payment
 		{
-			get
-			{
-				return _payment;
-			}
+			get { return _payment; }
 			set
 			{
-				if (_payment != value)
-				{
+				if (_payment != value) {
 					_payment = value;
 					Payer.UpdatePaymentSum();
 				}
@@ -52,14 +48,10 @@ namespace AdminInterface.Models.Billing
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
 		public virtual bool BeAccounted
 		{
-			get
-			{
-				return _beAccounted;
-			}
+			get { return _beAccounted; }
 			set
 			{
-				if (_beAccounted != value)
-				{
+				if (_beAccounted != value) {
 					_beAccounted = value;
 					Payer.UpdatePaymentSum();
 				}
@@ -69,14 +61,10 @@ namespace AdminInterface.Models.Billing
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
 		public virtual bool ReadyForAccounting
 		{
-			get
-			{
-				return _readyForAccounting;
-			}
+			get { return _readyForAccounting; }
 			set
 			{
-				if (_readyForAccounting != value)
-				{
+				if (_readyForAccounting != value) {
 					_readyForAccounting = value;
 					Payer.UpdatePaymentSum();
 				}
@@ -95,14 +83,10 @@ namespace AdminInterface.Models.Billing
 		]
 		public virtual bool IsFree
 		{
-			get
-			{
-				return _isFree;
-			}
+			get { return _isFree; }
 			set
 			{
-				if (IsFree != value)
-				{
+				if (IsFree != value) {
 					_isFree = value;
 					Payer.UpdatePaymentSum();
 				}
@@ -119,15 +103,12 @@ namespace AdminInterface.Models.Billing
 
 		public virtual uint PayerId
 		{
-			get
-			{
-				return Payer.Id;
-			}
+			get { return Payer.Id; }
 		}
 
 		public abstract Payer Payer { get; }
 
-		public abstract string Name { get;}
+		public abstract string Name { get; }
 
 		public abstract LogObjectType ObjectType { get; }
 
@@ -135,10 +116,7 @@ namespace AdminInterface.Models.Billing
 
 		public virtual string Type
 		{
-			get
-			{
-				return BindingHelper.GetDescription(ObjectType);
-			}
+			get { return BindingHelper.GetDescription(ObjectType); }
 		}
 
 		public virtual Service Service
@@ -210,8 +188,7 @@ namespace AdminInterface.Models.Billing
 			var freeEnd = DateTime.Today.AddDays(10);
 			var readyForAccounting = Queryable.Where(a => a.ReadyForAccounting
 				&& !a.BeAccounted
-				&& !(a.IsFree && a.FreePeriodEnd != null && a.FreePeriodEnd > freeEnd)
-			);
+				&& !(a.IsFree && a.FreePeriodEnd != null && a.FreePeriodEnd > freeEnd));
 
 			pager.Total = readyForAccounting.Count();
 			return pager.DoPage(readyForAccounting).ToList();

@@ -17,8 +17,8 @@ namespace Integration.Models
 	[TestFixture]
 	public class UserFilterFixture : Test.Support.IntegrationFixture
 	{
-		UserFilter filter;
-		Random random;
+		private UserFilter filter;
+		private Random random;
 
 		[SetUp]
 		public void Setup()
@@ -40,7 +40,7 @@ namespace Integration.Models
 			firstContact.AddContact(ContactType.Phone, phone2);
 			client.ContactGroupOwner.AddContactGroup(firstContact);
 			var user = client.Users.FirstOrDefault();
-			user.ContactGroup = new ContactGroup(ContactGroupType.General) {ContactGroupOwner = client.ContactGroupOwner};
+			user.ContactGroup = new ContactGroup(ContactGroupType.General) { ContactGroupOwner = client.ContactGroupOwner };
 			user.ContactGroup.AddContact(ContactType.Phone, phone3);
 			var newUser = new User(client);
 			newUser.Setup();
@@ -95,7 +95,7 @@ namespace Integration.Models
 		{
 			var user = DataMother.CreateSupplierUser();
 			var supplier = (Supplier)user.RootService;
-			
+
 			var phone = RandomPhone();
 			supplier.ContactGroupOwner.ContactGroups[0].AddContact(ContactType.Phone, phone);
 			Save(supplier);
@@ -112,7 +112,7 @@ namespace Integration.Models
 		{
 			var user = DataMother.CreateSupplierUser();
 			var supplier = (Supplier)user.RootService;
-			
+
 			var phone = RandomPhone();
 			var orderGroup = new RegionalDeliveryGroup(Region.Find(2ul));
 			orderGroup.AddContact(ContactType.Phone, phone);
@@ -130,7 +130,7 @@ namespace Integration.Models
 		{
 			var user = DataMother.CreateSupplierUser();
 			var supplier = (Supplier)user.RootService;
-			
+
 			var email = @"testmailQWERTYS@mail.ru";
 			var contactGroup = new ContactGroup {
 				Type = ContactGroupType.General,
@@ -174,9 +174,8 @@ namespace Integration.Models
 		{
 			var client = DataMother.CreateClientAndUsers();
 			var newRegion = Region.Queryable.FirstOrDefault(r => r.Id == 2UL);
-			if (newRegion != null)
-			{
-				client.UpdateRegionSettings(new [] {
+			if (newRegion != null) {
+				client.UpdateRegionSettings(new[] {
 					new RegionSettings {
 						Id = newRegion.Id,
 						IsAvaliableForBrowse = true

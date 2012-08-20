@@ -8,7 +8,8 @@ namespace AdminInterface.Models.Suppliers
 	public class SpecialHandler
 	{
 		public SpecialHandler()
-		{}
+		{
+		}
 
 		public SpecialHandler(Supplier supplier)
 		{
@@ -25,6 +26,6 @@ namespace AdminInterface.Models.Suppliers
 		public virtual Supplier Supplier { get; set; }
 
 		[BelongsTo("HandlerId"), Description("Обработчик"), ValidateNonEmpty]
-		public virtual OrderHandler Handler { get; set;}
+		public virtual OrderHandler Handler { get; set; }
 	}
 }

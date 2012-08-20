@@ -20,7 +20,7 @@ namespace Integration
 			Global.Config.DocsPath = "../../../AdminInterface/Docs/";
 
 			ForTest.InitialzeAR();
-			var admin = new Administrator{
+			var admin = new Administrator {
 				UserName = Environment.UserName,
 				Email = "kvasovtest@analit.net",
 				PhoneSupport = "112",

@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using Functional.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional
 {
@@ -14,8 +15,7 @@ namespace Functional
 		[Test]
 		public void TestViewCallHistory()
 		{
-			using (var browser = new IE(BuildTestUrl("default.aspx")))
-			{
+			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
 				browser.Link(Find.ByText("История звонков")).Click();
 				browser.TextField(Find.ByName("SearchBy.BeginDate")).TypeText("01.01.2009");
 				browser.Button(Find.ByValue("Найти")).Click();

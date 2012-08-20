@@ -21,8 +21,8 @@ namespace Functional
 			var user = client.Users.First();
 			var afUpdate = new UpdateLogEntity(user);
 			var supplier = DataMother.CreateSupplier();
-			var document = new FullDocument {Supplier = supplier, ClientCode = client.Id};
-			var line = document.NewLine(new DocumentLine {Product = "TestCertificateRequestLogProduct"});
+			var document = new FullDocument { Supplier = supplier, ClientCode = client.Id };
+			var line = document.NewLine(new DocumentLine { Product = "TestCertificateRequestLogProduct" });
 
 			var nuSert = new CertificateRequestLog {
 				Line = line,

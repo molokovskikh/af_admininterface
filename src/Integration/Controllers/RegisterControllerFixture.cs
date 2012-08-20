@@ -59,12 +59,12 @@ namespace Integration.Controllers
 				Name = "test",
 			};
 
-			regionSettings = new [] {
-				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}
+			regionSettings = new[] {
+				new RegionSettings { Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true }
 			};
-			options = new AdditionalSettings {PayerExists = true};
-			clientContacts = new[] {new Contact{Type = ContactType.Email, ContactText = "11@33.ru"}};
-			person = new[] {new Person()};
+			options = new AdditionalSettings { PayerExists = true };
+			clientContacts = new[] { new Contact { Type = ContactType.Email, ContactText = "11@33.ru" } };
+			person = new[] { new Person() };
 		}
 
 		[Test]
@@ -192,7 +192,7 @@ namespace Integration.Controllers
 
 			controller.RegisterSupplier(
 				new Contact[0], 1,
-				new [] {new RegionSettings{Id = 1, IsAvaliableForBrowse = true}},
+				new[] { new RegionSettings { Id = 1, IsAvaliableForBrowse = true } },
 				new AdditionalSettings(),
 				null,
 				null,

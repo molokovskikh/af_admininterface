@@ -9,7 +9,9 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord(DiscriminatorValue = "1")]
 	public class AddressAccount : Account
 	{
-		public AddressAccount() {}
+		public AddressAccount()
+		{
+		}
 
 		public AddressAccount(Address address)
 		{
@@ -22,10 +24,7 @@ namespace AdminInterface.Models.Billing
 
 		public override Service Service
 		{
-			get
-			{
-				return Address.Client;
-			}
+			get { return Address.Client; }
 		}
 
 		public override Payer Payer

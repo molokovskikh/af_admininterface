@@ -47,16 +47,14 @@ namespace AdminInterface.Controllers
 
 		public void Process([ARDataBind("acts", AutoLoadBehavior.Always)] Act[] acts)
 		{
-			if (Form["delete"] != null)
-			{
+			if (Form["delete"] != null) {
 				foreach (var act in acts)
 					act.Delete();
 
 				Flash["message"] = "Удалено";
 				RedirectToReferrer();
 			}
-			if (Form["print"] != null)
-			{
+			if (Form["print"] != null) {
 				var printer = Form["printer"];
 				var arguments = String.Format("act \"{0}\" \"{1}\"", printer, acts.Implode(a => a.Id));
 				Printer.Execute(arguments);
@@ -73,17 +71,15 @@ namespace AdminInterface.Controllers
 			PropertyBag["act"] = act;
 			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
 
-			if (IsPost)
-			{
+			if (IsPost) {
 				RecreateOnlyIfNullBinder.Prepare(this, "act.Parts");
 
 				BindObjectInstance(act, "act");
-				if (!HasValidationError(act))
-				{
+				if (!HasValidationError(act)) {
 					act.CalculateSum();
 					act.Save();
 					Flash["Message"] = "Сохранено";
-					RedirectUsingRoute("Acts", "Edit", new {act.Id});
+					RedirectUsingRoute("Acts", "Edit", new { act.Id });
 				}
 			}
 		}

@@ -11,15 +11,15 @@ using Test.Support.Web;
 using WatiN.Core;
 using WatiN.Core.Native.Windows;
 using WatiN.CssSelectorExtensions;
-using DescriptionAttribute=NUnit.Framework.DescriptionAttribute;
+using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 
 namespace Functional.Drugstore
 {
 	[TestFixture]
 	public class SettingsFixture : WatinFixture2
 	{
-		Client client;
-		DrugstoreSettings settings;
+		private Client client;
+		private DrugstoreSettings settings;
 
 		[SetUp]
 		public new void Setup()
@@ -152,7 +152,7 @@ namespace Functional.Drugstore
 			});
 			Save(supplier);
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
-			session.Save(new ParseAlgorithm {Name = "testParse"});
+			session.Save(new ParseAlgorithm { Name = "testParse" });
 			Flush();
 
 			Css("#drugstore_EnableSmartOrder").Click();
@@ -198,7 +198,7 @@ namespace Functional.Drugstore
 		public void Change_work_region_and_order_region()
 		{
 			var workRegion = GetWorkRegion(browser, "Курск");
-			Assert.That(workRegion.Checked, Is.False);				
+			Assert.That(workRegion.Checked, Is.False);
 			workRegion.Checked = true;
 			Assert.That(GetWorkRegion(browser, "Воронеж").Checked, Is.True);
 
@@ -329,7 +329,7 @@ namespace Functional.Drugstore
 		public void Show_all_regions()
 		{
 			var countVisibleRegions = browser.Table("RegionsTable").TableRows.Count();
-				
+
 			browser.Link(Find.ByText("Показать все регионы")).Click();
 			var countAllRegions = browser.Table("RegionsTable").TableRows.Count();
 			Assert.That(countVisibleRegions, Is.LessThan(countAllRegions));
@@ -477,9 +477,7 @@ namespace Functional.Drugstore
 		public void When_add_region_for_browse_it_must_be_in_intersection()
 		{
 			var region = Region.Find(64UL);
-			var supplier = DataMother.CreateSupplier(s => {
-				s.AddRegion(region);
-			});
+			var supplier = DataMother.CreateSupplier(s => { s.AddRegion(region); });
 			Save(supplier);
 			Flush();
 
@@ -544,7 +542,7 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			Save(supplier);
 			Flush();
 
-			var checkbox = (CheckBox) Css("#drugstore_IsConvertFormat");
+			var checkbox = (CheckBox)Css("#drugstore_IsConvertFormat");
 			checkbox.Click();
 			var row = checkbox.Parents().OfType<TableRow>().First();
 			((TextField)row.CssSelect("input.term")).TypeText("Поставщик для тестирования");

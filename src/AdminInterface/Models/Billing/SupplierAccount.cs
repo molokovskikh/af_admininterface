@@ -8,7 +8,8 @@ namespace AdminInterface.Models.Billing
 	public class SupplierAccount : Account
 	{
 		public SupplierAccount()
-		{}
+		{
+		}
 
 		public SupplierAccount(Supplier supplier)
 		{
@@ -49,10 +50,7 @@ namespace AdminInterface.Models.Billing
 
 		public override string DefaultDescription
 		{
-			get
-			{
-				return "Справочно-информационные услуги за {0}";
-			}
+			get { return "Справочно-информационные услуги за {0}"; }
 		}
 	}
 }

@@ -33,6 +33,5 @@ namespace AdminInterface.Models.Validators
 				return ErrorMessage;
 			return "Список расширений должен быть как: doc, tif, jpg";
 		}
-
 	}
 }

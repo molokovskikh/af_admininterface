@@ -16,45 +16,37 @@ namespace AdminInterface.Initializers
 			engine.Add(
 				new PatternRoute("/<controller>/<id>")
 					.DefaultForAction().Is("show")
-					.Restrict("id").ValidInteger
-				);
+					.Restrict("id").ValidInteger);
 
 			engine.Add(
 				new BugRoute(
 					new PatternRoute("/<controller>/[action]")
-						.DefaultForAction().Is("index")
-					)
-				);
+						.DefaultForAction().Is("index")));
 
 			engine.Add(
 				new PatternRoute("/<controller>/[id]/<action>")
 					.Restrict("id")
-					.ValidInteger
-				);
+					.ValidInteger);
 
 			engine.Add(
 				new PatternRoute("/client/[id]/[action]")
 					.DefaultForController().Is("clients")
 					.DefaultForAction().Is("show")
-					.Restrict("id").ValidInteger
-				);
+					.Restrict("id").ValidInteger);
 
 			engine.Add(
 				new PatternRoute("/client/<action>")
-					.DefaultForController().Is("clients")
-				);
+					.DefaultForController().Is("clients"));
 
 			engine.Add(
 				new PatternRoute("/deliveries/[id]/[action]")
 					.DefaultForController().Is("addresses")
 					.DefaultForAction().Is("edit")
-					.Restrict("id").ValidInteger
-				);
+					.Restrict("id").ValidInteger);
 
 			engine.Add(
 				new PatternRoute("/deliveries/[action]")
-					.DefaultForController().Is("addresses")
-				);
+					.DefaultForController().Is("addresses"));
 
 			engine.Add(new PatternRoute("/client/[clientId]/orders")
 				.DefaultForController().Is("Logs")

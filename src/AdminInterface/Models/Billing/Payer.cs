@@ -57,7 +57,8 @@ namespace AdminInterface.Models.Billing
 	{
 		public Payer(string name)
 			: this(name, name)
-		{}
+		{
+		}
 
 		public Payer(string name, string fullname)
 			: this()
@@ -190,13 +191,13 @@ namespace AdminInterface.Models.Billing
 		[BelongsTo("RecipientId")]
 		public virtual Recipient Recipient { get; set; }
 
-		[HasMany(typeof (User), Lazy = true, Inverse = true, OrderBy = "Name")]
+		[HasMany(typeof(User), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<User> Users { get; set; }
 
-		[HasMany(typeof (Address), Lazy = true, Inverse = true, OrderBy = "Address")]
+		[HasMany(typeof(Address), Lazy = true, Inverse = true, OrderBy = "Address")]
 		public virtual IList<Address> Addresses { get; set; }
 
-		[HasMany(typeof (Supplier), Lazy = true, Inverse = true, OrderBy = "Name")]
+		[HasMany(typeof(Supplier), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<Supplier> Suppliers { get; set; }
 
 		[HasMany(typeof(LegalEntity), Lazy = true, Inverse = true, Cascade = ManyRelationCascadeEnum.All, OrderBy = "Name")]
@@ -208,7 +209,7 @@ namespace AdminInterface.Models.Billing
 		[HasMany(typeof(Advertising), Lazy = true, Inverse = true, Cascade = ManyRelationCascadeEnum.SaveUpdate)]
 		public virtual IList<Advertising> Ads { get; set; }
 
-		[HasAndBelongsToMany(typeof (Client),
+		[HasAndBelongsToMany(typeof(Client),
 			Lazy = true,
 			Inverse = true,
 			ColumnKey = "PayerId",
@@ -220,9 +221,9 @@ namespace AdminInterface.Models.Billing
 		public virtual string GetMailAddress()
 		{
 			return String.Join(", ",
-				new [] {
+				new[] {
 					!String.IsNullOrWhiteSpace(ActualAddressStreet) ? "ул. " + ActualAddressStreet : null,
-					!String.IsNullOrWhiteSpace(ActualAddressHouse) ? "д. " + ActualAddressHouse: null,
+					!String.IsNullOrWhiteSpace(ActualAddressHouse) ? "д. " + ActualAddressHouse : null,
 					!String.IsNullOrWhiteSpace(ActualAddressOffice) ? "оф. " + ActualAddressOffice : null,
 					!String.IsNullOrWhiteSpace(ActualAddressProvince) ? "обл. " + ActualAddressProvince : null,
 					!String.IsNullOrWhiteSpace(ActualAddressRegion) ? "р-н " + ActualAddressRegion : null,
@@ -283,17 +284,14 @@ and (exists(
 ORDER BY {Payer}.shortname;";
 			var resultList = session.CreateSQLQuery(sql).AddEntity(typeof(Payer))
 				.SetParameter("AdminRegionCode", SecurityContext.Administrator.RegionMask)
-				.SetParameter("SearchText", "%" + searchPattern  + "%")
+				.SetParameter("SearchText", "%" + searchPattern + "%")
 				.List<Payer>().Distinct();
 			return resultList;
 		}
 
 		public virtual decimal TotalSum
 		{
-			get
-			{
-				return GetAccounts().Sum(a => a.Payment);
-			}
+			get { return GetAccounts().Sum(a => a.Payment); }
 		}
 
 		public virtual IEnumerable<Account> GetAccounts()
@@ -380,8 +378,7 @@ ORDER BY {Payer}.shortname;";
 
 		private void UpdateBalance()
 		{
-			if (this.IsChanged(p => p.BeginBalance))
-			{
+			if (this.IsChanged(p => p.BeginBalance)) {
 				var oldBeginBalance = this.OldValue(p => p.BeginBalance);
 				Balance += BeginBalance;
 				Balance -= oldBeginBalance;
@@ -429,8 +426,7 @@ ORDER BY {Payer}.shortname;";
 
 		public virtual DateTime GetDocumentDate(DateTime date)
 		{
-			if (!InvoiceSettings.DocumentsOnLastWorkingDay)
-			{
+			if (!InvoiceSettings.DocumentsOnLastWorkingDay) {
 				return date;
 			}
 
@@ -489,7 +485,7 @@ ORDER BY {Payer}.shortname;";
 				.SelectList(l => l.SelectMax(p => p.PayedOn))
 				.SingleOrDefault<DateTime>();
 
-			var documentDates = new [] {maxPayment};
+			var documentDates = new[] { maxPayment };
 
 			return Reports.Count == 0
 				&& Clients.All(c => c.CanDelete(session))
@@ -532,7 +528,7 @@ ORDER BY {Payer}.shortname;";
 		{
 			get
 			{
-				return new [] {
+				return new[] {
 					new ModelAction(this, "Delete", "Удалить Плательщика")
 				};
 			}
@@ -550,7 +546,7 @@ ORDER BY {Payer}.shortname;";
 				return;
 
 			var oldValue = this.OldValue(p => p.Comment);
-			var propertyInfo = typeof (Payer).GetProperty("Comment");
+			var propertyInfo = typeof(Payer).GetProperty("Comment");
 			var property = new DiffAuditableProperty(propertyInfo, BindingHelper.GetDescription(propertyInfo), Comment, oldValue);
 			mailer.NotifyAboutChanges(property, this, "BillingList@analit.net");
 			foreach (var client in Clients) {
@@ -574,8 +570,7 @@ ORDER BY {Payer}.shortname;";
 				MakeRequest(config.DeleteReportUri,
 					config.ReportSystemUser,
 					config.ReportSystemPassword,
-					request
-				);
+					request);
 			}
 		}
 	}
@@ -583,6 +578,7 @@ ORDER BY {Payer}.shortname;";
 	public class DoNotHaveContacts : Exception
 	{
 		public DoNotHaveContacts(string message) : base(message)
-		{}
+		{
+		}
 	}
 }

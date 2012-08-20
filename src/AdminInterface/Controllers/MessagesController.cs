@@ -18,24 +18,25 @@ namespace AdminInterface.Controllers
 	{
 		public DatePeriod Period { get; set; }
 		public string SearchText { get; set; }
+
 		[Description("Тип сообщения:")]
 		public IList<LogMessageType> Types { get; set; }
 
 		public MessageFilter()
 		{
-			SortKeyMap = new Dictionary<string, string>{
-				{"Messages.WriteTime", "WriteTime"},
-				{"Messages.Operator", "UserName"},
-				{"Messages.Service.Id", "s.Id"},
-				{"Messages.Service.Name", "s.Name"},
-				{"Messages.Type", "Type"},
-				{"Messages.ObjectId", "ObjectId"},
-				{"Messages.Name", "Name"}
+			SortKeyMap = new Dictionary<string, string> {
+				{ "Messages.WriteTime", "WriteTime" },
+				{ "Messages.Operator", "UserName" },
+				{ "Messages.Service.Id", "s.Id" },
+				{ "Messages.Service.Name", "s.Name" },
+				{ "Messages.Type", "Type" },
+				{ "Messages.ObjectId", "ObjectId" },
+				{ "Messages.Name", "Name" }
 			};
 			SortBy = "WriteTime";
 			SortDirection = "desc";
 			Period = new DatePeriod(DateTime.Today.AddDays(-7), DateTime.Today);
-			Types = new List<LogMessageType>{LogMessageType.User, LogMessageType.System};
+			Types = new List<LogMessageType> { LogMessageType.User, LogMessageType.System };
 		}
 
 		public IList<AuditRecord> Find()
@@ -48,9 +49,8 @@ namespace AdminInterface.Controllers
 					.Where(l => l.MessageType.IsIn(Types.ToArray()))
 					.And(
 						Restrictions.On<AuditRecord>(l => l.Message).IsLike(SearchText, MatchMode.Anywhere) ||
-						Restrictions.On<AuditRecord>(l => l.Name).IsLike(SearchText, MatchMode.Anywhere) ||
-						Restrictions.On<AuditRecord>(l => l.ObjectId).IsLike(id)
-					);
+							Restrictions.On<AuditRecord>(l => l.Name).IsLike(SearchText, MatchMode.Anywhere) ||
+								Restrictions.On<AuditRecord>(l => l.ObjectId).IsLike(id));
 
 				query.RootCriteria
 					.CreateCriteria("Service", "s", JoinType.InnerJoin)

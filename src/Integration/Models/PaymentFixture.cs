@@ -77,7 +77,7 @@ namespace Integration.Models
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var payment = new Payment(payer);
-			payment.Sum  = 800;
+			payment.Sum = 800;
 			payment.ForAd = true;
 			payment.AdSum = 800;
 			payment.SaveAndFlush();
@@ -93,7 +93,7 @@ namespace Integration.Models
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var payment = new Payment(payer);
-			payment.Sum  = 800;
+			payment.Sum = 800;
 			payment.SaveAndFlush();
 			var ad = new Advertising(payer, 600);
 			payer.Ads.Add(ad);
@@ -109,7 +109,7 @@ namespace Integration.Models
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var payment = new Payment(payer);
-			payment.Sum  = 800;
+			payment.Sum = 800;
 			payment.SaveAndFlush();
 			Assert.That(payer.Balance, Is.EqualTo(800));
 		}

@@ -7,7 +7,8 @@ using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.Billing
 {
@@ -56,7 +57,7 @@ namespace Functional.Billing
 			Css("input[name='Payment.Sum']").TypeText("500");
 			Click("Добавить");
 			AssertText("Создать неопознанный платеж?");
-			var continueButton =  browser.Spans.Where(s => s.Text == "Продолжить").Select(s => (Button)s.Parent).First();
+			var continueButton = browser.Spans.Where(s => s.Text == "Продолжить").Select(s => (Button)s.Parent).First();
 			continueButton.Click();
 
 			var payments = Payments();

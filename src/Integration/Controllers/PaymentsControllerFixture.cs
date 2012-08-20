@@ -39,20 +39,20 @@ namespace Integration.Controllers
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			payer.INN = "361911638854";
 			payer.SaveAndFlush();
-			
+
 			var file = "../../../TestData/1c.txt";
-			using(var stream = File.OpenRead(file))
+			using (var stream = File.OpenRead(file))
 				Context.Session["payments"] = Payment.Parse(file, stream);
 
 			Reopen();
 			controller.SavePayments();
 
-			try
-			{
+			try {
 				Reopen();
 				controller.SavePayments();
 			}
-			catch (SessionExpiredException) {}
+			catch (SessionExpiredException) {
+			}
 
 			Reopen();
 			payer = Payer.Find(payer.Id);

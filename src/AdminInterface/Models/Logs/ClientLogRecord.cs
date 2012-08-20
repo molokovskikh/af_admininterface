@@ -33,7 +33,7 @@ namespace AdminInterface.Models.Logs
 			if (clients.Count() == 0)
 				return Enumerable.Empty<ClientLogRecord>().ToList();
 
-			return (List<ClientLogRecord>) Execute(
+			return (List<ClientLogRecord>)Execute(
 				(session, instance) => session.CreateSQLQuery(@"
 select {ClientLogRecord.*}
 from logs.ClientLogs {ClientLogRecord}
@@ -41,14 +41,14 @@ where status is not null
 		and clientId in (:clientId)
 order by logtime desc
 limit 100")
-						.AddEntity(typeof (ClientLogRecord))
-						.SetParameterList("clientId", clients.Select(c => c.Id).ToList())
-						.List<ClientLogRecord>(), null);
+					.AddEntity(typeof(ClientLogRecord))
+					.SetParameterList("clientId", clients.Select(c => c.Id).ToList())
+					.List<ClientLogRecord>(), null);
 		}
 
 		public static ClientLogRecord LastOff(Client client)
 		{
-			return (ClientLogRecord) Execute(
+			return (ClientLogRecord)Execute(
 				(session, instance) => session.CreateSQLQuery(@"
 select {ClientLogRecord.*}
 from logs.ClientLogs {ClientLogRecord}
@@ -56,9 +56,9 @@ where status = 0
 		and clientId = :ClientCode
 order by logtime desc
 limit 1")
-						.AddEntity(typeof (ClientLogRecord))
-						.SetParameter("ClientCode", client.Id)
-						.UniqueResult(), null);
+					.AddEntity(typeof(ClientLogRecord))
+					.SetParameter("ClientCode", client.Id)
+					.UniqueResult(), null);
 		}
 	}
 }
