@@ -19,6 +19,12 @@ namespace AdminInterface.Models.Telephony
 
 		public int TotalPages { get; private set; }
 
+		public int PageSize
+		{
+			get { return pageSize; }
+			set { pageSize = value; }
+		}
+
 		public CallRecordFilter()
 		{
 			SortBy = "WriteTime";
@@ -34,7 +40,7 @@ namespace AdminInterface.Models.Telephony
 
 			BeginDate = DateTime.Today.AddDays(-1);
 			EndDate = DateTime.Today;
-			pageSize = 25;
+			PageSize = 25;
 		}
 
 		public IList<CallRecord> Find()
@@ -43,7 +49,7 @@ namespace AdminInterface.Models.Telephony
 			searchText.Trim();
 			searchText = Utils.StringToMySqlString(searchText);
 			var sortFilter = String.Format(" order by `{0}` {1} ", GetSortProperty(), GetSortDirection());
-			var limit = String.Format("limit {0}, {1}", Page * pageSize, pageSize);
+			var limit = String.Format("limit {0}, {1}", Page * PageSize, PageSize);
 			var searchCondition = String.IsNullOrEmpty(searchText) ? String.Empty :
 				" and (LOWER({CallRecord}.`From`) like \"%" + searchText +
 				"%\" or LOWER({CallRecord}.`To`) like \"%" + searchText +
@@ -75,8 +81,8 @@ where {CallRecord}.WriteTime > :BeginDate and {CallRecord}.WriteTime < :EndDate"
 					.SetParameter("BeginDate", BeginDate)
 					.SetParameter("EndDate", EndDate.AddDays(1))
 					.UniqueResult());
-				TotalPages = count / pageSize;
-				if (count % pageSize > 0)
+				TotalPages = count / PageSize;
+				if (count % PageSize > 0)
 					TotalPages++;
 			});
 			return callList;

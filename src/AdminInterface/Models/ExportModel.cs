@@ -123,21 +123,18 @@ namespace AdminInterface.Models
 			ExcelHelper.WriteHeader1(ws, 0, 4, "Куда звонил", true, true);
 			ExcelHelper.WriteHeader1(ws, 0, 5, "Кому звонил", true, true);
 			ExcelHelper.WriteHeader1(ws, 0, 6, "Тип звонка", true, true);
-
-			filter.Page = 0;
-			while (filter.Page <= filter.TotalPages) {
-				var calls = filter.Find();
-				foreach (var call in calls) {
-					ExcelHelper.Write(ws, row, col, call.WriteTime, true);
-					ExcelHelper.Write(ws, row, col + 1, call.From, true);
-					ExcelHelper.Write(ws, row, col + 2, call.NameSource, true);
-					ExcelHelper.Write(ws, row, col + 3, call.To, true);
-					ExcelHelper.Write(ws, row, col + 4, call.NameDestination, true);
-					ExcelHelper.Write(ws, row, col + 5, call.GetCallType(), true);
-					row ++;
-				}
-				filter.Page++;
+			filter.PageSize =UInt16.MaxValue;
+			var calls = filter.Find();
+			foreach (var call in calls) {
+				ExcelHelper.Write(ws, row, col, call.WriteTime, true);
+				ExcelHelper.Write(ws, row, col + 1, call.From, true);
+				ExcelHelper.Write(ws, row, col + 2, call.NameSource, true);
+				ExcelHelper.Write(ws, row, col + 3, call.To, true);
+				ExcelHelper.Write(ws, row, col + 4, call.NameDestination, true);
+				ExcelHelper.Write(ws, row, col + 5, call.GetCallType(), true);
+				row ++;
 			}
+
 			for(ushort i = 1; i <= 6; i++) {
 				ws.Cells.ColumnWidth[i] = 20 * 256;
 			}
