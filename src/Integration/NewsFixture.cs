@@ -40,8 +40,10 @@ test<br>
 localhost<br>
 Код {0}<br>
 Новость <a href=""/News/{0}"">TestNewHeader</a><br>
+Адресат {2}
+Дата и время публикации новости {3}
 Изменено 'Тело новости' </br> <b>было</b> 'TestNewsBody'</br><b>стало</b> 'NewTestNewsBody'
-", news.Id, DateTime.Now)));
+", news.Id, DateTime.Now, news.DestinationType.GetDescription(), news.PublicationDate)));
 			Assert.That(message.To[0].ToString(), Is.EqualTo("AFNews@subscribe.analit.net"));
 			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Тело новости'"));
 		}

@@ -1,4 +1,5 @@
 ﻿<% OutputSubView("PropertyChanged_html") %>
 Зарегистрированна новость: <br/>
 Тема: ${header}</br>
+Адресат: ${destination}</br>
 Текст: ${body}</br>"
