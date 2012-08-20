@@ -84,5 +84,19 @@ namespace Functional
 			Click("Сохранить");
 			AssertText("отключен у всех пользователей");
 		}
+
+		[Test]
+		public void Disabled_address_test_for_user()
+		{
+			var address = user.GetAvaliableAddresses().First();
+			user.AvaliableAddresses.Add(address);
+			address.Enabled = false;
+			session.SaveOrUpdate(address);
+			Flush();
+			Open(user);
+			browser.CheckBox(Find.ByName("user.AvaliableAddresses[0].Id")).Checked = false;
+			Click("Сохранить");
+			Assert.IsFalse(browser.CheckBox(Find.ByName("user.AvaliableAddresses[0].Id")).Enabled);
+		}
 	}
 }

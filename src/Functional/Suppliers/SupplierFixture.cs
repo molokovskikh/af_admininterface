@@ -36,7 +36,7 @@ namespace Functional.Suppliers
 			Open(supplier);
 			Click("Сформировать заказы");
 			browser.TextField("email").Clear();
-			browser.TextField("email").AppendText("test@analit.net");
+			browser.TextField("email").AppendText("kvasovtest@analit.net");
 			Click("Получить файлы");
 			AssertText("Вы не указали номера заказов");
 			browser.TextField("ordersNames").AppendText("0000");

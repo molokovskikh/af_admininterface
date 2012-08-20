@@ -123,21 +123,6 @@ namespace Integration.Controllers
 		}
 
 		[Test]
-		public void Create_user_with_permissions()
-		{
-			client = DataMother.CreateTestClientWithUser();
-			Flush();
-			user1 = client.Users[0];
-			var permission = new UserPermission();
-			permission.Id = 1;
-			user1.AddPermission(permission);
-			session.SaveOrUpdate(user1);
-			Assert.That(user1.AssignedPermissions[0].Id, Is.EqualTo(1));
-			Assert.That(user1.AssignedPermissions[0].Type.ToString(), Is.EqualTo("Base"));
-			Assert.That(user1.AssignedPermissions[0].AvailableFor.ToString(), Is.EqualTo("Supplier"));
-		}
-
-		[Test]
 		public void Show_supplier_client()
 		{
 			var user = DataMother.CreateSupplierUser();
@@ -148,7 +133,7 @@ namespace Integration.Controllers
 
 		private User Registred()
 		{
-			return ActiveRecordLinqBase<User>.Queryable.Where(u => u.Registration.RegistrationDate >= begin).ToArray().Last();
+			return session.Query<User>().Where(u => u.Registration.RegistrationDate >= begin).ToArray().Last();
 		}
 	}
 }
