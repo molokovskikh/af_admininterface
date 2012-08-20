@@ -344,13 +344,6 @@ namespace AdminInterface.Models
 			return String.Format("{0} ({1})", Login, _name);
 		}
 
-		public virtual void AddPermission(UserPermission permission)
-		{
-			if (AssignedPermissions == null)
-				AssignedPermissions = new List<UserPermission>();
-			AssignedPermissions.Add(permission);
-		}
-
 		public static User GetByLogin(string login)
 		{
 			return ActiveRecordMediator<User>.FindOne(Restrictions.Eq("Login", login));
