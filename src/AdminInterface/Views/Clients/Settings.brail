@@ -153,6 +153,7 @@
 						${app.Edit("drugstore.IgnoreNewPriceForUser")}<br>
 						${app.Edit("drugstore.CalculateLeader")}<br>
 						${app.Edit("drugstore.AllowAnalitFSchedule")}<br>
+						${app.Edit("drugstore.DebugOrders")}<br>
 						<label>Формат для сохранения накладных Протек</label>
 						${app.Edit("drugstore.ProtekWaybillSavingType")}<br>
 
