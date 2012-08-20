@@ -243,6 +243,9 @@ namespace AdminInterface.Models
 		[Property, Description("Формат для сохранения накладных Протек"), Auditable]
 		public virtual WaybillConvertFormat ProtekWaybillSavingType { get; set; }
 
+		[Property, Description("Отправлять копию заказа на zakaz_copy@analit.net"), Auditable]
+		public virtual bool DebugOrders { get; set; }
+
 		public virtual void CheckDefaults()
 		{
 			if (Client == null)
