@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
@@ -62,16 +65,22 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		public void ToExcel([DataBind("filter")] CallRecordFilter filter)
+		public void CallHistoryExport([DataBind("filter")] CallRecordFilter filter, string format)
+		{
+			if(format.Match("excel")) {
+				ToExcel(filter);
+			}
+		}
+
+		private void ToExcel(CallRecordFilter filter)
 		{
 			CancelLayout();
 			CancelView();
-
+			var result = ExportModel.GetCallsHistory(filter);
 			Response.Clear();
 			Response.AppendHeader("Content-Disposition",
-				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("История звонков")));
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("История звонков.xls")));
 			Response.ContentType = "application/vnd.ms-excel";
-			var result = ExportModel.GetCallsHistory(filter);
 			Response.OutputStream.Write(result, 0, result.Length);
 		}
 

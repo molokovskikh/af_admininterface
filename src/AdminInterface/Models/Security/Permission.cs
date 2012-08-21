@@ -142,7 +142,7 @@ namespace AdminInterface.Models.Security
 			}
 			if(Type == PermissionType.CallHistory) {
 				if(controller.ToLower() == "callhistory"
-					&& action.ToLower() == "toexcel") {
+					&& action.ToLower() == "callhistoryexport") {
 					return true;
 				}
 			}
