@@ -71,7 +71,7 @@ namespace AdminInterface.Helpers
 			if (filter is Sortable) {
 				var query = ((Sortable)filter).PublicPropertiesToUrlParts("filter");
 				foreach (var key in querystring.Keys) {
-					query.Add(key.ToString(),querystring[key]);
+					query.Add(key.ToString(), querystring[key]);
 				}
 				var controller = Context.CurrentControllerContext.ControllerDescriptor.ControllerDescriptor.Name;
 				return LinkTo(name, controller, action, query);

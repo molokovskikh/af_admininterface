@@ -123,7 +123,7 @@ namespace AdminInterface.Models
 			ExcelHelper.WriteHeader1(ws, 0, 4, "Куда звонил", true, true);
 			ExcelHelper.WriteHeader1(ws, 0, 5, "Кому звонил", true, true);
 			ExcelHelper.WriteHeader1(ws, 0, 6, "Тип звонка", true, true);
-			filter.PageSize =UInt16.MaxValue;
+			filter.PageSize = UInt16.MaxValue;
 			var calls = filter.Find();
 			foreach (var call in calls) {
 				ExcelHelper.Write(ws, row, col, call.WriteTime, true);
