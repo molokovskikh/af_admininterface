@@ -46,7 +46,7 @@ namespace Integration.ForTesting
 			scope = new TransactionlessSession();
 
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
-			session = sessionHolder.CreateSession(typeof (ActiveRecordBase));
+			session = sessionHolder.CreateSession(typeof(ActiveRecordBase));
 		}
 
 		[TearDown]

@@ -56,7 +56,8 @@ namespace AdminInterface.Models
 			var wb = new Workbook();
 			var ws = new Worksheet("Зарегистрированные пользователи и адреса в регионе");
 
-			int row = 4; int colShift = 0;
+			int row = 4;
+			int colShift = 0;
 
 			ws.Merge(0, 0, 0, 6);
 
@@ -70,16 +71,15 @@ namespace AdminInterface.Models
 			string regionName;
 			if (filter.Region == null)
 				regionName = "Все";
-			else
-			{
+			else {
 				regionName = filter.Region.Name;
 			}
 			ExcelHelper.Write(ws, 1, 1, regionName, false);
 
 			ws.Merge(2, 1, 2, 2);
 			ExcelHelper.Write(ws, 2, 0, "Период:", false);
-			if(filter.Period.Begin != filter.Period.End)
-				ExcelHelper.Write(ws, 2, 1, 
+			if (filter.Period.Begin != filter.Period.End)
+				ExcelHelper.Write(ws, 2, 1,
 					"С " + filter.Period.Begin.ToString("dd.MM.yyyy") + " по " + filter.Period.End.ToString("dd.MM.yyyy"), false);
 			else
 				ExcelHelper.Write(ws, 2, 1, "За " + filter.Period.Begin.ToString("dd.MM.yyyy"), false);
@@ -132,10 +132,9 @@ namespace AdminInterface.Models
 				ExcelHelper.Write(ws, row, col + 3, call.To, true);
 				ExcelHelper.Write(ws, row, col + 4, call.NameDestination, true);
 				ExcelHelper.Write(ws, row, col + 5, call.GetCallType(), true);
-				row ++;
+				row++;
 			}
-
-			for(ushort i = 1; i <= 6; i++) {
+			for (ushort i = 1; i <= 6; i++) {
 				ws.Cells.ColumnWidth[i] = 20 * 256;
 			}
 			wb.Worksheets.Add(ws);

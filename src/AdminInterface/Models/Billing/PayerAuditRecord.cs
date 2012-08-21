@@ -40,7 +40,7 @@ namespace AdminInterface.Models.Billing
 		public string UserName { get; set; }
 
 		[BelongsTo]
-		public Administrator Administrator { get; set;}
+		public Administrator Administrator { get; set; }
 
 		[Property]
 		public DateTime WriteTime { get; set; }
@@ -60,10 +60,7 @@ namespace AdminInterface.Models.Billing
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
 		public string Message
 		{
-			get
-			{
-				return _message;
-			}
+			get { return _message; }
 			set
 			{
 				_message = value;

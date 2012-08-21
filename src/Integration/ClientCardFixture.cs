@@ -17,7 +17,7 @@ namespace Integration
 			var defaults = session.Query<DefaultValues>().First();
 			Flush();
 
-			Assert.That(ReportHelper.SendClientCard(client.Users.First(), "", true,  defaults, "kvasovtest@analit.net"), Is.Not.EqualTo(0));
+			Assert.That(ReportHelper.SendClientCard(client.Users.First(), "", true, defaults, "kvasovtest@analit.net"), Is.Not.EqualTo(0));
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace Functional.Suppliers
 	{
 		private User user;
 		private Supplier supplier;
-		private Payer  payer;
+		private Payer payer;
 
 		[SetUp]
 		public void SetUp()

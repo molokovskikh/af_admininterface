@@ -5,7 +5,8 @@ using AdminInterface.Models.Logs;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Functional.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using Common.Web.Ui.Helpers;
 using AdminInterface.Helpers;
 
@@ -18,8 +19,7 @@ namespace Functional
 		public void ViewAccumulativeUpdateLog()
 		{
 			var updateType = UpdateType.Accumulative;
-			using (var browser = ViewUpdateLogFromMainPage(updateType))
-			{
+			using (var browser = ViewUpdateLogFromMainPage(updateType)) {
 				CheckColumnNames(browser, updateType);
 			}
 		}
@@ -28,8 +28,7 @@ namespace Functional
 		public void ViewCumulativeUpdateLog()
 		{
 			var updateType = UpdateType.Cumulative;
-			using (var browser = ViewUpdateLogFromMainPage(updateType))
-			{
+			using (var browser = ViewUpdateLogFromMainPage(updateType)) {
 				CheckColumnNames(browser, updateType);
 			}
 		}
@@ -38,8 +37,7 @@ namespace Functional
 		public void ViewAccessErrorUpdateLog()
 		{
 			var updateType = UpdateType.AccessError;
-			using (var browser = ViewUpdateLogFromMainPage(updateType))
-			{
+			using (var browser = ViewUpdateLogFromMainPage(updateType)) {
 				CheckColumnNames(browser, updateType);
 			}
 		}
@@ -48,20 +46,18 @@ namespace Functional
 		public void ViewServerErrorUpdateLog()
 		{
 			var updateType = UpdateType.ServerError;
-			using (var browser = ViewUpdateLogFromMainPage(updateType))
-			{
+			using (var browser = ViewUpdateLogFromMainPage(updateType)) {
 				CheckColumnNames(browser, updateType);
 			}
-		}		
+		}
 
 		private void CheckColumnNames(IE browser, UpdateType updateType)
 		{
 			CheckCommonColumnNames(browser);
-			if ((updateType == UpdateType.Accumulative) || (updateType == UpdateType.Cumulative))
-			{
+			if ((updateType == UpdateType.Accumulative) || (updateType == UpdateType.Cumulative)) {
 				Assert.That(browser.Text, Is.StringContaining("Регион"));
 				Assert.That(browser.Text, Is.StringContaining("Размер приготовленных данных"));
-				Assert.That(browser.Text, Is.StringContaining("Лог"));				
+				Assert.That(browser.Text, Is.StringContaining("Лог"));
 			}
 		}
 
@@ -89,9 +85,8 @@ namespace Functional
 		[Test]
 		public void ViewUpdateLogFromUserPage()
 		{
-			var uri = String.Format("Logs/UpdateLog?userId={0}", GetId(typeof(User)));			
-			using (var browser = new IE(BuildTestUrl(uri)))
-			{
+			var uri = String.Format("Logs/UpdateLog?userId={0}", GetId(typeof(User)));
+			using (var browser = new IE(BuildTestUrl(uri))) {
 				var calendarFrom = browser.Div("beginDateCalendarHolder");
 				var headerRow = calendarFrom.TableRow(Find.ByClass("headrow"));
 				headerRow.TableCells[1].MouseDown();
@@ -103,19 +98,18 @@ namespace Functional
 				Assert.That(browser.Text, Is.StringContaining("Тип обновления"));
 				Assert.That(browser.Text, Is.StringContaining("Размер приготовленных данных"));
 				Assert.That(browser.Text, Is.StringContaining("Лог"));
-			}			
+			}
 		}
 
 		[Test]
 		public void ViewUpdateLogFromClientPage()
 		{
 			var uri = String.Format("Logs/UpdateLog?clientCode={0}", GetId(typeof(Client)));
-			using (var browser = new IE(BuildTestUrl(uri)))
-			{
+			using (var browser = new IE(BuildTestUrl(uri))) {
 				var calendarFrom = browser.Div("beginDateCalendarHolder");
 				var headerRow = calendarFrom.TableRow(Find.ByClass("headrow"));
 				headerRow.TableCells[1].MouseDown();
-				headerRow.TableCells[1].MouseUp(); 
+				headerRow.TableCells[1].MouseUp();
 				headerRow.TableCells[1].MouseDown();
 				headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад
 
@@ -150,13 +144,11 @@ where
 	Id = (select max(UserId) from `logs`.`AnalitFUpdates` limit 1)";
 			uint id = 0;
 
-			if (type.Equals(typeof(User)))
-			{
+			if (type.Equals(typeof(User))) {
 				var sql = String.Format(sqlFormat, "Id");
 				id = Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(sql).UniqueResult()));
 			}
-			else if (type.Equals(typeof(Client)))
-			{
+			else if (type.Equals(typeof(Client))) {
 				var sql = String.Format(sqlFormat, "ClientId");
 				id = Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(sql).UniqueResult()));
 			}
@@ -167,8 +159,7 @@ where
 		public void Try_sort_by_columns()
 		{
 			var uri = String.Format("Logs/UpdateLog?clientCode={0}", GetId(typeof(Client)));
-			using (var browser = new IE(BuildTestUrl(uri)))
-			{
+			using (var browser = new IE(BuildTestUrl(uri))) {
 				var calendarFrom = browser.Div("beginDateCalendarHolder");
 				var headerRow = calendarFrom.TableRow(Find.ByClass("headrow"));
 				headerRow.TableCells[1].MouseDown();

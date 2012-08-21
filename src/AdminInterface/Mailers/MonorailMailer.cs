@@ -25,13 +25,15 @@ namespace AdminInterface.Mailers
 {
 	public class MonorailMailer : BaseMailer
 	{
-		private static ILog _log = LogManager.GetLogger(typeof (MonorailMailer));
+		private static ILog _log = LogManager.GetLogger(typeof(MonorailMailer));
 
 		public MonorailMailer(IEmailSender sender) : base(sender)
-		{}
+		{
+		}
 
 		public MonorailMailer()
-		{}
+		{
+		}
 
 		public static void Deliver(Action<MonorailMailer> domail)
 		{
@@ -51,10 +53,10 @@ namespace AdminInterface.Mailers
 			var clazz = NHibernateUtil.GetClass(item);
 			if (clazz == typeof(User)) {
 				type = "пользователя";
-				var user = (User) item;
+				var user = (User)item;
 				PropertyBag["service"] = user.RootService;
 				var disable = UserLogRecord.LastOff(user.Id);
-				if (disable != null){
+				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
 					disable.Comment = comment;
 					disable.Save();
@@ -62,10 +64,10 @@ namespace AdminInterface.Mailers
 			}
 			if (clazz == typeof(Address)) {
 				type = "адреса";
-				var address = (Address) item;
+				var address = (Address)item;
 				PropertyBag["service"] = address.Client;
 				var disable = AddressLogRecord.LastOff(address.Id);
-				if (disable != null){
+				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
 					disable.Comment = comment;
 					disable.Save();
@@ -295,8 +297,7 @@ namespace AdminInterface.Mailers
 			To = "billing@analit.net";
 			Subject = String.Format("Изменение стоимости {0} - {1}", payer.Name, payer.Id);
 
-			if (service != null)
-			{
+			if (service != null) {
 				Subject += String.Format(", {0} - {1}, {2}",
 					service.Name,
 					service.Id,
@@ -315,8 +316,7 @@ namespace AdminInterface.Mailers
 
 		public MonorailMailer InvoiceToEmail(Invoice invoice, bool interactive)
 		{
-			try
-			{
+			try {
 				SendInvoiceToEmail(invoice);
 
 				if (!interactive)
@@ -329,20 +329,17 @@ namespace AdminInterface.Mailers
 						invoice.Payer.Name,
 						invoice.Id);
 			}
-			catch (DoNotHaveContacts)
-			{
+			catch (DoNotHaveContacts) {
 				if (_log.IsDebugEnabled)
 					_log.DebugFormat("Счет {0} не отправлен тк не задана контактная информация для плательщика {1} - {2}",
 						invoice.Id,
 						invoice.Payer.Id,
 						invoice.Payer.Name);
 
-				if (interactive)
-				{
+				if (interactive) {
 					DoNotHaveInvoiceContactGroup(invoice);
 				}
-				else if (invoice.ShouldNotify())
-				{
+				else if (invoice.ShouldNotify()) {
 					invoice.LastErrorNotification = DateTime.Now;
 					DoNotHaveInvoiceContactGroup(invoice);
 				}

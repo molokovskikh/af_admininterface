@@ -5,7 +5,8 @@ using Common.Web.Ui.Models;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional
 {
@@ -29,7 +30,7 @@ namespace Functional
 		private Catalog FindFirstFreeCatalog()
 		{
 			DataMother.CreateCatelogProduct();
-var catalogId = session.CreateSQLQuery(@"
+			var catalogId = session.CreateSQLQuery(@"
 select
 	catalog.Id
 from
@@ -47,8 +48,7 @@ limit 1")
 
 		private SupplierPromotion CreatePromotion(PromotionOwnerSupplier supplier, Catalog catalog)
 		{
-			var supplierPromotion = new SupplierPromotion
-			{
+			var supplierPromotion = new SupplierPromotion {
 				Enabled = true,
 				PromotionOwnerSupplier = supplier,
 				Annotation = catalog.Name,
@@ -88,7 +88,7 @@ limit 1")
 			Assert.That(browser.Text, Is.StringContaining("Статус:"));
 			var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
 			Assert.That(list.Exists, Is.True);
-			Assert.That(list.SelectedItem, Is.EqualTo("Включенные")); 
+			Assert.That(list.SelectedItem, Is.EqualTo("Включенные"));
 		}
 
 		public void RowPromotionNotExists(SupplierPromotion promotion)

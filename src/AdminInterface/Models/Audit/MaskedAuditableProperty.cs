@@ -15,7 +15,8 @@ namespace AdminInterface.Models.Audit
 
 		public MaskedAuditableProperty(PropertyInfo property, string name, object newValue, object oldValue)
 			: base(property, name, newValue, oldValue)
-		{}
+		{
+		}
 
 		protected override void Convert(PropertyInfo property, object newValue, object oldValue)
 		{

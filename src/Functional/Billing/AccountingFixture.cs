@@ -6,7 +6,8 @@ using Castle.ActiveRecord;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.Billing
 {
@@ -28,8 +29,7 @@ namespace Functional.Billing
 		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByUser()
 		{
-			using (var browser = Open("Billing/Accounting?tab=AccountingHistory"))
-			{
+			using (var browser = Open("Billing/Accounting?tab=AccountingHistory")) {
 				BaseSearchBy(browser, "SearchByUser", "Аптека");
 			}
 		}
@@ -37,8 +37,7 @@ namespace Functional.Billing
 		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByAddress()
 		{
-			using (var browser = Open("Billing/Accounting?tab=AccountingHistory"))
-			{
+			using (var browser = Open("Billing/Accounting?tab=AccountingHistory")) {
 				BaseSearchBy(browser, "SearchByAddress", "офис");
 			}
 		}
@@ -46,8 +45,7 @@ namespace Functional.Billing
 		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByClient()
 		{
-			using (var browser = Open("Billing/Accounting?tab=AccountingHistory"))
-			{
+			using (var browser = Open("Billing/Accounting?tab=AccountingHistory")) {
 				BaseSearchBy(browser, "SearchByClient", "аптека");
 			}
 		}
@@ -55,8 +53,7 @@ namespace Functional.Billing
 		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByPayer()
 		{
-			using (var browser = Open("Billing/Accounting?tab=AccountingHistory"))
-			{
+			using (var browser = Open("Billing/Accounting?tab=AccountingHistory")) {
 				BaseSearchBy(browser, "SearchByPayer", "офис");
 			}
 		}
@@ -64,20 +61,19 @@ namespace Functional.Billing
 		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByAuto()
 		{
-			using (var browser = Open("Billing/Accounting?tab=AccountingHistory"))
-			{
+			using (var browser = Open("Billing/Accounting?tab=AccountingHistory")) {
 				BaseSearchBy(browser, "Autosearch", "офис");
 			}
 		}
 
 		[Test,
-			NUnit.Framework.Description("1 пользователь, 2 адреса. 1-й адрес не должне быть в списке неучтенных, 2-й должен быть"),
-			Ignore("Временно до починки")]
+		 NUnit.Framework.Description("1 пользователь, 2 адреса. 1-й адрес не должне быть в списке неучтенных, 2-й должен быть"),
+		 Ignore("Временно до починки")]
 		public void Check_address_for_accounting()
 		{
 			client.AddUser("test user");
 
-			var address = new Address {Value = "address",};
+			var address = new Address { Value = "address", };
 			client.AddAddress(address);
 			address.Save();
 			client = session.Load<Client>(client.Id);
@@ -94,13 +90,11 @@ namespace Functional.Billing
 			client.Addresses[1].Accounting.BeAccounted = true;
 			client.Addresses[1].Value = String.Format("Test address for accounting [{0}]", client.Addresses[1].Id);
 			client.Addresses[1].Save();
-			foreach (var addr in client.Addresses)
-			{
+			foreach (var addr in client.Addresses) {
 				addr.AvaliableForUsers = new List<User> { client.Users[0] };
 				addr.Save();
 			}
-			using (var browser = Open("Billing/Accounting"))
-			{
+			using (var browser = Open("Billing/Accounting")) {
 				Assert.That(browser.Text, Is.Not.StringContaining(client.Addresses[0].Value));
 				Assert.That(browser.Text, Is.StringContaining(client.Addresses[1].Value));
 			}

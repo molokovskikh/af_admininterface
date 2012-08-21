@@ -56,11 +56,11 @@ namespace Functional.Suppliers
 			var supplier = GetSupplier();
 			var group = supplier.ContactGroupOwner.Group(ContactGroupType.ClientManagers);
 			Assert.That(group.Persons.Select(p => p.Name).ToArray(),
-				Is.EquivalentTo(new [] {"Родионов Максим Валерьевич"}));
+				Is.EquivalentTo(new[] { "Родионов Максим Валерьевич" }));
 			Assert.That(group.Contacts.Where(c => c.Type == ContactType.Email).Select(p => p.ContactText).ToArray(),
-				Is.EquivalentTo(new [] {"manager1@analit.net"}));
+				Is.EquivalentTo(new[] { "manager1@analit.net" }));
 			Assert.That(group.Contacts.Where(c => c.Type == ContactType.Phone).Select(p => p.ContactText).ToArray(),
-				Is.EquivalentTo(new [] {"473-2606000"}));
+				Is.EquivalentTo(new[] { "473-2606000" }));
 			Assert.That(group.Contacts.Count, Is.EqualTo(2));
 		}
 

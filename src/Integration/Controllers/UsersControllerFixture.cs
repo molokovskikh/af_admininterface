@@ -64,10 +64,12 @@ namespace Integration.Controllers
 			};
 			client.AddAddress(address);
 			var clientContacts = new[] {
-				new Contact{Id = 1, Type = 0, ContactText = "4411@33.ru, hffty@jhg.ru"}};
-			var regionSettings = new [] {
-				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}};
-			var person = new[] {new Person()};
+				new Contact { Id = 1, Type = 0, ContactText = "4411@33.ru, hffty@jhg.ru" }
+			};
+			var regionSettings = new[] {
+				new RegionSettings { Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true }
+			};
+			var person = new[] { new Person() };
 			Prepare();
 
 			controller.Add(clientContacts, regionSettings, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");
@@ -86,10 +88,10 @@ namespace Integration.Controllers
 			client = DataMother.CreateTestClientWithUser();
 			Prepare();
 			controller.Add(new Contact[0], new[] {
-					new RegionSettings {
-						Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
-					},
-				}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+				new RegionSettings {
+					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
+				},
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
 
 			var user = Registred();
 			var messages = AuditRecord.Queryable.Where(l => l.ObjectId == user.Id);
@@ -106,10 +108,10 @@ namespace Integration.Controllers
 			session.SaveOrUpdate(client);
 			Request.Params.Add("user.Payer.Id", payer.Id.ToString());
 			controller.Add(new Contact[0], new[] {
-					new RegionSettings {
-						Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
-					},
-				}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+				new RegionSettings {
+					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
+				},
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
 
 			var user = Registred();
 			Assert.That(user.Payer, Is.EqualTo(payer));

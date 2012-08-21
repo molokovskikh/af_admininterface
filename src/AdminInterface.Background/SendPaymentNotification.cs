@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -27,15 +27,13 @@ namespace AdminInterface.Background
 
 		public void Process()
 		{
-			using(new SessionScope(FlushAction.Never))
-			{
+			using (new SessionScope(FlushAction.Never)) {
 				var payers = ActiveRecordLinq.AsQueryable<Payer>()
 					.Where(p => p.SendPaymentNotification && p.Balance < 0)
 					.ToList();
 				var usersForNotification = payers.SelectMany(p => p.Users)
 					.Where(u => u.Client != null && u.Enabled && u.Client.Enabled && !u.Accounting.IsFree);
-				foreach (var user in usersForNotification)
-				{
+				foreach (var user in usersForNotification) {
 					var message = UserMessage.Find(user.Id);
 					message.ShowMessageCount = 1;
 					if (IsFirstNotification())
@@ -43,8 +41,7 @@ namespace AdminInterface.Background
 					else
 						message.Message = SecondNotificationText;
 
-					using(var scope = new TransactionScope(OnDispose.Rollback))
-					{
+					using (var scope = new TransactionScope(OnDispose.Rollback)) {
 						message.Save();
 						scope.VoteCommit();
 					}

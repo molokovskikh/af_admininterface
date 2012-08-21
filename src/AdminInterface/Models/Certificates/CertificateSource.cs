@@ -32,7 +32,7 @@ namespace AdminInterface.Models.Certificates
 		[Property(Column = "PersonOrientationName")]
 		public virtual string Name { get; set; }
 
-		[HasAndBelongsToMany(typeof (Supplier),
+		[HasAndBelongsToMany(typeof(Supplier),
 			Lazy = true,
 			ColumnKey = "CertificateSourceId",
 			Table = "SourceSuppliers",

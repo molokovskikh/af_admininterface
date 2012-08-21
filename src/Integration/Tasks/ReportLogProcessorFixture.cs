@@ -8,9 +8,9 @@ namespace Integration.Tasks
 	[TestFixture]
 	public class ReportLogProcessorFixture : Test.Support.IntegrationFixture
 	{
-		Payer payer;
-		Report report;
-		ReportAccount account;
+		private Payer payer;
+		private Report report;
+		private ReportAccount account;
 
 		[SetUp]
 		public void Setup()

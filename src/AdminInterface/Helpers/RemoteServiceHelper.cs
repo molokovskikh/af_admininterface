@@ -34,20 +34,17 @@ namespace AdminInterface.Helpers
 
 			var channelFactory = new ChannelFactory<IRemotePriceProcessor>(binding, Settings.Default.WCFServiceUrl);
 			IRemotePriceProcessor channel = null;
-			try
-			{
+			try {
 				channel = channelFactory.CreateChannel();
 				action(channel);
 				((ICommunicationObject)channel).Close();
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				_log.Warn("Ошибка при обращении к сервису обработки прайс листов", e);
 			}
-			finally
-			{
-				var communicationObject = (ICommunicationObject) channel;
-				if (communicationObject != null 
+			finally {
+				var communicationObject = (ICommunicationObject)channel;
+				if (communicationObject != null
 					&& communicationObject.State != CommunicationState.Closed)
 					communicationObject.Abort();
 				channelFactory.Close();
@@ -58,13 +55,12 @@ namespace AdminInterface.Helpers
 		{
 			return Try(
 				() => {
-					using (WindowsIdentity.GetCurrent().Impersonate())
-					{
+					using (WindowsIdentity.GetCurrent().Impersonate()) {
 						return ServiceController.GetServices(host)
-								.First(s => s.ServiceName == serviceName)
-								.Status == ServiceControllerStatus.Running
-								? ServiceStatus.Running
-								: ServiceStatus.NotRunning;
+							.First(s => s.ServiceName == serviceName)
+							.Status == ServiceControllerStatus.Running
+							? ServiceStatus.Running
+							: ServiceStatus.NotRunning;
 					}
 				},
 				e => {
@@ -75,24 +71,20 @@ namespace AdminInterface.Helpers
 
 		public static T Try<T>(Func<T> action, Func<Exception, T> fail)
 		{
-			try
-			{
+			try {
 				return action();
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				return fail(e);
 			}
 		}
 
 		public static void Try(Action action)
 		{
-			try
-			{
+			try {
 				action();
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				_log.Error(e);
 			}
 		}

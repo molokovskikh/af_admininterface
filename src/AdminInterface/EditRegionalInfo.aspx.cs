@@ -16,17 +16,17 @@ public partial class EditRegionalInfo : Page
 		get { return Convert.ToInt32(Session["RegionalSettingsCode"]); }
 		set { Session["RegionalSettingsCode"] = value; }
 	}
-	
+
 	private uint _clientCode
 	{
 		get { return Convert.ToUInt32(Session["ClientCode"]); }
 		set { Session["ClientCode"] = value; }
 	}
-	
+
 	protected void Page_Load(object sender, EventArgs e)
 	{
 		SecurityContext.Administrator.CheckPermisions(PermissionType.ManageSuppliers, PermissionType.ViewSuppliers);
-		
+
 		if (IsPostBack)
 			return;
 		int regionalSettingsCode;
@@ -38,7 +38,7 @@ public partial class EditRegionalInfo : Page
 	}
 
 	private void BindData()
-	{	
+	{
 		var regionalData = ActiveRecordMediator<RegionalData>.FindByPrimaryKey(_regionalSettingsCode);
 		ContactInfoText.Text = regionalData.ContactInfo;
 		OperativeInfoText.Text = regionalData.OperativeInfo;
@@ -47,11 +47,10 @@ public partial class EditRegionalInfo : Page
 		RegionInfoLabel.Text = String.Format("В регионе: {0}", regionalData.Region.Name);
 		SecurityContext.Administrator.CheckRegion(regionalData.Region.Id);
 	}
-	
+
 	protected void SaveButton_Click(object sender, EventArgs e)
 	{
-		using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-		{
+		using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
 			connection.Open();
 
 			var commandText = @"
@@ -67,7 +66,7 @@ WHERE RowId = ?Id;";
 			Response.Redirect(String.Format("managep.aspx?cc={0}", _clientCode));
 		}
 	}
-	
+
 	protected void CancelButton_Click(object sender, EventArgs e)
 	{
 		Response.Redirect(String.Format("managep.aspx?cc={0}", _clientCode));

@@ -4,7 +4,8 @@ using AdminInterface.Models.Billing;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.Billing
 {
@@ -37,7 +38,7 @@ namespace Functional.Billing
 		[Test]
 		public void Check_comment_with_disable_client()
 		{
-			var client =  DataMother.CreateClientAndUsers();
+			var client = DataMother.CreateClientAndUsers();
 			session.Save(client);
 			session.Flush();
 			browser = Open(string.Format("Billing/Edit?BillingCode={0}", client.Payers[0].Id));

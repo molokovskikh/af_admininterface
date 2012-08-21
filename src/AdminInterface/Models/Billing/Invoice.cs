@@ -13,7 +13,8 @@ namespace AdminInterface.Models.Billing
 	public class Invoice : BalanceUpdater<Invoice>
 	{
 		public Invoice()
-		{}
+		{
+		}
 
 		public Invoice(Advertising ad)
 			: this(ad.Payer)
@@ -25,7 +26,8 @@ namespace AdminInterface.Models.Billing
 
 		public Invoice(Payer payer)
 			: this(payer, DateTime.Now)
-		{}
+		{
+		}
 
 		public Invoice(Payer payer, DateTime date)
 			: this()
@@ -159,7 +161,7 @@ namespace AdminInterface.Models.Billing
 
 		public string SumInWords()
 		{
-			return ViewHelper.InWords((float) Sum);
+			return ViewHelper.InWords((float)Sum);
 		}
 
 		public List<InvoicePart> BuildParts(int invoiceGroup)
@@ -180,21 +182,19 @@ namespace AdminInterface.Models.Billing
 		{
 			var month = period.GetPeriodBegin().Month;
 			var maxDays = CultureInfo.CurrentUICulture.Calendar.GetDaysInMonth(Date.Year, month);
-			
+
 			return new DateTime(Date.Year, month, Math.Min(maxDays, Date.Day));
 		}
 
 		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period, IEnumerable<Account> accounts, DateTime payDate)
 		{
-			if (Payer.InvoiceSettings.DoNotGroupParts)
-			{
+			if (Payer.InvoiceSettings.DoNotGroupParts) {
 				return accounts
 					.Select(a => new InvoicePart(this, FormatPartDescription(a.Description, period), a.Payment, 1, payDate));
 			}
-			else
-			{
+			else {
 				return accounts
-					.GroupBy(a => new {a.Description, a.Payment})
+					.GroupBy(a => new { a.Description, a.Payment })
 					.Select(g => new InvoicePart(this, FormatPartDescription(g.Key.Description, period), g.Key.Payment, g.Count(), payDate));
 			}
 		}

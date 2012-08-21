@@ -9,8 +9,8 @@ namespace AdminInterface.Queries
 {
 	public class RejectWaibillParams
 	{
-		public bool SendWaybills { get; set;}
-		public bool SendRejects { get; set;}
+		public bool SendWaybills { get; set; }
+		public bool SendRejects { get; set; }
 
 		public RejectWaibillParams Get(uint clientId, ISession DbSession)
 		{
@@ -20,8 +20,8 @@ select SendRejects, SendWaybills from
 where clientId = :client
 group by u.SendWaybills and u.SendRejects) as k
 order by cou desc;")
-			.SetParameter("client", clientId)
-			.ToList<RejectWaibillParams>().FirstOrDefault();
+				.SetParameter("client", clientId)
+				.ToList<RejectWaibillParams>().FirstOrDefault();
 			if (rejectWaibillParams != null) {
 				SendRejects = rejectWaibillParams.SendRejects;
 				SendWaybills = rejectWaibillParams.SendWaybills;

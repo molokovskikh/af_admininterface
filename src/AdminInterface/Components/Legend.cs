@@ -22,7 +22,7 @@ namespace AdminInterface.Components
 		<table>
 			<tr>
 ", style);
-			var legendItems = (IDictionary) ComponentParams["LegendItems"];
+			var legendItems = (IDictionary)ComponentParams["LegendItems"];
 			foreach (var key in legendItems.Keys)
 				writer.WriteLine(@"
 <tr>

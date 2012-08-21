@@ -14,7 +14,9 @@ namespace AdminInterface.Models
 			AFCopyId = "";
 		}
 
-		public UserUpdateInfo() { }
+		public UserUpdateInfo()
+		{
+		}
 
 		[PrimaryKey("UserId", Generator = PrimaryKeyType.Foreign)]
 		public virtual uint Id { get; set; }

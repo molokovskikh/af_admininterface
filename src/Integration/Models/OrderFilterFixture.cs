@@ -54,7 +54,7 @@ insert into Logs.Orders(OrderId, TransportType, ResultCode) values(:orderId, 1, 
 				.SetParameter("orderId", order.Id)
 				.ExecuteUpdate();
 
-			var orders = new OrderFilter{User = user}.Find();
+			var orders = new OrderFilter { User = user }.Find();
 			Assert.That(orders.Count, Is.EqualTo(1));
 			Assert.That(orders[0].GetResult(), Is.EqualTo("24989"));
 		}

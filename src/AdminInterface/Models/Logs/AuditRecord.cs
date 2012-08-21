@@ -35,7 +35,8 @@ namespace AdminInterface.Models.Logs
 	public class AuditRecord : ActiveRecordLinqBase<AuditRecord>, IUrlContributor, IAuditRecord
 	{
 		public AuditRecord()
-		{}
+		{
+		}
 
 		public AuditRecord(object entity)
 		{
@@ -53,14 +54,12 @@ namespace AdminInterface.Models.Logs
 
 		private void SetObjectInfo(object entity)
 		{
-			if (entity is DrugstoreSettings)
-			{
-				entity = ((DrugstoreSettings) entity).Client;
+			if (entity is DrugstoreSettings) {
+				entity = ((DrugstoreSettings)entity).Client;
 			}
 
-			if (entity is Service)
-			{
-				var service = ((Service) entity);
+			if (entity is Service) {
+				var service = ((Service)entity);
 				Service = service;
 				ObjectId = Service.Id;
 				Name = service.Name;
@@ -69,24 +68,21 @@ namespace AdminInterface.Models.Logs
 				if (service.Type == ServiceType.Supplier)
 					Type = LogObjectType.Supplier;
 			}
-			else if (entity is User)
-			{
-				var user = (User) entity;
+			else if (entity is User) {
+				var user = (User)entity;
 				ObjectId = user.Id;
 				Service = user.RootService;
 				Type = LogObjectType.User;
 				Name = user.GetLoginOrName();
 			}
-			else if (entity is Address)
-			{
-				var address = ((Address) entity);
+			else if (entity is Address) {
+				var address = ((Address)entity);
 				ObjectId = address.Id;
 				Service = address.Client;
 				Type = LogObjectType.Address;
 				Name = address.Value;
 			}
-			else
-			{
+			else {
 				throw new Exception(String.Format("Не знаю как делать сообщения для {0}", entity));
 			}
 		}
@@ -98,7 +94,7 @@ namespace AdminInterface.Models.Logs
 		public string UserName { get; set; }
 
 		[BelongsTo]
-		public Administrator Administrator { get; set;}
+		public Administrator Administrator { get; set; }
 
 		[Property]
 		public DateTime WriteTime { get; set; }
@@ -164,7 +160,7 @@ namespace AdminInterface.Models.Logs
 			if (isFree)
 				Message = String.Format("$$$Пользователь {0}. Бесплатное изменение пароля: {1}", username, problem);
 			else
-				Message = String.Format("$$$Пользователь {0}. Платное изменение пароля: {1}", username,problem);
+				Message = String.Format("$$$Пользователь {0}. Платное изменение пароля: {1}", username, problem);
 			return this;
 		}
 
@@ -191,7 +187,7 @@ namespace AdminInterface.Models.Logs
 				status = "отключен";
 			else
 				status = "включен";
-			return new AuditRecord(String.Format("$$$Клиент {0}", status), service) {MessageType = LogMessageType.System};
+			return new AuditRecord(String.Format("$$$Клиент {0}", status), service) { MessageType = LogMessageType.System };
 		}
 
 		public static AuditRecord ReseteUin(Client client, string reason)
@@ -222,9 +218,9 @@ where ObjectId = :objectId")
 		public IDictionary GetQueryString()
 		{
 			return new Dictionary<string, string> {
-				{"controller", Type.ToString()},
-				{"action", "show"},
-				{"id", ObjectId.ToString()},
+				{ "controller", Type.ToString() },
+				{ "action", "show" },
+				{ "id", ObjectId.ToString() },
 			};
 		}
 

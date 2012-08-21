@@ -45,7 +45,6 @@ namespace AdminInterface.NHibernateExtentions
 				.Append(" as y")
 				.Append(loc.ToString())
 				.Append("_");
-
 		}
 
 		public override bool IsGrouped
@@ -54,7 +53,7 @@ namespace AdminInterface.NHibernateExtentions
 		}
 
 		public override SqlString ToGroupSqlString(ICriteria criteria, ICriteriaQuery criteriaQuery,
-												   IDictionary<string, IFilter> enabledFilters)
+			IDictionary<string, IFilter> enabledFilters)
 		{
 			throw new InvalidOperationException("not a grouping projection");
 		}

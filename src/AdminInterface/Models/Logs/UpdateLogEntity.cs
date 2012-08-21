@@ -33,7 +33,8 @@ namespace AdminInterface.Models.Logs
 	public class UpdateLogEntity
 	{
 		public UpdateLogEntity()
-		{}
+		{
+		}
 
 		public UpdateLogEntity(User user)
 		{
@@ -78,7 +79,7 @@ namespace AdminInterface.Models.Logs
 
 		public static bool IsDataTransferUpdateType(UpdateType updateType)
 		{
-			return updateType == UpdateType.Accumulative || updateType == UpdateType.Cumulative || updateType == UpdateType.LimitedCumulative 
+			return updateType == UpdateType.Accumulative || updateType == UpdateType.Cumulative || updateType == UpdateType.LimitedCumulative
 				|| updateType == UpdateType.AccumulativeAsync || updateType == UpdateType.CumulativeAsync || updateType == UpdateType.LimitedCumulativeAsync || updateType == UpdateType.AutoOrder
 				|| IsDocumentLoading(updateType);
 		}
@@ -93,8 +94,8 @@ namespace AdminInterface.Models.Logs
 			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof(DocumentReceiveLog))
 					.Add(Expression.Eq("SendUpdateLogEntity", this))
-						.AddOrder(Order.Desc("LogTime"))
-						.List<DocumentReceiveLog>());
+					.AddOrder(Order.Desc("LogTime"))
+					.List<DocumentReceiveLog>());
 		}
 	}
 }

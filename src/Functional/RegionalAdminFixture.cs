@@ -6,7 +6,8 @@ using AdminInterface.Models;
 using Common.Tools;
 using Functional.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 
@@ -83,9 +84,9 @@ namespace Functional
 			browser.TextField(Find.ByName("administrator.InternalPhone")).TypeText(phone.ToString());
 
 			var departmentId = new Random().Next(1, 6);
-			var department = (Department) Enum.ToObject(typeof (Department), departmentId);
+			var department = (Department)Enum.ToObject(typeof(Department), departmentId);
 			browser.SelectList(Find.ByName("administrator.Department")).Select(department.GetDescription());
-				
+
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
@@ -127,7 +128,7 @@ namespace Functional
 
 			browser.TextField(Find.ByName("administrator.PhoneSupport")).TypeText("123-123123");
 			var id = Convert.ToUInt32(browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).GetAttributeValue("value"));
-			var permissionType = (PermissionType) Enum.ToObject(typeof (PermissionType), id);
+			var permissionType = (PermissionType)Enum.ToObject(typeof(PermissionType), id);
 
 			browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).Checked = true;
 			browser.Button(Find.ByValue("Сохранить")).Click();

@@ -16,8 +16,7 @@ namespace AdminInterface.Models.Logs
 		public static LastServicesUsage GetLastUsage(LastServicesUsage[] usages)
 		{
 			LastServicesUsage last = null;
-			for (var i = 0; i < usages.Length; i++)
-			{
+			for (var i = 0; i < usages.Length; i++) {
 				if (usages[i] == null)
 					continue;
 				if (last == null)
@@ -37,7 +36,9 @@ namespace AdminInterface.Models.Logs
 			User = user;
 		}
 
-		public AuthorizationLogEntity() {}
+		public AuthorizationLogEntity()
+		{
+		}
 
 		[PrimaryKey("UserId", Generator = PrimaryKeyType.Foreign)]
 		public virtual uint Id { get; set; }
@@ -46,13 +47,13 @@ namespace AdminInterface.Models.Logs
 		public virtual User User { get; set; }
 
 		[Property]
-		public virtual  DateTime? CITime { get; set; }
+		public virtual DateTime? CITime { get; set; }
 
 		[Property]
-		public virtual  DateTime? AFTime { get; set; }
+		public virtual DateTime? AFTime { get; set; }
 
 		[Property]
-		public virtual  DateTime? AOLTime { get; set; }
+		public virtual DateTime? AOLTime { get; set; }
 
 		[Property]
 		public virtual DateTime? IOLTime { get; set; }
@@ -62,7 +63,7 @@ namespace AdminInterface.Models.Logs
 
 		public virtual string GetLastServicesUsage()
 		{
-			var usages = new [] {
+			var usages = new[] {
 				AFTime.HasValue ? new LastServicesUsage { Date = AFTime.Value, ShortServiceName = "AF" } : null,
 				AOLTime.HasValue ? new LastServicesUsage { Date = AOLTime.Value, ShortServiceName = "AOL" } : null,
 				CITime.HasValue ? new LastServicesUsage { Date = CITime.Value, ShortServiceName = "CI" } : null,

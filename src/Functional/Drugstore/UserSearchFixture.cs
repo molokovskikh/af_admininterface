@@ -36,20 +36,18 @@ namespace Functional.Drugstore
 		{
 			Search(searchBy, text);
 
-			if (browser.Text.Contains("Поиск пользователей") && browser.Text.Contains("Введите текст для поиска:"))
-			{
+			if (browser.Text.Contains("Поиск пользователей") && browser.Text.Contains("Введите текст для поиска:")) {
 				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 				Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
 			}
-			else
-			{
+			else {
 				CheckThatIsUserPage(browser);
 			}
 		}
 
 		private void Search(SearchUserBy searchBy, string text)
 		{
-			Css(String.Format("input[type='radio'][name='filter.SearchBy'][value='{0}']", (int) searchBy)).Checked = true;
+			Css(String.Format("input[type='radio'][name='filter.SearchBy'][value='{0}']", (int)searchBy)).Checked = true;
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(text);
 			browser.Button(Find.ByValue("Поиск")).Click();
 		}
@@ -96,12 +94,10 @@ namespace Functional.Drugstore
 			Flush();
 
 			AssetSearch(SearchUserBy.ByLogin, user.Login);
-			if (browser.TableBody(Find.ById("SearchResults")).Exists)
-			{
+			if (browser.TableBody(Find.ById("SearchResults")).Exists) {
 				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.EqualTo(1));
 			}
-			else
-			{
+			else {
 				CheckThatIsUserPage(browser);
 			}
 		}
@@ -189,8 +185,8 @@ namespace Functional.Drugstore
 		{
 			//нужно добавить еще одного пользователя что не произошел автовход
 			var client = DataMother.TestClient(c => {
-				c.AddUser(new User(c) {Name = "test",});
-				c.AddUser(new User(c) {Name = "test",});
+				c.AddUser(new User(c) { Name = "test", });
+				c.AddUser(new User(c) { Name = "test", });
 			});
 			Flush();
 
@@ -218,8 +214,8 @@ namespace Functional.Drugstore
 		{
 			//нужно добавить еще одного пользователя что не произошел автовход
 			var client = DataMother.TestClient(c => {
-				c.AddUser(new User(c) {Name = "test",});
-				c.AddUser(new User(c) {Name = "test",});
+				c.AddUser(new User(c) { Name = "test", });
+				c.AddUser(new User(c) { Name = "test", });
 			});
 			Flush();
 

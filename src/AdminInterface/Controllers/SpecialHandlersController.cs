@@ -46,7 +46,7 @@ namespace AdminInterface.Controllers
 			var handler = DbSession.Load<SpecialHandler>(id);
 			DbSession.Delete(handler);
 			Notify("Удалено");
-			RedirectToAction("Index", new{supplierId = handler.Supplier.Id});
+			RedirectToAction("Index", new { supplierId = handler.Supplier.Id });
 		}
 
 		private void ValidateAndSaveIfNeeded(SpecialHandler handler)
@@ -56,7 +56,7 @@ namespace AdminInterface.Controllers
 				if (IsValid(handler)) {
 					DbSession.Save(handler);
 					Notify("Сохранено");
-					RedirectToAction("Index", new{supplierId = handler.Supplier.Id});
+					RedirectToAction("Index", new { supplierId = handler.Supplier.Id });
 				}
 			}
 		}

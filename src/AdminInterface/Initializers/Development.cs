@@ -32,11 +32,9 @@ namespace AdminInterface.Initializers
 				dataPath,
 				config.AttachmentsPath,
 				config.CertificatesPath,
-				config.PromotionsPath
-			);
+				config.PromotionsPath);
 
-			using(new SessionScope())
-			{
+			using (new SessionScope()) {
 				if (Administrator.GetByName(Environment.UserName) == null)
 					ActiveRecordMediator.Save(Administrator.CreateLocalAdministrator());
 			}
@@ -44,8 +42,7 @@ namespace AdminInterface.Initializers
 
 		public void InitDirs(params string[] dirs)
 		{
-			foreach (var dir in dirs)
-			{
+			foreach (var dir in dirs) {
 				if (!Directory.Exists(dir))
 					Directory.CreateDirectory(dir);
 			}

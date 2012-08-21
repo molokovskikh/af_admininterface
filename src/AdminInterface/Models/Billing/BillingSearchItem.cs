@@ -16,10 +16,10 @@ namespace AdminInterface.Models.Billing
 
 		public double PaySum { get; set; }
 
-		public decimal Balance {get; set; }
+		public decimal Balance { get; set; }
 
 		public DateTime LastClientRegistrationDate { get; set; }
-	
+
 		public uint DisabledUsersCount { get; set; }
 
 		public uint EnabledUsersCount { get; set; }

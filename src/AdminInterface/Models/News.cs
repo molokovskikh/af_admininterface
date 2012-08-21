@@ -35,10 +35,7 @@ namespace AdminInterface.Models
 		[Description("Время публикации")]
 		public virtual TimeSpan PublicationTime
 		{
-			get
-			{
-				return PublicationDate.TimeOfDay;
-			}
+			get { return PublicationDate.TimeOfDay; }
 			set
 			{
 				PublicationDate = PublicationDate
@@ -56,7 +53,10 @@ namespace AdminInterface.Models
 		[Property]
 		public bool Deleted { get; set; }
 
-		public string Name { get {return Header; }}
+		public string Name
+		{
+			get { return Header; }
+		}
 
 		[Property, Description("Адресат"), NotifyNews]
 		public virtual NewsDestinationType DestinationType { get; set; }
@@ -64,7 +64,7 @@ namespace AdminInterface.Models
 		[Style]
 		public virtual bool HiddenNews
 		{
-			get{ return Deleted; }
+			get { return Deleted; }
 		}
 	}
 }

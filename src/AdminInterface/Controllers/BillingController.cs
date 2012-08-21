@@ -28,10 +28,7 @@ namespace AdminInterface.Controllers
 
 		public string Tab
 		{
-			get
-			{
-				return _tab;
-			}
+			get { return _tab; }
 			set
 			{
 				if (String.IsNullOrEmpty(value))
@@ -78,8 +75,7 @@ namespace AdminInterface.Controllers
 			var result = new StringBuilder();
 			var filterValue = (string)(log.LogType.ToString() + log.ObjectId.ToString());
 			result.AppendFormat("data-filter=\"{0}\" ", filterValue);
-			if (IsFiltred)
-			{
+			if (IsFiltred) {
 				var currentFilterValue = GetFilterValue(Service);
 
 				if (filterValue.ToLower() != currentFilterValue.ToLower())
@@ -106,7 +102,7 @@ namespace AdminInterface.Controllers
 		public Dictionary<string, string> Parts()
 		{
 			var result = new Dictionary<string, string> {
-				{"BillingCode", PayerId.ToString()}
+				{ "BillingCode", PayerId.ToString() }
 			};
 			if (ServiceId != 0)
 				result.Add("ClientCode", ServiceId.ToString());
@@ -117,8 +113,8 @@ namespace AdminInterface.Controllers
 	}
 
 	[
-		Helper(typeof (BindingHelper)),
-		Helper(typeof (ViewHelper)),
+		Helper(typeof(BindingHelper)),
+		Helper(typeof(ViewHelper)),
 		Secure(PermissionType.Billing),
 	]
 	public class BillingController : AdminInterfaceController
@@ -179,15 +175,12 @@ namespace AdminInterface.Controllers
 			uint billingCode,
 			string tab)
 		{
-			try
-			{
-				if (message.Id != 0)
-				{
+			try {
+				if (message.Id != 0) {
 					var user = DbSession.Load<User>(message.Id);
 					SendMessageToUser(user, message);
 				}
-				else
-				{
+				else {
 					var payer = Payer.Find(billingCode);
 					foreach (var user in payer.Users)
 						SendMessageToUser(user, message);
@@ -196,8 +189,7 @@ namespace AdminInterface.Controllers
 					Mailer.SendMessageFromBillingToClient(message);
 				Notify("Сообщение сохранено");
 			}
-			catch (ValidationException exception)
-			{
+			catch (ValidationException exception) {
 				Flash["SendError"] = exception.ValidationErrorMessages[0];
 			}
 
@@ -223,8 +215,7 @@ namespace AdminInterface.Controllers
 			service.Disabled = !status;
 			ActiveRecordMediator<Service>.Save(service);
 			DbSession.Flush();
-			if (oldDisabled != service.Disabled)
-			{
+			if (oldDisabled != service.Disabled) {
 				this.Mailer().EnableChanged(service, addComment).Send();
 				AuditRecord.StatusChange(service).Save();
 			}
@@ -234,8 +225,7 @@ namespace AdminInterface.Controllers
 		public void Search()
 		{
 			var filter = new PayerFilter();
-			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter.")))
-			{
+			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter."))) {
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.NullIfInvalidKey;
 				BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter");
 				PropertyBag["searchResults"] = filter.Find();
@@ -245,17 +235,15 @@ namespace AdminInterface.Controllers
 
 		public void SentMail(uint clientCode, string tab, [DataBind("MailSentEntity")] MailSentEntity sentEntity)
 		{
-			try
-			{
+			try {
 				sentEntity.UserName = Admin.UserName;
 				sentEntity.SaveAndFlush();
 				Notify("Cохранено");
 			}
-			catch (ValidationException ex)
-			{
+			catch (ValidationException ex) {
 				Flash["SendMailError"] = ex.ValidationErrorMessages[0];
 			}
-			Redirect("Billing", "Edit", new {clientCode, billingCode = sentEntity.PayerId, tab});
+			Redirect("Billing", "Edit", new { clientCode, billingCode = sentEntity.PayerId, tab });
 		}
 
 		public void DeleteMail(uint id)
@@ -302,7 +290,7 @@ namespace AdminInterface.Controllers
 			var address = Address.Find(addressId);
 			var users = address.Client.Users.Where(user =>
 				((!String.IsNullOrEmpty(user.Name) && user.Name.ToLower().Contains(searchText.ToLower())) || (user.Login.ToLower().Contains(searchText.ToLower()))) &&
-				(!address.AvaliableFor(user)));
+					(!address.AvaliableFor(user)));
 			PropertyBag["Users"] = users;
 			CancelLayout();
 		}
@@ -312,9 +300,9 @@ namespace AdminInterface.Controllers
 			if (String.IsNullOrEmpty(searchText))
 				searchText = String.Empty;
 			var user = DbSession.Load<User>(userId);
-			var addresses = user.Client.Addresses.Where(address => 
+			var addresses = user.Client.Addresses.Where(address =>
 				address.Value.ToLower().Contains(searchText.ToLower()) &&
-				!address.AvaliableFor(user));
+					!address.AvaliableFor(user));
 			PropertyBag["Addresses"] = addresses;
 			CancelLayout();
 		}

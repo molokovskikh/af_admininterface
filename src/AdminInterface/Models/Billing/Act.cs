@@ -35,22 +35,20 @@ namespace AdminInterface.Models.Billing
 
 			ActDate = Payer.GetDocumentDate(actDate);
 			var invoiceParts = invoices.SelectMany(i => i.Parts);
-			if (Payer.InvoiceSettings.DoNotGroupParts)
-			{
+			if (Payer.InvoiceSettings.DoNotGroupParts) {
 				Parts = invoiceParts
 					.Select(p => new ActPart(p.Name, p.Count, p.Cost))
 					.ToList();
 			}
-			else
-			{
+			else {
 				Parts = invoiceParts
-					.GroupBy(p => new {p.Name, p.Cost})
+					.GroupBy(p => new { p.Name, p.Cost })
 					.Select(g => new ActPart(g.Key.Name, g.Sum(i => i.Count), g.Key.Cost))
 					.ToList();
 			}
 			CalculateSum();
 
-			foreach(var part in invoiceParts.Where(p => p.Ad != null))
+			foreach (var part in invoiceParts.Where(p => p.Ad != null))
 				part.Ad.Act = this;
 
 			foreach (var invoice in invoices)
@@ -114,7 +112,8 @@ namespace AdminInterface.Models.Billing
 	public class ActPart
 	{
 		public ActPart()
-		{}
+		{
+		}
 
 		public ActPart(Act act)
 		{

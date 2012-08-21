@@ -32,12 +32,10 @@ namespace AdminInterface.Controllers.Filters
 
 			criteria.Add(Restrictions.Eq("Period", Period));
 
-			if (PayerId != null && PayerId.Length > 0)
-			{
+			if (PayerId != null && PayerId.Length > 0) {
 				criteria.Add(Restrictions.In("p.PayerID", PayerId));
 			}
-			else
-			{
+			else {
 				if (Region != null)
 					criteria.CreateCriteria("p.Clients", "c")
 						.Add(Expression.Sql("{alias}.RegionCode = " + Region.Id));
@@ -83,7 +81,7 @@ namespace AdminInterface.Controllers.Filters
 					var query = session.QueryOver<Payer>()
 						.Where(p => p.AutoInvoice == InvoiceType.Auto
 							&& p.PayCycle == invoicePeriod
-							&& p.Recipient != null);
+								&& p.Recipient != null);
 
 					if (Recipient != null)
 						query.Where(p => p.Recipient == Recipient);
@@ -99,7 +97,7 @@ namespace AdminInterface.Controllers.Filters
 					payers = session.Query<Payer>()
 						.Where(p => PayerId.Contains(p.PayerID)
 							&& p.Registration.RegistrationDate <= periodEnd
-							&& p.Recipient != null)
+								&& p.Recipient != null)
 						.OrderBy(p => p.Name)
 						.ToList();
 				}

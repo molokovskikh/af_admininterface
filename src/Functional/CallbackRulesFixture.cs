@@ -17,8 +17,7 @@ namespace Functional
 		public void SetupFixture()
 		{
 			var adm = Administrator.GetByName("kvasov");
-			if (!adm.HavePermision(PermissionType.ManageCallbacks))
-			{
+			if (!adm.HavePermision(PermissionType.ManageCallbacks)) {
 				adm.AllowedPermissions.Add(Permission.Find(PermissionType.ManageCallbacks));
 				session.Save(adm);
 			}
@@ -41,13 +40,12 @@ namespace Functional
 		[Test]
 		public void Main_form_should_have_link_to_rejected_emails_where_should_be_emails_for_current_day()
 		{
-			var callback1 = new Callback {CallerPhone = "4732606000", Comment = "Офис", Enabled = false};
+			var callback1 = new Callback { CallerPhone = "4732606000", Comment = "Офис", Enabled = false };
 			callback1.Save();
-			var callback2 = new Callback {CallerPhone = "9202299222", Comment = "Епихин"};
+			var callback2 = new Callback { CallerPhone = "9202299222", Comment = "Епихин" };
 			callback2.SaveAndFlush();
 
-			using (var browser = new IE(BuildTestUrl("default.aspx")))
-			{
+			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
 				browser.Link(Find.ByText(CallbackLinkText)).Click();
 				browser.AssertThatTableContains(callback2, callback1);
 			}
@@ -61,8 +59,7 @@ namespace Functional
 			var callback2 = new Callback { CallerPhone = "9202299222", Comment = "Епихин" };
 			callback2.SaveAndFlush();
 
-			using (var browser = new IE(BuildTestUrl("default.aspx")))
-			{
+			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
 				browser.Link(Find.ByText(CallbackLinkText)).Click();
 				browser.FindRow(callback1).Link(Find.ByText("Удалить")).Click();
 				browser.AssertThatTableContains(callback2);
@@ -75,8 +72,7 @@ namespace Functional
 			var callback1 = new Callback { CallerPhone = "4732606000", Comment = "Офис" };
 			callback1.Save();
 
-			using (var browser = new IE(BuildTestUrl("default.aspx")))
-			{
+			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
 				browser.Link(Find.ByText(CallbackLinkText)).Click();
 				browser.FindRow(callback1).Link(Find.ByText("Редактировать")).Click();
 				browser.Input<Callback>(callback => callback.DueDate, DateTime.Today.AddMonths(-1));
@@ -96,8 +92,7 @@ namespace Functional
 			var callback2 = new Callback { CallerPhone = "9202299222", Comment = "Епихин" };
 			callback2.SaveAndFlush();
 
-			using (var browser = new IE(BuildTestUrl("default.aspx")))
-			{
+			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
 				browser.Link(Find.ByText(CallbackLinkText)).Click();
 				browser.FindRow(callback1).Input<Callback[]>(callbacks => callbacks[1].CheckDate, true);
 				browser.FindRow(callback2).Input<Callback[]>(callbacks => callbacks[0].Enabled, true);
@@ -122,8 +117,7 @@ namespace Functional
 			var callback = new Callback { CallerPhone = "4732606000", Comment = "Офис" };
 			callback.Save();
 
-			using (var browser = new IE(BuildTestUrl("default.aspx")))
-			{
+			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
 				browser.Link(Find.ByText(CallbackLinkText)).Click();
 				browser.FindRow(callback).Input<Callback[]>(callbacks => callbacks[0].CheckDate, true);
 				browser.Button(Find.ByValue("Сохранить")).Click();

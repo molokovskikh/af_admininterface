@@ -49,7 +49,7 @@ namespace AdminInterface.Controllers
 	}
 
 	[
-		Helper(typeof(BindingHelper)), 
+		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
 		Secure(PermissionType.RegisterDrugstore, PermissionType.RegisterSupplier, Required = Required.AnyOf),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
@@ -72,16 +72,13 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void RegisterSupplier(
 			[DataBind("supplierContacts")] Contact[] supplierContacts,
-			ulong homeRegion, 
+			ulong homeRegion,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			[DataBind("options")] AdditionalSettings options,
-
 			[DataBind("payer")] Payer payer,
 			uint? existingPayerId,
-
 			[DataBind("userContacts")] Contact[] userContacts,
 			[DataBind("userPersons")] Person[] userPersons,
-
 			string additionalEmailsForSendingCard,
 			string comment)
 		{
@@ -92,8 +89,7 @@ namespace AdminInterface.Controllers
 			supplier.RegionMask = regionSettings.GetBrowseMask();
 			BindObjectInstance(supplier, "supplier");
 
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
+			using (var scope = new TransactionScope(OnDispose.Rollback)) {
 				DbLogHelper.SetupParametersForTriggerLogging();
 				var currentPayer = RegisterPayer(options, payer, existingPayerId, supplier.Name, supplier.FullName);
 
@@ -120,8 +116,7 @@ namespace AdminInterface.Controllers
 				supplier.OrderRules.Add(new OrderSendRules(Defaults, supplier));
 				DbSession.Save(supplier);
 
-				foreach (var group in supplier.ContactGroupOwner.ContactGroups)
-				{
+				foreach (var group in supplier.ContactGroupOwner.ContactGroups) {
 					var persons = BindObject<List<Person>>(group.Type + "Persons");
 					var contacts = BindObject<List<Contact>>(group.Type + "Contacts");
 
@@ -131,8 +126,7 @@ namespace AdminInterface.Controllers
 
 				var groups = BindObject<RegionalDeliveryGroup[]>("orderDeliveryGroup");
 
-				foreach (var group in groups)
-				{
+				foreach (var group in groups) {
 					group.Region = Region.Find(group.Region.Id);
 					group.Name = "Доставка заказов " + group.Region.Name;
 					group.ContactGroupOwner = supplier.ContactGroupOwner;
@@ -143,8 +137,7 @@ namespace AdminInterface.Controllers
 					Validator.IsValid(group);
 				}
 
-				foreach (var group in supplier.ContactGroupOwner.ContactGroups)
-				{
+				foreach (var group in supplier.ContactGroupOwner.ContactGroups) {
 					group.Adopt();
 					group.Save();
 					group.Persons.Each(p => p.Save());
@@ -176,23 +169,20 @@ namespace AdminInterface.Controllers
 				log = SendRegistrationCard(log, user, password, additionalEmailsForSendingCard);
 			DbSession.Save(log);
 
-			if (options.FillBillingInfo)
-			{
+			if (options.FillBillingInfo) {
 				Session["password"] = password;
 				Redirect("Register", "RegisterPayer", new {
 					id = supplier.Payer.Id,
 					showRegistrationCard = options.ShowRegistrationCard
 				});
 			}
-			else if (supplier.Users.Count > 0 && options.ShowRegistrationCard)
-			{
+			else if (supplier.Users.Count > 0 && options.ShowRegistrationCard) {
 				Flash["password"] = password;
-				Redirect("main", "report", new{id = supplier.Users.First().Id});
+				Redirect("main", "report", new { id = supplier.Users.First().Id });
 			}
-			else
-			{
+			else {
 				Notify("Регистрация завершена успешно");
-				Redirect("Suppliers", "Show", new{id = supplier.Id});
+				Redirect("Suppliers", "Show", new { id = supplier.Id });
 			}
 		}
 
@@ -210,12 +200,12 @@ namespace AdminInterface.Controllers
 			PropertyBag["address"] = client.AddAddress("");
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.Base);
 			PropertyBag["regions"] = regions;
-			PropertyBag["clientContacts"] = new [] { new Contact(ContactType.Phone, string.Empty), new Contact(ContactType.Email, string.Empty) };
+			PropertyBag["clientContacts"] = new[] { new Contact(ContactType.Phone, string.Empty), new Contact(ContactType.Email, string.Empty) };
 			PropertyBag["options"] = new AdditionalSettings();
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void RegisterClient([DataBind("client")]Client client,
+		public void RegisterClient([DataBind("client")] Client client,
 			ulong homeRegion,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			[DataBind("permissions")] UserPermission[] permissions,
@@ -320,7 +310,7 @@ namespace AdminInterface.Controllers
 			}
 			else if (client.Users.Count > 0 && options.ShowRegistrationCard) {
 				Flash["password"] = password;
-				Redirect("main", "report", new{id = client.Users.First().Id});
+				Redirect("main", "report", new { id = client.Users.First().Id });
 			}
 			else {
 				Notify("Регистрация завершена успешно");
@@ -340,7 +330,7 @@ namespace AdminInterface.Controllers
 						organization.Payer = currentPayer;
 						organization.Name = currentPayer.Name;
 						organization.FullName = currentPayer.JuridicalName;
-						currentPayer.JuridicalOrganizations = new List<LegalEntity> {organization};
+						currentPayer.JuridicalOrganizations = new List<LegalEntity> { organization };
 						organization.Save();
 					}
 				}
@@ -463,8 +453,7 @@ WHERE   pricesdata.firmcode = s.Id
 		public void RegisterPayer(uint id, bool showRegistrationCard)
 		{
 			var payer = Payer.TryFind(id);
-			if (payer == null)
-			{
+			if (payer == null) {
 				payer = new Payer {
 					JuridicalOrganizations = new List<LegalEntity> {
 						new LegalEntity()
@@ -484,21 +473,18 @@ WHERE   pricesdata.firmcode = s.Id
 			[DataBind("PaymentOptions")] PaymentOptions paymentOptions,
 			bool showRegistrationCard)
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
+			using (var scope = new TransactionScope(OnDispose.Rollback)) {
 				if (payer.Id == 0)
 					payer.Init(Admin);
 
 				payer.AddComment(paymentOptions.GetCommentForPayer());
 
-				if (payer.JuridicalOrganizations == null || payer.JuridicalOrganizations.Count == 0)
-				{
+				if (payer.JuridicalOrganizations == null || payer.JuridicalOrganizations.Count == 0) {
 					payer.JuridicalOrganizations = new List<LegalEntity> {
 						new LegalEntity(payer.Name, payer.JuridicalName, payer)
 					};
 				}
-				else
-				{
+				else {
 					var org = payer.JuridicalOrganizations.First();
 					org.Name = payer.Name;
 					org.FullName = payer.JuridicalName;
@@ -545,7 +531,7 @@ WHERE   pricesdata.firmcode = s.Id
 			if (!allowViewSuppliers)
 				return;
 			var suppliers = DbSession.Query<Supplier>()
-					.Where(s => !s.Disabled && s.Name.Contains(searchPattern));
+				.Where(s => !s.Disabled && s.Name.Contains(searchPattern));
 			if (payerId.HasValue && payerId.Value > 0)
 				suppliers = suppliers.Where(item => item.Payer.PayerID == payerId.Value);
 

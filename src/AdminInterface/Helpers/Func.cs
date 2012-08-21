@@ -9,38 +9,36 @@ namespace AdminInterface.Helpers
 {
 	public class Func
 	{
-		private static readonly ILog _log = LogManager.GetLogger(typeof (Func));
+		private static readonly ILog _log = LogManager.GetLogger(typeof(Func));
 
-		public static void Mail(string from, 
-		                        string subject, 
-		                        string body, 
-		                        string to)
+		public static void Mail(string from,
+			string subject,
+			string body,
+			string to)
 		{
 			Mail(from, String.Empty, subject, body, to, String.Empty, String.Empty);
 		}
 
 		public static void Mail(string from,
-		                        string subject,
-		                        string body,
-		                        string to,
-		                        string bcc)
+			string subject,
+			string body,
+			string to,
+			string bcc)
 		{
 			Mail(from, String.Empty, subject, body, to, String.Empty, bcc);
 		}
 
 
-		public static void Mail(string from, 
-		                        string fromDisplayName, 
-		                        string subject, 
-		                        string body, 
-		                        string to, 
-		                        string toDisplayName, 
-		                        string bcc)
+		public static void Mail(string from,
+			string fromDisplayName,
+			string subject,
+			string body,
+			string to,
+			string toDisplayName,
+			string bcc)
 		{
-			try
-			{
-				if (!String.IsNullOrEmpty(to))
-				{
+			try {
+				if (!String.IsNullOrEmpty(to)) {
 #if DEBUG
 					to = GetDebugMail();
 					bcc = "";
@@ -63,8 +61,7 @@ namespace AdminInterface.Helpers
 					client.Send(message);
 				}
 			}
-			catch (Exception ex)
-			{
+			catch (Exception ex) {
 				_log.Error("Не удалось отправить письмо", ex);
 			}
 		}
@@ -81,8 +78,7 @@ namespace AdminInterface.Helpers
 
 		public static void SendWitnStandartSender(MailMessage message)
 		{
-			try
-			{
+			try {
 #if DEBUG
 				message.To.Clear();
 				message.CC.Clear();
@@ -94,16 +90,14 @@ namespace AdminInterface.Helpers
 				var client = new SmtpClient(GetSmtpServer());
 				client.Send(message);
 			}
-			catch (Exception ex)
-			{
+			catch (Exception ex) {
 				_log.Error("Не удалось отправить письмо", ex);
 			}
 		}
 
 		public static int Send(MailMessage message)
 		{
-			try
-			{
+			try {
 #if DEBUG
 				message.To.Clear();
 				message.To.Add(GetDebugMail());
@@ -116,8 +110,7 @@ namespace AdminInterface.Helpers
 
 				return smtpid.Value;
 			}
-			catch (Exception ex)
-			{
+			catch (Exception ex) {
 				_log.Error("Не удалось отправить письмо", ex);
 			}
 			return 0;

@@ -212,12 +212,12 @@
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Отправлять дубль заказа в zakaz_copy@analit.net">
 								<ItemTemplate>
-									<asp:CheckBox ID="SendDebugMessage" runat="server" Checked='<%#  Convert.ToBoolean(Eval("SendDebugMessage")) %>' />
+									<asp:CheckBox ID="SendDebugMessage" runat="server" Checked='<%# Convert.ToBoolean(Eval("SendDebugMessage")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Задерживать отправку sms оповещения об ошибке на заданное число секунд">
 								<ItemTemplate>
-									<asp:TextBox ID="SmsSendDelay" runat="server" Text='<%# Eval("ErrorNotificationDelay")  %>' />
+									<asp:TextBox ID="SmsSendDelay" runat="server" Text='<%# Eval("ErrorNotificationDelay") %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:HyperLinkField Text="Свойства" DataNavigateUrlFields="id" DataNavigateUrlFormatString="~/SenderProperties.aspx?ruleid={0}" />

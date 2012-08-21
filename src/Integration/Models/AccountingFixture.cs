@@ -30,7 +30,7 @@ update billing.Accounts
 set ReadyForAccounting = 0,
 BeAccounted = 0;
 ").ExecuteUpdate();
-			
+
 			var accountings = Account.GetReadyForAccounting(new Pager());
 			Assert.That(accountings.Count(), Is.EqualTo(0));
 			client.Users[0].Accounting.ReadyForAccounting = true;
@@ -48,7 +48,7 @@ BeAccounted = 0;
 			session.SaveOrUpdate(client);
 			Flush();
 
-			var accounts = new AccountFilter {SearchBy = AccountingSearchBy.ByUser, SearchText = client.Users[0].Id.ToString()}.Find(new Pager());
+			var accounts = new AccountFilter { SearchBy = AccountingSearchBy.ByUser, SearchText = client.Users[0].Id.ToString() }.Find(new Pager());
 			Assert.That(accounts.Count, Is.EqualTo(1));
 			Assert.That(accounts.Single().Id, Is.EqualTo(client.Users[0].Accounting.Id));
 		}

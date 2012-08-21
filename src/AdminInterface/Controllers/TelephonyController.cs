@@ -6,7 +6,7 @@ using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using NHibernate.Criterion;
-using ViewHelper=Common.Web.Ui.Helpers.ViewHelper;
+using ViewHelper = Common.Web.Ui.Helpers.ViewHelper;
 
 namespace AdminInterface.Controllers
 {

@@ -26,8 +26,7 @@ namespace AdminInterface.Controllers
 		public void Search()
 		{
 			var filter = new CallRecordFilter();
-			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter.")))
-			{
+			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter."))) {
 				BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter");
 				var calls = filter.Find();
 				PropertyBag["calls"] = calls;
@@ -58,8 +57,7 @@ namespace AdminInterface.Controllers
 				String.Format("{0}.wav", recordId);
 			Response.AppendHeader("Content-Disposition", String.Format("attachment; filename=\"{0}\"", filename));
 			Response.ContentType = "audio/wav";
-			foreach (var track in files)
-			{
+			foreach (var track in files) {
 				using (var fileStream = File.OpenRead(track))
 					fileStream.CopyTo(Response.OutputStream);
 			}
@@ -83,6 +81,5 @@ namespace AdminInterface.Controllers
 			Response.ContentType = "application/vnd.ms-excel";
 			Response.OutputStream.Write(result, 0, result.Length);
 		}
-
 	}
 }

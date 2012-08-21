@@ -10,8 +10,8 @@ namespace Integration.Tasks
 	[TestFixture]
 	public class ReportProcessorFixture : Test.Support.IntegrationFixture
 	{
-		ReportProcessor processor;
-		Payer payer;
+		private ReportProcessor processor;
+		private Payer payer;
 
 		[SetUp]
 		public void Setup()

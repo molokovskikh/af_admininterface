@@ -13,7 +13,8 @@ namespace AdminInterface.Helpers
 	public class StubRequestRunner : IRequestRunner
 	{
 		public void Request(string uri, string user, string password, string request)
-		{}
+		{
+		}
 	}
 
 	public class WebRequestRunner : IRequestRunner
@@ -23,19 +24,18 @@ namespace AdminInterface.Helpers
 		public void Request(string uri, string user, string password, string request)
 		{
 			var requestUri = uri + "?" + request;
-			try
-			{
+			try {
 				var webRequest = (HttpWebRequest)WebRequest.Create(requestUri);
 				if (!String.IsNullOrEmpty(user))
 					webRequest.Credentials = new NetworkCredential(user, password);
 				webRequest.Method = "GET";
-				using(var response = (HttpWebResponse)webRequest.GetResponse()) {
+				using (var response = (HttpWebResponse)webRequest.GetResponse()) {
 					if (response.StatusCode == HttpStatusCode.OK) {
 						log.WarnFormat("Выполнения запроса {0} закончилось с неожиданным кодом {1}", requestUri, response.StatusCode);
 					}
 				}
 			}
-			catch(Exception e) {
+			catch (Exception e) {
 				log.Error(String.Format("Выполнения запроса {0} завершилось с ошибкой", requestUri), e);
 			}
 		}

@@ -28,7 +28,7 @@
 									<asp:Label runat="server" CssClass="ValidationErrorMessage" Visible='<%# ShowWarning(Convert.ToUInt32(Eval("CostCode"))) %>'>
 										Внимание! Ценовая колонка настроена.<br>
 									</asp:Label>
-									<asp:Button ID="DeletButton" CommandArgument='<%# Bind("CostCode")%>' runat="server"
+									<asp:Button ID="DeletButton" CommandArgument='<%# Bind("CostCode") %>' runat="server"
 												CausesValidation="False" CommandName="Delete" Text='<%# DeleteLabel(Convert.ToUInt32(Eval("CostCode"))) %>'
 												Visible='<%# CanDelete(Eval("BaseCost")) %>'/>
 								</ItemTemplate>
@@ -38,7 +38,7 @@
 								<HeaderStyle Width="160px"></HeaderStyle>
 								<ItemTemplate>
 									<asp:TextBox ID="CostName" Font-Size="8pt" Font-Names="Verdana" runat="server" Width="150px"
-										Text='<%#DataBinder.Eval(Container, "DataItem.CostName") %>'>
+										Text='<%# DataBinder.Eval(Container, "DataItem.CostName") %>'>
 									</asp:TextBox>
 									<asp:RequiredFieldValidator ID="rfv1" ControlToValidate="CostName" runat="server"
 										Text="*" ErrorMessage="Необходимо указать наименование цены в полях, указанных знаком *."
@@ -49,14 +49,14 @@
 							<asp:TemplateColumn HeaderText="Включить">
 								<HeaderStyle Width="100px"></HeaderStyle>
 								<ItemTemplate>
-									<asp:CheckBox ID="Ena" runat="server" Checked='<%# Convert.ToBoolean(Eval("Enabled"))%>'>
+									<asp:CheckBox ID="Ena" runat="server" Checked='<%# Convert.ToBoolean(Eval("Enabled")) %>'>
 									</asp:CheckBox>
 								</ItemTemplate>
 							</asp:TemplateColumn>
 							<asp:TemplateColumn HeaderText="Публиковать">
 								<HeaderStyle Width="100px"></HeaderStyle>
 								<ItemTemplate>
-									<asp:CheckBox ID="Pub" runat="server" Checked='<%# Convert.ToBoolean(Eval("AgencyEnabled"))%>'>
+									<asp:CheckBox ID="Pub" runat="server" Checked='<%# Convert.ToBoolean(Eval("AgencyEnabled")) %>'>
 									</asp:CheckBox>
 								</ItemTemplate>
 							</asp:TemplateColumn>
@@ -64,7 +64,7 @@
 								<HeaderStyle Width="80px"></HeaderStyle>
 								<ItemTemplate>
 									<asp:HiddenField ID="CostCode" runat="server" Value='<%# Eval("CostCode") %>' />
-									<input value='<%# DataBinder.Eval(Container, "DataItem.CostCode")%>' type="radio" <%# IsChecked(Convert.ToBoolean(DataBinder.Eval(Container, "DataItem.BaseCost"))) %> name="uid" />
+									<input value='<%# DataBinder.Eval(Container, "DataItem.CostCode") %>' type="radio" <%# IsChecked(Convert.ToBoolean(DataBinder.Eval(Container, "DataItem.BaseCost"))) %> name="uid" />
 								</ItemTemplate>
 							</asp:TemplateColumn>
 							<asp:BoundColumn DataField="CostID" SortExpression="CostID" HeaderText="Идентификатор">

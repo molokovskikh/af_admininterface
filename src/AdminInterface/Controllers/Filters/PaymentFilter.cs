@@ -19,6 +19,7 @@ namespace AdminInterface.Controllers.Filters
 
 		[Description("Показывать только неопознанные:")]
 		public bool ShowOnlyUnknown { get; set; }
+
 		public decimal Sum { get; private set; }
 		public int Count { get; private set; }
 
@@ -30,11 +31,11 @@ namespace AdminInterface.Controllers.Filters
 			};
 
 			SortKeyMap = new Dictionary<string, string> {
-				{"Recipient", "Recipient"},
-				{"PayedOn", "PayedOn"},
-				{"Payer", "Payer"},
-				{"Sum", "Sum"},
-				{"RegistredOn", "RegistredOn"}
+				{ "Recipient", "Recipient" },
+				{ "PayedOn", "PayedOn" },
+				{ "Payer", "Payer" },
+				{ "Sum", "Sum" },
+				{ "RegistredOn", "RegistredOn" }
 			};
 		}
 
@@ -49,8 +50,7 @@ namespace AdminInterface.Controllers.Filters
 			if (ShowOnlyUnknown)
 				criteria.Add(Expression.IsNull("Payer"));
 
-			if (!String.IsNullOrWhiteSpace(SearchText))
-			{
+			if (!String.IsNullOrWhiteSpace(SearchText)) {
 				criteria.CreateAlias("Payer", "p");
 				criteria.Add(Expression.Like("p.Name", SearchText, MatchMode.Anywhere));
 			}

@@ -39,7 +39,7 @@ namespace AdminInterface.Models
 		public OrderHandler Formater { get; set; }
 
 		[BelongsTo("SenderId")]
-		public OrderHandler Sender{ get; set; }
+		public OrderHandler Sender { get; set; }
 
 		[Property, ValidateNonEmpty, Description("Разрешенные расширения вложений мини-почты"), ExtensionListValidation]
 		public string AllowedMiniMailExtensions { get; set; }
@@ -73,7 +73,7 @@ namespace AdminInterface.Models
 
 		public IEnumerable<string> GetPhones()
 		{
-			return Phones.Split(new [] {"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries);
+			return Phones.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 		}
 
 		public string AppendFooter(string body)
@@ -107,7 +107,7 @@ namespace AdminInterface.Models
 		public OrderHandler Formater { get; set; }
 
 		[BelongsTo("SenderId"), Auditable("Отправщик")]
-		public OrderHandler Sender{ get; set; }
+		public OrderHandler Sender { get; set; }
 
 		[Property]
 		public ulong? RegionCode { get; set; }

@@ -8,40 +8,40 @@ using MySql.Data.Types;
 
 namespace AdminInterface.Helpers
 {
-public static class ExcelHelper
+	public static class ExcelHelper
 	{
 		private static CellStyle boldCell = null;
+
 		private static CellStyle BoldCell
 		{
 			get
 			{
-				if (boldCell == null)
-				{
+				if (boldCell == null) {
 					boldCell = new CellStyle();
 					boldCell.Font = new Font("Arial", 11);
 					boldCell.Font.Bold = true;
-					boldCell.Borders = new Borders(){
+					boldCell.Borders = new Borders() {
 						Bottom = BorderStyle.Thin,
 						Left = BorderStyle.Thin,
 						Right = BorderStyle.Thin,
-						Top = BorderStyle.Thin};
+						Top = BorderStyle.Thin
+					};
 				}
 				return boldCell;
 			}
 		}
 
 		private static CellStyle crossBoldCell = null;
+
 		private static CellStyle CrossBoldCell
 		{
 			get
 			{
-				if (crossBoldCell == null)
-				{
+				if (crossBoldCell == null) {
 					crossBoldCell = new CellStyle();
 					crossBoldCell.Font = new Font("Arial", 11);
 					crossBoldCell.Font.Bold = true;
-					crossBoldCell.Borders = new Borders()
-					{
+					crossBoldCell.Borders = new Borders() {
 						Bottom = BorderStyle.Thin,
 						Left = BorderStyle.Thin,
 						Right = BorderStyle.Thin,
@@ -53,15 +53,14 @@ public static class ExcelHelper
 		}
 
 		private static CellStyle crossCell = null;
+
 		private static CellStyle CrossCell
 		{
 			get
 			{
-				if (crossCell == null)
-				{
+				if (crossCell == null) {
 					crossCell = new CellStyle();
-					crossCell.Borders = new Borders()
-					{
+					crossCell.Borders = new Borders() {
 						Bottom = BorderStyle.Thin,
 						Left = BorderStyle.Thin,
 						Right = BorderStyle.Thin,
@@ -73,12 +72,12 @@ public static class ExcelHelper
 		}
 
 		private static CellStyle headerCell = null;
+
 		private static CellStyle HeaderCell
 		{
 			get
 			{
-				if (headerCell == null)
-				{
+				if (headerCell == null) {
 					headerCell = new CellStyle();
 					headerCell.Font = new Font("Arial", 11);
 					headerCell.Font.Bold = true;
@@ -91,20 +90,19 @@ public static class ExcelHelper
 		}
 
 		private static CellStyle headerCrossCell = null;
+
 		private static CellStyle HeaderCrossCell
 		{
 			get
 			{
-				if (headerCrossCell == null)
-				{
+				if (headerCrossCell == null) {
 					headerCrossCell = new CellStyle();
 					headerCrossCell.Font = new Font("Arial", 11);
 					headerCrossCell.Font.Bold = true;
 					headerCrossCell.HorizontalAlignment = HorizontalAlignment.Center;
 					headerCrossCell.VerticalAlignment = VerticalAlignment.Center;
 					headerCrossCell.Warp = true;
-					headerCrossCell.Borders = new Borders()
-					{
+					headerCrossCell.Borders = new Borders() {
 						Bottom = BorderStyle.Thin,
 						Left = BorderStyle.Thin,
 						Right = BorderStyle.Thin,
@@ -116,10 +114,12 @@ public static class ExcelHelper
 		}
 
 		private static CellFormat dateCellFormat = null;
+
 		private static CellFormat DateCellFormat
 		{
-			get{
-				if(dateCellFormat == null)
+			get
+			{
+				if (dateCellFormat == null)
 					dateCellFormat = new CellFormat(CellFormatType.DateTime, "dd.mm.yyyy HH:MM:SS");
 				return dateCellFormat;
 			}
@@ -132,10 +132,9 @@ public static class ExcelHelper
 				temp = ((MySqlDateTime)value).GetDateTime();
 			else
 				temp = value;
-			
-			if(temp != null && temp != DBNull.Value)
-				if (temp is DateTime)
-				{
+
+			if (temp != null && temp != DBNull.Value)
+				if (temp is DateTime) {
 					ws.Cells[row, col] = new Cell(temp);
 					ws.Cells[row, col].Format = DateCellFormat;
 				}
@@ -166,7 +165,7 @@ public static class ExcelHelper
 			Object value = reader[fieldName];
 
 			CreateCell(ws, row, col, value);
-			
+
 			if (bordered)
 				BorderCell(ws.Cells[row, col], bolded);
 			else if (bolded)
@@ -179,24 +178,23 @@ public static class ExcelHelper
 			WriteStringFromRecord(ws, row, col, fieldName, reader, bordered, false);
 		}
 
-		public static void WriteBoolFromRecord(Worksheet ws, int row, int col, string fieldName, 
+		public static void WriteBoolFromRecord(Worksheet ws, int row, int col, string fieldName,
 			DbDataRecord reader, bool bordered)
 		{
 			WriteBoolFromRecord(ws, row, col, fieldName, reader, bordered, false);
 		}
 
-		public static void WriteBoolFromRecord(Worksheet ws, int row, int col, string fieldName, 
+		public static void WriteBoolFromRecord(Worksheet ws, int row, int col, string fieldName,
 			DbDataRecord reader, bool bordered, bool bolded)
 		{
 			Object value = reader[fieldName];
 			if (value != null && value != DBNull.Value)
 				ws.Cells[row, col] = new Cell(
-						(Convert.ToInt64(value) == 1) ? "Да" : "Нет");
+					(Convert.ToInt64(value) == 1) ? "Да" : "Нет");
 
 			if (bordered)
 				BorderCell(ws.Cells[row, col], bolded);
-			else if (bolded)
-			{
+			else if (bolded) {
 				if (ws.Cells[row, col] == null)
 					ws.Cells[row, col] = new Cell(String.Empty);
 				ws.Cells[row, col].Style = BoldCell;
@@ -209,7 +207,7 @@ public static class ExcelHelper
 			Object value = reader[fieldName];
 			if (value != null && value != DBNull.Value)
 				ws.Cells[row, col] = new Cell(
-						((long)value != 1) ? "Да" : "Нет");
+					((long)value != 1) ? "Да" : "Нет");
 
 			if (bordered)
 				BorderCell(ws.Cells[row, col]);
@@ -217,7 +215,7 @@ public static class ExcelHelper
 
 		public static void WriteBool(Worksheet ws, int row, int col, bool value, bool bordered)
 		{
-			ws.Cells[row, col] = new Cell( value  ? "Да" : "Нет");
+			ws.Cells[row, col] = new Cell(value ? "Да" : "Нет");
 
 			if (bordered)
 				BorderCell(ws.Cells[row, col]);

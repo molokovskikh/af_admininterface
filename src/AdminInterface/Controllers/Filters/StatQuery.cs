@@ -129,7 +129,7 @@ from Documents.Mails m
 where c.MaskRegion & ?RegionMaskParam > 0
 	and u.PayerId <> 921
 ;";
-				var mainSql = @"
+			var mainSql = @"
 select count(*) as RequestInProcessCount
 from Logs.PrgDataLogs;
 
@@ -201,14 +201,12 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 			};
 			string sql;
 
-			if (Full)
-			{
+			if (Full) {
 				sql = String.Format(mainSql,
 					"," + additionalUpdateStatColumns.Implode(","),
 					"," + additionalOrderColumns.Implode(","));
 			}
-			else
-			{
+			else {
 				sql = String.Format(mainSql, "", "");
 			}
 

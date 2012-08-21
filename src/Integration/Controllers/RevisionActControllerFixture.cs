@@ -21,7 +21,6 @@ namespace Integration.Controllers
 		[SetUp]
 		public void Setup()
 		{
-
 			payer = DataMother.CreatePayerForBillingDocumentTest();
 
 			controller = new RevisionActsController();

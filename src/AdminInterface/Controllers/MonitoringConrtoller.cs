@@ -12,20 +12,20 @@ namespace AdminInterface.Controllers
 {
 	[
 		Secure,
-		Helper(typeof (ViewHelper)),
-		Helper(typeof (BindingHelper)),
-		Filter(ExecuteWhen.BeforeAction, typeof (SecurityActivationFilter))
+		Helper(typeof(ViewHelper)),
+		Helper(typeof(BindingHelper)),
+		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
 	public class MonitoringController : AdminInterfaceController
 	{
 		public void Updates()
 		{
 			var sortMap = new Dictionary<string, string> {
-				{"MethodName", "MethodName"},
-				{"StartTime", "StartTime"},
-				{"ShortName", "c.Name"},
-				{"ClientCode", "c.Id"},
-				{"User", "u.Name"}
+				{ "MethodName", "MethodName" },
+				{ "StartTime", "StartTime" },
+				{ "ShortName", "c.Name" },
+				{ "ClientCode", "c.Id" },
+				{ "User", "u.Name" }
 			};
 
 			var sortable = new Sortable(sortMap);
@@ -43,7 +43,7 @@ namespace AdminInterface.Controllers
 
 		public void Orders()
 		{
-			PropertyBag["Orders"] = new OrderFilter{NotSent = true}.Find();
+			PropertyBag["Orders"] = new OrderFilter { NotSent = true }.Find();
 		}
 	}
 }

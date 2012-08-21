@@ -15,7 +15,8 @@ namespace AdminInterface.Models
 	public class ClientOrder
 	{
 		public ClientOrder()
-		{}
+		{
+		}
 
 		public ClientOrder(User user, Price price)
 		{
@@ -86,7 +87,8 @@ where ol.OrderId = :id
 	public class OrderLine
 	{
 		public OrderLine()
-		{}
+		{
+		}
 
 		public OrderLine(ClientOrder order, Product product, decimal cost, decimal quantity)
 		{

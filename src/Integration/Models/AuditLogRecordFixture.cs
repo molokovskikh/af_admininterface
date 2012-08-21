@@ -20,7 +20,7 @@ namespace Integration.Models
 		public void Setup()
 		{
 			ForTest.InitializeMailer();
-			mailer = ForTest.TestMailer(m => {});
+			mailer = ForTest.TestMailer(m => { });
 		}
 
 		[Test]

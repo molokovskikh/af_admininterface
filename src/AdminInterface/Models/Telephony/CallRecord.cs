@@ -51,8 +51,7 @@ namespace AdminInterface.Models.Telephony
 		{
 			get
 			{
-				if (_files == null)
-				{
+				if (_files == null) {
 					_files = new List<CallRecordFile>();
 					var searchPattern = String.Format("{0}*", Id);
 					var files = Directory.GetFiles(ConfigurationManager.AppSettings["CallRecordsDirectory"], searchPattern);

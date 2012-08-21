@@ -42,8 +42,7 @@ namespace AdminInterface.Models
 			if (PriceId == 2647)
 				return "ok (Обезличенный заказ)";
 
-			switch (TransportType)
-			{
+			switch (TransportType) {
 				case 1:
 					return ResultCode.ToString();
 				case 2:

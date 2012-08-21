@@ -9,7 +9,8 @@ namespace AdminInterface.Models.Billing
 	public class LegalEntity : ActiveRecordLinqBase<LegalEntity>
 	{
 		public LegalEntity()
-		{}
+		{
+		}
 
 		public LegalEntity(string name, string fullName, Payer payer)
 		{
@@ -20,7 +21,8 @@ namespace AdminInterface.Models.Billing
 
 		public LegalEntity(string name, Payer payer)
 			: this(name, name, payer)
-		{}
+		{
+		}
 
 		[PrimaryKey]
 		public virtual uint Id { get; set; }

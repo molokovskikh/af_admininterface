@@ -57,7 +57,7 @@ namespace AdminInterface.Models.Billing
 		public Recipient Recipient { get; set; }
 
 		[Description("Регион:")]
-		public Region Region {get; set; }
+		public Region Region { get; set; }
 
 		[Description("Должен\\Не должен:")]
 		public PayerStateFilter PayerState { get; set; }
@@ -89,16 +89,16 @@ namespace AdminInterface.Models.Billing
 			SearchBy = SearchBy.Name;
 			SortBy = "ShortName";
 			SortKeyMap = new Dictionary<string, string> {
-				{"PayerId", "PayerId"},
-				{"ShortName", "ShortName"},
-				{"Recipient", "Recipient"},
-				{"PaymentSum", "PaymentSum"},
-				{"Balance", "Balance"},
-				{"LastClientRegistrationDate", "LastClientRegistrationDate"},
-				{"DisabledUsersCount", "DisabledUsersCount"},
-				{"EnabledUsersCount", "EnabledUsersCount"},
-				{"DisabledAddressesCount", "DisabledAddressesCount"},
-				{"EnabledAddressesCount", "EnabledAddressesCount"}
+				{ "PayerId", "PayerId" },
+				{ "ShortName", "ShortName" },
+				{ "Recipient", "Recipient" },
+				{ "PaymentSum", "PaymentSum" },
+				{ "Balance", "Balance" },
+				{ "LastClientRegistrationDate", "LastClientRegistrationDate" },
+				{ "DisabledUsersCount", "DisabledUsersCount" },
+				{ "EnabledUsersCount", "EnabledUsersCount" },
+				{ "DisabledAddressesCount", "DisabledAddressesCount" },
+				{ "EnabledAddressesCount", "EnabledAddressesCount" }
 			};
 		}
 
@@ -110,8 +110,7 @@ namespace AdminInterface.Models.Billing
 
 			var query = new DetachedSqlQuery();
 			var text = SearchText;
-			switch(SearchBy)
-			{
+			switch (SearchBy) {
 				case SearchBy.Name:
 					And(having, String.Format(
 						@"(p.ShortName like :searchText
@@ -139,8 +138,7 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			}
 			query.SetParameter("searchText", text);
 
-			switch (PayerState)
-			{
+			switch (PayerState) {
 				case PayerStateFilter.Debitors:
 					And(where, "p.Balance < 0");
 					break;
@@ -149,14 +147,12 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 					break;
 			}
 
-			if (InvoiceType.HasValue)
-			{
+			if (InvoiceType.HasValue) {
 				And(where, "p.AutoInvoice = :InvoiceType");
 				query.SetParameter("InvoiceType", InvoiceType.Value);
 			}
 
-			switch(ClientType)
-			{
+			switch (ClientType) {
 				case SearchClientType.Drugstore:
 					And(groupFilter, "cd.Id is not null");
 					break;
@@ -165,8 +161,7 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 					break;
 			}
 
-			switch(ClientStatus)
-			{
+			switch (ClientStatus) {
 				case SearchClientStatus.Enabled:
 					And(having, "(EnabledClientCount > 0 or EnabledSupplierCount > 0 or EnabledReportsCount > 0)");
 					break;
@@ -175,14 +170,12 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 					break;
 			}
 
-			if (Recipient != null && Recipient.Id != 0)
-			{
+			if (Recipient != null && Recipient.Id != 0) {
 				And(groupFilter, " p.RecipientId = :recipientId");
 				query.SetParameter("recipientId", Recipient.Id);
 			}
 
-			if (Region != null && Region.Id != 0)
-			{
+			if (Region != null && Region.Id != 0) {
 				And(groupFilter, "(cd.MaskRegion & :RegionId > 0 or s.RegionMask & :RegionId > 0)");
 				query.SetParameter("RegionId", Region.Id);
 			}
@@ -190,8 +183,7 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			if (groupFilter.Length > 0)
 				And(having, String.Format("sum(if({0}, 1, 0)) > 0", groupFilter));
 
-			if (SearchWithoutDocuments)
-			{
+			if (SearchWithoutDocuments) {
 				//мы не должны выбирать тех плательщиков у которых не могло быть документов
 				//за этот период тк они еще не были зарегистрированны
 				And(where, "p.RegistrationDate <= :PeriodEnd");
@@ -238,15 +230,13 @@ order by p.ShortName
 
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var session = sessionHolder.CreateSession(typeof(BillingSearchItem));
-			try
-			{
+			try {
 				query.Sql = sql;
 				var result = query.GetSqlQuery(session).ToList<BillingSearchItem>().ToList();
 				result.Sort(new PropertyComparer<BillingSearchItem>(GetSortDirection(), GetSortProperty()));
 				return result;
 			}
-			finally
-			{
+			finally {
 				sessionHolder.ReleaseSession(session);
 			}
 		}
@@ -255,18 +245,15 @@ order by p.ShortName
 		{
 			var template = "not exists(select * from {0} d where d.Payer = p.PayerId and d.Period = :Period)";
 			string table;
-			if (documentType == DocumentType.Invoice)
-			{
+			if (documentType == DocumentType.Invoice) {
 				table = "Billing.Invoices";
 				return String.Format(template, table);
 			}
-			else if (documentType == DocumentType.Act)
-			{
+			else if (documentType == DocumentType.Act) {
 				table = "Billing.Acts";
 				return String.Format(template, table);
 			}
-			else
-			{
+			else {
 				return String.Format("{0} and {1}", GetDocumentSubQuery(DocumentType.Invoice), GetDocumentSubQuery(DocumentType.Act));
 			}
 		}

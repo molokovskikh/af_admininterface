@@ -22,14 +22,8 @@ namespace Unit.Helpers
 		{
 			public override bool Disabled
 			{
-				get
-				{
-					return base.Disabled;
-				}
-				set
-				{
-					base.Disabled = value;
-				}
+				get { return base.Disabled; }
+				set { base.Disabled = value; }
 			}
 		}
 
@@ -43,7 +37,7 @@ namespace Unit.Helpers
 		public void Get_object_styles()
 		{
 			var styles = styler.GetStyles(new TestClass { Disabled = true });
-			Assert.That(styles.ToArray(), Is.EquivalentTo(new [] {"disabled"}));
+			Assert.That(styles.ToArray(), Is.EquivalentTo(new[] { "disabled" }));
 		}
 
 		[Test]
@@ -69,7 +63,7 @@ namespace Unit.Helpers
 		public void Inherit_styles()
 		{
 			var styles = styler.GetStyles(new TestChild { Disabled = true });
-			Assert.That(styles.ToArray(), Is.EquivalentTo(new [] {"disabled"}));
+			Assert.That(styles.ToArray(), Is.EquivalentTo(new[] { "disabled" }));
 		}
 	}
 }

@@ -2,7 +2,8 @@
 using Functional.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.Billing
 {

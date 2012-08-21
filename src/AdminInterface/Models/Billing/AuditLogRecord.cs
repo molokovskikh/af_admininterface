@@ -107,11 +107,9 @@ namespace AdminInterface.Models.Billing
 				.GroupBy(a => a.UserName.ToLowerInvariant())
 				.Select(g => g.First())
 				.ToDictionary(a => a.UserName.ToLowerInvariant());
-			foreach (var log in logs)
-			{
+			foreach (var log in logs) {
 				var key = log.OperatorName.ToLowerInvariant();
-				if (admins.ContainsKey(key))
-				{
+				if (admins.ContainsKey(key)) {
 					var administrator = admins[key];
 					log.OperatorName = administrator.ManagerName;
 				}

@@ -32,8 +32,7 @@ namespace AdminInterface.Controllers
 		{
 			PopulateValidatorErrorSummary(contactGroup, Binder.GetValidationSummary(contactGroup));
 			if (ValidationHelper.IsInstanceHasValidationError(contactGroup)
-				|| ValidationHelper.IsCollectionHasNotValideObject(contacts))
-			{
+				|| ValidationHelper.IsCollectionHasNotValideObject(contacts)) {
 				contactGroup.Contacts = CleanUp(contacts);
 				var payer = Payer.Find(billingCode);
 				PropertyBag["billingCode"] = payer.Id;
@@ -45,8 +44,7 @@ namespace AdminInterface.Controllers
 			}
 			var billingInstance = Payer.Find(billingCode);
 			contactGroup.ContactGroupOwner = billingInstance.ContactGroupOwner;
-			using (new TransactionScope())
-			{
+			using (new TransactionScope()) {
 				UpdateContactForContactOwner(contacts, contactGroup);
 				contactGroup.Save();
 			}

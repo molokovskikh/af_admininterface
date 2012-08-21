@@ -48,7 +48,7 @@ limit 5").SetParameter("SupplierId", supplier.Id).List<uint>();
 		public void DoMakeOrders(string orders, string email, string formater)
 		{
 			var isGood = true;
-			var mailMessage = new MailMessage {Subject = "Сформированные заказы"};
+			var mailMessage = new MailMessage { Subject = "Сформированные заказы" };
 			mailMessage.To.Add(email);
 			mailMessage.From = new MailAddress("tech@analit.net", "Сервис отправки заказов", Encoding.UTF8);
 			if (!string.IsNullOrEmpty(orders))
@@ -71,7 +71,7 @@ limit 5").SetParameter("SupplierId", supplier.Id).List<uint>();
 				Error("Вы не указали номера заказов");
 				isGood = false;
 			}
-			var smtpClient = new SmtpClient {Host = Func.GetSmtpServer()};
+			var smtpClient = new SmtpClient { Host = Func.GetSmtpServer() };
 			smtpClient.Send(mailMessage);
 			if (isGood)
 				Notify("Заказы сформированы и отправлены, проверте почту");

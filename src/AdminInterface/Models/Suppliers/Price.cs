@@ -72,7 +72,7 @@ namespace AdminInterface.Models.Suppliers
 					Source = new PriceSource()
 				}
 			};
-			cost.CostFormRule = new CostFormRule{Cost = cost, FieldName = ""};
+			cost.CostFormRule = new CostFormRule { Cost = cost, FieldName = "" };
 			Costs.Add(cost);
 			return cost;
 		}
@@ -89,7 +89,8 @@ namespace AdminInterface.Models.Suppliers
 	public class PriceRegionalData
 	{
 		public PriceRegionalData()
-		{}
+		{
+		}
 
 		public PriceRegionalData(Price price, Region region)
 		{
@@ -108,7 +109,7 @@ namespace AdminInterface.Models.Suppliers
 		public virtual Price Price { get; set; }
 
 		[BelongsTo("RegionCode")]
-		public virtual Region Region {get; set; }
+		public virtual Region Region { get; set; }
 	}
 
 	[ActiveRecord("PricesCosts", Schema = "Usersettings", Lazy = true)]
@@ -131,10 +132,7 @@ namespace AdminInterface.Models.Suppliers
 
 		public virtual bool IsConfigured
 		{
-			get
-			{
-				return !String.IsNullOrEmpty(CostFormRule.FieldName);
-			}
+			get { return !String.IsNullOrEmpty(CostFormRule.FieldName); }
 		}
 	}
 

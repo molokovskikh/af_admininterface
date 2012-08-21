@@ -10,7 +10,8 @@ using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using Functional.ForTesting;
 using WatiN.Core.Native.Windows;
 using WatiN.CssSelectorExtensions;
@@ -131,7 +132,7 @@ namespace Functional.Drugstore
 			Assert.That(settings.NoiseCosts, Is.True);
 			Assert.That(settings.NoiseCostExceptSupplier.Id, Is.EqualTo(supplier.Id));
 			Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Hidden));
-			Assert.That(settings.FirmCodeOnly, Is.EqualTo(supplier.Id)); 
+			Assert.That(settings.FirmCodeOnly, Is.EqualTo(supplier.Id));
 		}
 
 		private void Test_search_and_select(Browser browser, string namePart, string searchText)
@@ -264,17 +265,14 @@ namespace Functional.Drugstore
 			browser.Button("RegisterButton").Click();
 			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				var client = session.Load<Client>(clientCode);
 				browser.Link(Find.ByText(client.Users[0].Login)).Click();
 				var pass = false;
-				for (var i = 0; i < 10; i++)
-				{
+				for (var i = 0; i < 10; i++) {
 					var regionCheckBox = browser.CheckBox(Find.ByName(String.Format("WorkRegions[{0}]", i)));
 					Assert.IsTrue(regionCheckBox.Exists);
-					if (regionCheckBox.GetValue("value").Equals(regions[0].Id.ToString()))
-					{
+					if (regionCheckBox.GetValue("value").Equals(regions[0].Id.ToString())) {
 						pass = true;
 						break;
 					}

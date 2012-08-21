@@ -25,13 +25,13 @@ namespace Unit.Models
 			paymentOptions.Comment = @"алалала-алал
 алала";
 
-			Assert.That(paymentOptions.GetCommentForPayer(), 
+			Assert.That(paymentOptions.GetCommentForPayer(),
 				Is.EqualTo(
-@"Дата начала платного периода: 01.01.2008
+					@"Дата начала платного периода: 01.01.2008
 Комментарий: алалала-алал
 алала"));
 			paymentOptions.Comment = null;
-			Assert.That(paymentOptions.GetCommentForPayer(),Is.EqualTo("Дата начала платного периода: 01.01.2008"));
+			Assert.That(paymentOptions.GetCommentForPayer(), Is.EqualTo("Дата начала платного периода: 01.01.2008"));
 		}
 	}
 }

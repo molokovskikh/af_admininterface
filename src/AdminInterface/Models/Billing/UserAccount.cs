@@ -10,13 +10,14 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord(DiscriminatorValue = "0")]
 	public class UserAccount : Account
 	{
-		public UserAccount() {}
+		public UserAccount()
+		{
+		}
 
 		public UserAccount(User user)
 		{
 			User = user;
-			if (user.RootService.GetType() == typeof(Supplier))
-			{
+			if (user.RootService.GetType() == typeof(Supplier)) {
 				_payment = User.RootService.HomeRegion.SupplierUserPayment;
 				_readyForAccounting = true;
 				_beAccounted = true;
@@ -37,10 +38,7 @@ namespace AdminInterface.Models.Billing
 
 		public override Service Service
 		{
-			get
-			{
-				return User.RootService;
-			}
+			get { return User.RootService; }
 		}
 
 		public override Payer Payer

@@ -21,7 +21,8 @@ namespace AdminInterface.Models.Logs
 	public class DocumentSendLog
 	{
 		public DocumentSendLog()
-		{}
+		{
+		}
 
 		public DocumentSendLog(User user, DocumentReceiveLog document)
 		{
@@ -58,7 +59,8 @@ namespace AdminInterface.Models.Logs
 	public class DocumentReceiveLog
 	{
 		public DocumentReceiveLog()
-		{}
+		{
+		}
 
 		public DocumentReceiveLog(Supplier supplier)
 		{

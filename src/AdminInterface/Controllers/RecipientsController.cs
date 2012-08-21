@@ -20,8 +20,7 @@ namespace AdminInterface.Controllers
 		public void Index()
 		{
 			var recipients = DbSession.Query<Recipient>().OrderBy(r => r.Name).ToList();
-			if (IsPost)
-			{
+			if (IsPost) {
 				var forSave = (Recipient[])BindObject(ParamStore.Form, typeof(Recipient[]), "recipients", AutoLoadBehavior.NewInstanceIfInvalidKey);
 				var deleted = recipients.Where(r => !forSave.Any(n => n.Id == r.Id));
 				deleted.Each(d => DbSession.Delete(d));
@@ -30,8 +29,7 @@ namespace AdminInterface.Controllers
 				Notify("Сохранено");
 				RedirectToAction("Index");
 			}
-			else
-			{
+			else {
 				PropertyBag["Recipients"] = recipients;
 			}
 		}
@@ -39,15 +37,13 @@ namespace AdminInterface.Controllers
 		public void Edit(uint id)
 		{
 			var recipient = DbSession.Load<Recipient>(id);
-			if (IsPost)
-			{
+			if (IsPost) {
 				BindObjectInstance(recipient, "recipient");
 				DbSession.Save(recipient);
 				Notify("Сохранено");
 				RedirectToReferrer();
 			}
-			else
-			{
+			else {
 				PropertyBag["recipient"] = recipient;
 			}
 		}

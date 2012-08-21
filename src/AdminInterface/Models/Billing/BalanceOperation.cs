@@ -20,7 +20,8 @@ namespace AdminInterface.Models.Billing
 		private OperationType _type;
 
 		public BalanceOperation()
-		{}
+		{
+		}
 
 		public BalanceOperation(Payer payer)
 		{
@@ -57,14 +58,8 @@ namespace AdminInterface.Models.Billing
 		[Property, ValidateGreaterThanZero, Description("Сумма")]
 		public virtual decimal Sum
 		{
-			get
-			{
-				return Math.Abs(BalanceAmount);
-			}
-			set
-			{
-				BalanceAmount = Type == OperationType.Refund ? Decimal.Negate(value) : value;
-			}
+			get { return Math.Abs(BalanceAmount); }
+			set { BalanceAmount = Type == OperationType.Refund ? Decimal.Negate(value) : value; }
 		}
 
 		[Property]
@@ -74,7 +69,7 @@ namespace AdminInterface.Models.Billing
 		{
 			get
 			{
-				return new [] {
+				return new[] {
 					new ModelAction(this, "Delete", "Удалить")
 				};
 			}

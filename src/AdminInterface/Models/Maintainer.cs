@@ -72,15 +72,14 @@ WHERE i.Id IS NULL
 	{0}
 group by pd.pricecode, regions.regioncode, drugstore.Id, le.Id;
 ", filter));
-					prepare(query);
-					query.ExecuteUpdate();
-				});
+				prepare(query);
+				query.ExecuteUpdate();
+			});
 		}
 
 		public static void LegalEntityCreated(LegalEntity legalEntity)
 		{
-			foreach (var client in legalEntity.Payer.Clients)
-			{
+			foreach (var client in legalEntity.Payer.Clients) {
 				MaintainIntersection(client, legalEntity);
 			}
 		}

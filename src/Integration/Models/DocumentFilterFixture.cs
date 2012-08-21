@@ -38,8 +38,7 @@ namespace Integration.Models
 		{
 			var supplier = DataMother.CreateSupplier();
 			Save(supplier);
-			for (int i = 0; i < 1000; i++)
-			{
+			for (int i = 0; i < 1000; i++) {
 				var client = DataMother.CreateTestClientWithAddress();
 				session.SaveOrUpdate(client);
 				Save(DataMother.CreateTestDocumentLog(supplier, client));
@@ -49,7 +48,6 @@ namespace Integration.Models
 		[Test(Description = "проверям работу DocumentLog")]
 		public void CheckDocumentProcessedSuccessfully()
 		{
-
 			//Для документов с DocumentSendLogs.Id > 15374942 все должно работать по новому,
 
 			var log = new DocumentLog();
@@ -74,7 +72,7 @@ namespace Integration.Models
 			log.DocumentDelivered = true;
 			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(true));
 
-			
+
 			//для старых документов - они всегда должно помечатся как ProcessedSuccessfully и отдавать RequestTime сразу
 
 			log.DeliveredId = 1;

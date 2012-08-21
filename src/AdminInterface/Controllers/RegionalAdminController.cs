@@ -27,14 +27,14 @@ namespace AdminInterface.Controllers
 	{
 		private string[] _weekDays = new[] { "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье" };
 
-		private int[] _defaultLogonHours = new [] {
-			0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
-			0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
-			0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
-			0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
-			0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
-			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		private int[] _defaultLogonHours = new[] {
+			0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+			0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+			0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+			0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+			0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		};
 
 		[AccessibleThrough(Verb.Get)]
@@ -66,10 +66,8 @@ namespace AdminInterface.Controllers
 				foreach (var permission in administrator.AllowedPermissions)
 					admin.AllowedPermissions.Add(permission);
 			var countAccessibleRegions = 0;
-			foreach (var region in accessibleRegions)
-			{
-				if (region.IsAvaliableForBrowse)
-				{
+			foreach (var region in accessibleRegions) {
+				if (region.IsAvaliableForBrowse) {
 					admin.RegionMask |= Convert.ToUInt64(region.Id);
 					countAccessibleRegions++;
 				}
@@ -112,10 +110,8 @@ namespace AdminInterface.Controllers
 			[DataBind("logonHours")] bool[] weekLogonHours)
 		{
 			var countAccessibleRegions = 0;
-			foreach (var region in accessibleRegions)
-			{
-				if (region.IsAvaliableForBrowse)
-				{
+			foreach (var region in accessibleRegions) {
+				if (region.IsAvaliableForBrowse) {
 					administrator.RegionMask |= Convert.ToUInt64(region.Id);
 					countAccessibleRegions++;
 				}
@@ -142,8 +138,7 @@ namespace AdminInterface.Controllers
 			CancelView();
 
 			var responseString = String.Empty;
-			foreach (var permission in Permission.FindAll())
-			{
+			foreach (var permission in Permission.FindAll()) {
 				if (permission.IsDefaultFor(departmentDescription))
 					responseString += String.Format("{0},", permission.Id);
 			}

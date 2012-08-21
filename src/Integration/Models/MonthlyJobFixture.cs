@@ -16,10 +16,10 @@ namespace Integration.Models
 			SystemTime.Now = () => DateTime.Now.FirstDayOfMonth();
 
 			var name = String.Format("TestJob{0}", DateTime.Now);
-			var job = new ActiveRecordJob(name, () => {});
+			var job = new ActiveRecordJob(name, () => { });
 			job.Job.Plan(PlanPeriod.Month, 1.Day());
 			Assert.That(job.Run(), Is.True);
-			job = new ActiveRecordJob(name, () => {});
+			job = new ActiveRecordJob(name, () => { });
 			job.Job.Plan(PlanPeriod.Month, 1.Day());
 			Assert.That(job.Run(), Is.False);
 		}
@@ -33,7 +33,7 @@ namespace Integration.Models
 		[SetUp]
 		public void Setup()
 		{
-			job = new MonthlyJob(() => {});
+			job = new MonthlyJob(() => { });
 			SystemTime.Now = () => new DateTime(2011, 1, 1);
 		}
 

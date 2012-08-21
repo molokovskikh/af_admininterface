@@ -48,8 +48,7 @@ namespace AdminInterface.Models.Billing
 			var where = "";
 			var order = "ORDER BY c.WriteTime DESC";
 			var limit = String.Format(" LIMIT {0}, {1} ", pager.Page * pager.PageSize, pager.PageSize);
-			switch (SearchBy)
-			{
+			switch (SearchBy) {
 				case AccountingSearchBy.ByAddress:
 					from = @"
 	join Customers.Addresses a ON a.AccountingId = c.Id AND c.Type = 1";

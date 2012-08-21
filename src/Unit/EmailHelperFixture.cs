@@ -14,7 +14,7 @@ namespace Unit
 			EmailHelper.BuildAttachementFromString(@"
 r.kvasov@analit.net
 
-",message);
+", message);
 			Assert.That(message.To.Count, Is.EqualTo(1), "количество записей в поле to меньше одной");
 		}
 

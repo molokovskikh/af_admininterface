@@ -9,7 +9,8 @@ namespace AdminInterface.Models.Billing
 	public class Advertising : ActiveRecordLinqBase<Advertising>
 	{
 		public Advertising()
-		{}
+		{
+		}
 
 		public Advertising(Payer payer, decimal cost)
 		{

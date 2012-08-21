@@ -7,7 +7,8 @@ namespace AdminInterface.Models.Logs
 	public class PrgDataLog
 	{
 		public PrgDataLog()
-		{}
+		{
+		}
 
 		public PrgDataLog(User user, string method)
 		{

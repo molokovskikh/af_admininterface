@@ -161,7 +161,8 @@ namespace AdminInterface.Models.Documents
 	public class AttachmentSendLog
 	{
 		public AttachmentSendLog()
-		{}
+		{
+		}
 
 		public AttachmentSendLog(User user, Attachment attachment, UpdateLogEntity update)
 		{

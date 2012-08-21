@@ -37,7 +37,7 @@ namespace AddUser
 
 	public class Global : WebApplication, IMonoRailConfigurationEvents
 	{
-		private static readonly ILog _log = LogManager.GetLogger(typeof (Global));
+		private static readonly ILog _log = LogManager.GetLogger(typeof(Global));
 
 		public static AppConfig Config = new AppConfig();
 
@@ -49,30 +49,26 @@ namespace AddUser
 			Logger.SmtpHost = "box.analit.net";
 		}
 
-		void Application_Start(object sender, EventArgs e)
+		private void Application_Start(object sender, EventArgs e)
 		{
-			try
-			{
+			try {
 				BaseRemoteRequest.Runner = new WebRequestRunner();
 				ConfigReader.LoadSettings(Config);
 				Initialize();
 			}
-			catch(Exception ex)
-			{
+			catch (Exception ex) {
 				_log.Fatal("Ошибка при запуске Административного интерфеса", ex);
 			}
 		}
 
-		void Application_Error(object sender, EventArgs e)
+		private void Application_Error(object sender, EventArgs e)
 		{
 			var exception = Server.GetLastError();
-			if (exception.InnerException is NotAuthorizedException)
-			{
+			if (exception.InnerException is NotAuthorizedException) {
 				Server.Transfer("~/Rescue/NotAuthorized.aspx");
 				return;
 			}
-			if (exception.InnerException is NotHavePermissionException)
-			{
+			if (exception.InnerException is NotHavePermissionException) {
 				Server.Transfer("~/Rescue/NotAllowed.aspx");
 				return;
 			}

@@ -26,19 +26,17 @@ namespace AddUser
 	partial class managep : System.Web.UI.Page
 	{
 		private readonly Dictionary<object, string> _configuratedCostTypes
-			= new Dictionary<object, string>
-				{
-					{0, "Мультиколоночный"},
-					{1, "Многофайловый"},
-				};
+			= new Dictionary<object, string> {
+				{ 0, "Мультиколоночный" },
+				{ 1, "Многофайловый" },
+			};
 
 		private readonly Dictionary<object, string> _unconfiguratedCostTypes
-			= new Dictionary<object, string>
-				{
-					{0, "Мультиколоночный"},
-					{1, "Многофайловый"},
-					{DBNull.Value, "Не настроенный"},
-				};
+			= new Dictionary<object, string> {
+				{ 0, "Мультиколоночный" },
+				{ 1, "Многофайловый" },
+				{ DBNull.Value, "Не настроенный" },
+			};
 
 		private DataSet Data
 		{
@@ -47,14 +45,14 @@ namespace AddUser
 		}
 
 		private Supplier supplier;
-			
+
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
 			uint id;
 			if (!UInt32.TryParse(Request["cc"], out id))
 				throw new ArgumentException(String.Format("Не верное значение ClientCode = {0}", id), "ClientCode");
-			
+
 			supplier = Supplier.Find(id);
 			HandlersLink.NavigateUrl = "~/SpecialHandlers/?supplierId=" + supplier.Id;
 
@@ -62,7 +60,6 @@ namespace AddUser
 				LoadPageData();
 			else
 				ConnectDataSource();
-
 		}
 
 		private void LoadPageData()
@@ -88,7 +85,7 @@ namespace AddUser
 			var data = new DataSet();
 
 			var pricesCommandText =
-@"
+				@"
 SELECT  pd.PriceCode,
 		pd.PriceName,
 		pd.AgencyEnabled,
@@ -215,8 +212,7 @@ order by r.Region;";
 
 		protected void PricesGrid_RowCommand(object sender, GridViewCommandEventArgs e)
 		{
-			switch (e.CommandName)
-			{
+			switch (e.CommandName) {
 				case "Add":
 					var row = Data.Tables["Prices"].NewRow();
 					row["UpCost"] = 0;
@@ -228,8 +224,8 @@ order by r.Region;";
 					((GridView)sender).DataBind();
 					break;
 			}
-
 		}
+
 		protected void PricesGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)
 		{
 			Data.Tables["Prices"].DefaultView[e.RowIndex].Delete();
@@ -409,7 +405,7 @@ WHERE RowId = ?Id;
 			var modifiedIntersection = data.Tables["Prices"].Rows.Cast<DataRow>().Where(r => r.RowState == DataRowState.Modified);
 			var vipChangeFlag = false;
 			foreach (
-				var dataRow in modifiedIntersection.Where(dataRow => Convert.ToInt32(dataRow["PriceType"]) == (int) PriceType.Vip)) {
+				var dataRow in modifiedIntersection.Where(dataRow => Convert.ToInt32(dataRow["PriceType"]) == (int)PriceType.Vip)) {
 				ActiveRecordLinqBase<Intersection>.Queryable.Where(i => i.Price.Id == Convert.ToUInt32(dataRow["PriceCode"])).ToList().ForEach(
 					inter => {
 						inter.AvailableForClient = false;
@@ -486,20 +482,16 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 
 		private static void BindRule(Supplier supplier, DataSet data)
 		{
-			foreach (var row in data.Tables["OrderSendConfig"].Rows.Cast<DataRow>())
-			{
-				switch (row.RowState)
-				{
-					case DataRowState.Added:
-					{
+			foreach (var row in data.Tables["OrderSendConfig"].Rows.Cast<DataRow>()) {
+				switch (row.RowState) {
+					case DataRowState.Added: {
 						var rule = new OrderSendRules();
 						rule.Supplier = supplier;
 						BindRule(rule, row);
 						supplier.OrderRules.Add(rule);
 						break;
 					}
-					case DataRowState.Deleted:
-					{
+					case DataRowState.Deleted: {
 						var rule = GetExistRule(supplier, row);
 						if (rule == null)
 							continue;
@@ -507,8 +499,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 						supplier.OrderRules.Remove(rule);
 						break;
 					}
-					case DataRowState.Modified:
-					{
+					case DataRowState.Modified: {
 						var rule = GetExistRule(supplier, row);
 						if (rule == null)
 							continue;
@@ -528,7 +519,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 			rule.Formater = OrderHandler.Find(formaterId);
 			rule.SendDebugMessage = Convert.ToBoolean(row["SendDebugMessage"]);
 			rule.ErrorNotificationDelay = Convert.ToUInt32(row["ErrorNotificationDelay"]);
-			rule.RegionCode = Equals(row["RegionCode"], DBNull.Value) ? null : (ulong?) Convert.ToUInt64(row["RegionCode"]);
+			rule.RegionCode = Equals(row["RegionCode"], DBNull.Value) ? null : (ulong?)Convert.ToUInt64(row["RegionCode"]);
 		}
 
 		private static OrderSendRules GetExistRule(Supplier supplier, DataRow row)
@@ -541,8 +532,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 
 		private void ProcessChanges()
 		{
-			for (var i = 0; i < RegionalSettingsGrid.Rows.Count; i++)
-			{
+			for (var i = 0; i < RegionalSettingsGrid.Rows.Count; i++) {
 				if (Convert.ToBoolean(Data.Tables["RegionSettings"].Rows[i]["Enabled"]) != ((CheckBox)RegionalSettingsGrid.Rows[i].FindControl("EnabledCheck")).Checked)
 					Data.Tables["RegionSettings"].Rows[i]["Enabled"] = ((CheckBox)RegionalSettingsGrid.Rows[i].FindControl("EnabledCheck")).Checked;
 				if (Convert.ToBoolean(Data.Tables["RegionSettings"].Rows[i]["Storage"]) != ((CheckBox)RegionalSettingsGrid.Rows[i].FindControl("StorageCheck")).Checked)
@@ -554,8 +544,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 				if (Convert.ToString(Data.Tables["RegionSettings"].Rows[i]["SupportPhone"]) != ((TextBox)RegionalSettingsGrid.Rows[i].FindControl("SupportPhoneText")).Text)
 					Data.Tables["RegionSettings"].Rows[i]["SupportPhone"] = ((TextBox)RegionalSettingsGrid.Rows[i].FindControl("SupportPhoneText")).Text;
 			}
-			for (var i = 0; i < PricesGrid.Rows.Count; i++)
-			{
+			for (var i = 0; i < PricesGrid.Rows.Count; i++) {
 				if (Convert.ToString(Data.Tables["Prices"].DefaultView[i]["UpCost"]) != ((TextBox)PricesGrid.Rows[i].FindControl("UpCostText")).Text)
 					Data.Tables["Prices"].DefaultView[i]["UpCost"] = ((TextBox)PricesGrid.Rows[i].FindControl("UpCostText")).Text;
 				if (Convert.ToString(Data.Tables["Prices"].DefaultView[i]["PriceType"]) != ((DropDownList)PricesGrid.Rows[i].FindControl("PriceTypeList")).SelectedValue)
@@ -566,9 +555,8 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 					Data.Tables["Prices"].DefaultView[i]["Enabled"] = ((CheckBox)PricesGrid.Rows[i].FindControl("InWorkCheck")).Checked;
 				if (Convert.ToBoolean(Data.Tables["Prices"].DefaultView[i]["BuyingMatrix"]) != ((CheckBox)PricesGrid.Rows[i].FindControl("BuyingMatrix")).Checked)
 					Data.Tables["Prices"].DefaultView[i]["BuyingMatrix"] = ((CheckBox)PricesGrid.Rows[i].FindControl("BuyingMatrix")).Checked;
-				if (Data.Tables["Prices"].DefaultView[i]["CostType"].ToString() != ((DropDownList)PricesGrid.Rows[i].FindControl("CostType")).SelectedValue)
-				{
-					var value = ((DropDownList) PricesGrid.Rows[i].FindControl("CostType")).SelectedValue;
+				if (Data.Tables["Prices"].DefaultView[i]["CostType"].ToString() != ((DropDownList)PricesGrid.Rows[i].FindControl("CostType")).SelectedValue) {
+					var value = ((DropDownList)PricesGrid.Rows[i].FindControl("CostType")).SelectedValue;
 					if (value == DBNull.Value.ToString())
 						Data.Tables["Prices"].DefaultView[i]["CostType"] = DBNull.Value;
 					else
@@ -576,20 +564,18 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 				}
 			}
 
-			for (var i = 0; i < OrderSendRules.Rows.Count; i++)
-			{
+			for (var i = 0; i < OrderSendRules.Rows.Count; i++) {
 				var row = OrderSendRules.Rows[i];
 				var dataRow = Data.Tables["OrderSendConfig"].DefaultView[i];
 
 				if (Convert.ToUInt32(((DropDownList)row.FindControl("Sender")).SelectedValue) != Convert.ToUInt32(dataRow["SenderId"]))
-					dataRow["Senderid"] = Convert.ToUInt32(((DropDownList) row.FindControl("Sender")).SelectedValue);
+					dataRow["Senderid"] = Convert.ToUInt32(((DropDownList)row.FindControl("Sender")).SelectedValue);
 
 				if (Convert.ToUInt32(((DropDownList)row.FindControl("Formater")).SelectedValue) != Convert.ToUInt32(dataRow["FormaterId"]))
 					dataRow["FormaterId"] = Convert.ToUInt32(((DropDownList)row.FindControl("Formater")).SelectedValue);
 
-				if (((DropDownList)row.FindControl("Region")).SelectedValue != dataRow["RegionCode"].ToString())
-				{
-					var value = ((DropDownList) row.FindControl("Region")).SelectedValue;
+				if (((DropDownList)row.FindControl("Region")).SelectedValue != dataRow["RegionCode"].ToString()) {
+					var value = ((DropDownList)row.FindControl("Region")).SelectedValue;
 					if (value == DBNull.Value.ToString())
 						dataRow["RegionCode"] = DBNull.Value;
 					else
@@ -607,8 +593,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 		protected void ShowAllRegionsCheck_CheckedChanged(object sender, EventArgs e)
 		{
 			string commandText;
-			if (((CheckBox)sender).Checked)
-			{
+			if (((CheckBox)sender).Checked) {
 				commandText = @"
 SELECT  a.RegionCode,   
 		a.Region,
@@ -617,8 +602,7 @@ FROM farm.regions as a, Customers.Suppliers as s
 WHERE a.regionCode & ?AdminRegionMask > 0 and s.Id = ?ClientCode
 ORDER BY region;";
 			}
-			else
-			{
+			else {
 				commandText = @"
 SELECT  a.RegionCode,
 		a.Region,
@@ -644,16 +628,14 @@ ORDER BY region;";
 			WorkRegionList.DataBind();
 			SetRegions();
 		}
-		
+
 		private void UpdateMaskRegion()
 		{
-			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-			{
+			using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
 				connection.Open();
 				var oldMaskRegion = supplier.RegionMask;
 				var newMaskRegion = oldMaskRegion;
-				foreach (ListItem item in WorkRegionList.Items)
-				{
+				foreach (ListItem item in WorkRegionList.Items) {
 					if (item.Selected)
 						newMaskRegion |= Convert.ToUInt64(item.Value);
 					else
@@ -669,7 +651,7 @@ ORDER BY region;";
 				SessionScope.Current.Commit();
 
 				var updateCommand = new MySqlCommand(
-						@"
+					@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
@@ -717,11 +699,11 @@ WHERE   s.Id = ?ClientCode
 					Maintainer.MaintainIntersection(supplier);
 			}
 		}
-		
+
 		private void UpdateHomeRegion()
 		{
 			var currentHomeRegion = Convert.ToUInt64(HomeRegion.SelectedValue);
-			if (supplier.HomeRegion.Id == currentHomeRegion) 
+			if (supplier.HomeRegion.Id == currentHomeRegion)
 				return;
 
 			supplier.HomeRegion = Common.Web.Ui.Models.Region.Find(currentHomeRegion);
@@ -731,17 +713,14 @@ WHERE   s.Id = ?ClientCode
 		}
 
 		protected void RegionalSettingsGrid_RowCreated(object sender, GridViewRowEventArgs e)
-		{			
-			if (e.Row.RowType == DataControlRowType.DataRow)
-			{
+		{
+			if (e.Row.RowType == DataControlRowType.DataRow) {
 				var rows = Data.Tables["EnableRegions"].Select(String.Format("RegionCode = {0}", Data.Tables["RegionSettings"].Rows[e.Row.DataItemIndex]["RegionCode"]));
-				if (rows.Length > 0)
-				{
+				if (rows.Length > 0) {
 					if (Convert.ToBoolean(rows[0]["Enable"]) == false)
-						e.Row.BackColor = ColorTranslator.FromHtml("#B5B5B5"); 
+						e.Row.BackColor = ColorTranslator.FromHtml("#B5B5B5");
 				}
-				else
-				{
+				else {
 					e.Row.BackColor = ColorTranslator.FromHtml("#B5B5B5");
 				}
 			}
@@ -761,8 +740,7 @@ WHERE   s.Id = ?ClientCode
 
 		protected void OrderSettings_RowCommand(object sender, GridViewCommandEventArgs e)
 		{
-			switch (e.CommandName)
-			{
+			switch (e.CommandName) {
 				case "Add":
 					var row = Data.Tables["OrderSendConfig"].NewRow();
 					row["SenderId"] = 1;
@@ -793,7 +771,7 @@ WHERE   s.Id = ?ClientCode
 
 			orderSender.DataSource = Data.Tables["Senders"];
 			orderSender.DataBind();
-			orderSender.SelectedValue = ((DataRowView) e.Row.DataItem)["SenderId"].ToString();
+			orderSender.SelectedValue = ((DataRowView)e.Row.DataItem)["SenderId"].ToString();
 
 			orderFormater.DataSource = Data.Tables["Formaters"];
 			orderFormater.DataBind();

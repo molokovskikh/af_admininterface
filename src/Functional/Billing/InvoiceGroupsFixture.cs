@@ -8,7 +8,8 @@ using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using WatiN.CssSelectorExtensions;
 
 namespace Functional.Billing

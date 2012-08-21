@@ -39,28 +39,25 @@ namespace Integration.Controllers
 		public void Unlock_every_locked_login()
 		{
 			using (var adUser1 = new TestADUser())
-			using (var adUser2 = new TestADUser())
-			{
-				client.Users.Add(new User(client) {Login = adUser1.Login});
-				client.Users[0].Login = adUser1.Login;
-				session.SaveOrUpdate(client);
+				using (var adUser2 = new TestADUser()) {
+					client.Users.Add(new User(client) { Login = adUser1.Login });
+					client.Users[0].Login = adUser1.Login;
+					session.SaveOrUpdate(client);
 
-				using (new SessionScope())
-					controller.Unlock(client.Id);
+					using (new SessionScope())
+						controller.Unlock(client.Id);
 
-				Assert.That(ADHelper.IsLocked(adUser1.Login), Is.False);
-				Assert.That(ADHelper.IsLocked(adUser2.Login), Is.False);
-				Assert.That(Response.RedirectedTo, Is.EqualTo("/Controller/Info.castle?cc=" + client.Id));
-				Assert.That(Context.Flash["UnlockMessage"], Is.EqualTo("Разблокировано"));
-			}
+					Assert.That(ADHelper.IsLocked(adUser1.Login), Is.False);
+					Assert.That(ADHelper.IsLocked(adUser2.Login), Is.False);
+					Assert.That(Response.RedirectedTo, Is.EqualTo("/Controller/Info.castle?cc=" + client.Id));
+					Assert.That(Context.Flash["UnlockMessage"], Is.EqualTo("Разблокировано"));
+				}
 		}
 
 		[Test, Ignore("нет доступа к ad")]
 		public void If_login_not_exists_it_must_be_skiped()
 		{
-			using (var adUser1 = new TestADUser())
-			{
-
+			using (var adUser1 = new TestADUser()) {
 				ADHelper.Block(adUser1.Login);
 
 				session.SaveOrUpdate(new User(client) { Login = "test8779546" });
@@ -77,8 +74,7 @@ namespace Integration.Controllers
 		public void Before_unlock_user_permission_must_be_checked()
 		{
 			SecurityContext.GetAdministrator = () => new Administrator { AllowedPermissions = new List<Permission>() };
-			using (var adUser1 = new TestADUser())
-			{
+			using (var adUser1 = new TestADUser()) {
 				client.Users[0].Login = adUser1.Login;
 				session.SaveOrUpdate(client);
 

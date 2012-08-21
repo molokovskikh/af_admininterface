@@ -41,8 +41,8 @@ namespace Integration.MonoRailExtentions
 		{
 			var controller = new TestController();
 
-			var context = services.ControllerContextFactory.
-				Create("", "test", "action", services.ControllerDescriptorProvider.BuildDescriptor(controller));
+			var context = services.ControllerContextFactory
+				.Create("", "test", "action", services.ControllerDescriptorProvider.BuildDescriptor(controller));
 			request.QueryString["Name"] = "test";
 
 			controller.Process(engineContext, context);

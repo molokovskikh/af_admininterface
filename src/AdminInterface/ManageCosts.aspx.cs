@@ -28,28 +28,24 @@ namespace AddUser
 			With.Transaction((c, t) => {
 				PriceRegionSettings.DataSource = dataSet;
 
-				foreach (DataGridItem Itm in CostsDG.Items)
-				{
-					for (var i = 0; i <= dataSet.Tables[0].Rows.Count - 1; i++)
-					{
-						if (dataSet.Tables[0].Rows[i]["CostCode"].ToString() == ((HiddenField)Itm.FindControl("CostCode")).Value)
-						{
-							if (dataSet.Tables[0].Rows[i]["CostName"].ToString() != ((TextBox) (Itm.FindControl("CostName"))).Text)
-								dataSet.Tables[0].Rows[i]["CostName"] = ((TextBox) (Itm.FindControl("CostName"))).Text;
+				foreach (DataGridItem Itm in CostsDG.Items) {
+					for (var i = 0; i <= dataSet.Tables[0].Rows.Count - 1; i++) {
+						if (dataSet.Tables[0].Rows[i]["CostCode"].ToString() == ((HiddenField)Itm.FindControl("CostCode")).Value) {
+							if (dataSet.Tables[0].Rows[i]["CostName"].ToString() != ((TextBox)(Itm.FindControl("CostName"))).Text)
+								dataSet.Tables[0].Rows[i]["CostName"] = ((TextBox)(Itm.FindControl("CostName"))).Text;
 							if (dataSet.Tables[0].Rows[i]["CostCode"].ToString() == Request.Form["uid"])
 								dataSet.Tables[0].Rows[i]["BaseCost"] = true;
 							else
 								dataSet.Tables[0].Rows[i]["BaseCost"] = false;
 							if (Convert.ToInt32(dataSet.Tables[0].Rows[i]["Enabled"]) != Convert.ToInt32(((CheckBox)(Itm.FindControl("Ena"))).Checked))
-								dataSet.Tables[0].Rows[i]["Enabled"] = Convert.ToInt32(((CheckBox) (Itm.FindControl("Ena"))).Checked);
+								dataSet.Tables[0].Rows[i]["Enabled"] = Convert.ToInt32(((CheckBox)(Itm.FindControl("Ena"))).Checked);
 							if (Convert.ToInt32(dataSet.Tables[0].Rows[i]["AgencyEnabled"]) != Convert.ToInt32(((CheckBox)(Itm.FindControl("Pub"))).Checked))
 								dataSet.Tables[0].Rows[i]["AgencyEnabled"] = Convert.ToInt32(((CheckBox)(Itm.FindControl("Pub"))).Checked);
 						}
 					}
 				}
 
-				for (var i = 0; i < PriceRegionSettings.Rows.Count; i++ )
-				{
+				for (var i = 0; i < PriceRegionSettings.Rows.Count; i++) {
 					dataSet.Tables["PriceRegionSettings"].Rows[i]["Enabled"] = ((CheckBox)PriceRegionSettings.Rows[i].FindControl("EnableCheck")).Checked;
 					dataSet.Tables["PriceRegionSettings"].Rows[i]["UpCost"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("UpCostText")).Text;
 					dataSet.Tables["PriceRegionSettings"].Rows[i]["MinReq"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("MinReqText")).Text;
@@ -87,7 +83,7 @@ namespace AddUser
 
 
 				command.CommandText =
-@"
+					@"
 set @inHost = ?Host;
 set @inUser = ?UserName;
 
@@ -102,7 +98,7 @@ WHERE   CostCode     =?CostCode;
 
 				command.Parameters.Clear();
 				command.CommandText =
-@"
+					@"
 UPDATE PricesRegionalData
 SET UpCost = ?UpCost,
 	MinReq = ?MinReq, 
@@ -157,7 +153,7 @@ WHERE RowID = ?Id
 Прайс-лист: {3}
 ", field.OperatorName, field.ShortName, field.Region, field.PriceName)));
 
-			collumnCreator.CreateCost(priceId,SecurityContext.Administrator.UserName);
+			collumnCreator.CreateCost(priceId, SecurityContext.Administrator.UserName);
 
 			PostDataToGrid();
 		}
@@ -179,12 +175,9 @@ WHERE RowID = ?Id
 				SecurityContext.Administrator.CheckRegion(supplier.HomeRegion.Id);
 				PriceNameLB.Text = price.Name;
 
-				if (price.CostType == 0)
-				{
-					foreach (DataGridColumn column in CostsDG.Columns)
-					{
-						if (column.HeaderText == "Дата ценовой колонки")
-						{
+				if (price.CostType == 0) {
+					foreach (DataGridColumn column in CostsDG.Columns) {
+						if (column.HeaderText == "Дата ценовой колонки") {
 							column.Visible = false;
 							break;
 						}
@@ -194,7 +187,7 @@ WHERE RowID = ?Id
 				var command = adapter.SelectCommand;
 				command.Parameters.AddWithValue("?PriceCode", price.Id);
 				command.CommandText =
-@"
+					@"
 SELECT  pc.CostCode, 
 		cast(concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) as CHAR) CostID, 
 		pc.CostName,
@@ -207,7 +200,7 @@ FROM usersettings.pricescosts pc
 		JOIN farm.sources s on pi.SourceId = s.Id
 	JOIN farm.costformrules cf on cf.CostCode = pc.CostCode
 WHERE pc.PriceCode = ?PriceCode;";
-				
+
 				adapter.Fill(data, "Costs");
 
 				command.CommandText = @"

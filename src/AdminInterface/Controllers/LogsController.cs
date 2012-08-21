@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
@@ -63,8 +63,7 @@ namespace AdminInterface.Controllers
 
 			ulong totalByteDownloaded = 0;
 			ulong totalBytes = 1;
-			foreach (var entity in detailsLogEntities)
-			{
+			foreach (var entity in detailsLogEntities) {
 				totalByteDownloaded += entity.SendBytes;
 				totalBytes = entity.TotalBytes;
 			}

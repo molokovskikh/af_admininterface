@@ -17,9 +17,9 @@ namespace AdminInterface.MonoRailExtentions
 			binder.AutoLoad = AutoLoadBehavior.NewInstanceIfInvalidKey;
 			if (!string.IsNullOrEmpty(expect))
 				typeof(ARDataBinder).GetField("expectCollPropertiesList", BindingFlags.Instance | BindingFlags.NonPublic)
-					.SetValue(binder, new [] { "root." + expect });
+					.SetValue(binder, new[] { "root." + expect });
 
-			typeof (SmartDispatcherController)
+			typeof(SmartDispatcherController)
 				.GetField("binder", BindingFlags.NonPublic | BindingFlags.Instance)
 				.SetValue(controller, binder);
 		}

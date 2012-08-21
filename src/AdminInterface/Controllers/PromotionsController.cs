@@ -23,15 +23,16 @@ namespace AdminInterface.Controllers
 {
 	public enum PromotionStatus
 	{
-		[Description("Все")]All,
-		[Description("Включенные")]Enabled,
-		[Description("Отключенные")]Disabled,
+		[Description("Все")] All,
+		[Description("Включенные")] Enabled,
+		[Description("Отключенные")] Disabled,
 	}
 
 	public class PromotionFilter : SortableContributor
 	{
 		[Description("Статус:")]
 		public PromotionStatus PromotionStatus { get; set; }
+
 		public string SearchText { get; set; }
 
 		public PromotionFilter()
@@ -46,9 +47,8 @@ namespace AdminInterface.Controllers
 
 			if (PromotionStatus == Controllers.PromotionStatus.Enabled)
 				criteria.Add(Expression.Eq("Status", true));
-			else
-				if (PromotionStatus == Controllers.PromotionStatus.Disabled)
-					criteria.Add(Expression.Eq("Status", false));
+			else if (PromotionStatus == Controllers.PromotionStatus.Disabled)
+				criteria.Add(Expression.Eq("Status", false));
 
 			if (!String.IsNullOrEmpty(SearchText))
 				criteria.Add(Expression.Like("Name", SearchText, MatchMode.Anywhere));
@@ -80,8 +80,7 @@ namespace AdminInterface.Controllers
 		{
 			var result = new StringBuilder();
 			result.Append("filter.PromotionStatus=" + (int)PromotionStatus);
-			if (!String.IsNullOrEmpty(SearchText))
-			{
+			if (!String.IsNullOrEmpty(SearchText)) {
 				result.Append("&filter.SearchText=" + SearchText);
 			}
 			return result.ToString();
@@ -139,6 +138,7 @@ namespace AdminInterface.Controllers
 		{
 			return ToUrlQuery();
 		}
+
 		public int RowsCount
 		{
 			get { return _lastRowsCount; }
@@ -200,6 +200,7 @@ namespace AdminInterface.Controllers
 		{
 			return ToUrlQuery();
 		}
+
 		public int RowsCount
 		{
 			get { return _lastRowsCount; }
@@ -214,7 +215,7 @@ namespace AdminInterface.Controllers
 	}
 
 	[
-		Helper(typeof(BindingHelper)), 
+		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(ADHelper)),
 		Helper(typeof(PaginatorHelper), "paginator"),
@@ -225,11 +226,10 @@ namespace AdminInterface.Controllers
 
 		public PromotionsController()
 		{
-			_allowedExtentions = new Dictionary<string, string> 
-			{
-				{".jpg", "image/JPEG"},
-				{".jpeg", "image/JPEG"},
-				{".txt", "text/plain"},
+			_allowedExtentions = new Dictionary<string, string> {
+				{ ".jpg", "image/JPEG" },
+				{ ".jpeg", "image/JPEG" },
+				{ ".txt", "text/plain" },
 			};
 		}
 
@@ -273,20 +273,15 @@ namespace AdminInterface.Controllers
 			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.PromotionOwnerSupplier.MaskRegion).OrderBy(reg => reg.Name);
 
 
-			if (IsPost)
-			{
+			if (IsPost) {
 				promotion.RegionMask = promoRegions.Aggregate(0UL, (v, a) => a + v);
 
 				BindObjectInstance(promotion, "promotion");
 
-				if (!HasValidationError(promotion) && Binder.Validator.IsValid(promotion))
-				{
-
+				if (!HasValidationError(promotion) && Binder.Validator.IsValid(promotion)) {
 					var file = Request.Files["inputfile"] as HttpPostedFile;
-					if (file != null && file.ContentLength > 0)
-					{
-						if (!IsAllowedExtention(Path.GetExtension(file.FileName)))
-						{
+					if (file != null && file.ContentLength > 0) {
+						if (!IsAllowedExtention(Path.GetExtension(file.FileName))) {
 							PropertyBag["Message"] = Message.Error("Выбранный файл имеет недопустимый формат.");
 							return;
 						}
@@ -298,8 +293,7 @@ namespace AdminInterface.Controllers
 						promotion.PromoFile = file.FileName;
 
 						var newLocalPromoFile = GetPromoFile(promotion);
-						using (var newFile = File.Create(newLocalPromoFile))
-						{
+						using (var newFile = File.Create(newLocalPromoFile)) {
 							file.InputStream.CopyTo(newFile);
 						}
 					}
@@ -342,8 +336,7 @@ namespace AdminInterface.Controllers
 
 			var client = PromotionOwnerSupplier.Find(supplierId);
 
-			var promotion = new SupplierPromotion
-			{
+			var promotion = new SupplierPromotion {
 				Enabled = true,
 				Catalogs = new List<Catalog>(),
 				PromotionOwnerSupplier = client,
@@ -356,19 +349,15 @@ namespace AdminInterface.Controllers
 			ActiveRecordMediator.Evict(promotion);
 			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.PromotionOwnerSupplier.MaskRegion).OrderBy(reg => reg.Name);
 
-			if (IsPost)
-			{
+			if (IsPost) {
 				promotion.RegionMask = promoRegions.Aggregate(0UL, (v, a) => a + v);
 
 				BindObjectInstance(promotion, "promotion");
 
-				if (!HasValidationError(promotion) && Binder.Validator.IsValid(promotion))
-				{
+				if (!HasValidationError(promotion) && Binder.Validator.IsValid(promotion)) {
 					var file = Request.Files["inputfile"] as HttpPostedFile;
-					if (file != null && file.ContentLength > 0)
-					{
-						if (!IsAllowedExtention(Path.GetExtension(file.FileName)))
-						{
+					if (file != null && file.ContentLength > 0) {
+						if (!IsAllowedExtention(Path.GetExtension(file.FileName))) {
 							PropertyBag["Message"] = Message.Error("Выбранный файл имеет недопустимый формат.");
 							return;
 						}
@@ -378,11 +367,9 @@ namespace AdminInterface.Controllers
 
 					promotion.Save();
 
-					if (file != null && file.ContentLength > 0)
-					{
+					if (file != null && file.ContentLength > 0) {
 						var newLocalPromoFile = GetPromoFile(promotion);
-						using (var newFile = File.Create(newLocalPromoFile))
-						{
+						using (var newFile = File.Create(newLocalPromoFile)) {
 							file.InputStream.CopyTo(newFile);
 						}
 					}
@@ -410,8 +397,7 @@ namespace AdminInterface.Controllers
 			var fileName = GetPromoFile(promotion);
 
 			if (File.Exists(fileName) && !String.IsNullOrEmpty(promotion.PromoFile))
-				using (var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
-				{
+				using (var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read)) {
 					Response.Clear();
 
 					var extention = Path.GetExtension(promotion.PromoFile);
@@ -437,11 +423,10 @@ namespace AdminInterface.Controllers
 		{
 			return ActiveRecordLinq
 				.AsQueryable<Catalog>()
-				.Where(c => !c.Hidden  && c.Name.Contains(term))
+				.Where(c => !c.Hidden && c.Name.Contains(term))
 				.Take(20)
 				.ToList()
-				.Select(c => new
-				{
+				.Select(c => new {
 					id = c.Id,
 					label = c.Name
 				});
@@ -458,13 +443,10 @@ namespace AdminInterface.Controllers
 			PropertyBag["filter"] = filter;
 			PropertyBag["catalogNames"] = filter.Find<Catalog>();
 
-			if (IsPost)
-			{
-				if (Request.Params["delBtn"] != null)
-				{
+			if (IsPost) {
+				if (Request.Params["delBtn"] != null) {
 					foreach (string key in Request.Params.AllKeys)
-						if (key.StartsWith("chd"))
-						{
+						if (key.StartsWith("chd")) {
 							var catalog = Catalog.Find(Convert.ToUInt32(Request.Params[key]));
 							var index = promotion.Catalogs.IndexOf(c => c.Id == catalog.Id);
 							if (index >= 0)
@@ -472,11 +454,9 @@ namespace AdminInterface.Controllers
 						}
 				}
 
-				if (Request.Params["addBtn"] != null)
-				{
+				if (Request.Params["addBtn"] != null) {
 					foreach (string key in Request.Params.AllKeys)
-						if (key.StartsWith("cha"))
-						{
+						if (key.StartsWith("cha")) {
 							var catalog = Catalog.Find(Convert.ToUInt32(Request.Params[key]));
 
 							if (promotion.Catalogs.FirstOrDefault(c => c.Id == catalog.Id) == null)
@@ -485,14 +465,12 @@ namespace AdminInterface.Controllers
 				}
 
 				ActiveRecordMediator.Evict(promotion);
-				if (Validator.IsValid(promotion) && promotion.Catalogs.Count > 0)
-				{
+				if (Validator.IsValid(promotion) && promotion.Catalogs.Count > 0) {
 					Flash["Message"] = "Сохранено";
 					promotion.Save();
 					RedirectToAction("EditCatalogs", filter.ToUrl());
 				}
-				else
-				{
+				else {
 					var summary = String.Empty;
 					if (Validator.GetErrorSummary(promotion) != null)
 						summary = String.Join(Environment.NewLine, Validator.GetErrorSummary(promotion).ErrorMessages);
@@ -507,6 +485,5 @@ namespace AdminInterface.Controllers
 				}
 			}
 		}
-
 	}
 }

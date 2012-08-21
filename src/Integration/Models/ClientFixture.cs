@@ -62,7 +62,7 @@ namespace Integration.Models
 			payer.Save();
 			client.ChangePayer(payer, payer.JuridicalOrganizations.First());
 			session.SaveOrUpdate(client);
-			Assert.That(client.Payers, Is.EquivalentTo(new []{payer}));
+			Assert.That(client.Payers, Is.EquivalentTo(new[] { payer }));
 			Assert.That(client.Users[0].Payer, Is.EqualTo(payer));
 			var address = client.Addresses[0];
 			Assert.That(address.Payer, Is.EqualTo(payer));

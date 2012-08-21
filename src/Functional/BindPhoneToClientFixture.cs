@@ -3,7 +3,8 @@ using AdminInterface.Models;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using AdminInterface.Models.Telephony;
 
 namespace Functional

@@ -34,15 +34,9 @@ namespace AdminInterface.Models.Suppliers
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
 		public virtual bool Disabled
 		{
-			get
-			{
-				return _disabled;
-			}
+			get { return _disabled; }
 
-			set
-			{
-				_disabled = value;
-			}
+			set { _disabled = value; }
 		}
 
 		public virtual bool Enabled
@@ -54,12 +48,10 @@ namespace AdminInterface.Models.Suppliers
 		{
 			get
 			{
-				if (this is Client)
-				{
+				if (this is Client) {
 					return ((Client)this).FullName;
 				}
-				else if (this is Supplier)
-				{
+				else if (this is Supplier) {
 					return ((Supplier)this).FullName;
 				}
 				return "";

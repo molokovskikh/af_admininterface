@@ -21,7 +21,7 @@ namespace AdminInterface.Controllers
 
 		public void Show(uint id)
 		{
-			RedirectUsingRoute("Edit", new {id});
+			RedirectUsingRoute("Edit", new { id });
 		}
 
 		[AccessibleThrough(Verb.Get)]
@@ -72,21 +72,19 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Update([ARDataBind("address", AutoLoadBehavior.Always, Expect = "address.AvaliableForUsers")] Address address, 
+		public void Update([ARDataBind("address", AutoLoadBehavior.Always, Expect = "address.AvaliableForUsers")] Address address,
 			[DataBind("contacts")] Contact[] contacts, [DataBind("deletedContacts")] Contact[] deletedContacts)
 		{
 			address.UpdateContacts(contacts, deletedContacts);
 
 			var oldLegalEntity = address.OldValue(a => a.LegalEntity);
-			if (address.Payer != address.LegalEntity.Payer)
-			{
+			if (address.Payer != address.LegalEntity.Payer) {
 				address.Payer = address.LegalEntity.Payer;
 				this.Mailer().AddressMoved(address, address.Client, oldLegalEntity).Send();
 			}
 
 			address.Update();
-			if (address.IsChanged(a => a.LegalEntity))
-			{
+			if (address.IsChanged(a => a.LegalEntity)) {
 				address.MoveAddressIntersection(address.Client, address.LegalEntity,
 					address.Client, oldLegalEntity);
 			}

@@ -64,7 +64,7 @@ namespace AdminInterface.Models
 
 		[OneToOne]
 		public virtual Client Client { get; set; }
-		
+
 		[Property, Description("Не доставлять заказы поставщикам"), Auditable]
 		public virtual bool ServiceClient { get; set; }
 
@@ -77,8 +77,7 @@ namespace AdminInterface.Models
 			get { return _noiseCosts; }
 			set
 			{
-				if (_noiseCosts != value)
-				{
+				if (_noiseCosts != value) {
 					var supplierId = GetSupplierId();
 					FirmCodeOnly = value
 						? (uint?)supplierId
@@ -97,13 +96,13 @@ namespace AdminInterface.Models
 		}
 
 		[BelongsTo("NoiseCostExceptSupplierId"), Description("Зашумлять все прайс листы всех поставщиков кроме"), Auditable]
-		public virtual Supplier NoiseCostExceptSupplier {
+		public virtual Supplier NoiseCostExceptSupplier
+		{
 			get { return _noiseCostExceptSupplier; }
 			set
 			{
 				_noiseCostExceptSupplier = value;
-				if (NoiseCosts)
-				{
+				if (NoiseCosts) {
 					FirmCodeOnly = GetSupplierId();
 				}
 			}
@@ -148,10 +147,7 @@ namespace AdminInterface.Models
 		[Description("Скрыть клиента в интефрейсе поставщика, не доставлять заказы поставщикам")]
 		public virtual bool IsHiddenFromSupplier
 		{
-			get
-			{
-				return InvisibleOnFirm == DrugstoreType.Hidden;
-			}
+			get { return InvisibleOnFirm == DrugstoreType.Hidden; }
 			set
 			{
 				if (value)
@@ -163,10 +159,7 @@ namespace AdminInterface.Models
 
 		public virtual bool EnableBuyingMatrix
 		{
-			get
-			{
-				return BuyingMatrixPrice != null;
-			}
+			get { return BuyingMatrixPrice != null; }
 			set
 			{
 				if (!value)
@@ -215,10 +208,7 @@ namespace AdminInterface.Models
 
 		public virtual bool EnableOfferMatrix
 		{
-			get
-			{
-				return OfferMatrixPrice != null;
-			}
+			get { return OfferMatrixPrice != null; }
 			set
 			{
 				if (!value)

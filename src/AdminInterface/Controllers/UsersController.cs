@@ -44,7 +44,7 @@ namespace AdminInterface.Controllers
 	{
 		public void Show(uint id)
 		{
-			RedirectUsingRoute("Edit", new {id});
+			RedirectUsingRoute("Edit", new { id });
 		}
 
 		[AccessibleThrough(Verb.Get)]
@@ -91,7 +91,7 @@ namespace AdminInterface.Controllers
 
 		[AccessibleThrough(Verb.Post)]
 		public void Add(
-			[DataBind("contacts")] Contact[] contacts, 
+			[DataBind("contacts")] Contact[] contacts,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			[DataBind("persons")] Person[] persons,
 			string comment,
@@ -132,8 +132,7 @@ namespace AdminInterface.Controllers
 			user.UpdateContacts(contacts);
 			user.UpdatePersons(persons);
 
-			if (service.IsClient() && address != null)
-			{
+			if (service.IsClient() && address != null) {
 				address = ((Client)service).AddAddress(address);
 				user.RegistredWith(address);
 				address.SaveAndFlush();
@@ -147,26 +146,24 @@ namespace AdminInterface.Controllers
 
 			Mailer.Registred(user, comment, Defaults);
 			user.AddBillingComment(comment);
-			if (address != null)
-			{
+			if (address != null) {
 				address.AddBillingComment(comment);
 				Mailer.Registred(address, comment, Defaults);
 			}
-			if (user.Client != null) { 
+			if (user.Client != null) {
 				var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены следующие адреса доставки: \r\n {2}",
 					user.Id,
-					user.Name, 
+					user.Name,
 					user.AvaliableAddresses.Select(a => Address.TryFind(a.Id))
 						.Where(a => a != null)
 						.Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
-				new AuditRecord(message, user.Client){ MessageType = LogMessageType.System }.Save();
+				new AuditRecord(message, user.Client) { MessageType = LogMessageType.System }.Save();
 			}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
 				(contacts.Any(contact => contact.Type == ContactType.Email));
 			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
-			if (sendClientCard && haveMails)
-			{
+			if (sendClientCard && haveMails) {
 				var contactEmails = contacts
 					.Where(c => c.Type == ContactType.Email)
 					.Implode(c => c.ContactText);
@@ -185,15 +182,14 @@ namespace AdminInterface.Controllers
 
 				Notify("Пользователь создан");
 				if (service.IsClient())
-					RedirectUsingRoute("Clients", "show", new {service.Id});
+					RedirectUsingRoute("Clients", "show", new { service.Id });
 				else
-					RedirectUsingRoute("Suppliers", "show", new {service.Id});
+					RedirectUsingRoute("Suppliers", "show", new { service.Id });
 			}
-			else
-			{
+			else {
 				Flash["newUser"] = true;
 				Flash["password"] = password;
-				Redirect("main", "report", new {id = user.Id});
+				Redirect("main", "report", new { id = user.Id });
 			}
 		}
 
@@ -233,7 +229,7 @@ namespace AdminInterface.Controllers
 
 			if (user.RootService.Disabled || user.Enabled == false)
 				PropertyBag["enabled"] = false;
-			else 
+			else
 				PropertyBag["enabled"] = true;
 
 			Sort.Make(this);
@@ -242,7 +238,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void Update(
 			[ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AvaliableAddresses")] User user,
-			[DataBind("WorkRegions")] ulong[] workRegions, 
+			[DataBind("WorkRegions")] ulong[] workRegions,
 			[DataBind("OrderRegions")] ulong[] orderRegions,
 			[DataBind("contacts")] Contact[] contacts,
 			[DataBind("deletedContacts")] Contact[] deletedContacts,
@@ -262,7 +258,7 @@ namespace AdminInterface.Controllers
 			DbSession.Save(user);
 
 			Notify("Сохранено");
-			RedirectUsingRoute("users", "Edit", new {id = user.Id});
+			RedirectUsingRoute("users", "Edit", new { id = user.Id });
 		}
 
 		[RequiredPermission(PermissionType.ChangePassword)]
@@ -276,18 +272,18 @@ namespace AdminInterface.Controllers
 		}
 
 		[RequiredPermission(PermissionType.ChangePassword)]
-		public void DoPasswordChange(uint userId, 
-									 string emailsForSend, 
-									 bool isSendClientCard, 
-									 bool isFree, 
-									 bool changeLogin,
-									 string reason)
+		public void DoPasswordChange(uint userId,
+			string emailsForSend,
+			bool isSendClientCard,
+			bool isFree,
+			bool changeLogin,
+			string reason)
 		{
 			var user = DbSession.Load<User>(userId);
 			user.CheckLogin();
 			var administrator = Admin;
 			var password = User.GeneratePassword();
-		
+
 			ADHelper.ChangePassword(user.Login, password);
 			if (changeLogin)
 				ADHelper.RenameUser(user.Login, user.Id.ToString());
@@ -324,7 +320,7 @@ namespace AdminInterface.Controllers
 			}
 			else {
 				Flash["password"] = password;
-				Redirect("main", "report", new {id = user.Id, isPasswordChange = true});
+				Redirect("main", "report", new { id = user.Id, isPasswordChange = true });
 			}
 		}
 
@@ -341,18 +337,16 @@ namespace AdminInterface.Controllers
 
 		public void DeletePreparedData(uint id)
 		{
-			try
-			{
+			try {
 				var user = DbSession.Load<User>(id);
 				var files = Directory.GetFiles(Global.Config.UserPreparedDataDirectory)
-				.Where(f => Regex.IsMatch(Path.GetFileName(f), string.Format(@"^({0}_)\d+?\.zip", user.Id))).ToList();
+					.Where(f => Regex.IsMatch(Path.GetFileName(f), string.Format(@"^({0}_)\d+?\.zip", user.Id))).ToList();
 				foreach (var file in files) {
 					File.Delete(file);
 				}
 				Notify("Подготовленные данные удалены");
 			}
-			catch
-			{
+			catch {
 				Error("Ошибка удаления подготовленных данных, попробуйте позднее.");
 			}
 			RedirectToReferrer();
@@ -375,8 +369,7 @@ namespace AdminInterface.Controllers
 		{
 			var user = DbSession.Load<User>(userId);
 
-			if (!String.IsNullOrEmpty(message))
-			{
+			if (!String.IsNullOrEmpty(message)) {
 				new AuditRecord(message, user).Save();
 				Notify("Сохранено");
 			}
@@ -388,13 +381,11 @@ namespace AdminInterface.Controllers
 		{
 			var user = DbSession.Load<User>(id);
 			PropertyBag["user"] = user;
-			if (user.Client == null)
-			{
+			if (user.Client == null) {
 				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.SupplierInterface);
 				RenderView("SupplierSettings");
 			}
-			else
-			{
+			else {
 				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.Base);
 				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel);
 				PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint);
@@ -435,7 +426,7 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		[return : JSONReturnBinder]
+		[return: JSONReturnBinder]
 		public object[] SearchForShowUser(string text)
 		{
 			uint id;
@@ -445,7 +436,7 @@ namespace AdminInterface.Controllers
 				.OrderBy(u => u.Id)
 				.Take(50)
 				.ToArray()
-				.Select(p => new {id = p.Id, name = String.Format("{0} - {1}", p.Id, p.Name)})
+				.Select(p => new { id = p.Id, name = String.Format("{0} - {1}", p.Id, p.Name) })
 				.ToArray();
 		}
 	}

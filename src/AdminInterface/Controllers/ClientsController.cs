@@ -38,20 +38,19 @@ namespace AdminInterface.Controllers
 
 		public Sort(NameValueCollection query)
 			: this(query["SortBy"], query["Direction"])
-		{}
+		{
+		}
 
 		public Sort(string property, string direction)
 		{
-			var columns = new [] {
+			var columns = new[] {
 				"Messages.WriteTime",
 				"Messages.Operator",
 				"Messages.Type",
 				"Messages.ObjectId",
 				"Messages.Name",
-
 				"Addresses.Value",
 				"Addresses.LegalName",
-
 				"Users.Id",
 				"Users.Login",
 			};
@@ -59,7 +58,7 @@ namespace AdminInterface.Controllers
 			if (columns.All(s => !s.Equals(property, StringComparison.OrdinalIgnoreCase)))
 				property = null;
 
-			var directions = new [] {"asc", "desc"};
+			var directions = new[] { "asc", "desc" };
 			if (directions.All(s => !s.Equals(direction, StringComparison.OrdinalIgnoreCase)))
 				direction = null;
 
@@ -85,8 +84,7 @@ namespace AdminInterface.Controllers
 
 			var sortedList = new ArrayList(((IList)bag[prefix]));
 			sortedList.Sort(
-				new PropertyComparer(Direction.Equals("asc", StringComparison.OrdinalIgnoreCase) ? SortDirection.Asc : SortDirection.Desc, property)
-			);
+				new PropertyComparer(Direction.Equals("asc", StringComparison.OrdinalIgnoreCase) ? SortDirection.Asc : SortDirection.Desc, property));
 
 			bag[prefix] = sortedList;
 			bag["SortBy"] = Property;
@@ -176,7 +174,7 @@ namespace AdminInterface.Controllers
 			if (group == null)
 				group = owner.AddContactGroup(ContactGroupType.KnownPhones);
 			phone = phone.Substring(0, 4) + "-" + phone.Substring(4, phone.Length - 4);
-			group.AddContact(new Contact{ ContactText = phone, Type = ContactType.Phone});
+			group.AddContact(new Contact { ContactText = phone, Type = ContactType.Phone });
 
 			DbSession.CreateSQLQuery(@"
 delete from telephony.UnresolvedPhone
@@ -193,8 +191,7 @@ where Phone like :phone")
 		{
 			var client = Client.FindAndCheck<Client>(clientCode);
 
-			if (!String.IsNullOrEmpty(message))
-			{
+			if (!String.IsNullOrEmpty(message)) {
 				new AuditRecord(message, client).Save();
 				Notify("Сохранено");
 			}
@@ -205,7 +202,7 @@ where Phone like :phone")
 		{
 			var client = Client.FindAndCheck<Client>(clientCode);
 
-			foreach(var user in client.Users)
+			foreach (var user in client.Users)
 				if (ADHelper.IsLoginExists(user.Login) && ADHelper.IsLocked(user.Login))
 					ADHelper.Unlock(user.Login);
 
@@ -217,18 +214,15 @@ where Phone like :phone")
 		{
 			var client = Client.FindAndCheck<Client>(clientCode);
 
-			try
-			{
-				foreach (var user in client.Users)
-				{
+			try {
+				foreach (var user in client.Users) {
 					var file = String.Format(Properties.Settings.Default.UserPreparedDataFormatString, user.Id);
 					if (File.Exists(file))
 						File.Delete(file);
 				}
 				Notify("Подготовленные данные удалены");
 			}
-			catch
-			{
+			catch {
 				Error("Ошибка удаления подготовленных данных, попробуйте позднее.");
 			}
 			RedirectToReferrer();
@@ -335,7 +329,7 @@ where Phone like :phone")
 			client.ChangePayer(payer, org);
 
 			Notify("Изменено");
-			RedirectToAction("Show", new {id = client.Id});
+			RedirectToAction("Show", new { id = client.Id });
 		}
 
 		[AccessibleThrough(Verb.Get)]
@@ -343,7 +337,7 @@ where Phone like :phone")
 		public object[] LegalEntities(uint id)
 		{
 			var client = Client.FindAndCheck<Client>(id);
-			return client.Orgs().Select(j => new {j.Id, j.Name}).ToArray();
+			return client.Orgs().Select(j => new { j.Id, j.Name }).ToArray();
 		}
 
 		[return: JSONReturnBinder]
@@ -356,7 +350,7 @@ where Phone like :phone")
 				.OrderBy(p => p.Supplier.Name)
 				.Take(50)
 				.ToArray()
-				.Select(p => new {id = p.Id, name = String.Format("{0} - {1}", p.Supplier.Name, p.Name)})
+				.Select(p => new { id = p.Id, name = String.Format("{0} - {1}", p.Supplier.Name, p.Name) })
 				.ToArray();
 		}
 
@@ -392,7 +386,7 @@ where Phone like :phone")
 				Restrictions.On<ParseAlgorithm>(l => l.Name).IsLike(text, MatchMode.Anywhere))
 				.Take(50)
 				.List().OrderBy(l => l.Name)
-				.Select(p => new {id = p.Id, name = p.Name})
+				.Select(p => new { id = p.Id, name = p.Name })
 				.ToArray();
 		}
 
@@ -415,7 +409,7 @@ where s.Name like :SearchText")
 				.SetParameter("SearchText", "%" + text + "%")
 				.List()
 				.Cast<object[]>()
-				.Select(s => new { id = Convert.ToUInt32(s[0]), name = String.Format("{0}. {1}", s[0], s[1])})
+				.Select(s => new { id = Convert.ToUInt32(s[0]), name = String.Format("{0}. {1}", s[0], s[1]) })
 				.ToArray();
 		}
 
@@ -440,16 +434,13 @@ where s.Name like :SearchText")
 			// тогда переносим пользователя
 
 			if ((user != null && user.AvaliableAddresses.Count > 1)
-				|| (address != null && address.AvaliableForUsers.Count > 1))
-			{
-				if (moveAddress)
-				{
+				|| (address != null && address.AvaliableForUsers.Count > 1)) {
+				if (moveAddress) {
 					Error("Адрес доставки не может быть перемещен, т.к. имеет доступ к нему подключены пользователи");
 					RedirectUsingRoute("deliveries", "Edit", new { id = address.Id });
 					return;
 				}
-				else
-				{
+				else {
 					Error("Пользователь не может быть перемещен т.к. имеет доступ к адресам доставки");
 					RedirectUsingRoute("users", "Edit", new { id = user.Id });
 					return;
@@ -457,9 +448,9 @@ where s.Name like :SearchText")
 			}
 
 			if (user != null && user.AvaliableAddresses.Any(a => a.AvaliableForUsers.Count > 1)) {
-					Error("Пользователь не может быть перемещен т.к. подключен к адресу который связан с другими пользователями");
-					RedirectUsingRoute("users", "Edit", new { id = user.Id });
-					return;
+				Error("Пользователь не может быть перемещен т.к. подключен к адресу который связан с другими пользователями");
+				RedirectUsingRoute("users", "Edit", new { id = user.Id });
+				return;
 			}
 
 			if (address != null)
@@ -500,8 +491,7 @@ where s.Name like :SearchText")
 			DbSession.Refresh(oldClient);
 			if (oldClient.Users.Count == 0
 				&& oldClient.Addresses.Count == 0
-				&& oldClient.Enabled)
-			{
+				&& oldClient.Enabled) {
 				oldClient.Disabled = true;
 				this.Mailer().EnableChanged(oldClient).Send();
 				DbSession.Save(AuditRecord.StatusChange(oldClient));

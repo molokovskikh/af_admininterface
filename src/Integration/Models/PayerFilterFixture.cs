@@ -41,7 +41,7 @@ namespace Integration.Models
 			Save(supplier);
 			Flush();
 
-			var items = new PayerFilter{
+			var items = new PayerFilter {
 				SearchBy = SearchBy.PayerId,
 				SearchText = payer.Id.ToString(),
 			}.Find();
@@ -77,7 +77,7 @@ namespace Integration.Models
 			payer.Recipient = recipient;
 			payer.Save();
 
-			var items = new PayerFilter{
+			var items = new PayerFilter {
 				Recipient = session.Query<Recipient>().First()
 			}.Find();
 			Assert.That(items.Count, Is.GreaterThan(0));
@@ -91,7 +91,7 @@ namespace Integration.Models
 			payer.AutoInvoice = InvoiceType.Auto;
 			payer.SaveAndFlush();
 
-			var items = new PayerFilter{InvoiceType = InvoiceType.Manual}.Find();
+			var items = new PayerFilter { InvoiceType = InvoiceType.Manual }.Find();
 			Assert.That(items.Any(i => i.PayerId == payer.Id), Is.False,
 				"не должны были найти плательщика {0}, есть {1}", payer.Id, items.Implode(i => i.PayerId.ToString()));
 		}
@@ -104,7 +104,7 @@ namespace Integration.Models
 			payer.INN = DataMother.RandomInn();
 			payer.SaveAndFlush();
 
-			var items = new PayerFilter{SearchText = payer.INN, SearchBy = SearchBy.Inn}.Find();
+			var items = new PayerFilter { SearchText = payer.INN, SearchBy = SearchBy.Inn }.Find();
 			Assert.That(items.Count, Is.EqualTo(1));
 			Assert.That(items[0].PayerId, Is.EqualTo(payer.Id));
 		}
@@ -119,7 +119,7 @@ namespace Integration.Models
 			address.SaveAndFlush();
 			session.SaveOrUpdate(client);
 
-			var items = new PayerFilter{SearchText = address.Value, SearchBy = SearchBy.Address}.Find();
+			var items = new PayerFilter { SearchText = address.Value, SearchBy = SearchBy.Address }.Find();
 			Assert.That(items.Count, Is.EqualTo(1));
 			Assert.That(items[0].PayerId, Is.EqualTo(payer.Id));
 		}
@@ -130,7 +130,7 @@ namespace Integration.Models
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 
 			var period = DateTime.Now.ToPeriod();
-			var filter = new PayerFilter {SearchWithoutDocuments = true, Period = period, DocumentType = DocumentType.Invoice};
+			var filter = new PayerFilter { SearchWithoutDocuments = true, Period = period, DocumentType = DocumentType.Invoice };
 			var items = filter.Find();
 
 			Assert.Contains(payer.Id, items.Select(i => i.PayerId).ToArray());
@@ -148,7 +148,7 @@ namespace Integration.Models
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 
 			var period = DateTime.Now.AddMonths(-1).ToPeriod();
-			var filter = new PayerFilter {SearchWithoutDocuments = true, Period = period, DocumentType = DocumentType.Invoice};
+			var filter = new PayerFilter { SearchWithoutDocuments = true, Period = period, DocumentType = DocumentType.Invoice };
 			var items = filter.Find();
 
 			Assert.That(items.Select(i => i.PayerId).ToArray(), Is.Not.Contains(payer.Id));

@@ -15,8 +15,7 @@ namespace AdminInterface.Models
 		public static IList<Offer> Search(User user, string text)
 		{
 			IList<Offer> offers = null;
-			using (new TransactionScope())
-			{
+			using (new TransactionScope()) {
 				ArHelper.WithSession(s => {
 					s.CreateSQLQuery(@"call Customers.GetActivePrices(:userid)")
 						.SetParameter("userid", user.Id)
@@ -40,13 +39,12 @@ FROM farm.core0 c0
 WHERE s.Synonym like :SearchText
 GROUP BY c0.Id
 ORDER BY CatalogName")
-							.SetParameter("SearchText", "%" + text + "%")
-							.SetResultTransformer(Transformers.AliasToBean(typeof(Offer)))
-							.List<Offer>();
+						.SetParameter("SearchText", "%" + text + "%")
+						.SetResultTransformer(Transformers.AliasToBean(typeof(Offer)))
+						.List<Offer>();
 				});
 				return offers;
 			}
-
 		}
 	}
 }

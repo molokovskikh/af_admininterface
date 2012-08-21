@@ -17,7 +17,7 @@ using Integration.ForTesting;
 using NHibernate;
 using NUnit.Framework;
 using AppHelper = AdminInterface.Helpers.AppHelper;
-using DescriptionAttribute=System.ComponentModel.DescriptionAttribute;
+using DescriptionAttribute = System.ComponentModel.DescriptionAttribute;
 
 namespace Integration
 {
@@ -45,8 +45,7 @@ namespace Integration
 		[Test]
 		public void Link_to_for_lazy()
 		{
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				var user = ActiveRecordLinqBase<User>.Queryable.First(u => u.Payer != null);
 				Assert.That(NHibernateUtil.IsInitialized(user.Payer), Is.False);
 				var linkTo = helper.LinkTo(user.Payer);
@@ -84,6 +83,7 @@ namespace Integration
 		{
 			public uint Id { get; set; }
 			public string Name { get; set; }
+
 			public static IList<Multivalue> All()
 			{
 				return new List<Multivalue> {
@@ -132,7 +132,7 @@ namespace Integration
 			var result = helper.FilterFor("filter.TextField");
 			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'>Введите текст для поиска:</td>" +
 				"<td colspan=2 class='value'>"
-				+"<input type=\"text\" id=\"filter_TextField\" name=\"filter.TextField\" value=\"\" /></td></tr>"));
+				+ "<input type=\"text\" id=\"filter_TextField\" name=\"filter.TextField\" value=\"\" /></td></tr>"));
 		}
 
 		[Test]
@@ -195,8 +195,8 @@ namespace Integration
 		public void Select_with_values()
 		{
 			var edit = helper.Edit("filter.Entity", new List<Entity> {
-				new Entity{Id = 1, Name = "Test1"},
-				new Entity{Id = 2, Name = "Test2"}
+				new Entity { Id = 1, Name = "Test1" },
+				new Entity { Id = 2, Name = "Test2" }
 			});
 			Assert.That(edit, Is.EqualTo("<select id='filter_Entity_Id' name='filter.Entity.Id'>"
 				+ "<option value=1>Test1</option>"
@@ -229,11 +229,12 @@ namespace Integration
 		public class UrlContributor : IUrlContributor
 		{
 			public string Name { get; set; }
+
 			public IDictionary GetQueryString()
 			{
 				return new Dictionary<string, string> {
-					{"controller", "client"},
-					{"action", "index"},
+					{ "controller", "client" },
+					{ "action", "index" },
 				};
 			}
 		}
@@ -242,21 +243,21 @@ namespace Integration
 		public void Get_link_from_url_contributor()
 		{
 			engine.Add(new PatternRoute("/<controller>/[id]/<action>").Restrict("id").ValidInteger);
-			var link = helper.LinkTo(new UrlContributor{Name = "bad bad test"});
+			var link = helper.LinkTo(new UrlContributor { Name = "bad bad test" });
 			Assert.That(link, Is.EqualTo("<a  href=\"/clients/index\">bad bad test</a>"));
 		}
 
 		[Test]
 		public void Style_link()
 		{
-			var link = helper.LinkTo(new Address{Enabled = false, Value = "Test"});
+			var link = helper.LinkTo(new Address { Enabled = false, Value = "Test" });
 			Assert.That(link, Is.EqualTo("<a class=\"disabled has-no-connected-users\"  href=\"/Addresses/0\">Test</a>"));
 		}
 
 		[Test]
 		public void Link_with_parameters()
 		{
-			var link = helper.LinkTo(new Address{Enabled = true, Value = "Test"}, "Test", "Index", new Dictionary<string, object>{{"tab", "1"}});
+			var link = helper.LinkTo(new Address { Enabled = true, Value = "Test" }, "Test", "Index", new Dictionary<string, object> { { "tab", "1" } });
 			Assert.That(link, Is.EqualTo("<a class=\"has-no-connected-users\"  href=\"/Addresses/0/Index?tab=1\">Test</a>"));
 		}
 	}

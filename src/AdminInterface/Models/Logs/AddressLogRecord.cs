@@ -43,9 +43,9 @@ where {AddressLogRecord}.Enabled is not null
 		and {AddressLogRecord}.AddressId in (:addressIds)
 order by logtime desc
 limit 100")
-				.AddEntity(typeof(AddressLogRecord))
-				.SetParameterList("addressIds", addresses.Select(a => a.Id).ToList())
-				.List<AddressLogRecord>(), null);
+						.AddEntity(typeof(AddressLogRecord))
+						.SetParameterList("addressIds", addresses.Select(a => a.Id).ToList())
+						.List<AddressLogRecord>(), null);
 		}
 
 		public static AddressLogRecord LastOff(uint addressId)
@@ -59,9 +59,9 @@ where Enabled = 0
 		and AddressId = :AddressId
 order by logtime desc
 limit 1")
-				.AddEntity(typeof(AddressLogRecord))
-				.SetParameter("AddressId", addressId)
-				.UniqueResult(), null);
+						.AddEntity(typeof(AddressLogRecord))
+						.SetParameter("AddressId", addressId)
+						.UniqueResult(), null);
 		}
 	}
 }

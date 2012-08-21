@@ -10,8 +10,8 @@ namespace Integration.Tasks
 	[TestFixture]
 	public class InvoicePartProcessorFixture : Test.Support.IntegrationFixture
 	{
-		InvoicePartProcessor processor;
-		Payer payer;
+		private InvoicePartProcessor processor;
+		private Payer payer;
 
 		[SetUp]
 		public void Setup()

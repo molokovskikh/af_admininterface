@@ -6,17 +6,18 @@ using AdminInterface.Models.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.Billing
 {
 	[TestFixture]
 	public class ReportFixture : WatinFixture2
 	{
-		Client client;
-		Report report;
-		Payer payer;
-		ReportAccount account;
+		private Client client;
+		private Report report;
+		private Payer payer;
+		private ReportAccount account;
 
 		[SetUp]
 		public void SetUp()

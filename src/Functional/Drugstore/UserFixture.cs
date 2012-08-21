@@ -8,7 +8,8 @@ using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using System.IO;
 using AdminInterface;
 using Common.Web.Ui.Models;
@@ -65,8 +66,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
 
 			browser.Link(Find.ByText("Статистика изменения пароля")).Click();
-			using (var stat = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика изменения пароля для пользователя {0}", user.Login))))
-			{
+			using (var stat = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика изменения пароля для пользователя {0}", user.Login)))) {
 				Assert.That(stat.Text, Is.StringContaining(String.Format("Статистика изменения пароля для пользователя {0}", user.Login)));
 			}
 		}
@@ -76,8 +76,7 @@ namespace Functional.Drugstore
 		{
 			browser.Link(Find.ByText("Новый пользователь")).Click();
 			browser.Button(Find.ByValue("Создать")).Click();
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				client = session.Load<Client>(client.Id);
 				Assert.That(client.Users.Count, Is.GreaterThan(0));
 				browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
@@ -219,10 +218,11 @@ namespace Functional.Drugstore
 			file.Close();
 			browser.Button(Find.ByValue("Удалить подготовленные данные")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Подготовленные данные удалены"));
-			try
-			{
+			try {
 				File.Delete(file.Name);
-			} catch {}
+			}
+			catch {
+			}
 		}
 
 		[Test]
@@ -237,12 +237,14 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			browser.Back(); browser.Back(); browser.Back();
+			browser.Back();
+			browser.Back();
+			browser.Back();
 
 			browser.Link(Find.ByText("Новый пользователь")).Click();
 			browser.TextField(Find.ByName("user.Name")).TypeText("test2");
 
-			for (int i = 0; i < 25; i++ )
+			for (int i = 0; i < 25; i++)
 				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
 
 			browser.Button(Find.ByValue("Создать")).Click();
@@ -296,12 +298,11 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
 			ContactGroup group;
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				client = session.Load<Client>(client.Id);
 				group = client.Users[0].ContactGroup;
 				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
-							"Не совпадают Id владельца группы у клиента и у новой группы");
+					"Не совпадают Id владельца группы у клиента и у новой группы");
 			}
 			// Проверка, что контактные записи создались в БД
 			ContactInformationFixture.CheckContactGroupInDb(group);
@@ -320,12 +321,11 @@ namespace Functional.Drugstore
 			ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			ContactGroup group;
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				client = session.Load<Client>(client.Id);
 				group = client.Users[0].ContactGroup;
 				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
-							"Не совпадают Id владельца группы у клиента и у новой группы");
+					"Не совпадают Id владельца группы у клиента и у новой группы");
 			}
 			// Проверка, что контактные записи создались в БД
 			ContactInformationFixture.CheckContactGroupInDb(group);
@@ -344,8 +344,7 @@ namespace Functional.Drugstore
 
 			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
 			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				client = session.Load<Client>(client.Id);
 				var group = client.Users[0].ContactGroup;
 				browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
@@ -503,7 +502,7 @@ namespace Functional.Drugstore
 			browser.CheckBox(Find.ById("browseRegion" + browseRegions[0])).Checked = false;
 			browser.TextField(Find.ByName("user.Name")).TypeText("User for test regions");
 			browser.Button(Find.ByValue("Создать")).Click();
-			
+
 			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта "));
 			var login = Helper.GetLoginFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
@@ -611,8 +610,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				client = session.Load<Client>(client.Id);
 				Assert.That(client.ContactGroupOwner.ContactGroups.Count, Is.EqualTo(1));
 				var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
@@ -660,8 +658,7 @@ namespace Functional.Drugstore
 			Open(user, "Edit");
 			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
 			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				client = session.Load<Client>(client.Id);
 				var group = client.Users[0].ContactGroup;
 				browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", group.Contacts[0].Id))).TypeText("some comment");
@@ -686,8 +683,7 @@ namespace Functional.Drugstore
 			session.SaveOrUpdate(newClient);
 			Flush();
 
-			using (var browser = Open("users/{0}/edit", user.Id))
-			{
+			using (var browser = Open("users/{0}/edit", user.Id)) {
 				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
 				browser.Button(Find.ById("SearchClientButton")).Click();
 				Thread.Sleep(2000);
@@ -717,9 +713,7 @@ namespace Functional.Drugstore
 		]
 		public void After_user_moving_must_be_entries_in_UserPrices()
 		{
-			var supplier = DataMother.CreateSupplier(s => {
-				s.AddRegion(Region.Find(16UL));
-			});
+			var supplier = DataMother.CreateSupplier(s => { s.AddRegion(Region.Find(16UL)); });
 			Save(supplier);
 			var maskRegion = 1UL | 16UL;
 			var newClient = DataMother.CreateTestClientWithAddressAndUser(maskRegion);
@@ -760,15 +754,13 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 			Address address;
 			User user;
 
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				oldClient = DataMother.CreateTestClientWithAddressAndUser();
 				user = oldClient.Users[0];
 				address = oldClient.Addresses[0];
 				newClient = DataMother.CreateTestClientWithAddressAndUser();
 			}
-			using (var browser = Open(user, "edit"))
-			{
+			using (var browser = Open(user, "edit")) {
 				// Даем доступ пользователю к адресу доставки
 				browser.CheckBox(Find.ByName("user.AvaliableAddresses[0].Id")).Checked = true;
 				browser.Button(Find.ByValue("Сохранить")).Click();
@@ -784,8 +776,7 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 				Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
 			}
 
-			using (new SessionScope())
-			{
+			using (new SessionScope()) {
 				session.Refresh(oldClient);
 				session.Refresh(newClient);
 				session.Refresh(user);

@@ -19,20 +19,15 @@ namespace AdminInterface.Background
 
 		public void Process()
 		{
-			using (new SessionScope(FlushAction.Never))
-			{
+			using (new SessionScope(FlushAction.Never)) {
 				var invoices = Invoice.Queryable.Where(i => (i.SendToEmail || i.SendToMinimail) && i.Date <= DateTime.Today);
-				foreach (var invoice in invoices)
-				{
+				foreach (var invoice in invoices) {
 					_mailer.Clear();
-					using (var transaction = new TransactionScope(OnDispose.Rollback))
-					{
-						if (invoice.SendToEmail)
-						{
+					using (var transaction = new TransactionScope(OnDispose.Rollback)) {
+						if (invoice.SendToEmail) {
 							_mailer.InvoiceToEmail(invoice, false);
 						}
-						else if (invoice.SendToMinimail)
-						{
+						else if (invoice.SendToMinimail) {
 							_mailer.SendInvoiceToMinimail(invoice);
 							invoice.SendToMinimail = false;
 						}

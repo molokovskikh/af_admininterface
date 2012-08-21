@@ -18,8 +18,7 @@ namespace AdminInterface.Helpers
 
 		public static int GetSoundLength(string fileName)
 		{
-			try
-			{
+			try {
 				var lengthBuf = new StringBuilder(32);
 
 				mciSendString(string.Format("open \"{0}\" type waveaudio alias wave", fileName), null, 0, IntPtr.Zero);
@@ -31,8 +30,8 @@ namespace AdminInterface.Helpers
 
 				return length;
 			}
-			catch (Exception)
-			{}
+			catch (Exception) {
+			}
 			return 0;
 		}
 	}

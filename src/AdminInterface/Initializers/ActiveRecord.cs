@@ -13,7 +13,7 @@ namespace AdminInterface.Initializers
 	{
 		public ActiveRecord()
 		{
-			Assemblies = new [] {"AdminInterface", "Common.Web.Ui"};
+			Assemblies = new[] { "AdminInterface", "Common.Web.Ui" };
 		}
 
 		public override void Initialize(IConfigurationSource config)
@@ -28,14 +28,14 @@ namespace AdminInterface.Initializers
 			Configuration.FilterDefinitions.Add("RegionFilter",
 				new FilterDefinition("RegionFilter",
 					"",
-					new Dictionary<string, IType> {{"AdminRegionMask", NHibernateUtil.UInt64}},
+					new Dictionary<string, IType> { { "AdminRegionMask", NHibernateUtil.UInt64 } },
 					true));
 			Configuration.FilterDefinitions.Add("DrugstoreOnlyFilter",
 				new FilterDefinition("DrugstoreOnlyFilter", "", new Dictionary<string, IType>(), true));
 			Configuration.FilterDefinitions.Add("SupplierOnlyFilter",
 				new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>(), true));
 
-			var regionMapping = Configuration.GetClassMapping(typeof (Region));
+			var regionMapping = Configuration.GetClassMapping(typeof(Region));
 			regionMapping.AddFilter("RegionFilter", "if(RegionCode is null, 1, RegionCode & :AdminRegionMask > 0)");
 		}
 	}

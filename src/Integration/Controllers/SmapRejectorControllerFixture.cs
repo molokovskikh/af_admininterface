@@ -32,16 +32,16 @@ namespace Integration.Controllers
 		[Test]
 		public void Show_method_should_return_rejected_messages_for_current_day()
 		{
-			var mail1 = new RejectedEmail { SmtpId = 64789, Comment = "нафиг", LogTime = DateTime.Now, From = "tech@analit.net", Subject = "test"};
+			var mail1 = new RejectedEmail { SmtpId = 64789, Comment = "нафиг", LogTime = DateTime.Now, From = "tech@analit.net", Subject = "test" };
 			mail1.SaveAndFlush();
-			var mail2 = new RejectedEmail { SmtpId = 65469, Comment = "еще нафиг", LogTime = DateTime.Now, From = "tech@analit.net", Subject = "test"};
+			var mail2 = new RejectedEmail { SmtpId = 65469, Comment = "еще нафиг", LogTime = DateTime.Now, From = "tech@analit.net", Subject = "test" };
 			mail2.SaveAndFlush();
-			var mail3 = new RejectedEmail { SmtpId = 64619, Comment = "снова нафиг", LogTime = DateTime.Now.AddDays(-1), From = "tech@analit.net", Subject = "test"};
+			var mail3 = new RejectedEmail { SmtpId = 64619, Comment = "снова нафиг", LogTime = DateTime.Now.AddDays(-1), From = "tech@analit.net", Subject = "test" };
 			mail3.SaveAndFlush();
 
 			controller.Show();
 
-			var mails = (RejectedEmail[]) ControllerContext.PropertyBag["rejects"];
+			var mails = (RejectedEmail[])ControllerContext.PropertyBag["rejects"];
 			Assert.That(mails.Length, Is.EqualTo(2));
 			Assert.That(mails[0].Id, Is.EqualTo(mail1.Id));
 			Assert.That(mails[1].Id, Is.EqualTo(mail2.Id));

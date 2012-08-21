@@ -25,14 +25,12 @@ namespace AdminInterface.Changer
 
 				foreach (var regionalData in rds) {
 					var list = regionalData.ContactInfo.Split('\r').ToList();
-					if (list.Count < 14)
-					{
-						foreach (var i in Enumerable.Range(1, 14 - list.Count))
-						{
+					if (list.Count < 14) {
+						foreach (var i in Enumerable.Range(1, 14 - list.Count)) {
 							list.Add(string.Empty);
 						}
 					}
-					var operativeInfo = list[0].Trim() + "\r\n" + list[1].Trim()  + "\r\n";
+					var operativeInfo = list[0].Trim() + "\r\n" + list[1].Trim() + "\r\n";
 
 					for (int i = 6; i < 14; i++) {
 						var val = list[i].Trim();
@@ -46,31 +44,27 @@ namespace AdminInterface.Changer
 					supp.Address = list[3].Trim();
 					ActiveRecordMediator.Save(supp);
 					list[2] = list[2].Trim();
-					if (!Regex.IsMatch(list[2], @"^(\d{3,4})-(\d{6,7})(\*\d{3})?$"))
-					{
+					if (!Regex.IsMatch(list[2], @"^(\d{3,4})-(\d{6,7})(\*\d{3})?$")) {
 						var nums = list[2].Split(',');
 						if (nums.Length > 1)
 							list[2] = nums.First();
 						var matches = Regex.Matches(list[2], "\\d+")
-						.Cast<Match>()
-						.Select(x => int.Parse(x.Value))
-						.ToArray();
+							.Cast<Match>()
+							.Select(x => int.Parse(x.Value))
+							.ToArray();
 						var tel = matches.Implode(string.Empty);
 						if (tel.Length == 7)
 							list[2] = "4732-" + tel;
-						else
-							if (tel.Length == 6)
+						else if (tel.Length == 6)
 							list[2] = "4732-2" + tel;
-								else
-								if (list[2].Contains("4732"))
-									list[2] = list[2].Replace("4732", "4732-");
-								else
-								{
-									operativeInfo += "\r\n" + list[2];
-									list[2] = string.Empty;
-								}
+						else if (list[2].Contains("4732"))
+							list[2] = list[2].Replace("4732", "4732-");
+						else {
+							operativeInfo += "\r\n" + list[2];
+							list[2] = string.Empty;
+						}
 					}
-					if (!string.IsNullOrEmpty(list[2])) { 
+					if (!string.IsNullOrEmpty(list[2])) {
 						var generaleGroup = supp.ContactGroupOwner.Group(ContactGroupType.General);
 						if (generaleGroup == null) {
 							var group = supp.ContactGroupOwner.AddContactGroup(ContactGroupType.General);

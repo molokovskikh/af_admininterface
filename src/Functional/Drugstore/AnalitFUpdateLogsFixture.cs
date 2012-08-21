@@ -4,7 +4,8 @@ using AdminInterface.Models.Suppliers;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Common.Web.Ui.Helpers;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Functional.ForTesting;
@@ -17,9 +18,9 @@ namespace Functional.Drugstore
 {
 	public class AnalitFUpdateLogsFixture : WatinFixture2
 	{
-		Client client;
-		UpdateLogEntity updateLog;
-		User user;
+		private Client client;
+		private UpdateLogEntity updateLog;
+		private User user;
 
 		[SetUp]
 		public void Setup()
@@ -95,8 +96,7 @@ namespace Functional.Drugstore
 
 			Open(client);
 			Click("История обновлений");
-			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений клиента {0}", client.Name))))
-			{
+			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений клиента {0}", client.Name)))) {
 				Thread.Sleep(2000);
 				Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
 				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
@@ -129,11 +129,10 @@ namespace Functional.Drugstore
 			var user = client.Users[0];
 			Open(user);
 			Click("История обновлений");
-			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений пользователя {0}", user.Login))))
-			{
+			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений пользователя {0}", user.Login)))) {
 				Thread.Sleep(2000);
 				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
-					
+
 				Thread.Sleep(2000);
 				Assert.That(browser.Text, Is.StringContaining("Дата загрузки"));
 				Assert.That(browser.Text, Is.StringContaining("Тип документа"));
@@ -161,8 +160,7 @@ namespace Functional.Drugstore
 
 			Open(client);
 			Click("История документов");
-			using (var browser = IE.AttachTo<IE>(Find.ByTitle("История документов")))
-			{
+			using (var browser = IE.AttachTo<IE>(Find.ByTitle("История документов"))) {
 				Thread.Sleep(2000);
 				Assert.That(browser.Text, Is.StringContaining(supplier.Name));
 				browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
@@ -191,8 +189,7 @@ namespace Functional.Drugstore
 
 			Open(client);
 			Click("История документов");
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("История документов")))
-			{
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("История документов"))) {
 				Thread.Sleep(2000);
 				Assert.That(openedWindow.Text, Is.StringContaining(supplier.Name));
 				openedWindow.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
@@ -217,11 +214,9 @@ namespace Functional.Drugstore
 			UpdateLogEntity updateEntity = null;
 
 			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateEntity);
-			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Id))
-			{
+			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Id)) {
 				mainWindow.Link(Find.ByText(@"История документов")).Click();
-				using (var browser = IE.AttachTo<IE>(Find.ByTitle("История документов")))
-				{
+				using (var browser = IE.AttachTo<IE>(Find.ByTitle("История документов"))) {
 					Thread.Sleep(2000);
 					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
 					Assert.That(browser.Text, Is.StringContaining(documentLogEntity.FileName));
@@ -242,8 +237,7 @@ namespace Functional.Drugstore
 			var user = client.Users[0];
 			Open(user);
 			Click(@"История обновлений");
-			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений пользователя {0}", user.Login))))
-			{
+			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений пользователя {0}", user.Login)))) {
 				Thread.Sleep(2000);
 				Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
 				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
@@ -283,7 +277,7 @@ namespace Functional.Drugstore
 				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог " +
 				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог " +
 				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог"));
-			Assert.Less(logLink.AsHtmlElement.offsetLeft, offset*1.5);
+			Assert.Less(logLink.AsHtmlElement.offsetLeft, offset * 1.5);
 		}
 	}
 }

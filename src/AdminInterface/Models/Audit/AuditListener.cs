@@ -50,7 +50,7 @@ namespace AdminInterface.Models.Audit
 		protected override AuditableProperty GetPropertyForNotify(PropertyInfo property, string name, object newState, object oldState, object entity)
 		{
 			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region")) {
-				return  new MaskedAuditableProperty(property, name, newState, oldState);
+				return new MaskedAuditableProperty(property, name, newState, oldState);
 			}
 			return new HtmlAuditableProperty(property, name, newState, oldState);
 		}

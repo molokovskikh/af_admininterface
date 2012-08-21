@@ -44,25 +44,20 @@ namespace AdminInterface.Controllers
 		{
 			var account = Account.TryFind(id);
 			var result = UpdateAccounting(account.Id, accounted, payment, free, freePeriodEnd);
-			if (status != null)
-			{
+			if (status != null) {
 				NHibernateUtil.Initialize(account);
-				if (account is UserAccount)
-				{
+				if (account is UserAccount) {
 					var user = ((UserAccount)account).User;
 					SetUserStatus(user.Id, status, addComment);
 				}
-				else if (account is AddressAccount)
-				{
+				else if (account is AddressAccount) {
 					var address = ((AddressAccount)account).Address;
 					SetAddressStatus(address.Id, status, addComment);
 				}
-				else if (account is SupplierAccount)
-				{
+				else if (account is SupplierAccount) {
 					SetSupplierStatus(((SupplierAccount)account).Supplier, status.Value, addComment);
 				}
-				else
-				{
+				else {
 					account.Status = status.Value;
 				}
 			}
@@ -75,8 +70,7 @@ namespace AdminInterface.Controllers
 			supplier.Disabled = !status;
 			DbSession.Save(supplier);
 			DbSession.Flush();
-			if (oldStatus != !status)
-			{
+			if (oldStatus != !status) {
 				this.Mailer().EnableChanged(supplier, comment).Send();
 				AuditRecord.StatusChange(supplier).Save();
 			}
@@ -92,12 +86,10 @@ namespace AdminInterface.Controllers
 			DbSession.Flush();
 			if (enabled != oldStatus)
 				this.Mailer().EnableChanged(user, comment).Send();
-			if (enabled.HasValue && !enabled.Value)
-			{
+			if (enabled.HasValue && !enabled.Value) {
 				// Если это отключение, то проходим по адресам и
 				// отключаем адрес, который доступен только отключенным пользователям
-				foreach (var address in user.AvaliableAddresses)
-				{
+				foreach (var address in user.AvaliableAddresses) {
 					if (address.AvaliableForEnabledUsers)
 						continue;
 					address.Enabled = false;
@@ -114,29 +106,25 @@ namespace AdminInterface.Controllers
 			if (freePeriodEnd.HasValue)
 				account.FreePeriodEnd = freePeriodEnd.Value;
 
-			if (accounted.HasValue)
-			{
+			if (accounted.HasValue) {
 				if (accounted.Value)
 					account.Accounted();
 				else
 					account.BeAccounted = false;
 			}
 
-			if (isFree.HasValue)
-			{
+			if (isFree.HasValue) {
 				IEnumerable<Address> addresses = null;
-				if (account is UserAccount)
-				{
-					addresses = ((UserAccount) account).User
+				if (account is UserAccount) {
+					addresses = ((UserAccount)account).User
 						.AvaliableAddresses
 						.Where(a => a.Accounting.IsFree)
 						.ToArray();
 				}
 
 				account.IsFree = isFree.Value;
-				
-				if (addresses != null && !account.IsFree && addresses.Any())
-				{
+
+				if (addresses != null && !account.IsFree && addresses.Any()) {
 					foreach (var address in addresses)
 						address.Accounting.IsFree = isFree.Value;
 					result = new {
@@ -149,8 +137,7 @@ namespace AdminInterface.Controllers
 				}
 			}
 
-			if (payment.HasValue)
-			{
+			if (payment.HasValue) {
 				Admin.CheckPermisions(PermissionType.ChangePayment);
 				account.Payment = payment.Value;
 			}
@@ -178,11 +165,9 @@ namespace AdminInterface.Controllers
 		public void Edit(uint id)
 		{
 			var account = Account.Find(id);
-			if (IsPost)
-			{
+			if (IsPost) {
 				BindObjectInstance(account, "account");
-				if (IsValid(account))
-				{
+				if (IsValid(account)) {
 					account.Save();
 					Notify("Сохранено");
 					RedirectToReferrer();

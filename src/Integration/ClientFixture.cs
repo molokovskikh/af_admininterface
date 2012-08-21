@@ -46,7 +46,7 @@ namespace Integration
 			var info = GetReplication(user.Id);
 
 			Assert.That(info.Count, Is.GreaterThan(0));
-			Assert.That(info, Is.EqualTo(new [] {true}));
+			Assert.That(info, Is.EqualTo(new[] { true }));
 		}
 
 		[Test]
@@ -58,7 +58,7 @@ namespace Integration
 			var info = GetReplication(user.Id);
 
 			Assert.That(info.Count, Is.GreaterThan(0));
-			Assert.That(info, Is.EqualTo(new [] {true}));
+			Assert.That(info, Is.EqualTo(new[] { true }));
 		}
 
 		[Test]
@@ -67,14 +67,14 @@ namespace Integration
 			supplier.RegionMask = ulong.MaxValue;
 			session.Save(supplier);
 			Flush();
-			var info =  session.CreateSQLQuery("select ForceReplication from Usersettings.AnalitfReplicationInfo where FirmCode = :SupplierId")
+			var info = session.CreateSQLQuery("select ForceReplication from Usersettings.AnalitfReplicationInfo where FirmCode = :SupplierId")
 				.SetParameter("SupplierId", supplier.Id)
 				.List<object>()
 				.Select(v => Convert.ToBoolean(v))
 				.ToList();
 
 			Assert.That(info.Count, Is.GreaterThan(0));
-			Assert.That(info, Is.EqualTo(new [] {true}));
+			Assert.That(info, Is.EqualTo(new[] { true }));
 		}
 
 		private IList<bool> GetReplication(uint userId)

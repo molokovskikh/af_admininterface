@@ -13,14 +13,14 @@ namespace Integration.Tasks
 	[TestFixture]
 	public class UpdateAccountProcessorFixture : Test.Support.IntegrationFixture
 	{
-		Client client;
-		User user;
+		private Client client;
+		private User user;
 		private Stack savedStack;
 
 		[SetUp]
 		public void Seup()
 		{
-			client =  DataMother.CreateTestClientWithAddressAndUser();
+			client = DataMother.CreateTestClientWithAddressAndUser();
 			user = client.Users.First();
 			user.AvaliableAddresses.Add(client.Addresses.First());
 			Flush();
@@ -79,19 +79,17 @@ namespace Integration.Tasks
 		private void MakeUpdates(User user, int count)
 		{
 			for (var i = 0; i < count; i++)
-				Save(new UpdateLogEntity(user) {Commit = true});
+				Save(new UpdateLogEntity(user) { Commit = true });
 		}
 
 		private void Check()
 		{
 			Flush();
 			HideScope();
-			try
-			{
+			try {
 				new UpdateAccountProcessor().Process();
 			}
-			finally
-			{
+			finally {
 				ShowScope();
 			}
 		}
@@ -107,8 +105,7 @@ namespace Integration.Tasks
 			var stack = ThreadScopeAccessor.Instance.CurrentStack;
 			foreach (var sessionScope in stack.Cast<ISessionScope>().Reverse())
 				sessionScope.Dispose();
-			foreach (var scope in savedStack.Cast<ISessionScope>())
-			{
+			foreach (var scope in savedStack.Cast<ISessionScope>()) {
 				stack.Push(scope);
 			}
 		}

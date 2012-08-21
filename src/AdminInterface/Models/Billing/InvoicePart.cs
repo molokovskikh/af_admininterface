@@ -10,7 +10,8 @@ namespace AdminInterface.Models.Billing
 	public class InvoicePart
 	{
 		public InvoicePart()
-		{}
+		{
+		}
 
 		public InvoicePart(Invoice invoice)
 		{
@@ -53,10 +54,7 @@ namespace AdminInterface.Models.Billing
 
 		public virtual decimal Sum
 		{
-			get
-			{
-				return Cost * Count;
-			}
+			get { return Cost * Count; }
 		}
 
 		public virtual void Process()
