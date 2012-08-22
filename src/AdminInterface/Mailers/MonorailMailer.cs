@@ -244,6 +244,7 @@ namespace AdminInterface.Mailers
 			Subject = String.Format("Зарегистрированна новость");
 			PropertyBag["header"] = news.Header;
 			PropertyBag["body"] = news.Body;
+			PropertyBag["destination"] = news.DestinationType.GetDescription();
 			GeneralizationPropertyChanged(news, string.Empty, "Код");
 			return this;
 		}
@@ -255,6 +256,12 @@ namespace AdminInterface.Mailers
 			var user = entity as User;
 			if (user != null) {
 				message.AppendLine("Клиент " + user.Client.Name);
+			}
+
+			var news = entity as News;
+			if(news != null) {
+				message.AppendLine("Адресат " + news.DestinationType.GetDescription());
+				message.AppendLine("Дата и время публикации новости " + news.PublicationDate);
 			}
 
 			if (!(entity is Service))
