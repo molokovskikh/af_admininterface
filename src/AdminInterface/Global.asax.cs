@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
@@ -47,6 +48,12 @@ namespace AddUser
 			LibAssemblies.Add(Assembly.Load("Common.Web.Ui"));
 			Logger.ErrorSubject = "Ошибка в Административном интерфейсе";
 			Logger.SmtpHost = "box.analit.net";
+			Logger.TimeOutAction = RedirectIfTimeOutException;
+		}
+
+		private void RedirectIfTimeOutException(HttpContext context)
+		{
+			context.Response.Redirect(context.Request.ApplicationPath + "/TimeOutError.htm");
 		}
 
 		private void Application_Start(object sender, EventArgs e)
