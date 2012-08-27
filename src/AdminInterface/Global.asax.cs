@@ -53,6 +53,7 @@ namespace AddUser
 
 		private void RedirectIfTimeOutException(HttpContext context)
 		{
+			_log.Warn(context.Server.GetLastError());
 			context.Response.Redirect(context.Request.ApplicationPath + "/TimeOutError.htm");
 		}
 
