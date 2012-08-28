@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Import Project="..\ProjectLib.properties" Condition="Exists('..\ProjectLib.properties')" />
-	<ItemGroup>
-		<StyleCopAdditionalAddinPaths Include="..\..\lib\StyleCop">
-			<InProject>false</InProject>
-		</StyleCopAdditionalAddinPaths>
-	</ItemGroup>
-	<PropertyGroup>
-		<StyleCopTreatErrorsAsWarnings>False</StyleCopTreatErrorsAsWarnings>
-		<StyleCopOverrideSettingsFile>..\..\lib\StyleCop\Settings.StyleCop</StyleCopOverrideSettingsFile>
+  <ItemGroup>
+    <StyleCopAdditionalAddinPaths Include="..\..\lib\StyleCop">
+      <InProject>false</InProject>
+    </StyleCopAdditionalAddinPaths>
+  </ItemGroup>
+  <PropertyGroup>
+    <StyleCopTreatErrorsAsWarnings>False</StyleCopTreatErrorsAsWarnings>
+    <StyleCopOverrideSettingsFile>..\..\lib\StyleCop\Settings.StyleCop</StyleCopOverrideSettingsFile>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
@@ -154,6 +154,7 @@
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\BalanceOperationsController.cs" />
+    <Compile Include="Controllers\TimeOutController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\Filters\StatisticsFilter.cs" />
     <Compile Include="Controllers\NewsController.cs" />
@@ -309,6 +310,13 @@
     <Compile Include="Queries\SetForceReplication.cs" />
     <Compile Include="Queries\UpdateOrders.cs" />
     <Compile Include="Queries\UserFilter.cs" />
+    <Compile Include="Rescue\TimeOutError.aspx.cs">
+      <DependentUpon>TimeOutError.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Rescue\TimeOutError.aspx.designer.cs">
+      <DependentUpon>TimeOutError.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />
     <Compile Include="Security\SecurityContext.cs" />
@@ -463,6 +471,7 @@
     <Content Include="JavaScript\Main.js" />
     <Content Include="ManageCosts.aspx" />
     <Content Include="managep.aspx" />
+    <Content Include="Rescue\TimeOutError.aspx" />
     <Content Include="ViewAdministrators.aspx" />
   </ItemGroup>
   <ItemGroup>
@@ -739,5 +748,5 @@
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
-	<Import Project="..\..\packages\StyleCop.MSBuild.4.7.35.0\tools\StyleCop.Targets" />
+  <Import Project="..\..\packages\StyleCop.MSBuild.4.7.35.0\tools\StyleCop.Targets" />
 </Project>
