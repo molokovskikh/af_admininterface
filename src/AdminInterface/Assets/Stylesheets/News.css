@@ -8,10 +8,18 @@
 }
 
 .hidden-news {
-	background-color: #c4c3c3;
+	background-color: #fcd0d0;
 }
 
 .DataTable tbody tr.hidden-news {
-	background-color: #c4c3c3;
+	background-color: #fcd0d0;
 	height: 26px;
+}
+
+.NewsTable {
+	border-spacing: 0px 0px;
+}
+
+.NewsTable tr td {
+	border-bottom: 2px solid #DADADA;
 }
