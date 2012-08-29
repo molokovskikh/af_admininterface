@@ -53,6 +53,8 @@ namespace AddUser
 
 		private void RedirectIfTimeOutException(HttpContext context)
 		{
+			ILog logger = LogManager.GetLogger("AdminInterface");
+			logger.Warn(context.Server.GetLastError());
 			context.Response.Redirect(Path.Combine(context.Request.ApplicationPath, "TimeOutError.htm"));
 		}
 
