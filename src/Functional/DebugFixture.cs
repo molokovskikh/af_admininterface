@@ -8,12 +8,12 @@ using Test.Support.Web;
 namespace Functional
 {
 	[TestFixture]
-	public class TimeOutFixture : WatinFixture2
+	public class DebugFixture : WatinFixture2
 	{
 		[Test]
 		public void Test_lock_time_out_test()
 		{
-			Open("TimeOut/TestLockTimeOut");
+			Open("Debug/TestLockTimeOut");
 			AssertText("Операция завершилось неудачей. Попробуйте повторить через несколько минут.");
 		}
 	}

@@ -53,7 +53,7 @@ namespace AddUser
 
 		private void RedirectIfTimeOutException(HttpContext context)
 		{
-			context.Response.Redirect("~/Rescue/TimeOutError.aspx");
+			context.Response.Redirect(Path.Combine(context.Request.ApplicationPath, "TimeOutError.htm"));
 		}
 
 		private void Application_Start(object sender, EventArgs e)

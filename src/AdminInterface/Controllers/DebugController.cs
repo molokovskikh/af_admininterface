@@ -7,7 +7,7 @@ using AdminInterface.MonoRailExtentions;
 
 namespace AdminInterface.Controllers
 {
-	public class TimeOutController : AdminInterfaceController
+	public class DebugController : AdminInterfaceController
 	{
 		public void TestLockTimeOut()
 		{
