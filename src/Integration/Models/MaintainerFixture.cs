@@ -89,7 +89,7 @@ namespace Integration.Models
 			row["PriceType"] = 0;
 			table.Rows.Add(row);
 			var message = "";
-			managep.Save(supplier, data, "", ref message);
+			(new managep()).Save(supplier, data, "", ref message);
 
 			session.Refresh(supplier);
 			Assert.That(supplier.Prices.Count, Is.EqualTo(3));
