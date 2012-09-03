@@ -29,6 +29,7 @@ namespace Integration.ForTesting
 			XmlConfigurator.Configure();
 			if (!ActiveRecordStarter.IsInitialized) {
 				var activeRecord = new ActiveRecord();
+				activeRecord.Assemblies = activeRecord.Assemblies.Concat(new[] { "Test.Support" }).ToArray();
 				activeRecord.Initialize(ActiveRecordSectionHandler.Instance);
 			}
 		}

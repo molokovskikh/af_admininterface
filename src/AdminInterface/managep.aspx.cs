@@ -9,6 +9,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
@@ -20,6 +21,7 @@ using Common.MySql;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
+using NHibernate.Linq;
 
 namespace AddUser
 {
@@ -488,6 +490,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 						var rule = new OrderSendRules();
 						rule.Supplier = supplier;
 						BindRule(rule, row);
+						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["FormaterId"]));
 						supplier.OrderRules.Add(rule);
 						break;
 					}
@@ -504,6 +507,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 						if (rule == null)
 							continue;
 						BindRule(rule, row);
+						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["FormaterId"]));
 						break;
 					}
 				}
@@ -528,6 +532,43 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 			if (id == 0)
 				return null;
 			return supplier.OrderRules.FirstOrDefault(r => r.Id == id);
+		}
+
+		public static void CreateNewSpecialOrders(Supplier supplier, uint formaterId)
+		{
+			var holder = ActiveRecordMediator.GetSessionFactoryHolder();
+			var session = holder.CreateSession(typeof(ActiveRecordBase));
+			try {
+				var orderHandler = session.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId);
+				if(session.Query<SpecialHandler>()
+					.FirstOrDefault(t => t.Supplier.Id == supplier.Id && t.Handler.Id == formaterId) == null
+					&& !OrderHandler.DefaultHandlerByType[HandlerTypes.Formatter].Contains(orderHandler.ClassName)) {
+					var handler = new SpecialHandler {
+						Supplier = supplier,
+						Handler = session.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId)
+					};
+					// задаем имя по умолчанию
+					var handlerName = "Специальный формат";
+					// проверяем свободно ли имя и если нет, то ищем свободное
+					if(session.Query<SpecialHandler>()
+						.Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName) != 0) {
+						handlerName += DateTime.Now.ToString("yyMMdd");
+					}
+					int i = 1;
+					string postfix = "";
+					while(session.Query<SpecialHandler>()
+						.Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName + postfix) != 0) {
+						postfix = "_" + i;
+						i++;
+					}
+					handler.Name = handlerName + postfix;
+					session.Save(handler);
+					session.Flush();
+				}
+			}
+			finally {
+				holder.ReleaseSession(session);
+			}
 		}
 
 		private void ProcessChanges()
