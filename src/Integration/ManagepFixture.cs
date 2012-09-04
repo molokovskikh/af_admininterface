@@ -29,7 +29,8 @@ namespace Integration
 		{
 			var handler = session.Query<TestHandler>().First(t => t.ClassName.Contains("Formater") && !t.ClassName.Contains("Default"));
 			var supplier = session.Query<Supplier>().First(t => t.Id == _supplier.Id);
-
+			var managep = new managep();
+			managep.DbSession = ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof(ActiveRecordBase));
 			managep.CreateNewSpecialOrders(supplier, handler.Id);
 			var specHandler = session.Query<SpecialHandler>().First(t => t.Supplier == supplier && t.Handler.Id == handler.Id);
 			Assert.That(specHandler.Name, Is.EqualTo("Специальный формат"));

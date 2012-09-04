@@ -25,7 +25,7 @@ using NHibernate.Linq;
 
 namespace AddUser
 {
-	partial class managep : System.Web.UI.Page
+	partial class managep : BasePage
 	{
 		private readonly Dictionary<object, string> _configuratedCostTypes
 			= new Dictionary<object, string> {
@@ -257,7 +257,7 @@ order by r.Region;";
 			LoadPageData();
 		}
 
-		public static void Save(Supplier supplier, DataSet data, string host, ref string message)
+		public void Save(Supplier supplier, DataSet data, string host, ref string message)
 		{
 			var pricesDataAdapter = new MySqlDataAdapter();
 			pricesDataAdapter.DeleteCommand = new MySqlCommand(
@@ -482,7 +482,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 			});
 		}
 
-		private static void BindRule(Supplier supplier, DataSet data)
+		private void BindRule(Supplier supplier, DataSet data)
 		{
 			foreach (var row in data.Tables["OrderSendConfig"].Rows.Cast<DataRow>()) {
 				switch (row.RowState) {
@@ -534,40 +534,33 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 			return supplier.OrderRules.FirstOrDefault(r => r.Id == id);
 		}
 
-		public static void CreateNewSpecialOrders(Supplier supplier, uint formaterId)
+		public void CreateNewSpecialOrders(Supplier supplier, uint formaterId)
 		{
-			var holder = ActiveRecordMediator.GetSessionFactoryHolder();
-			var session = holder.CreateSession(typeof(ActiveRecordBase));
-			try {
-				var orderHandler = session.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId);
-				if(session.Query<SpecialHandler>()
-					.FirstOrDefault(t => t.Supplier.Id == supplier.Id && t.Handler.Id == formaterId) == null
-					&& !OrderHandler.DefaultHandlerByType[HandlerTypes.Formatter].Contains(orderHandler.ClassName)) {
-					var handler = new SpecialHandler {
-						Supplier = supplier,
-						Handler = session.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId)
-					};
-					// задаем имя по умолчанию
-					var handlerName = "Специальный формат";
-					// проверяем свободно ли имя и если нет, то ищем свободное
-					if(session.Query<SpecialHandler>()
-						.Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName) != 0) {
-						handlerName += DateTime.Now.ToString("yyMMdd");
-					}
-					int i = 1;
-					string postfix = "";
-					while(session.Query<SpecialHandler>()
-						.Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName + postfix) != 0) {
-						postfix = "_" + i;
-						i++;
-					}
-					handler.Name = handlerName + postfix;
-					session.Save(handler);
-					session.Flush();
+			var orderHandler = DbSession.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId);
+			if(DbSession.Query<SpecialHandler>()
+				.FirstOrDefault(t => t.Supplier.Id == supplier.Id && t.Handler.Id == formaterId) == null
+				&& !OrderHandler.DefaultHandlerByType[HandlerTypes.Formatter].Contains(orderHandler.ClassName)) {
+				var handler = new SpecialHandler {
+					Supplier = supplier,
+					Handler = DbSession.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId)
+				};
+				// задаем имя по умолчанию
+				var handlerName = "Специальный формат";
+				// проверяем свободно ли имя и если нет, то ищем свободное
+				if(DbSession.Query<SpecialHandler>()
+					.Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName) != 0) {
+					handlerName += DateTime.Now.ToString("yyMMdd");
 				}
-			}
-			finally {
-				holder.ReleaseSession(session);
+				int i = 1;
+				string postfix = "";
+				while(DbSession.Query<SpecialHandler>()
+					.Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName + postfix) != 0) {
+					postfix = "_" + i;
+					i++;
+				}
+				handler.Name = handlerName + postfix;
+				DbSession.Save(handler);
+				DbSession.Flush();
 			}
 		}
 
