@@ -13,7 +13,7 @@ namespace Unit
 		public void Setup()
 		{
 			log4net.Config.XmlConfigurator.Configure();
-			log = log4net.LogManager.GetLogger("AdminInterface");
+			log = log4net.LogManager.GetLogger("Common.Web.Ui.Helpers.HttpSessionLog");
 		}
 
 		[Test(Description = "проверка того, будет ли записан в таблицу Logs сведения о незначительном исключении")]
