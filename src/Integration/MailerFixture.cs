@@ -311,6 +311,17 @@ namespace Integration
 			Assert.That(message.Body, Is.StringContaining("Изменено 'Комментарий'"));
 		}
 
+		[Test]
+		public void Payer_registred()
+		{
+			mailer.PayerRegistred(payer);
+			mailer.Send();
+
+			Assert.That(message.IsBodyHtml, Is.True);
+			Assert.That(message.Subject, Is.EqualTo("Зарегистрирован Плательщик"));
+			Assert.That(message.Body, Is.StringContaining("Тестовый плательщик"));
+		}
+
 		private Invoice CreateInvoice()
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
