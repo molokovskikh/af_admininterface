@@ -256,8 +256,7 @@ namespace AdminInterface.Models.Suppliers
 
 					Directory.SetAccessControl(root, rootDirectorySecurity);
 					var orders = Path.Combine(root, "Orders");
-					if (Directory.Exists(orders))
-					{
+					if (Directory.Exists(orders)) {
 						var ordersDirectorySecurity = Directory.GetAccessControl(orders);
 						ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
 							FileSystemRights.DeleteSubdirectoriesAndFiles,
