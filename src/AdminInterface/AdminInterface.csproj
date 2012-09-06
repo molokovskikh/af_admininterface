@@ -154,7 +154,6 @@
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\BalanceOperationsController.cs" />
-    <Compile Include="Controllers\DebugController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\Filters\StatisticsFilter.cs" />
     <Compile Include="Controllers\NewsController.cs" />
@@ -464,7 +463,6 @@
     <Content Include="JavaScript\Main.js" />
     <Content Include="ManageCosts.aspx" />
     <Content Include="managep.aspx" />
-    <Content Include="TimeOutError.htm" />
     <Content Include="ViewAdministrators.aspx" />
   </ItemGroup>
   <ItemGroup>
