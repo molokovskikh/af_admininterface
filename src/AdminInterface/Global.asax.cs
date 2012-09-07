@@ -53,7 +53,7 @@ namespace AddUser
 
 		private void RedirectIfTimeOutException(HttpContext context)
 		{
-			context.Response.Redirect(Path.Combine(context.Request.ApplicationPath, "DebugTimeOut/TimeOutError"));
+			context.Response.Redirect(Path.Combine(context.Request.ApplicationPath, "Error/TimeOutError"));
 		}
 
 		private void Application_Start(object sender, EventArgs e)
