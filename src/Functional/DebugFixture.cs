@@ -14,7 +14,7 @@ namespace Functional
 		public void Test_lock_time_out_test()
 		{
 			Open("DebugTimeOut/TestLockTimeOut");
-			AssertText("Операция завершилось неудачей. Попробуйте повторить через несколько минут.");
+			AssertText("Ошибка при выполнении операции");
 		}
 	}
 }
