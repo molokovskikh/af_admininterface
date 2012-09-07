@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using AdminInterface.Models;
+using AdminInterface.Models.Audit;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Integration.ForTesting;
@@ -84,6 +86,21 @@ namespace Integration
 				.List<object>()
 				.Select(v => Convert.ToBoolean(v))
 				.ToList();
+		}
+
+		[Test]
+		public void Name_change_one_mail()
+		{
+			ForTest.InitializeMailer();
+			var messages = new List<MailMessage>();
+			ChangeNotificationSender.Sender = ForTest.CreateStubSender(m => messages.Add(m));
+			ChangeNotificationSender.UnderTest = true;
+
+			client.Name += "123";
+			session.Save(client);
+			Flush();
+
+			Assert.That(messages.Count, Is.EqualTo(1));
 		}
 	}
 }

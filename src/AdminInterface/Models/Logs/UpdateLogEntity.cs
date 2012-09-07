@@ -27,6 +27,7 @@ namespace AdminInterface.Models.Logs
 		[Description("Асинхронное кумулятивное")] CumulativeAsync = 17,
 		[Description("Частичное кумулятивное")] LimitedCumulative = 18,
 		[Description("Частичное асинхронное кумулятивное")] LimitedCumulativeAsync = 19,
+		[Description("Запрос вложений мини-почты")] RequestAttachments = 20,
 	}
 
 	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs")]
@@ -81,6 +82,7 @@ namespace AdminInterface.Models.Logs
 		{
 			return updateType == UpdateType.Accumulative || updateType == UpdateType.Cumulative || updateType == UpdateType.LimitedCumulative
 				|| updateType == UpdateType.AccumulativeAsync || updateType == UpdateType.CumulativeAsync || updateType == UpdateType.LimitedCumulativeAsync || updateType == UpdateType.AutoOrder
+				|| updateType == UpdateType.RequestAttachments
 				|| IsDocumentLoading(updateType);
 		}
 

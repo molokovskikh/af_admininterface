@@ -473,34 +473,33 @@ WHERE   pricesdata.firmcode = s.Id
 			[DataBind("PaymentOptions")] PaymentOptions paymentOptions,
 			bool showRegistrationCard)
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback)) {
-				if (payer.Id == 0)
-					payer.Init(Admin);
+			if (payer.Id == 0)
+				payer.Init(Admin);
 
-				payer.AddComment(paymentOptions.GetCommentForPayer());
+			payer.AddComment(paymentOptions.GetCommentForPayer());
 
-				if (payer.JuridicalOrganizations == null || payer.JuridicalOrganizations.Count == 0) {
-					payer.JuridicalOrganizations = new List<LegalEntity> {
-						new LegalEntity(payer.Name, payer.JuridicalName, payer)
-					};
-				}
-				else {
-					var org = payer.JuridicalOrganizations.First();
-					org.Name = payer.Name;
-					org.FullName = payer.JuridicalName;
-				}
-
-				if (string.IsNullOrEmpty(payer.Customer))
-					payer.Customer = payer.JuridicalName;
-
-				payer.Save();
-				scope.VoteCommit();
+			if (payer.JuridicalOrganizations == null || payer.JuridicalOrganizations.Count == 0) {
+				payer.JuridicalOrganizations = new List<LegalEntity> {
+					new LegalEntity(payer.Name, payer.JuridicalName, payer)
+				};
 			}
+			else {
+				var org = payer.JuridicalOrganizations.First();
+				org.Name = payer.Name;
+				org.FullName = payer.JuridicalName;
+			}
+
+			if (string.IsNullOrEmpty(payer.Customer))
+				payer.Customer = payer.JuridicalName;
+
+			DbSession.SaveOrUpdate(payer);
 
 			var supplier = payer.Suppliers.FirstOrDefault();
 			var client = payer.Clients.FirstOrDefault();
 			if (client != null)
 				this.Mailer().NotifyBillingAboutClientRegistration(client);
+			else
+				this.Mailer().PayerRegistred(payer);
 
 			string redirectUrl;
 			if (showRegistrationCard && client != null && client.Users.Count > 0)

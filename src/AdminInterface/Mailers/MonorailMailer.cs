@@ -217,17 +217,16 @@ namespace AdminInterface.Mailers
 				propertyMessage = propertyMessage.Remove(0, 3);
 			message.AppendLine(propertyMessage);
 
-			var idLabel = BindingHelper.TryGetDescription(NHibernateUtil.GetClass(entity), "Id");
-			if (idLabel == null)
-				idLabel = "Код";
-
-			GeneralizationPropertyChanged(entity, message.ToString(), idLabel);
+			GeneralizationPropertyChanged(entity, message.ToString());
 
 			return this;
 		}
 
-		private void GeneralizationPropertyChanged(object entity, string message, string idLabel)
+		private void GeneralizationPropertyChanged(object entity, string message = null)
 		{
+			var idLabel = BindingHelper.TryGetDescription(NHibernateUtil.GetClass(entity), "Id");
+			if (idLabel == null)
+				idLabel = "Код";
 			From = "register@analit.net";
 			PropertyBag["message"] = message;
 			PropertyBag["admin"] = SecurityContext.Administrator;
@@ -245,7 +244,7 @@ namespace AdminInterface.Mailers
 			PropertyBag["header"] = news.Header;
 			PropertyBag["body"] = news.Body;
 			PropertyBag["destination"] = news.DestinationType.GetDescription();
-			GeneralizationPropertyChanged(news, string.Empty, "Код");
+			GeneralizationPropertyChanged(news);
 			return this;
 		}
 
@@ -391,6 +390,16 @@ namespace AdminInterface.Mailers
 			writer.Flush();
 			memory.Position = 0;
 			Attachments.Add(new Attachment(memory, "Счет.html"));
+		}
+
+		public MonorailMailer PayerRegistred(Payer payer)
+		{
+			GeneralizationPropertyChanged(payer);
+			To = "billing@analit.net";
+			IsBodyHtml = true;
+			Template = "PropertyChanged_html";
+			Subject = String.Format("Зарегистрирован {0}", BindingHelper.GetDescription(payer));
+			return this;
 		}
 	}
 }

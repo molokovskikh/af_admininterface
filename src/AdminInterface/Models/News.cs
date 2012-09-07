@@ -61,6 +61,11 @@ namespace AdminInterface.Models
 		[Property, Description("Адресат"), NotifyNews]
 		public virtual NewsDestinationType DestinationType { get; set; }
 
+		public virtual string DestinationDescription
+		{
+			get { return DestinationType.GetDescription(); }
+		}
+
 		[Style]
 		public virtual bool HiddenNews
 		{

@@ -12,3 +12,4 @@ lib/Chrome.Printer/Release
 lib/Chrome.Printer/Debug
 lib/Chrome.Printer/Chrome.Printer/GeneratedFiles
 packages/
+*.Cache

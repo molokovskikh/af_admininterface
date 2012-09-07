@@ -124,9 +124,29 @@ namespace AdminInterface.Models
 		}
 	}
 
+	public enum HandlerTypes
+	{
+		Formatter = 1,
+		Sender = 2
+	}
+
+	public enum SenderType
+	{
+		Email,
+		Ftp,
+		Lan,
+		Other
+	}
+
 	[ActiveRecord(Table = "order_handlers", Schema = "OrderSendRules")]
 	public class OrderHandler : ActiveRecordLinqBase<OrderHandler>
 	{
+		public static Dictionary<HandlerTypes, string[]> DefaultHandlerByType
+			= new Dictionary<HandlerTypes, string[]> {
+				{ HandlerTypes.Sender, new[] { "EmailSender", "FtpSender", "LanSender" } },
+				{ HandlerTypes.Formatter, new[] { "DefaultXmlFormater", "DefaultDbfFormater", "DefaultFormater2" } },
+			};
+
 		[PrimaryKey]
 		public uint Id { get; set; }
 
