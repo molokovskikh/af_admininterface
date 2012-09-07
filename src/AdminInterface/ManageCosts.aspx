@@ -82,7 +82,7 @@
 			</tr>
 			<tr align="center">
 				<td>
-					<asp:GridView ID="PriceRegionSettings" runat="server" Font-Names="Verdana" Font-Size="8pt" BorderColor="#DADADA" AutoGenerateColumns="False" DataMember="PriceRegionSettings" HorizontalAlign="Center">
+					<asp:GridView ID="PriceRegionSettings" runat="server" Font-Names="Verdana" Font-Size="8pt" BorderColor="#DADADA" AutoGenerateColumns="False" DataMember="PriceRegionSettings" HorizontalAlign="Center" onrowdatabound="PriceRegionSettings_RowDataBound">
 						<FooterStyle HorizontalAlign="Center"></FooterStyle>
 						<AlternatingRowStyle HorizontalAlign="Center" VerticalAlign="Middle" BackColor="#EEF8FF" />
 						<RowStyle HorizontalAlign="Center" VerticalAlign="Middle" BackColor="#F6F6F6" />
@@ -107,6 +107,11 @@
 									<asp:TextBox ID="MinReqText" runat="server" Text='<%# Eval("MinReq") %>' />
 									<asp:RegularExpressionValidator ID="MinReqValidator" runat="server" ErrorMessage="*" ControlToValidate="MinReqText" ValidationExpression="^\d+(\,\d+)?$" />
 								</ItemTemplate>
+							</asp:TemplateField>
+							<asp:TemplateField HeaderText="Базовая колонка" SortExpression="enabled">
+									<ItemTemplate>
+										<asp:DropDownList ID="RegionalBaseCost" runat="server"  DataTextField="Name" DataValueField="Id"/>
+									</ItemTemplate>
 							</asp:TemplateField>
 						</Columns>
 					

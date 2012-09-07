@@ -45,12 +45,16 @@ SELECT  DISTINCT drugstore.Id,
 		regions.regioncode,
 		pd.pricecode,
 		le.Id,
-		ifnull(parent.CostId, (
+		ifnull(parent.CostId,
+			ifnull((select BaseCost
+				from pricesregionaldata prd
+				where prd.PriceCode = pd.PriceCode
+				and prd.RegionCode = regions.regioncode), (
 			SELECT costcode
 			FROM pricescosts pcc
 			WHERE basecost
 				AND pcc.PriceCode = pd.PriceCode
-		)),
+		))),
 		ifnull(parent.PriceMarkup, 0),
 		ifnull(parent.AgencyEnabled, if(a.IgnoreNewPrices = 1, 0, 1)),
 		ifnull(parent.AvailableForClient, if(pd.PriceType = 0, 1, 0)),
