@@ -4,6 +4,10 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <Import Project="..\ProjectLib.properties" Condition="Exists('..\ProjectLib.properties')" />
   <ItemGroup>
@@ -159,6 +163,7 @@
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\BalanceOperationsController.cs" />
+    <Compile Include="Controllers\DebugStatusColorController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\Filters\StatisticsFilter.cs" />
     <Compile Include="Controllers\NewsController.cs" />
@@ -207,6 +212,7 @@
     <Compile Include="Models\Logs\UserMessageSendLog.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\ParseAlgorithm.cs" />
+    <Compile Include="Models\StatusServices.cs" />
     <Compile Include="Models\Suppliers\SpecialHandler.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
     <Compile Include="Models\Validators\ExtensionListValidator.cs" />
@@ -601,6 +607,7 @@
     <None Include="Views\Billing\SearchUsersForAddress.brail" />
     <None Include="Views\Billing\AdditionalAddressInfo.brail" />
     <None Include="Views\Billing\ShowMessageForUser.brail" />
+    <Content Include="Views\DebugStatusColor\DebugStatusColor.brail" />
     <None Include="Views\Accounts\Unaccounted.brail" />
     <None Include="Views\CallHistory\ListenCallRecord.brail" />
     <None Include="Views\CallHistory\Search.brail" />
