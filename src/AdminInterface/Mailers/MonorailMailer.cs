@@ -254,13 +254,13 @@ namespace AdminInterface.Mailers
 
 			var user = entity as User;
 			if (user != null) {
-				message.AppendLine("Клиент " + user.Client.Name);
+				message.AppendLine("Клиент: " + user.Client.Name);
 			}
 
 			var news = entity as News;
 			if(news != null) {
-				message.AppendLine("Адресат " + news.DestinationType.GetDescription());
-				message.AppendLine("Дата и время публикации новости " + news.PublicationDate);
+				message.AppendLine("Адресат: " + news.DestinationType.GetDescription() + "<br>");
+				message.AppendLine("Дата и время публикации новости: " + news.PublicationDate + "<br>");
 			}
 
 			if (!(entity is Service))
@@ -268,11 +268,11 @@ namespace AdminInterface.Mailers
 
 			var client = entity as Client;
 			if (client != null) {
-				message.AppendLine("Плательщики " + client.Payers.Implode(p => p.Name));
+				message.AppendLine("Плательщики: " + client.Payers.Implode(p => p.Name));
 			}
 			var supplier = entity as Supplier;
 			if (supplier != null) {
-				message.AppendLine("Плательщик " + supplier.Payer.Name);
+				message.AppendLine("Плательщик: " + supplier.Payer.Name);
 			}
 			return message;
 		}
