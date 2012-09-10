@@ -1,5 +1,5 @@
 ﻿Дата изменения: ${System.DateTime.Now}<br>
-Пользователь: ${admin.Name}<br>
+Сотрудник: ${admin.Name}<br>
 Хост: ${admin.Host}<br>
 Для разработчиков: ${idLabel} ${entity.Id}<br>
 ${BindingHelper.GetDescription(entity)}: <a href="${siteroot}/${type}/${entity.Id}">${entity.Name}</a><br>

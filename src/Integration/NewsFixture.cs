@@ -36,7 +36,7 @@ namespace Integration
 			Close();
 			Assert.That(message, Is.Not.Null);
 			Assert.That(message.Body, Is.StringEnding(String.Format(@"Дата изменения: {1}<br>
-Пользователь: test<br>
+Сотрудник: test<br>
 Хост: localhost<br>
 Для разработчиков: Код {0}<br>
 Новость: <a href=""/News/{0}"">TestNewHeader</a><br>
