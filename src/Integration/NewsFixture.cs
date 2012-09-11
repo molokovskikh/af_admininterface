@@ -35,13 +35,13 @@ namespace Integration
 			Save(news);
 			Close();
 			Assert.That(message, Is.Not.Null);
-			Assert.That(message.Body, Is.StringEnding(String.Format(@"{1}<br>
-test<br>
-localhost<br>
-Код {0}<br>
-Новость <a href=""/News/{0}"">TestNewHeader</a><br>
-Адресат {2}
-Дата и время публикации новости {3}
+			Assert.That(message.Body, Is.StringEnding(String.Format(@"Дата изменения: {1}<br>
+Сотрудник: test<br>
+Хост: localhost<br>
+Для разработчиков: Код {0}<br>
+Новость: <a href=""/News/{0}"">TestNewHeader</a><br>
+Адресат: {2}<br>
+Дата и время публикации новости: {3}<br>
 Изменено 'Тело новости' </br> <b>было</b> 'TestNewsBody'</br><b>стало</b> 'NewTestNewsBody'
 ", news.Id, DateTime.Now, news.DestinationType.GetDescription(), news.PublicationDate)));
 			Assert.That(message.To[0].ToString(), Is.EqualTo("AFNews@subscribe.analit.net"));

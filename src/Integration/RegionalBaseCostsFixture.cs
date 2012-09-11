@@ -22,6 +22,7 @@ namespace Integration
 			var supplier = DataMother.CreateSupplier();
 			// назначаем регионы Белгород и Воронеж
 			supplier.RegionMask = 1 | 2;
+			supplier.Prices[0].Costs[0].Name = "Базовая";
 			Save(supplier);
 			Flush();
 			// добавляем новую ценовую колонку к прайсу
@@ -29,6 +30,7 @@ namespace Integration
 			price.Costs.Add(new Cost {
 				Price = price,
 				PriceItem = price.Costs[0].PriceItem,
+				Name = "Новая"
 			});
 			price.Costs[1].CostFormRule = new CostFormRule { Cost = price.Costs[1], FieldName = "" };
 			// добавляем новые региональные настройки и выставляем там базовой ценой только что добавленную

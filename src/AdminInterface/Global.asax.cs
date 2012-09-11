@@ -46,14 +46,14 @@ namespace AddUser
 			: base(Assembly.Load("AdminInterface"))
 		{
 			LibAssemblies.Add(Assembly.Load("Common.Web.Ui"));
-			Logger.ErrorSubject = "Ошибка в Административном интерфейсе";
+			Logger.ErrorSubject = "РћС€РёР±РєР° РІ РђРґРјРёРЅРёСЃС‚СЂР°С‚РёРІРЅРѕРј РёРЅС‚РµСЂС„РµР№СЃРµ";
 			Logger.SmtpHost = "box.analit.net";
 			Logger.TimeOutAction = RedirectIfTimeOutException;
 		}
 
 		private void RedirectIfTimeOutException(HttpContext context)
 		{
-			context.Response.Redirect(Path.Combine(context.Request.ApplicationPath, "TimeOutError.htm"));
+			context.Response.Redirect(Path.Combine(context.Request.ApplicationPath, "Error/TimeOutError"));
 		}
 
 		private void Application_Start(object sender, EventArgs e)
@@ -64,7 +64,7 @@ namespace AddUser
 				Initialize();
 			}
 			catch (Exception ex) {
-				_log.Fatal("Ошибка при запуске Административного интерфеса", ex);
+				_log.Fatal("РћС€РёР±РєР° РїСЂРё Р·Р°РїСѓСЃРєРµ РђРґРјРёРЅРёСЃС‚СЂР°С‚РёРІРЅРѕРіРѕ РёРЅС‚РµСЂС„РµСЃР°", ex);
 			}
 		}
 
