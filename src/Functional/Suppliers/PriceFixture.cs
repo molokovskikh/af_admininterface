@@ -4,6 +4,7 @@ using AdminInterface.Models.Suppliers;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
+using WatiN.Core;
 
 namespace Functional.Suppliers
 {
@@ -60,6 +61,29 @@ namespace Functional.Suppliers
 			session.Clear();
 			var price = session.Load<Price>(supplier.Prices[0].Id);
 			Assert.That(price.Name, Is.EqualTo("Тестовый"));
+		}
+
+		[Test]
+		public void RegionalBaseCostTest()
+		{
+			supplier.Prices[0].Costs.Add(new Cost {
+				Name = "Новая базовая",
+				Price = supplier.Prices[0]
+			});
+			supplier.Prices[0].CostType = 0;
+			Save(supplier);
+			Flush();
+			Open(supplier);
+			Click("Настройка");
+			Click("Базовый");
+			var selectList = browser.SelectLists[0];
+			selectList.Select("Новая базовая");
+			Click("Применить");
+			AssertText("Сохранено");
+			Click("Настройка поставщика");
+			Click("Базовый");
+			selectList = browser.SelectLists[0];
+			Assert.That(selectList.SelectedItem, Is.EqualTo("Новая базовая"));
 		}
 	}
 }

@@ -68,6 +68,7 @@ namespace AdminInterface.Models.Suppliers
 			var cost = new Cost {
 				Price = this,
 				BaseCost = isBase,
+				Name = "Базовая",
 				PriceItem = new PriceItem {
 					FormRule = new FormRule(),
 					Source = new PriceSource()
@@ -125,7 +126,7 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public virtual bool BaseCost { get; set; }
 
-		[Property("CostName"), DataMember]
+		[Property("CostName")]
 		public virtual string Name { get; set; }
 
 		[BelongsTo("PriceCode")]
