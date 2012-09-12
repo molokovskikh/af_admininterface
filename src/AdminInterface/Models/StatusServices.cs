@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models
 {
@@ -32,11 +33,13 @@ namespace AdminInterface.Models
 			set { _priceProcessorMasterStatus = value; }
 		}
 
+		[Style]
 		public virtual bool OrderProcNotRunnigOrUnknown
 		{
 			get { return ((_orderProcStatus == "Недоступна") || (_orderProcStatus == "Не запущена")); }
 		}
 
+		[Style]
 		public virtual bool PriceProcessorMasterNotRunnigOrUnknown
 		{
 			get { return ((_priceProcessorMasterStatus == "Недоступна") || (_priceProcessorMasterStatus == "Не запущена")); }
