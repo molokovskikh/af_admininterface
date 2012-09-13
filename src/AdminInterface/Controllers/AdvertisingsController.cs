@@ -93,7 +93,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(ad, "ad");
 				if (!HasValidationError(ad)) {
 					ad.Save();
-					RedirectTo("Advertisings", "Index");
+					Redirect("Advertisings", "Index");
 				}
 			}
 			PropertyBag["payer"] = ad.Payer;
