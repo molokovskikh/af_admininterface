@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="windows-1251"?><XMLExport>
+<FileEncoding>Windows</FileEncoding>
+<ProgramReceiver>PSBOnline2</ProgramReceiver>
+<ProgramReceiver>XMLExportReader</ProgramReceiver>
+<CreationDate>10.09.2012</CreationDate>
+<extrCond>
+<extractStartDate>06.09.2012</extractStartDate>
+<extractEndDate>06.09.2012</extractEndDate>
+<AccountCode>40702810902000085401</AccountCode>
+</extrCond>
+<accDescr>
+<extractStartDate>06.09.2012</extractStartDate>
+<extractEndDate>06.09.2012</extractEndDate>
+<AccountCode>40702810902000085401</AccountCode>
+<incomeAmount>1265621.36</incomeAmount>
+<incomeTurns>641020.00</incomeTurns>
+<outTurns>0.00</outTurns>
+<outAmount>1906641.36</outAmount>
+</accDescr>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>823</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>800.00</Summa>
+<AssignPayment>оплата мониторинга по дог 5831 от 11.01.12г за сентябрь месяц без ндс</AssignPayment>
+<Payer>
+<Name>Общество с ограниченной ответственностью &quot;Знахарь&quot;</Name>
+<INN>3243502382</INN>
+<AccountCode>40702810169100000078</AccountCode>
+</Payer>
+<BankPayer>
+<Description>БРЯНСКИЙ РФ ОАО &quot;РОССЕЛЬХОЗБАНК&quot; г БРЯНСК</Description>
+<BIC>041501747</BIC>
+<AccountCode>30101810500000000747</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &quot;Аналитический центр&quot;</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>13</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>800.00</Summa>
+<AssignPayment>Оплата за мониторинг оптового фарм.рынка за сентябрь 2012 г. по договору 2440 от 11.11.2006г. Без НДС</AssignPayment>
+<Payer>
+<Name>ВАЛИКОВА ЕЛЕНА ИВАНОВНА (ИП)</Name>
+<INN>312311263307</INN>
+<AccountCode>40802810500030000921</AccountCode>
+</Payer>
+<BankPayer>
+<Description>БЕЛГОРОДСКИЙ ФИЛИАЛ АБ &quot;РОССИЯ&quot; г БЕЛГОРОД</Description>
+<BIC>041403810</BIC>
+<AccountCode>30101810800000000810</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &lt;Аналитический центр&gt;</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<PayerKPP>0</PayerKPP>
+<RecepientKPP>366601001</RecepientKPP>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>629</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>800.00</Summa>
+<AssignPayment>Мониторинг оптового фармрынка за сентябрь 2012г. согласно счета 201210183 от 01.09.2012г. Без НДС.</AssignPayment>
+<Payer>
+<Name>ИП Ярцев Игорь Михайлович</Name>
+<INN>463001504206</INN>
+<AccountCode>40802810901700000359</AccountCode>
+</Payer>
+<BankPayer>
+<Description>ОАО &quot;КУРСКПРОМБАНК&quot; г КУРСК</Description>
+<BIC>043807708</BIC>
+<AccountCode>30101810800000000708</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &quot;Аналитический центр&quot;</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<PayerKPP>0</PayerKPP>
+<RecepientKPP>366601001</RecepientKPP>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>565</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>800.00</Summa>
+<AssignPayment>За мониторинг оптового фармрынка по счету N 201209985 от 01.09.2012г., НДС не облагается.</AssignPayment>
+<Payer>
+<Name>Муниципальное унитарное предприятие &quot;Аптека 33&quot; (ОТДЕЛЕНИЕ N3853 СБЕРБАНКА РОССИИ Г.ЛИВНЫ) р/с 40702810347220100161 в ОТДЕЛЕНИЕ N8595 СБЕРБАНКА РОССИИ Г.ОРЕЛ</Name>
+<INN>5705000513</INN>
+<AccountCode>30302810000006001300</AccountCode>
+</Payer>
+<BankPayer>
+<Description>ОАО &quot;СБЕРБАНК РОССИИ&quot; г МОСКВА</Description>
+<BIC>044525225</BIC>
+<AccountCode>30101810400000000225</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &quot;Аналитический центр&quot;:</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<PayerKPP>570501001</PayerKPP>
+<RecepientKPP>366601001</RecepientKPP>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>88</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>1000.00</Summa>
+<AssignPayment>Информационные услуги за сентябрь 2012г. за ООО &quot;РИТМ&quot; Сумма: 1000-00, НДС не облагается.</AssignPayment>
+<Payer>
+<Name>ИП Аксёнова Наталья Леонидовна</Name>
+<INN>673000062370</INN>
+<AccountCode>40802810810440000626</AccountCode>
+</Payer>
+<BankPayer>
+<Description>ФИЛИАЛ N3652 ВТБ 24 (ЗАО) г ВОРОНЕЖ</Description>
+<BIC>042007738</BIC>
+<AccountCode>30101810100000000738</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &quot;Аналитический центр&quot;</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<PayerKPP>0</PayerKPP>
+<RecepientKPP>366601001</RecepientKPP>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>68</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>2000.00</Summa>
+<AssignPayment>Оплата по договору N5519 от 15.11.2011г.услуга мониторинга оптового фармрынка. Сумма 2000-00 без НДС</AssignPayment>
+<Payer>
+<Name>ООО ВетМедФарм инновации</Name>
+<INN>5753055431</INN>
+<AccountCode>40702810900050726266</AccountCode>
+</Payer>
+<BankPayer>
+<Description>ЗАО МКБ &quot;МОСКОМПРИВАТБАНК&quot; г МОСКВА</Description>
+<BIC>044585342</BIC>
+<AccountCode>30101810400000000342</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>Получатель ООО &quot;Аналитический центр&quot;</Name>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<PayerKPP>575301001</PayerKPP>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>953</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>2400.00</Summa>
+<AssignPayment>По сч.201210191 от 01.09.2012г. за услуги в сентябре 2012г., без налога (НДС).</AssignPayment>
+<Payer>
+<Name>ЗАО &quot;Полифарм&quot;</Name>
+<INN>6731002212</INN>
+<AccountCode>40702810900000000228</AccountCode>
+</Payer>
+<BankPayer>
+<Description>ФИЛИАЛ ОАО &quot;УРАЛСИБ&quot; В Г.СМОЛЕНСК г СМОЛЕНСК</Description>
+<BIC>046614711</BIC>
+<AccountCode>30101810400000000711</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &quot;Аналитический Центр&quot;</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<PayerKPP>673101001</PayerKPP>
+<RecepientKPP>366601001</RecepientKPP>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>188</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>2600.00</Summa>
+<AssignPayment>Оплата за информационные услуги за сентябрь 2012 г., согласно договора N1318 от 01.03.2008 г. Без НДС</AssignPayment>
+<Payer>
+<Name>ИП Петросян Людмила Владимировна</Name>
+<INN>312301825966</INN>
+<AccountCode>40802810100030000952</AccountCode>
+</Payer>
+<BankPayer>
+<Description>БЕЛГОРОДСКИЙ ФИЛИАЛ АБ &quot;РОССИЯ&quot; г БЕЛГОРОД</Description>
+<BIC>041403810</BIC>
+<AccountCode>30101810800000000810</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &quot;Аналитический центр&quot;</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<RecepientKPP>366601001</RecepientKPP>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>296</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>3200.00</Summa>
+<AssignPayment>оплата за мониторинг опт. рынка по дог. N 1955 от 03.05.05г. за 4 раб. места за сентябрь 2012г. НДС не облагается.</AssignPayment>
+<Payer>
+<Name>ИП Симонова Екатерина Юрьевна</Name>
+<INN>323201277464</INN>
+<AccountCode>40802810300053746866</AccountCode>
+</Payer>
+<BankPayer>
+<Description>ЗАО МКБ &quot;МОСКОМПРИВАТБАНК&quot; г МОСКВА</Description>
+<BIC>044585342</BIC>
+<AccountCode>30101810400000000342</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &quot;Аналитический центр&quot;</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<PayerKPP>0</PayerKPP>
+<RecepientKPP>366601001</RecepientKPP>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>282</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>14410.00</Summa>
+<AssignPayment>Оплата за информационные услуги по счету 493 от 01 сентября 2012г. НДС не облагается</AssignPayment>
+<Payer>
+<Name>ООО &quot;ПРИМЕР ФАРМА&quot; Р/С 40702810463010000294 В МОСКОВСКИЙ РФ ОАО &quot;РОССЕЛЬХОЗБАНК&quot; в г.МОСКВА</Name>
+<INN>5036111169</INN>
+<AccountCode>30302810900000026300</AccountCode>
+</Payer>
+<BankPayer>
+<Description>ОАО &quot;РОССЕЛЬХОЗБАНК&quot; г МОСКВА</Description>
+<BIC>044525111</BIC>
+<AccountCode>30101810200000000111</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &quot;Аналитический центр&quot;</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<PayerKPP>503601001</PayerKPP>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>776</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>82400.00</Summa>
+<AssignPayment>За мониторинг оптового фармрынка за сентябрь 2012г .по сч N201210113 от 03.09.2012г. Cумма 82400-00, без налога (НДС).</AssignPayment>
+<Payer>
+<Name>ООО &quot;Филигрань&quot;</Name>
+<INN>3235016660</INN>
+<AccountCode>40702810100270006271</AccountCode>
+</Payer>
+<BankPayer>
+<Description>Ф-Л ГПБ (ОАО) В Г.БРЯНСКЕ г БРЯНСК</Description>
+<BIC>041501758</BIC>
+<AccountCode>30101810900000000758</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &quot;Аналитический центр&quot;</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<PayerKPP>323501001</PayerKPP>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>615</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>100000.00</Summa>
+<AssignPayment>Оплата счета № 473 от 01.09.2012г за информационное обслуживание за сентябрь 2012г. Без НДС</AssignPayment>
+<Payer>
+<Name>Филиал ЗАО Фирмы ЦВ &quot;ПРОТЕК&quot; &quot;Протек-15&quot; р/с 40702810813000000603 в ЦЕНТРАЛЬНО-ЧЕРНОЗЕМНЫЙ БАНК СБЕРБАНКА РОССИИ Г.ВОРОНЕЖ</Name>
+<INN>7724053916</INN>
+<AccountCode>30302810000006001300</AccountCode>
+</Payer>
+<BankPayer>
+<Description>ОАО &quot;СБЕРБАНК РОССИИ&quot; г МОСКВА</Description>
+<BIC>044525225</BIC>
+<AccountCode>30101810400000000225</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &quot;Аналитический Центр&quot;</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<PayerKPP>366502001</PayerKPP>
+<RecepientKPP>366601001</RecepientKPP>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+<payment1C>
+<docType>Платежное поручение</docType>
+<payment>
+<NDoc>669</NDoc>
+<DatePorucheniya>06.09.2012</DatePorucheniya>
+<Summa>429810.00</Summa>
+<AssignPayment>Оплата информационных услуг по сч. N 496 от 01.09.2012г.,, НДС не облагается</AssignPayment>
+<Payer>
+<Name>ЗАО &quot;РОСТА&quot; р/с 40702810500290001434 в Ф-Л ГПБ (ОАО) В Г.НОВОСИБИРСКЕ</Name>
+<INN>7726320638</INN>
+<AccountCode>30302810400000186029</AccountCode>
+</Payer>
+<BankPayer>
+<Description>ГПБ (ОАО) г МОСКВА</Description>
+<BIC>044525823</BIC>
+<AccountCode>30101810200000000823</AccountCode>
+</BankPayer>
+<Recepient>
+<Client>
+<Name>ООО &quot;Аналитический центр&quot;</Name>
+<INN>3666086856</INN>
+<AccountCode>40702810902000085401</AccountCode>
+</Client>
+</Recepient>
+<BankRecipient>
+<Description>ЯРОСЛАВСКИЙ Ф-Л ОАО &quot;ПРОМСВЯЗЬБАНК&quot; г. ЯРОСЛАВЛЬ</Description>
+<BIC>047888760</BIC>
+<AccountCode>30101810300000000760</AccountCode>
+</BankRecipient>
+<TypePay>01</TypePay>
+<ExpiredDate>06.09.2012</ExpiredDate>
+<Queue>6</Queue>
+<SendDate>06.09.2012</SendDate>
+<KBK/>
+<OKATO/>
+<FiscalBasis/>
+<FiscalPeriod/>
+<FiscalNumber/>
+<FiscalDate/>
+<FiscalType/>
+</payment>
+</payment1C>
+</XMLExport>
