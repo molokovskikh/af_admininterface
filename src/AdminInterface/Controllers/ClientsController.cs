@@ -118,6 +118,12 @@ namespace AdminInterface.Controllers
 			var client = Service.FindAndCheck<Client>(id);
 			var users = client.Users;
 			var addresses = client.Addresses;
+			var innList = client.Payers.Where(p => !string.IsNullOrEmpty(p.INN)).Select(p => p.INN).ToArray();
+			var inn = "";
+			if(innList.Length > 0)
+				inn = innList.Implode();
+			if(!String.IsNullOrEmpty(inn))
+				inn = "ИНН: " + inn;
 
 			PropertyBag["Client"] = client;
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
@@ -128,6 +134,7 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["filter"] = filter;
 			PropertyBag["messages"] = filter.Execute(client, DbSession);
+			PropertyBag["inn"] = inn;
 
 			Sort.Make(this);
 		}
