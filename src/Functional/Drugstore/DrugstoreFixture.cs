@@ -8,6 +8,7 @@ using Functional.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support;
 using WatiN.Core;
 using Test.Support.Web;
 using WatiN.Core.Native.Windows;
@@ -112,6 +113,27 @@ namespace Functional.Drugstore
 		{
 			browser.Link(Find.ByText("Настройка")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Конфигурация клиента"));
+		}
+
+		[Test]
+		public void RenameClientTest()
+		{
+			var client = DataMother.TestClient(s => {
+				s.Name = "TestToRename";
+				s.FullName = "FullTestToRename";
+			});
+			Save(client);
+			Flush();
+			Open(client);
+			var clientNameEdit = browser.TextField(Find.ByValue("TestToRename"));
+			clientNameEdit.Value = "test";
+			Click("Сохранить");
+			AssertText("В данном регионе уже существует клиент с таким именем");
+			clientNameEdit = browser.TextField(Find.ByValue("TestToRename"));
+			clientNameEdit.Value = "testTest" + client.Id;
+			Click("Сохранить");
+			AssertText("Сохранено");
+			Assert.That(TestClient.Find(client.Id).Name, Is.EqualTo("testTest" + client.Id));
 		}
 	}
 }

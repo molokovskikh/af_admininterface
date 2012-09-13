@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
@@ -23,8 +24,10 @@ using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Linq;
 using NHibernate.Transform;
@@ -136,7 +139,17 @@ namespace AdminInterface.Controllers
 		public void Update([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client)
 		{
 			Admin.CheckClientPermission(client);
-
+			var name = client.Name;
+			var oldMode = DbSession.FlushMode;
+			DbSession.FlushMode = FlushMode.Never;
+			var clientNameExists = DbSession.QueryOver<Client>().Where(c => c.HomeRegion.Id == client.HomeRegion.Id && c.Name == name && c.Id != client.Id).RowCount() > 0;
+			DbSession.FlushMode = oldMode;
+			if (clientNameExists) {
+				Error(string.Format("В данном регионе уже существует клиент с таким именем {0}", client.Name));
+				DbSession.Evict(client);
+				RedirectToReferrer();
+				return;
+			}
 			var savedNotify = true;
 			var changeName = client.IsChanged(c => c.Name);
 			var changeFullName = client.IsChanged(c => c.FullName);
