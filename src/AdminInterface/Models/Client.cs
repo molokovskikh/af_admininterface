@@ -381,7 +381,7 @@ group by u.ClientId")
 				.Implode();
 		}
 
-		public virtual void ChangePayer(Payer payer, LegalEntity org)
+		public virtual void ChangePayer(ISession session, Payer payer, LegalEntity org)
 		{
 			var oldPayers = Payers.ToArray();
 			Payers.Clear();
@@ -399,13 +399,13 @@ group by u.ClientId")
 				address.Payer.Addresses.Add(address);
 			}
 
-			ArHelper.WithSession(s => s.CreateSQLQuery(@"
+			session.CreateSQLQuery(@"
 update Customers.intersection
 set LegalEntityId = :orgId
 where ClientId = :clientId")
 				.SetParameter("clientId", Id)
 				.SetParameter("orgId", org.Id)
-				.ExecuteUpdate());
+				.ExecuteUpdate();
 
 			payer.UpdatePaymentSum();
 			foreach (var oldPayer in oldPayers)

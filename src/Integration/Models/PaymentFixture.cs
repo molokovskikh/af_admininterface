@@ -45,6 +45,13 @@ namespace Integration.Models
 		}
 
 		[Test]
+		public void Parse_payment_without_recipient_inn()
+		{
+			var payments = Payment.ParseXml(File.OpenRead(@"..\..\..\TestData\20110113.xml"));
+			Assert.That(payments.Count, Is.GreaterThan(0));
+		}
+
+		[Test]
 		public void Parse_raiffeisen_payments()
 		{
 			var payments = Payment.ParseText(File.OpenRead(@"..\..\..\TestData\1c.txt"));

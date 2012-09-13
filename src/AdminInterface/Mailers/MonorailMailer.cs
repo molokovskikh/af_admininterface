@@ -259,8 +259,8 @@ namespace AdminInterface.Mailers
 
 			var news = entity as News;
 			if(news != null) {
-				message.AppendLine("Адресат " + news.DestinationType.GetDescription());
-				message.AppendLine("Дата и время публикации новости " + news.PublicationDate);
+				message.AppendLine("Адресат: " + news.DestinationType.GetDescription() + "<br>");
+				message.AppendLine("Дата и время публикации новости: " + news.PublicationDate + "<br>");
 			}
 
 			if (!(entity is Service))

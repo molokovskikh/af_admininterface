@@ -270,10 +270,6 @@ namespace AdminInterface.Models.Billing
 				var comment = node.XPathSelectElement("AssignPayment").Value;
 
 				//если платеж из банка россии (ЦБ) то у него нет корсчета
-				var bankAccountantCode = "";
-				if (node.XPathSelectElement("BankPayer/AccountCode") != null)
-					bankAccountantCode = node.XPathSelectElement("BankPayer/AccountCode").Value;
-
 				var payment = new Payment {
 					DocumentNumber = documentNumber,
 					PayedOn = DateTime.Parse(dateNode.Value, CultureInfo.GetCultureInfo("ru-RU")),
@@ -281,25 +277,22 @@ namespace AdminInterface.Models.Billing
 					Sum = Decimal.Parse(sum, CultureInfo.InvariantCulture),
 					Comment = comment,
 					PayerBank = new BankInfo(
-						node.XPathSelectElement("BankPayer/Description").Value,
-						node.XPathSelectElement("BankPayer/BIC").Value,
-						bankAccountantCode),
+						(string)node.XPathSelectElement("BankPayer/Description"),
+						(string)node.XPathSelectElement("BankPayer/BIC"),
+						(string)node.XPathSelectElement("BankPayer/AccountCode")),
 					PayerClient = new BankClient(
-						node.XPathSelectElement("Payer/Name").Value,
-						null,
-						node.XPathSelectElement("Payer/AccountCode").Value),
+						(string)node.XPathSelectElement("Payer/Name"),
+						(string)node.XPathSelectElement("Payer/INN"),
+						(string)node.XPathSelectElement("Payer/AccountCode")),
 					RecipientBank = new BankInfo(
-						node.XPathSelectElement("BankRecipient/Description").Value,
-						node.XPathSelectElement("BankRecipient/BIC").Value,
-						node.XPathSelectElement("BankRecipient/AccountCode").Value),
+						(string)node.XPathSelectElement("BankRecipient/Description"),
+						(string)node.XPathSelectElement("BankRecipient/BIC"),
+						(string)node.XPathSelectElement("BankRecipient/AccountCode")),
 					RecipientClient = new BankClient(
-						node.XPathSelectElement("Recepient/Client/Name").Value,
-						node.XPathSelectElement("Recepient/Client/INN").Value,
-						node.XPathSelectElement("Recepient/Client/AccountCode").Value),
+						(string)node.XPathSelectElement("Recepient/Client/Name"),
+						(string)node.XPathSelectElement("Recepient/Client/INN"),
+						(string)node.XPathSelectElement("Recepient/Client/AccountCode")),
 				};
-				var element = node.XPathSelectElement("Payer/INN");
-				if (element != null)
-					payment.PayerClient.Inn = element.Value;
 
 				payments.Add(payment);
 			}

@@ -326,7 +326,7 @@ where Phone like :phone")
 			var client = Client.FindAndCheck<Client>(clientId);
 			var payer = Payer.Find(payerId);
 			var org = payer.JuridicalOrganizations.FirstOrDefault(j => j.Id == orgId);
-			client.ChangePayer(payer, org);
+			client.ChangePayer(DbSession, payer, org);
 
 			Notify("Изменено");
 			RedirectToAction("Show", new { id = client.Id });

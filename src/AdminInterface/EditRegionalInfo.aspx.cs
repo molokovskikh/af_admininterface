@@ -39,7 +39,7 @@ public partial class EditRegionalInfo : Page
 
 	private void BindData()
 	{
-		var regionalData = ActiveRecordMediator<RegionalData>.FindByPrimaryKey(_regionalSettingsCode);
+		var regionalData = ActiveRecordMediator<RegionalData>.FindByPrimaryKey((uint)_regionalSettingsCode);
 		ContactInfoText.Text = regionalData.ContactInfo;
 		OperativeInfoText.Text = regionalData.OperativeInfo;
 		_clientCode = regionalData.Supplier.Id;
