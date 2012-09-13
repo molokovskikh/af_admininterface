@@ -41,7 +41,7 @@ namespace Integration
 				Cost = price.Costs[1]
 			};
 			price.RegionalData.Add(regionalData);
-			Save(regionalData);
+			Save(price);
 			Flush();
 			// вставка в intersection
 			Maintainer.MaintainIntersection(supplier);

@@ -52,7 +52,7 @@ namespace Functional.Suppliers
 		}
 
 		[Test]
-		public void Delete_cost_collumn_and_set_regional_base_cost()
+		public void Delete_cost_column_and_set_regional_base_cost()
 		{
 			// создаем нового поставщика
 			var supplier = DataMother.CreateSupplier();
@@ -118,11 +118,11 @@ namespace Functional.Suppliers
 			}
 			// выставляем базовой колонкой для Белгорода другую
 			regionalData.Cost = price.Costs[2];
-			Save(regionalData);
-			Flush();
 			// меняем базовую колонку для прайса
 			price.Costs[0].BaseCost = false;
 			price.Costs[3].BaseCost = true;
+			Save(regionalData);
+			Flush();
 			// Удаляем ценовые колонки, назначенные клиенту
 			Open(supplier);
 			Click("Настройка");
