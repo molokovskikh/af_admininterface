@@ -130,7 +130,7 @@ WHERE RowID = ?Id
 
 				UpdateLB.Text = "Сохранено.";
 			});
-			PostDataToGrid();
+			Response.Redirect("ManageCosts.aspx?pc=" + priceId);
 		}
 
 		public bool CanDelete(object baseCost)
@@ -210,7 +210,8 @@ SELECT  pc.CostCode,
 		pi.PriceDate, 
 		pc.BaseCost, 
 		pc.Enabled, 
-		pc.AgencyEnabled  
+		pc.AgencyEnabled,
+		exists (select * from PricesRegionalData prd where prd.BaseCost = pc.CostCode) as RegionBaseCode
 FROM usersettings.pricescosts pc
 	JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
 		JOIN farm.sources s on pi.SourceId = s.Id
@@ -251,13 +252,14 @@ WHERE PriceCode = ?PriceCode
 
 			With.Transaction((c, t) => {
 				var selectCurrentCost = @"
-select pd.CostType, base.CostCode, f.Id as RuleId, s.Id as SourceId, pi.Id as ItemId
+select pd.CostType, f.Id as RuleId, s.Id as SourceId, pi.Id as ItemId, prd.RegionCode as Region, ifnull(prd.BaseCost, base.CostCode) as CostCode
 from usersettings.PricesCosts pc
 	join usersettings.PricesData pd on pd.PriceCode = pc.PriceCode
 	join usersettings.pricescosts base on base.PriceCode = pc.PriceCode
 		join usersettings.PriceItems pi on pi.Id = pc.PriceItemId
 			join Farm.FormRules f on f.Id = pi.FormRuleId
 			join Farm.sources s on s.Id = pi.SourceId
+join usersettings.pricesregionaldata prd on prd.pricecode=pd.pricecode and prd.Enabled=1
 where pc.CostCode = ?CostCode and base.BaseCost = 1;";
 
 				var command = new MySqlCommand(selectCurrentCost, c, t);
@@ -267,19 +269,24 @@ where pc.CostCode = ?CostCode and base.BaseCost = 1;";
 				uint sourceId;
 				uint ruleId;
 				uint itemId;
+				uint region;
+				var deleteCommandText = "";
 				using (var reader = command.ExecuteReader()) {
 					reader.Read();
-					costType = reader.GetUInt32("CostType");
-					baseCost = reader.GetUInt32("CostCode");
-					sourceId = reader.GetUInt32("SourceId");
-					ruleId = reader.GetUInt32("RuleId");
-					itemId = reader.GetUInt32("ItemId");
-				}
-
-				var deleteCommandText = @"
+					do {
+						costType = reader.GetUInt32("CostType");
+						baseCost = reader.GetUInt32("CostCode");
+						sourceId = reader.GetUInt32("SourceId");
+						ruleId = reader.GetUInt32("RuleId");
+						itemId = reader.GetUInt32("ItemId");
+						region = reader.GetUInt32("Region");
+						deleteCommandText += String.Format(@"
 update Customers.Intersection
-set CostId = ?BaseCostCode
-where CostId = ?CostCode;";
+set CostId = {0}
+where CostId = {1}
+and RegionId = {2};", baseCost, costId, region);
+					} while (reader.Read());
+				}
 
 				if (costType == 1) {
 					deleteCommandText += @"
@@ -335,7 +342,7 @@ delete from usersettings.pricescosts where costcode = ?costcode;";
 
 			var baseCost = (DropDownList)e.Row.FindControl("RegionalBaseCost");
 
-			var price = DbSession.Query<Price>().FirstOrDefault(t => t.Id == priceId);
+			var price = DbSession.Query<Price>().First(t => t.Id == priceId);
 			baseCost.DataSource = price.Costs;
 			baseCost.DataBind();
 			if(((DataRowView)e.Row.DataItem)["BaseCost"] == DBNull.Value)

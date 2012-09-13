@@ -30,7 +30,7 @@
 									</asp:Label>
 									<asp:Button ID="DeletButton" CommandArgument='<%# Bind("CostCode") %>' runat="server"
 												CausesValidation="False" CommandName="Delete" Text='<%# DeleteLabel(Convert.ToUInt32(Eval("CostCode"))) %>'
-												Visible='<%# CanDelete(Eval("BaseCost")) %>'/>
+												Visible='<%# CanDelete(Eval("BaseCost")) && CanDelete(Eval("RegionBaseCode")) %>'/>
 								</ItemTemplate>
 								<ItemStyle HorizontalAlign="Left" />
 							</asp:TemplateColumn>
@@ -108,7 +108,7 @@
 									<asp:RegularExpressionValidator ID="MinReqValidator" runat="server" ErrorMessage="*" ControlToValidate="MinReqText" ValidationExpression="^\d+(\,\d+)?$" />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Базовая колонка" SortExpression="enabled">
+							<asp:TemplateField HeaderText="Базовая цена" SortExpression="enabled">
 									<ItemTemplate>
 										<asp:DropDownList ID="RegionalBaseCost" runat="server"  DataTextField="Name" DataValueField="Id"/>
 									</ItemTemplate>
