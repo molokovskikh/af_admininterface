@@ -47,17 +47,20 @@ namespace AdminInterface.Controllers
 			BindObjectInstance(query, "query");
 
 			var data = query.Load(fromDate, toDate);
+			var statuses = new StatusServices();
 #if !DEBUG
 			RemoteServiceHelper.RemotingCall(s => {
 				PropertyBag["FormalizationQueue"] = s.InboundFiles().Length.ToString();
 			});
 
 
-			PropertyBag["OrderProcStatus"] = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("offdc.adc.analit.net", "OrderProcService"));
-			PropertyBag["PriceProcessorMasterStatus"] = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("fms.adc.analit.net", "PriceProcessorService"));
+			statuses.OrderProcStatus = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("offdc.adc.analit.net", "OrderProcService"));
+			statuses.PriceProcessorMasterStatus = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("fms.adc.analit.net", "PriceProcessorService"));
+			PropertyBag["StatusServices"] = statuses;
 #else
-			PropertyBag["OrderProcStatus"] = "";
-			PropertyBag["PriceProcessorMasterStatus"] = "";
+			statuses.OrderProcStatus = "";
+			statuses.PriceProcessorMasterStatus = "";
+			PropertyBag["StatusServices"] = statuses;
 #endif
 
 			foreach (var pair in data.ToKeyValuePairs()) {
