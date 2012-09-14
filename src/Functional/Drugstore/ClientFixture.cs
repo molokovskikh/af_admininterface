@@ -188,6 +188,7 @@ namespace Functional.Drugstore
 		public void Change_client_payer()
 		{
 			var payer = DataMother.CreatePayer();
+			payer.INN = "123321123";
 			payer.Save();
 			payer.Name = "Тестовый плательщик " + payer.Id;
 			Flush();
@@ -201,7 +202,7 @@ namespace Functional.Drugstore
 
 			Css("#ChangePayer [type=submit]").Click();
 			Assert.That(browser.Text, Is.StringContaining("Изменено"));
-
+			AssertText("ИНН: " + payer.INN);
 			session.Refresh(client);
 			Assert.That(client.Payers, Is.EquivalentTo(new[] { payer }));
 		}

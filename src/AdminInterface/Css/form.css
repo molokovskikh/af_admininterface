@@ -130,3 +130,7 @@ input.error
 form.vertical label {
 	display: block;
 }
+
+.innspan {
+	font-size: 13px;
+}

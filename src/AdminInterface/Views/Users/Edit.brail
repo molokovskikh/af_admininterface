@@ -111,7 +111,7 @@
 					<td style="padding-left: 2px;">${authorizationLog.CITime if authorizationLog.CITime != null}</td>
 				</tr>
 				<tr>
-					<td>${"Обновление AnalitF:" if authorizationLog.AFTime != null}</td>
+					<td>${"Использование PrgData:" if authorizationLog.AFTime != null}</td>
 					<td style="padding-left: 2px;">${authorizationLog.AFTime if authorizationLog.AFTime != null}</td>
 				</tr>
 				<tr>
