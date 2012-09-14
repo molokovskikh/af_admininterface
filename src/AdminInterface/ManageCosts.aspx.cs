@@ -130,7 +130,8 @@ WHERE RowID = ?Id
 
 				UpdateLB.Text = "Сохранено.";
 			});
-			Response.Redirect("ManageCosts.aspx?pc=" + priceId);
+			DbSession.SessionFactory.Evict(typeof(Price), priceId);
+			PostDataToGrid();
 		}
 
 		public bool CanDelete(object baseCost)
@@ -226,7 +227,8 @@ SELECT  RowId,
 		UpCost,
 		MinReq,
 		Enabled,
-		BaseCost
+		BaseCost,
+		(select CostCode from PricesCosts pc where pc.pricecode=prd.pricecode and pc.BaseCost=1) as BaseRCost
 FROM PricesRegionalData prd
 	JOIN Farm.Regions r ON prd.RegionCode = r.RegionCode
 WHERE PriceCode = ?PriceCode
@@ -342,11 +344,12 @@ delete from usersettings.pricescosts where costcode = ?costcode;";
 
 			var baseCost = (DropDownList)e.Row.FindControl("RegionalBaseCost");
 
-			var price = DbSession.Query<Price>().First(t => t.Id == priceId);
+			var price = DbSession.QueryOver<Price>().Where(t => t.Id == priceId).SingleOrDefault();
 			baseCost.DataSource = price.Costs;
 			baseCost.DataBind();
-			if(((DataRowView)e.Row.DataItem)["BaseCost"] == DBNull.Value)
-				baseCost.SelectedValue = price.Costs.First(t => t.BaseCost).Id.ToString();
+			if(((DataRowView)e.Row.DataItem)["BaseCost"] == DBNull.Value) {
+				baseCost.SelectedValue = ((DataRowView)e.Row.DataItem)["BaseRCost"].ToString();
+			}
 			else
 				baseCost.SelectedValue = ((DataRowView)e.Row.DataItem)["BaseCost"].ToString();
 		}
