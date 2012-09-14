@@ -102,10 +102,10 @@ namespace Functional.Drugstore
 		public void Try_to_update_general_info()
 		{
 			browser.Input<Client>(client => client.FullName, testClient.FullName);
-			browser.Input<Client>(client => client.Name, testClient.Name);
+			browser.Input<Client>(client => client.Name, testClient.Name + testClient);
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Клиент {0}, Код {1}", testClient.Name, testClient.Id)));
+			Assert.That(browser.Text, Is.StringContaining(String.Format("Клиент {0}, Код {1}", testClient.Name + testClient, testClient.Id)));
 		}
 
 		[Test]
