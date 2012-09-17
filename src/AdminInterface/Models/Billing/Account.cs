@@ -114,6 +114,8 @@ namespace AdminInterface.Models.Billing
 
 		public abstract uint ObjectId { get; }
 
+		public abstract bool Enabled { get; }
+
 		public virtual string Type
 		{
 			get { return BindingHelper.GetDescription(ObjectType); }
@@ -189,9 +191,9 @@ namespace AdminInterface.Models.Billing
 			var readyForAccounting = Queryable.Where(a => a.ReadyForAccounting
 				&& !a.BeAccounted
 				&& !(a.IsFree && a.FreePeriodEnd != null && a.FreePeriodEnd > freeEnd));
-
-			pager.Total = readyForAccounting.Count();
-			return pager.DoPage(readyForAccounting).ToList();
+			var allResult = readyForAccounting.ToList().Where(a => a.Enabled);
+			pager.Total = allResult.Count();
+			return pager.DoPage(allResult).ToList();
 		}
 
 		public virtual IAuditRecord GetAuditRecord()

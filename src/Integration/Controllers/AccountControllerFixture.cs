@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Controllers;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
@@ -36,20 +37,26 @@ namespace Integration.Controllers
 			Assert.That(user.Enabled, Is.False);
 		}
 
+
 		[Test]
 		public void Update_report_account()
 		{
 			var report = new Report {
 				Allow = true,
 				Comment = "тестовый отчет",
-				Payer = payer,
+				Payer = payer
 			};
-			var account = new ReportAccount(report);
+			var account = new ReportAccount(report) { ReadyForAccounting = true, BeAccounted = false, IsFree = false, FreePeriodEnd = DateTime.Now.AddMonths(1) };
 			account.Save();
 			Flush();
 
+			var acoounts = Account.GetReadyForAccounting(new Pager { PageSize = 1000 }).Select(a => a.ObjectId).ToList();
+			Assert.IsTrue(acoounts.Contains(account.ObjectId));
 			controller.Update(account.Id, true, null, true, 500, null, null);
 			Flush();
+
+			acoounts = Account.GetReadyForAccounting(new Pager()).Select(a => a.ObjectId).ToList();
+			Assert.IsFalse(acoounts.Contains(account.ObjectId));
 
 			account.Refresh();
 			Assert.That(account.Payment, Is.EqualTo(500));

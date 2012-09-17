@@ -48,6 +48,11 @@ namespace AdminInterface.Models.Billing
 			get { return Supplier.Id; }
 		}
 
+		public override bool Enabled
+		{
+			get { return Supplier.Enabled; }
+		}
+
 		public override string DefaultDescription
 		{
 			get { return "Справочно-информационные услуги за {0}"; }

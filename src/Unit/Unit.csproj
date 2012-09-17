@@ -116,6 +116,7 @@
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinderFixture.cs" />
     <Compile Include="PermissionFixture.cs" />
     <Compile Include="SortFixture.cs" />
+    <Compile Include="StatusColorFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AdminInterface.Background\AdminInterface.Background.csproj">
