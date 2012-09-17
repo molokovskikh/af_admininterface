@@ -237,7 +237,7 @@
 					<p>
 						Полное наименование<br>
 						${app.Edit("client.FullName")}
-						${inn}
+						${client.INN}
 						${app.GetValidationError(client, @FullName)}
 
 					</p>
