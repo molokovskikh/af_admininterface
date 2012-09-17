@@ -279,5 +279,42 @@ namespace Functional.Drugstore
 				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог"));
 			Assert.Less(logLink.AsHtmlElement.offsetLeft, offset * 1.5);
 		}
+
+		[Test]
+		public void CertificateDetailsFileTest()
+		{
+			Client client = null;
+			Supplier supplier = null;
+			DocumentReceiveLog documentLogEntity = null;
+			Document document = null;
+			UpdateLogEntity updateEntity = null;
+
+			Create_loaded_document_logs(out client, out supplier, out documentLogEntity, out document, out updateEntity);
+			var sert = new CertificateRequestLog {
+				Line = document.Lines[0],
+				Update = updateEntity
+			};
+			Save(sert);
+			Flush();
+			Open("Main/Stat");
+			Css("#StatisticsTD a").Click();
+			AssertText("Статистика по сертификатам");
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("Статистика по сертификатам"))) {
+				Thread.Sleep(2000);
+				Assert.That(openedWindow.Text, Is.StringContaining(supplier.Name));
+				openedWindow.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+				Thread.Sleep(1000);
+				Assert.That(openedWindow.Text, Is.StringContaining("Код товара"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Наименование"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Производитель"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Страна"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Количество"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Срок годности"));
+
+				Thread.Sleep(2000);
+				Assert.That(browser.Text, Is.StringContaining(document.Lines[0].Producer));
+				Assert.That(browser.Text, Is.StringContaining(document.Lines[0].Country));
+			}
+		}
 	}
 }
