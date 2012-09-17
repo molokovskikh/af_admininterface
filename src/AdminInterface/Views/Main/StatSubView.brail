@@ -351,13 +351,13 @@
 				</tr>
 				<tr>
 					<td class="statistic-label">Обработки заказов:</td>
-					<td class="statistic-value ${app.Style(StatusServices)}" colspan=3>
+					<td class="statistic-value OrderProcStatus ${app.Style(StatusServices)}" colspan=3>
 						${StatusServices.OrderProcStatus}
 					</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Обработки прайс листов:</td>
-					<td class="statistic-value ${app.Style(StatusServices)}" colspan=3>
+					<td class="statistic-value PriceProcessorMasterStatus ${app.Style(StatusServices)}" colspan=3>
 						${StatusServices.PriceProcessorMasterStatus}
 					</td>
 				</tr>

@@ -51,10 +51,10 @@ td.service-stoped {
 	background-color: red;
 }
 
-td.order-proc-not-runnig-or-unknown{
+td.OrderProcStatus.order-proc-not-runnig-or-unknown{
 	background-color: red;
 }
 
-td.price-processor-master-not-runnig-or-unknown{
+td.PriceProcessorMasterStatus.price-processor-master-not-runnig-or-unknown{
 	background-color: red;
 }
