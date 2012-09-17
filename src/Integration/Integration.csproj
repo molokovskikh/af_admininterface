@@ -181,6 +181,7 @@
     <Compile Include="PrinterFixture.cs" />
     <Compile Include="Queries\ResetReclameDateFixture.cs" />
     <Compile Include="Queries\UpdateOrdersFixture.cs" />
+    <Compile Include="RegionalBaseCostsFixture.cs" />
     <Compile Include="Tasks\InvoicePartProcessorFixture.cs" />
     <Compile Include="Tasks\SendInvoiceTaskFixture.cs" />
     <Compile Include="Tasks\ReportLogProcessorFixture.cs" />

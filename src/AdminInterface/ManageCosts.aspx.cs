@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -11,11 +12,13 @@ using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.MySql;
+using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
+using NHibernate.Linq;
 
 namespace AddUser
 {
-	partial class ManageCosts : Page
+	partial class ManageCosts : BasePage
 	{
 		private uint priceId;
 		private uint warningCostId;
@@ -45,10 +48,21 @@ namespace AddUser
 					}
 				}
 
+				var price = DbSession.Query<Price>().FirstOrDefault(p => p.Id == priceId);
+				var DefaultSelect = price.Costs.FirstOrDefault(d => d.BaseCost).Id;
 				for (var i = 0; i < PriceRegionSettings.Rows.Count; i++) {
 					dataSet.Tables["PriceRegionSettings"].Rows[i]["Enabled"] = ((CheckBox)PriceRegionSettings.Rows[i].FindControl("EnableCheck")).Checked;
 					dataSet.Tables["PriceRegionSettings"].Rows[i]["UpCost"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("UpCostText")).Text;
 					dataSet.Tables["PriceRegionSettings"].Rows[i]["MinReq"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("MinReqText")).Text;
+
+					if (dataSet.Tables["PriceRegionSettings"].Rows[i]["BaseCost"].ToString() != ((DropDownList)PriceRegionSettings.Rows[i].FindControl("RegionalBaseCost")).SelectedValue) {
+						if (!string.IsNullOrEmpty(dataSet.Tables["PriceRegionSettings"].Rows[i]["BaseCost"].ToString())
+							|| ((DropDownList)PriceRegionSettings.Rows[i].FindControl("RegionalBaseCost")).SelectedValue != DefaultSelect.ToString())
+							dataSet.Tables["PriceRegionSettings"].Rows[i]["BaseCost"] = ((DropDownList)PriceRegionSettings.Rows[i].FindControl("RegionalBaseCost")).SelectedValue;
+						if(!string.IsNullOrEmpty(dataSet.Tables["PriceRegionSettings"].Rows[i]["BaseCost"].ToString())
+							&& ((DropDownList)PriceRegionSettings.Rows[i].FindControl("RegionalBaseCost")).SelectedValue == DefaultSelect.ToString())
+							dataSet.Tables["PriceRegionSettings"].Rows[i]["BaseCost"] = DBNull.Value;
+					}
 				}
 				var adapter = new MySqlDataAdapter("", c);
 				adapter.UpdateCommand = new MySqlCommand("", c);
@@ -102,7 +116,8 @@ WHERE   CostCode     =?CostCode;
 UPDATE PricesRegionalData
 SET UpCost = ?UpCost,
 	MinReq = ?MinReq, 
-	Enabled = ?Enabled
+	Enabled = ?Enabled,
+	BaseCost = ?BaseCost
 WHERE RowID = ?Id
 ";
 
@@ -110,10 +125,12 @@ WHERE RowID = ?Id
 				command.Parameters.Add("?MinReq", MySqlDbType.Decimal, 0, "MinReq");
 				command.Parameters.Add("?Enabled", MySqlDbType.Bit, 0, "Enabled");
 				command.Parameters.Add("?Id", MySqlDbType.Int32, 0, "RowId");
+				command.Parameters.Add("?BaseCost", MySqlDbType.Decimal, 0, "BaseCost");
 				adapter.Update(dataSet, "PriceRegionSettings");
 
 				UpdateLB.Text = "Сохранено.";
 			});
+			DbSession.SessionFactory.Evict(typeof(Price), priceId);
 			PostDataToGrid();
 		}
 
@@ -194,7 +211,8 @@ SELECT  pc.CostCode,
 		pi.PriceDate, 
 		pc.BaseCost, 
 		pc.Enabled, 
-		pc.AgencyEnabled  
+		pc.AgencyEnabled,
+		exists (select * from PricesRegionalData prd where prd.BaseCost = pc.CostCode) as RegionBaseCode
 FROM usersettings.pricescosts pc
 	JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
 		JOIN farm.sources s on pi.SourceId = s.Id
@@ -204,14 +222,16 @@ WHERE pc.PriceCode = ?PriceCode;";
 				adapter.Fill(data, "Costs");
 
 				command.CommandText = @"
-SELECT  RowId, 
-		Region, 
-		UpCost, 
-		MinReq, 
-		Enabled  
-FROM PricesRegionalData prd   
-	JOIN Farm.Regions r ON prd.RegionCode = r.RegionCode  
-WHERE PriceCode = ?PriceCode  
+SELECT  RowId,
+		Region,
+		UpCost,
+		MinReq,
+		Enabled,
+		BaseCost,
+		(select CostCode from PricesCosts pc where pc.pricecode=prd.pricecode and pc.BaseCost=1) as BaseRCost
+FROM PricesRegionalData prd
+	JOIN Farm.Regions r ON prd.RegionCode = r.RegionCode
+WHERE PriceCode = ?PriceCode
 	  and r.RegionCode & ?AdminRegionMask > 0;";
 
 				command.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
@@ -234,13 +254,14 @@ WHERE PriceCode = ?PriceCode
 
 			With.Transaction((c, t) => {
 				var selectCurrentCost = @"
-select pd.CostType, base.CostCode, f.Id as RuleId, s.Id as SourceId, pi.Id as ItemId
+select pd.CostType, f.Id as RuleId, s.Id as SourceId, pi.Id as ItemId, prd.RegionCode as Region, ifnull(prd.BaseCost, base.CostCode) as CostCode
 from usersettings.PricesCosts pc
 	join usersettings.PricesData pd on pd.PriceCode = pc.PriceCode
 	join usersettings.pricescosts base on base.PriceCode = pc.PriceCode
 		join usersettings.PriceItems pi on pi.Id = pc.PriceItemId
 			join Farm.FormRules f on f.Id = pi.FormRuleId
 			join Farm.sources s on s.Id = pi.SourceId
+join usersettings.pricesregionaldata prd on prd.pricecode=pd.pricecode and prd.Enabled=1
 where pc.CostCode = ?CostCode and base.BaseCost = 1;";
 
 				var command = new MySqlCommand(selectCurrentCost, c, t);
@@ -250,19 +271,24 @@ where pc.CostCode = ?CostCode and base.BaseCost = 1;";
 				uint sourceId;
 				uint ruleId;
 				uint itemId;
+				uint region;
+				var deleteCommandText = "";
 				using (var reader = command.ExecuteReader()) {
 					reader.Read();
-					costType = reader.GetUInt32("CostType");
-					baseCost = reader.GetUInt32("CostCode");
-					sourceId = reader.GetUInt32("SourceId");
-					ruleId = reader.GetUInt32("RuleId");
-					itemId = reader.GetUInt32("ItemId");
-				}
-
-				var deleteCommandText = @"
+					do {
+						costType = reader.GetUInt32("CostType");
+						baseCost = reader.GetUInt32("CostCode");
+						sourceId = reader.GetUInt32("SourceId");
+						ruleId = reader.GetUInt32("RuleId");
+						itemId = reader.GetUInt32("ItemId");
+						region = reader.GetUInt32("Region");
+						deleteCommandText += String.Format(@"
 update Customers.Intersection
-set CostId = ?BaseCostCode
-where CostId = ?CostCode;";
+set CostId = {0}
+where CostId = {1}
+and RegionId = {2};", baseCost, costId, region);
+					} while (reader.Read());
+				}
 
 				if (costType == 1) {
 					deleteCommandText += @"
@@ -309,6 +335,23 @@ delete from usersettings.pricescosts where costcode = ?costcode;";
 			if (costId == warningCostId)
 				return "Все равно удалить";
 			return "Удалить";
+		}
+
+		protected void PriceRegionSettings_RowDataBound(object sender, GridViewRowEventArgs e)
+		{
+			if (e.Row.RowType != DataControlRowType.DataRow)
+				return;
+
+			var baseCost = (DropDownList)e.Row.FindControl("RegionalBaseCost");
+
+			var price = DbSession.QueryOver<Price>().Where(t => t.Id == priceId).SingleOrDefault();
+			baseCost.DataSource = price.Costs;
+			baseCost.DataBind();
+			if(((DataRowView)e.Row.DataItem)["BaseCost"] == DBNull.Value) {
+				baseCost.SelectedValue = ((DataRowView)e.Row.DataItem)["BaseRCost"].ToString();
+			}
+			else
+				baseCost.SelectedValue = ((DataRowView)e.Row.DataItem)["BaseCost"].ToString();
 		}
 	}
 }
