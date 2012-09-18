@@ -192,6 +192,19 @@ namespace AdminInterface.Models
 					.UniqueResult<Client>());
 		}
 
+		public virtual string INN
+		{
+			get {
+				var innList = Payers.Where(p => !string.IsNullOrEmpty(p.INN)).Select(p => p.INN).ToArray();
+				var inn = "";
+				if(innList.Length > 0)
+					inn = innList.Implode();
+				if(!String.IsNullOrEmpty(inn))
+					inn = "ИНН: " + inn;
+				return inn;
+			}
+		}
+
 		public virtual ContactGroup GetContactGroup(ContactGroupType type)
 		{
 			return ContactGroupOwner.ContactGroups.FirstOrDefault(contactGroup => contactGroup.Type == type);
