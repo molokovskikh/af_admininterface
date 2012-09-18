@@ -157,10 +157,16 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		var sendMessageView = new PayerSendMessage();
 
 		$("input[name=free]").change(function () {
-			if (this.checked)
+			var accounted = $(this).parent().parent().children().children('input[name=accounted]');
+			if (this.checked) {
 				$(this).parents("tr").addClass("free");
-			else
+				accounted.attr("disabled", true);
+				accounted.removeAttr("checked");
+			}
+			else {
 				$(this).parents("tr").removeClass("free");
+				accounted.attr("disabled", false);
+			}
 		});
 
 		$("input[name=status]").change(function () {
@@ -177,6 +183,13 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			var item = $(this);
 			url = buildAjaxUrl(url, item);
 			checkBoxChanger(url, item);
+		});
+
+		$("input[name=free]").each(function () {
+			if (this.checked) {
+				var accounted = $(this).parent().parent().children().children('input[name=accounted]');
+				accounted.attr("disabled", true);
+			}
 		});
 
 		$("div.collapsible, div.autocollapsible").each(function () {

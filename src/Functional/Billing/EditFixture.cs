@@ -6,6 +6,7 @@ using NHibernate.Linq;
 using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Billing
 {
@@ -48,6 +49,23 @@ namespace Functional.Billing
 			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
 			browser.Refresh();
 			AssertText("TestComment");
+		}
+
+		[Test]
+		public void Check_free_accounting()
+		{
+			var client = DataMother.CreateClientAndUsers();
+			session.Save(client);
+			session.Flush();
+			browser = Open(string.Format("Billing/Edit?BillingCode={0}", client.Payers[0].Id));
+			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowMaximized);
+			Css("input[name=accounted]").Checked = true;
+			Css("input[name=free]").Checked = true;
+			Css("input[name=FreePeriodEnd]").AppendText(DateTime.Now.AddMonths(1).ToShortDateString());
+			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only ui-state-hover")).Click();
+			var accounted = Css("input[name=accounted]");
+			Assert.IsFalse(accounted.Checked);
+			Assert.IsFalse(accounted.Enabled);
 		}
 	}
 }

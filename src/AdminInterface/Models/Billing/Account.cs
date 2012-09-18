@@ -78,7 +78,7 @@ namespace AdminInterface.Models.Billing
 			Style,
 			Property(Access = PropertyAccess.FieldCamelcaseUnderscore),
 			Description("Обслуживается бесплатно"),
-			Auditable("Обслуживается бесплатно"),
+			Auditable("Бесплатно"),
 			RequiredPermission(PermissionType.CanRegisterClientWhoWorkForFree)
 		]
 		public virtual bool IsFree
