@@ -19,6 +19,7 @@ using AdminInterface.Security;
 using AdminInterface.Services;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -140,7 +141,7 @@ namespace AdminInterface.Controllers
 		{
 			Admin.CheckClientPermission(client);
 			var name = client.Name;
-			var oldMode = DbSession.FlushMode;
+			/*var oldMode = DbSession.FlushMode;
 			DbSession.FlushMode = FlushMode.Never;
 			var clientNameExists = DbSession.QueryOver<Client>().Where(c => c.HomeRegion.Id == client.HomeRegion.Id && c.Name == name && c.Id != client.Id).RowCount() > 0;
 			DbSession.FlushMode = oldMode;
@@ -149,7 +150,7 @@ namespace AdminInterface.Controllers
 				DbSession.Evict(client);
 				RedirectToReferrer();
 				return;
-			}
+			}*/
 			var savedNotify = true;
 			var changeName = client.IsChanged(c => c.Name);
 			var changeFullName = client.IsChanged(c => c.FullName);
