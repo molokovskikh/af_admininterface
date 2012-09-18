@@ -58,7 +58,6 @@ namespace Functional.Billing
 			session.Save(client);
 			session.Flush();
 			browser = Open(string.Format("Billing/Edit?BillingCode={0}", client.Payers[0].Id));
-			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowMaximized);
 			Css("input[name=accounted]").Checked = true;
 			Css("input[name=free]").Checked = true;
 			Css("input[name=FreePeriodEnd]").AppendText(DateTime.Now.AddMonths(1).ToShortDateString());
