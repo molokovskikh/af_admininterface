@@ -2,8 +2,6 @@
 using AdminInterface.Models;
 using AdminInterface.Helpers;
 using NUnit.Framework;
-using Test.Support.Web;
-using WatiN.Core;
 
 namespace Functional
 {
