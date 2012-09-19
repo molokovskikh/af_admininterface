@@ -66,8 +66,10 @@ namespace Functional.Billing
 			Assert.IsFalse(accounted.Checked);
 			Assert.IsFalse(accounted.Enabled);
 			Assert.That(browser.Text, !Is.StringContaining("Это поле необходимо заполнить."));
+			AssertText(DateTime.Now.AddMonths(1).ToShortDateString());
 			browser.Refresh();
 			AssertText("Check_free_accounting");
+			AssertText(DateTime.Now.AddMonths(1).ToShortDateString());
 		}
 	}
 }

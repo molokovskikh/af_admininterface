@@ -53,6 +53,7 @@ namespace AdminInterface.Controllers
 					lastLog.Comment = addComment;
 					DbSession.SaveOrUpdate(lastLog);
 				}
+				result = new { data = freePeriodEnd.Value.ToShortDateString() };
 			}
 			if (status != null) {
 				NHibernateUtil.Initialize(account);
