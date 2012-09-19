@@ -550,7 +550,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<td class=short>${app.LinkTo(report, "Редактировать", @Edit)}</td>
 							<td class=short>
 								<input name=id type=hidden value=${report.Id}>
-								<input name=status type="checkbox" ${"checked" if report.Status} />
+								<input name=status data-request="AddComment" unchecked="true" type="checkbox" ${"checked" if report.Status} />
 							</td>
 							<td class=short>
 								<input name=accounted type="checkbox" ${"checked" if report.BeAccounted} />

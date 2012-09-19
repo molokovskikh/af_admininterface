@@ -23,8 +23,12 @@ namespace Functional.Billing
 			_client = DataMother.CreateClientAndUsers();
 			_payer = _client.Payers[0];
 			_payer.Recipient = session.Query<Recipient>().First();
+			var report = new Report { Payer = _payer };
+			_payer.Reports.Add(report);
 			session.Save(_client);
 			session.Save(_payer);
+			session.Save(report);
+			session.Save(new ReportAccount(report));
 			session.Flush();
 		}
 
@@ -70,6 +74,19 @@ namespace Functional.Billing
 			browser.Refresh();
 			AssertText("Check_free_accounting");
 			AssertText(DateTime.Now.AddMonths(1).ToShortDateString());
+		}
+
+		[Test]
+		public void Check_report_status_test()
+		{
+			browser = Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
+			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowMaximized);
+			Css("#reports input[name=status]").Checked = true;
+			Css("#reports input[name=status]").Checked = false;
+			Css("input[name=AddComment]").AppendText("Check_report_status_test");
+			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
+			browser.Refresh();
+			AssertText("Check_report_status_test");
 		}
 	}
 }

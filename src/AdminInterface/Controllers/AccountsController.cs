@@ -69,6 +69,11 @@ namespace AdminInterface.Controllers
 					SetSupplierStatus(((SupplierAccount)account).Supplier, status.Value, addComment);
 				}
 				else {
+					if (account is ReportAccount && account.Status != status.Value)
+						DbSession.Save(new PayerAuditRecord(account.Payer, account) {
+							Message = status.Value ? "$$$Включен" : "$$$Отключен",
+							Comment = addComment
+						});
 					account.Status = status.Value;
 				}
 			}
