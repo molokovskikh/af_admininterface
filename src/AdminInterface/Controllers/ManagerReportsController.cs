@@ -7,6 +7,7 @@ using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
@@ -19,8 +20,10 @@ using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Criterion;
+using NHibernate.Linq;
 using NHibernate.SqlCommand;
 using NHibernate.Type;
+using DocumentType = AdminInterface.Models.Logs.DocumentType;
 
 namespace AdminInterface.Controllers
 {
@@ -28,6 +31,75 @@ namespace AdminInterface.Controllers
 	{
 		[Description("Пользователям")] Users,
 		[Description("Адресам")] Addresses
+	}
+
+	public class ClientAddressFilter : PaginableSortable
+	{
+		public Region Region { get; set; }
+		public RegistrationFinderType FinderType { get; set; }
+		public int PageSize { get; set; }
+
+		public ClientAddressFilter()
+		{
+			SortKeyMap = new Dictionary<string, string> {
+				{ "Id", "Id" },
+				{ "Name", "Name" },
+				{ "ClientId", "c.Id" },
+				{ "ClientName", "c.Name" }
+			};
+			PageSize = 30;
+		}
+
+		public List<Address> Sort(List<Address> list)
+		{
+			var sortProperty = GetSortProperty();
+			switch (sortProperty) {
+				case "Id":
+					if(SortDirection == "asc")
+						return list.OrderBy(t => t.Id).ToList();
+					return list.OrderByDescending(t => t.Id).ToList();
+				case "c.Id":
+					if(SortDirection == "asc")
+						return list.OrderBy(t => t.Client.Id).ToList();
+					return list.OrderByDescending(t => t.Client.Id).ToList();
+				case "Name":
+					if(SortDirection == "asc")
+						return list.OrderBy(t => t.Value).ToList();
+					return list.OrderByDescending(t => t.Value).ToList();
+				case "c.Name":
+					if(SortDirection == "asc")
+						return list.OrderBy(t => t.Client.Name).ToList();
+					return list.OrderByDescending(t => t.Client.Name).ToList();
+			}
+			return new List<Address>();
+		}
+
+		public IList<RegistrationInformation> Find()
+		{
+			var regionMask = SecurityContext.Administrator.RegionMask;
+			if (Region != null)
+				regionMask &= Region.Id;
+			var list = ArHelper.WithSession(s => s.Query<Address>()
+				.Where(a => (!a.Enabled
+					|| a.Client.Status == ClientStatus.Off
+					|| a.AvaliableForUsers.Count(u => u.Logs.AFTime >= DateTime.Now.AddMonths(-1)) == 0)
+					&& (a.Client.HomeRegion.Id & regionMask) > 0)
+				.ToList());
+			list = Sort(list);
+			RowsCount = list.Count;
+			var showClient = list.Skip(PageSize * CurrentPage).Take(PageSize);
+			var result = showClient.Select(c => new RegistrationInformation {
+				ClientEnabled = c.Client.Status,
+				ClientName = c.Client.Name,
+				RegionName = c.Client.HomeRegion.Name,
+				ClientId = c.Client.Id,
+				Id = c.Id,
+				AdressEnabled = c.Enabled,
+				Name = c.Value,
+				IsUpdate = c.AvaliableForUsers.Count(u => u.Logs.AFTime >= DateTime.Now.AddMonths(-1)) != 0
+			}).ToList();
+			return result;
+		}
 	}
 
 	public class RegistrationInformation : IUrlContributor
@@ -46,7 +118,7 @@ namespace AdminInterface.Controllers
 			}
 			set { _name = value; }
 		}
-
+		public bool IsUpdate { get; set; }
 		public DateTime RegistrationDate { get; set; }
 		public bool AdressEnabled { get; set; }
 		public ClientStatus ClientEnabled { get; set; }
@@ -305,6 +377,14 @@ namespace AdminInterface.Controllers
 		public void GetUsersAndAdresses([DataBind("filter")] UserFinderFilter userFilter)
 		{
 			this.RenderFile("Пользовалети_и_адреса.xls", ExportModel.GetUserOrAdressesInformation(userFilter));
+		}
+
+		public void ClientAddressesMonitor()
+		{
+			var filter = new ClientAddressFilter();
+			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			PropertyBag["Clients"] = filter.Find();
+			PropertyBag["filter"] = filter;
 		}
 	}
 }

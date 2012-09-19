@@ -1,0 +1,83 @@
+﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+
+ <% component CaptureFor, {@id : @Title}: %>
+	Клиенты и адреса в регионе, по которым не принимаются накладные
+<% end %>
+${app.BeginFormFor("filter")}
+${FormHelper.HiddenField("filter.SortBy")}
+${FormHelper.HiddenField("filter.SortDirection")}
+<table class="CenterBlock">
+<tbody>
+	<tr>
+		<td class="filter-label">Регион</td>
+		<td>${app.Edit("filter.Region")}</td>
+	</tr>
+
+	<tr>
+		${app.EndFormFor("filter")}
+	</tr>
+</tbody>
+</table>
+
+<% if IsDefined("Clients"): %>
+<table class="DataTable">
+<%if Clients.Count > 0: %>
+	<thead>
+		<tr>
+			<th>${app.Sortable("Код клиента", "ClientId")}</th>
+			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
+			<th>Регион</th>
+			<th>${app.Sortable("Код адреса", "Id")}</th>
+			<th>${app.Sortable("Адрес", "Name")}</th>
+			<th>Клиент отключен</th>
+			<th>Адрес отключен</th>
+			<th>Пользователь не обновлялся более месяца</th>
+		</tr>
+	</thead>
+<%end %>
+	<tbody>
+	<%if Clients.Count > 0: %>
+		<%for i, item in enumerate(Clients): %>
+		<tr style="text-align:center;" class="${ViewHelper.GetRowStyle(i)}">
+			<td>${item.ClientId}</td>
+			<td>
+				${UrlHelper.Link(item.ClientName, {@controller: @Clients, @params: {@id: item.ClientId}})}
+			</td>
+			<td>${item.RegionName}</td>
+			<td>${item.Id}</td>
+			<td>
+				${UrlHelper.Link(item.Name, {@controller: @Addresses, @params: {@id: item.Id}})}
+			</td>
+			<td>
+			<%if item.ClientEnabled>0: %>
+				Нет
+				<%else: %>
+				Да
+				<%end %></td>
+			<td>
+				<%if item.AdressEnabled: %>
+				Нет
+				<%else: %>
+				Да
+				<%end %>
+			</td>
+			<td>
+				<%if item.IsUpdate: %>
+				Нет
+				<%else: %>
+				Да
+				<%end %>
+			</td>
+		</tr>
+		<%end %>
+		<tr>
+			<td colspan=3>${paginator.ShowPaginator()}</td>
+		</tr>
+	<%else: %>
+	<tr class="EmptyData">
+		<td>Ничего не найдено</td>
+	</tr>
+	<%end %>
+	</tbody>
+</table>
+<%end %>

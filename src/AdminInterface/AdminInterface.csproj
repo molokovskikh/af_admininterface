@@ -484,6 +484,7 @@
     <None Include="Views\Logs\OrdersTable.brail" />
     <None Include="Views\Logs\Statistics.brail" />
     <None Include="Views\Mail\RegisterNews.brail" />
+    <Content Include="Views\ManagerReports\ClientAddressesMonitor.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />

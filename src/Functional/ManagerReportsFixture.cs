@@ -27,6 +27,11 @@ namespace Functional
 			browser.SelectList(Find.ByName("filter.FinderType")).SelectByValue(((int)RegistrationFinderType.Addresses).ToString());
 			Click("Показать");
 			AssertText("Зарегистрированные пользователи и адреса в регионе");
+			Open();
+			Click("Отчеты менеджеров");
+			AssertText("Отчеты для менеджеров");
+			Click("Клиенты и адреса, по которым не принимаются накладные");
+			AssertText("Клиенты и адреса в регионе, по которым не принимаются накладные");
 		}
 	}
 }
