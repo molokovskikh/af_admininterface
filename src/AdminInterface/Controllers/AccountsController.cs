@@ -15,6 +15,7 @@ using Castle.MonoRail.Framework;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using Common.Tools;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -44,6 +45,15 @@ namespace AdminInterface.Controllers
 		{
 			var account = Account.TryFind(id);
 			var result = UpdateAccounting(account.Id, accounted, payment, free, freePeriodEnd);
+			DbSession.Save(account);
+			DbSession.Flush();
+			if (freePeriodEnd != null) {
+				var lastLog = DbSession.Query<PayerAuditRecord>().Where(a => a.Payer == account.Payer).OrderByDescending(a => a.WriteTime).FirstOrDefault();
+				if (lastLog != null) {
+					lastLog.Comment = addComment;
+					DbSession.SaveOrUpdate(lastLog);
+				}
+			}
 			if (status != null) {
 				NHibernateUtil.Initialize(account);
 				if (account is UserAccount) {
@@ -146,6 +156,7 @@ namespace AdminInterface.Controllers
 				this.Mailer().AccountChanged(account).Send();
 
 			account.Update();
+
 			return result;
 		}
 

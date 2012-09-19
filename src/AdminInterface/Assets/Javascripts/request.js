@@ -25,12 +25,16 @@
       modal: true,
       buttons: {
         "Продолжить": function() {
+          var params;
           if (!$(this).valid()) {
             return;
           }
-          url += "&" + $.param($(this).find("input"));
+          params = url;
+          url = $(this).children("div").children("input").each(function() {
+            return params += "&" + $.param($(this));
+          });
           $(this).dialog("destroy");
-          return next(url);
+          return next(params);
         },
         "Отменить": function() {
           cancel();
@@ -42,7 +46,7 @@
   };
   freePeriodEnd = function(url, next, cancel) {
     var form;
-    form = $("<form><div><label>Дата окончания бесплатного периода</label><input name=FreePeriodEnd class='date'></div></form>");
+    form = $("<form><div><label>Дата окончания бесплатного периода</label><input name=FreePeriodEnd class='date'> </br>" + "<label>Основание бесплатного обслуживания</label><input id='AddCommentField' name='AddComment' class='required' >" + "</div></form>");
     return showForm(url, next, cancel, form);
   };
   addComment = function(url, next, cancel) {
