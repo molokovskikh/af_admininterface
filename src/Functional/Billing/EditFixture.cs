@@ -60,12 +60,14 @@ namespace Functional.Billing
 			Css("input[name=accounted]").Checked = true;
 			Css("input[name=free]").Checked = true;
 			Css("input[name=FreePeriodEnd]").AppendText(DateTime.Now.AddMonths(1).ToShortDateString());
-			Css("input[name=AddComment]").AppendText("testComment");
+			Css("input[name=AddComment]").AppendText("Check_free_accounting");
 			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
 			var accounted = Css("input[name=accounted]");
 			Assert.IsFalse(accounted.Checked);
 			Assert.IsFalse(accounted.Enabled);
 			Assert.That(browser.Text, !Is.StringContaining("Это поле необходимо заполнить."));
+			browser.Refresh();
+			AssertText("Check_free_accounting");
 		}
 	}
 }
