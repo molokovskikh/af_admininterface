@@ -80,7 +80,6 @@ namespace Functional.Billing
 		public void Check_report_status_test()
 		{
 			browser = Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
-			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowMaximized);
 			Css("#reports input[name=status]").Checked = true;
 			Css("#reports input[name=status]").Checked = false;
 			Css("input[name=AddComment]").AppendText("Check_report_status_test");
