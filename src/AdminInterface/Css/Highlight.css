@@ -50,3 +50,11 @@ td.to-many-orders {
 td.service-stoped {
 	background-color: red;
 }
+
+td.OrderProcStatus.order-proc-not-runnig-or-unknown{
+	background-color: red;
+}
+
+td.PriceProcessorMasterStatus.price-processor-master-not-runnig-or-unknown{
+	background-color: red;
+}

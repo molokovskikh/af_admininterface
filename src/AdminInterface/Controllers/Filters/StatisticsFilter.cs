@@ -26,6 +26,8 @@ namespace AdminInterface.Controllers.Filters
 		public string Producer { get; set; }
 		public uint? ProductId { get; set; }
 		public string CertificateError { get; set; }
+		public uint? DocumentId { get; set; }
+		public string DocumentFileName { get; set; }
 
 		public string GetReason()
 		{
@@ -50,6 +52,8 @@ namespace AdminInterface.Controllers.Filters
 				{ "ClientName", "c.Name" },
 				{ "ClientRegion", "r1.Region" },
 				{ "SupplierName", "s.Name" },
+				{ "DocumentId", "dl.RowId" },
+				{ "DocumentFileName", "dl.FileName" },
 				{ "SupplierRegion", "r2.Region" },
 				{ "ProcuctCode", "db.Code" },
 				{ "RequestTime", "u.RequestTime" },
@@ -70,6 +74,8 @@ r1.Region as ClientRegion,
 s.Name as SupplierName,
 s.Id as SupplierId,
 r2.Region as SupplierRegion,
+dl.RowId DocumentId,
+dl.FileName as DocumentFileName,
 u.RequestTime,
 db.Code ProcuctCode,
 db.Product as ProductName,
@@ -82,6 +88,7 @@ from Logs.CertificateRequestLogs l
 	join Customers.Clients c on c.Id = fu.ClientId
 	join Documents.DocumentBodies db on db.Id = l.DocumentBodyId
 	join Documents.DocumentHeaders dh on dh.Id = db.DocumentId
+	left join logs.Document_logs dl on dl.RowId = dh.DownloadId
 	join Customers.Suppliers s on s.Id = dh.FirmCode
 	join farm.Regions r1 on r1.RegionCode = c.RegionCode
 	join farm.Regions r2 on r2.RegionCode = s.HomeRegion

@@ -118,7 +118,7 @@ namespace AdminInterface.Mailers
 			Subject = String.Format("Платное изменение пароля - {0}", user.Client.FullName);
 		}
 
-		public void NotifyBillingAboutClientRegistration(Client client)
+		public MonorailMailer NotifyBillingAboutClientRegistration(Client client)
 		{
 			Template = "NotifyBillingAboutClientRegistration";
 			IsBodyHtml = true;
@@ -130,6 +130,7 @@ namespace AdminInterface.Mailers
 			PropertyBag["payer"] = client.Payers.First();
 			PropertyBag["user"] = client.Users.FirstOrDefault();
 			PropertyBag["admin"] = SecurityContext.Administrator;
+			return this;
 		}
 
 		public void DoNotHaveInvoiceContactGroup(Invoice invoice)
@@ -394,11 +395,11 @@ namespace AdminInterface.Mailers
 
 		public MonorailMailer PayerRegistred(Payer payer)
 		{
-			GeneralizationPropertyChanged(payer);
-			To = "billing@analit.net";
+			GeneralizationPropertyChanged(payer, payer.Comment);
+			To = "billing@analit.net, office@analit.net";
 			IsBodyHtml = true;
 			Template = "PropertyChanged_html";
-			Subject = String.Format("Зарегистрирован {0}", BindingHelper.GetDescription(payer));
+			Subject = String.Format("Зарегистрирован {0}", BindingHelper.GetDescription(payer).ToLower());
 			return this;
 		}
 	}

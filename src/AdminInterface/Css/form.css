@@ -130,3 +130,20 @@ input.error
 form.vertical label {
 	display: block;
 }
+
+.innspan {
+	font-size: 13px;
+	margin-left: 4px;
+	vertical-align: top;
+}
+
+.topvalign {
+	vertical-align: top;
+}
+
+.width100 {
+	width: 100%;
+}
+.width70 {
+	width: 70%;
+}

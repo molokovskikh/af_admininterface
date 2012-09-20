@@ -17,6 +17,8 @@ ${app.EndFormFor("filter")}
 				<th>${app.Sortable("Клиент", "ClientName")}</th>
 				<th>${app.Sortable("Регион клиента", "ClientRegion")}</th>
 				<th>${app.Sortable("Поставщик", "SupplierName")}</th>
+				<th>${app.Sortable("Номер документа", "DocumentId")}</th>
+				<th>${app.Sortable("Название файла", "DocumentFileName")}</th>
 				<th>${app.Sortable("Регион поставщика", "SupplierRegion")}</th>
 				<th>${app.Sortable("Код товара", "ProcuctCode")}</th>
 				<th>${app.Sortable("Товар", "ProductName")}</th>
@@ -33,6 +35,16 @@ ${app.EndFormFor("filter")}
 				<td>${app.LinkTo("${item.ClientName}",  @Clients, "${item.ClientCode}")}</td>
 				<td>${item.ClientRegion}</td>
 				<td>${app.LinkTo("${item.SupplierName}",  @Suppliers, "${item.SupplierId}")}</td>
+				<td>${item.DocumentId}</td>
+				<td>
+				<% if item.DocumentId: %>
+						<a id="ShowDocumentDetailsLink${item.DocumentId}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${item.DocumentId}, 'ShowDocumentDetails?documentLogId=${item.DocumentId}', 'DocumentDetails');">
+							!{item.DocumentFileName}
+						</a>
+						<br>
+					<a href="Download?id=${item.DocumentId}">Загрузить</a>
+				<% end %>
+				</td>
 				<td>${item.SupplierRegion}</td>
 				<td>${item.ProcuctCode}</td>
 				<td>${item.ProductName}</td>

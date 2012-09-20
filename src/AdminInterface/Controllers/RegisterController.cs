@@ -497,21 +497,18 @@ WHERE   pricesdata.firmcode = s.Id
 			var supplier = payer.Suppliers.FirstOrDefault();
 			var client = payer.Clients.FirstOrDefault();
 			if (client != null)
-				this.Mailer().NotifyBillingAboutClientRegistration(client);
+				this.Mailer().NotifyBillingAboutClientRegistration(client).Send();
 			else
-				this.Mailer().PayerRegistred(payer);
+				this.Mailer().PayerRegistred(payer).Send();
 
-			string redirectUrl;
 			if (showRegistrationCard && client != null && client.Users.Count > 0)
-				redirectUrl = String.Format("~/main/report?id={0}", client.Users.First().Id);
+				RedirectToUrl(String.Format("~/main/report?id={0}", client.Users.First().Id));
 			else if (client != null)
-				redirectUrl = String.Format("~/Client/{0}", client.Id);
+				RedirectTo(client);
 			else if (supplier != null)
-				redirectUrl = String.Format("~/Suppliers/{0}", supplier.Id);
+				RedirectTo(supplier);
 			else
-				redirectUrl = String.Format("~/Payers/{0}", payer.Id);
-
-			RedirectToUrl(redirectUrl);
+				RedirectTo(payer);
 		}
 
 		public void SearchPayers(string searchPattern)
