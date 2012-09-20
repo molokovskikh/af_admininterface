@@ -140,15 +140,16 @@ namespace AdminInterface.Controllers
 		public void Update([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client)
 		{
 			Admin.CheckClientPermission(client);
-			if(!Validator.IsValid(client)) {
-				var errors = Validator.GetErrorSummary(client);
-				if(errors.InvalidProperties.Contains("Name"))
-					Error(string.Format("В данном регионе уже существует клиент с таким именем {0}", client.Name));
-				RedirectToReferrer();
-				return;
-			}
-			var savedNotify = true;
 			var changeName = client.IsChanged(c => c.Name);
+			if(changeName)
+				if(!Validator.IsValid(client)) {
+					var errors = Validator.GetErrorSummary(client);
+					if(errors.InvalidProperties.Contains("Name"))
+						Error(string.Format("В данном регионе уже существует клиент с таким именем {0}", client.Name));
+					RedirectToReferrer();
+					return;
+				}
+			var savedNotify = true;
 			var changeFullName = client.IsChanged(c => c.FullName);
 			if (changeFullName || changeName) {
 				var legalEntityes = client.GetLegalEntity();

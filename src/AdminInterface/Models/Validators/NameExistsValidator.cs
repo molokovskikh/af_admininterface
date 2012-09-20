@@ -19,7 +19,8 @@ namespace AdminInterface.Models.Validators
 			var DbSession = sessionHolder.CreateSession(typeof(ActiveRecordBase));
 			DbSession.FlushMode = FlushMode.Never;
 			var clientNameExists = DbSession.QueryOver<Client>().Where(c => c.HomeRegion.Id == ((Client)instance).HomeRegion.Id && c.Name == fieldValue.ToString() && c.Id != ((Client)instance).Id).RowCount() > 0;
-			if (clientNameExists) {
+			var nameChanged = DbSession.QueryOver<Client>().Where(c => c.Id == ((Client)instance).Id && c.Name == fieldValue).RowCount() == 0;
+			if (clientNameExists && nameChanged) {
 				isValid = false;
 			}
 			if (DbSession != null) {
