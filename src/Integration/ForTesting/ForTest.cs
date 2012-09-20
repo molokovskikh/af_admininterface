@@ -16,7 +16,7 @@ using Castle.MonoRail.Framework.Internal;
 using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Views.Brail;
 using Common.Web.Ui.MonoRailExtentions;
-using IgorO.ExposedObjectProject;
+using ExposedObject;
 using Rhino.Mocks;
 using log4net.Config;
 
@@ -48,7 +48,7 @@ namespace Integration.ForTesting
 
 			var manager = new DefaultViewEngineManager();
 			manager.Service(provider);
-			var options = ExposedObject.From(manager).viewEnginesFastLookup[0].Options;
+			var options = Exposed.From(manager).viewEnginesFastLookup[0].Options;
 			var namespaces = options.NamespacesToImport;
 			namespaces.Add("Boo.Lang.Builtins");
 			namespaces.Add("AdminInterface.Helpers");

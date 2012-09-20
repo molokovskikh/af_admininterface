@@ -4,7 +4,7 @@ using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
-using IgorO.ExposedObjectProject;
+using ExposedObject;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -72,13 +72,13 @@ namespace Integration.Controllers
 			session.SaveOrUpdate(client);
 
 			//анонимные объекты internal для того что бы получить доступ к полям использую exposed object
-			var result = ExposedObject.From(controller.Update(userAccount.Id, null, false, null, null, null, null));
+			var result = Exposed.From(controller.Update(userAccount.Id, null, false, null, null, null, null));
 
 			addressAccount.Refresh();
 			Assert.That(addressAccount.IsFree, Is.False);
 			Assert.That(result.message, Is.EqualTo(String.Format("Следующие адреса доставки стали платными: {0}", address.Value)));
 			Assert.That(result.accounts.Length, Is.EqualTo(1));
-			var resultAccount = ExposedObject.From(result.accounts[0]);
+			var resultAccount = Exposed.From(result.accounts[0]);
 			Assert.That(resultAccount.id, Is.EqualTo(addressAccount.Id));
 			Assert.That(resultAccount.free, Is.EqualTo(addressAccount.IsFree));
 		}
