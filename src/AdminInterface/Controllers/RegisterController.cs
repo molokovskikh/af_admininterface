@@ -502,7 +502,7 @@ WHERE   pricesdata.firmcode = s.Id
 				this.Mailer().PayerRegistred(payer).Send();
 
 			if (showRegistrationCard && client != null && client.Users.Count > 0)
-				RedirectToUrl("~/main/report?id={0}", client.Users.First().Id);
+				RedirectToUrl(String.Format("~/main/report?id={0}", client.Users.First().Id));
 			else if (client != null)
 				RedirectTo(client);
 			else if (supplier != null)
