@@ -100,7 +100,7 @@ namespace AdminInterface.Models
 		[Property, Description("Краткое наименование"), Auditable, Notify, ValidateNonEmpty, NameExistsValidator]
 		public override string Name { get; set; }
 
-		[Property, Description("Полное наименование"), Auditable, Notify, ValidateNonEmpty, NameExistsValidator]
+		[Property, Description("Полное наименование"), Auditable, Notify, ValidateNonEmpty]
 		public virtual string FullName { get; set; }
 
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Включен"), Auditable]

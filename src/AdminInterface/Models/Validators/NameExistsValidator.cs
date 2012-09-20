@@ -6,6 +6,7 @@ using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Common.MySql;
+using NHibernate;
 
 namespace AdminInterface.Models.Validators
 {
@@ -13,17 +14,19 @@ namespace AdminInterface.Models.Validators
 	{
 		public override bool IsValid(object instance, object fieldValue)
 		{
+			var isValid = true;
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var DbSession = sessionHolder.CreateSession(typeof(ActiveRecordBase));
+			DbSession.FlushMode = FlushMode.Never;
 			var clientNameExists = DbSession.QueryOver<Client>().Where(c => c.HomeRegion.Id == ((Client)instance).HomeRegion.Id && c.Name == fieldValue.ToString() && c.Id != ((Client)instance).Id).RowCount() > 0;
 			if (clientNameExists) {
-				return false;
+				isValid = false;
 			}
 			if (DbSession != null) {
 				sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 				sessionHolder.ReleaseSession(DbSession);
 			}
-			return true;
+			return isValid;
 		}
 
 		public override bool SupportsBrowserValidation
