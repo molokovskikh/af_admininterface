@@ -80,11 +80,15 @@
 </script>
 
 <style>
+
 	input[type='text']
 	{
 		width: 70%;
 	}
-
+	input[id='client_FullName']
+	{
+	width: 100%;
+	}
 	span.message
 	{
 		display:block;
@@ -234,18 +238,33 @@
 			${FormHelper.FormTag("Update", null)}
 				${FormHelper.HiddenField("client.Id")}
 				<div>
-					<p>
-						Полное наименование<br>
-						${app.Edit("client.FullName")}
-						<span class="innspan">${client.INN}</span>
-						${app.GetValidationError(client, @FullName)}
+					<table class="width100">
+						<tr class="topvalign">
+							<td class="width70">
+								<p>
+									Полное наименование<br>
+									${app.Edit("client.FullName")}
+									${app.GetValidationError(client, @FullName)}
+								</p>
+							</td>
+							<td>
+								<p>
+									<br>
+									<span class="innspan">${client.INN}</span>
+								</p>
+							</td>
+						</tr>
+						<tr>
+							<td colspan=2>
+								<p>
+									Краткое наименование<br>
+									${app.Edit("client.Name")}
+									${app.GetValidationError(client, @Name)}
+								</p>
+							</td>
+						</tr>
+				</table>
 
-					</p>
-					<p>
-						Краткое наименование<br>
-						${app.Edit("client.Name")}
-						${app.GetValidationError(client, @Name)}
-					</p>
 				</div>
 				<div>
 					<input type=submit value="Сохранить" />
