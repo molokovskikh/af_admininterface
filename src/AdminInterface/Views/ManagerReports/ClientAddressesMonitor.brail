@@ -38,7 +38,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	<tbody>
 	<%if Clients.Count > 0: %>
 		<%for i, item in enumerate(Clients): %>
-		<tr style="text-align:center;" class="${ViewHelper.GetRowStyle(i)}">
+		<tr class="${ViewHelper.GetRowStyle(i)} Submit">
 			<td>${item.ClientId}</td>
 			<td>
 				${UrlHelper.Link(item.ClientName, {@controller: @Clients, @params: {@id: item.ClientId}})}
