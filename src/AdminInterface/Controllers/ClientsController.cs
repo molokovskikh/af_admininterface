@@ -19,6 +19,7 @@ using AdminInterface.Security;
 using AdminInterface.Services;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -139,19 +140,16 @@ namespace AdminInterface.Controllers
 		public void Update([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client)
 		{
 			Admin.CheckClientPermission(client);
-			var name = client.Name;
-			var oldMode = DbSession.FlushMode;
-			DbSession.FlushMode = FlushMode.Never;
-			var clientNameExists = DbSession.QueryOver<Client>().Where(c => c.HomeRegion.Id == client.HomeRegion.Id && c.Name == name && c.Id != client.Id).RowCount() > 0;
-			DbSession.FlushMode = oldMode;
-			if (clientNameExists) {
-				Error(string.Format("В данном регионе уже существует клиент с таким именем {0}", client.Name));
-				DbSession.Evict(client);
-				RedirectToReferrer();
-				return;
-			}
-			var savedNotify = true;
 			var changeName = client.IsChanged(c => c.Name);
+			if(changeName)
+				if(!Validator.IsValid(client)) {
+					var errors = Validator.GetErrorSummary(client);
+					if(errors.InvalidProperties.Contains("Name"))
+						Error(string.Format("В данном регионе уже существует клиент с таким именем {0}", client.Name));
+					RedirectToReferrer();
+					return;
+				}
+			var savedNotify = true;
 			var changeFullName = client.IsChanged(c => c.FullName);
 			if (changeFullName || changeName) {
 				var legalEntityes = client.GetLegalEntity();
