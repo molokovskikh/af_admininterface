@@ -327,7 +327,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining("111-111111 - some comment, 211-111111, 311-111111"));
 
 			var client = session.Load<Client>(clientCode);
-			var contacts = client.ContactGroupOwner.ContactGroups.First(g => g.Type == ContactGroupType.General).Contacts;
+			var contacts = client.ContactGroupOwner.ContactGroups.Where(g => g.Type == ContactGroupType.General).ToList()[1].Contacts;
 			Assert.That(contacts.Count, Is.EqualTo(4));
 			Assert.That(contacts[0].ContactText, Is.EqualTo("111-111111"));
 			Assert.That(contacts[0].Comment, Is.EqualTo("some comment"));
@@ -378,7 +378,7 @@ namespace Functional.Drugstore
 			browser.Button("RegisterButton").Click();
 
 			var client = GetRegistredClient();
-			var contacts = client.ContactGroupOwner.ContactGroups[0].Contacts;
+			var contacts = client.ContactGroupOwner.ContactGroups[1].Contacts;
 			Assert.That(contacts.Count, Is.EqualTo(3));
 			Assert.That(contacts[0].Type, Is.EqualTo(ContactType.Phone));
 			Assert.That(contacts[1].ContactText, Is.EqualTo("qwerty1@qq.qq"));

@@ -24,7 +24,6 @@ namespace AdminInterface.Models.Validators
 				isValid = false;
 			}
 			if (DbSession != null) {
-				sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 				sessionHolder.ReleaseSession(DbSession);
 			}
 			return isValid;
