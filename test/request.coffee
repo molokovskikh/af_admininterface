@@ -7,12 +7,13 @@ $ ->
 		handleDialog = ->
 			equal $(".ui-dialog").css("display"), "block"
 			$(".ui-dialog input[name=FreePeriodEnd]").val("2012/03/03")
+			$(".ui-dialog input[name=AddComment]").val("TestComment")
 			$(".ui-dialog button:contains('Продолжить')").click()
 
 		done = (url) ->
 			return if isDone
 			isDone = true
-			equal url, "&FreePeriodEnd=2012%2F03%2F03"
+			equal url, "&FreePeriodEnd=2012%2F03%2F03&AddComment=TestComment"
 			start()
 
 		setTimeout handleDialog, 20

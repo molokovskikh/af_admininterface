@@ -11,6 +11,7 @@ using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.Models.Validators;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -96,7 +97,7 @@ namespace AdminInterface.Models
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property, Description("Краткое наименование"), Auditable, Notify, ValidateNonEmpty]
+		[Property, Description("Краткое наименование"), Auditable, Notify, ValidateNonEmpty, NameExistsValidator]
 		public override string Name { get; set; }
 
 		[Property, Description("Полное наименование"), Auditable, Notify, ValidateNonEmpty]

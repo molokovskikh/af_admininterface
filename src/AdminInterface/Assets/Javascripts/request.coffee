@@ -21,16 +21,20 @@ showForm = (url, next, cancel, form) ->
 		buttons:
 			"Продолжить": ->
 				return unless $(this).valid()
-				url += "&" + $.param $(this).find("input")
+				params = url
+				url = $(this).children("div").children("input").each ->
+					params += "&" + $.param $(this)
 				$(this).dialog("destroy")
-				next(url)
+				next(params)
 			"Отменить": ->
 				cancel()
 				$(this).dialog("destroy")
 	form.validate()
 
 freePeriodEnd = (url, next, cancel) ->
-	form = $("<form><div><label>Дата окончания бесплатного периода</label><input name=FreePeriodEnd class='date'></div></form>")
+	form = $("<form><div><label>Дата окончания бесплатного периода</label><input name=FreePeriodEnd class='date'> </br>" +
+	"<label>Основание бесплатного обслуживания</label><input id='AddCommentField' name='AddComment' class='required' >" +
+	"</div></form>")
 	showForm(url, next, cancel, form)
 
 addComment = (url, next, cancel) ->

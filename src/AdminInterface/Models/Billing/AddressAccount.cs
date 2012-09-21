@@ -47,6 +47,11 @@ namespace AdminInterface.Models.Billing
 			get { return Address.Id; }
 		}
 
+		public override bool Enabled
+		{
+			get { return Address.Enabled; }
+		}
+
 		public virtual bool HasPaidUsers
 		{
 			get
