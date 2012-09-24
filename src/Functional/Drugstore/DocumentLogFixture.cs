@@ -52,6 +52,7 @@ namespace Functional.Drugstore
 			OpenedWindow("История документов");
 			AssertText(document.Id.ToString());
 			AssertText("тестовый адрес");
+			AssertText("Только неразобранные накладные:");
 		}
 
 		[Test]
