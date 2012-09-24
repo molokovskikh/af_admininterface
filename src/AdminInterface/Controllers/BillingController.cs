@@ -142,7 +142,7 @@ namespace AdminInterface.Controllers
 				.ToList();
 
 			PropertyBag["filter"] = filter;
-			PropertyBag["LogRecords"] = AuditLogRecord.GetLogs(payer);
+			PropertyBag["LogRecords"] = AuditLogRecord.GetLogs(payer, true);
 			PropertyBag["Instance"] = payer;
 			PropertyBag["payer"] = payer;
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer);
@@ -157,6 +157,14 @@ namespace AdminInterface.Controllers
 
 			if (currentJuridicalOrganizationId > 0)
 				PropertyBag["currentJuridicalOrganizationId"] = currentJuridicalOrganizationId;
+		}
+
+		public void SendMessage(uint BillingCode, string messageText)
+		{
+			var payer = DbSession.Get<Payer>(BillingCode);
+			var message = new PayerAuditRecord(payer, messageText);
+			DbSession.Save(message);
+			RedirectToReferrer();
 		}
 
 		public void Update(

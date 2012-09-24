@@ -211,7 +211,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["maxRegion"] = UInt64.MaxValue;
 
 			PropertyBag["filter"] = filter;
-			PropertyBag["messages"] = filter.Execute(user, DbSession);
+			PropertyBag["messages"] = user.GetAuditRecord(DbSession, filter);
 
 			if (user.Client != null) {
 				var setting = user.Client.Settings;

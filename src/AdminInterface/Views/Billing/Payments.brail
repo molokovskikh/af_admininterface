@@ -729,6 +729,14 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	<% end %>
 	
 	<div class="UseCaseGroup">
+		<form id="MessagesForm" action="SendMessage" method="post">
+			${FormHelper.HiddenField("BillingCode")}
+			<h3>Сообщения пользователя</h3>
+			Новое сообщение:
+			<textarea style="height: 150px; width:100%;" name="messageText"></textarea>
+			<br />
+			<input type=submit value="Принять"/>
+		</form>
 		<div class="InputGroupHeader" style="margin-bottom:10px;">
 			История
 		</div>

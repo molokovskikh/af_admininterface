@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using NHibernate;
@@ -29,22 +30,46 @@ namespace AdminInterface.Queries
 		{
 			var objectType = AuditRecord.GetLogObjectType(user);
 			var serviceType = AuditRecord.GetLogObjectType(user.RootService);
-			return session.Query<AuditRecord>()
+			var userAudit = session.Query<AuditRecord>()
 				.Where(l => (l.ObjectId == user.Id && l.Type == objectType) || (l.ObjectId == user.RootService.Id && l.Type == serviceType))
 				.Where(l => Types.Contains(l.MessageType))
 				.OrderByDescending(l => l.WriteTime)
 				.Fetch(l => l.Administrator)
 				.ToList();
+			return userAudit.Concat(ForPayer(user.Payer)).OrderByDescending(o => o.WriteTime).ToList();
 		}
 
 		public IList<AuditRecord> Execute(Service service, ISession session)
 		{
-			return session.Query<AuditRecord>()
+			var serviceAudit = session.Query<AuditRecord>()
 				.Where(l => l.Service == service)
 				.Where(l => Types.Contains(l.MessageType))
 				.OrderByDescending(l => l.WriteTime)
 				.Fetch(l => l.Administrator)
 				.ToList();
+			if (service.IsClient()) {
+				return serviceAudit.Concat(((Client)service).Payers.SelectMany(p => ForPayer(p))).OrderByDescending(o => o.WriteTime).ToList();
+			}
+			else {
+				return serviceAudit.Concat(ForPayer(((Supplier)service).Payer)).OrderByDescending(o => o.WriteTime).ToList();
+			}
+		}
+
+		public IList<AuditRecord> ForPayer(Payer payer)
+		{
+			if (payer != null && Types.Contains(LogMessageType.System)) {
+				var payerMessages = AuditLogRecord.GetLogs(payer, false);
+				return payerMessages.Select(m => new AuditRecord {
+					Message = m.Message,
+					ObjectId = m.ObjectId,
+					Name = m.Name,
+					Type = m.LogType,
+					WriteTime = m.LogTime,
+					UserName = m.OperatorName,
+					MessageType = LogMessageType.System
+				}).ToList();
+			}
+			return new List<AuditRecord>();
 		}
 	}
 }
