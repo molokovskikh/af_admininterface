@@ -141,14 +141,22 @@ namespace AdminInterface.Controllers
 		{
 			Admin.CheckClientPermission(client);
 			var changeName = client.IsChanged(c => c.Name);
-			if(changeName)
-				if(!Validator.IsValid(client)) {
-					var errors = Validator.GetErrorSummary(client);
-					if(errors.InvalidProperties.Contains("Name"))
-						Error(string.Format("В данном регионе уже существует клиент с таким именем {0}", client.Name));
-					RedirectToReferrer();
-					return;
-				}
+			if(!Validator.IsValid(client)) {
+				var users = client.Users;
+				var addresses = client.Addresses;
+				PropertyBag["Client"] = client;
+				PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
+				PropertyBag["users"] = users.OrderBy(user => user.Id).ToList();
+				PropertyBag["addresses"] = addresses.OrderBy(a => a.LegalEntity.Name).ThenBy(a => a.Name).ToList();
+
+				PropertyBag["usersInfo"] = ADHelper.GetPartialUsersInformation(users);
+				var filter = new MessageQuery();
+				BindObjectInstance(filter, "filter");
+				PropertyBag["filter"] = filter;
+				PropertyBag["messages"] = filter.Execute(client, DbSession);
+				RenderView("Show");
+				return;
+			}
 			var savedNotify = true;
 			var changeFullName = client.IsChanged(c => c.FullName);
 			if (changeFullName || changeName) {
@@ -174,7 +182,9 @@ namespace AdminInterface.Controllers
 			DbSession.SaveOrUpdate(client);
 			if (savedNotify)
 				Notify("Сохранено");
-			RedirectToReferrer();
+			RedirectToAction("Show", new Dictionary<string, string> {
+				{ "id", client.Id.ToString() }
+			});
 		}
 
 		[AccessibleThrough(Verb.Post)]
