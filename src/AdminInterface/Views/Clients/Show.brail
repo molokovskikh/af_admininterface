@@ -79,32 +79,10 @@
 
 </script>
 
-<style>
-
-	input[type='text']
-	{
-		width: 70%;
-	}
-	input[id='client_FullName']
-	{
-	width: 100%;
-	}
-	span.message
-	{
-		display:block;
-		clear:both;
-		font-style:italic;
-	}
-
-	span.message.error
-	{
-		color:Red;
-	}
-</style>
-	
+${app.Asset("ClientsShow.css")}
 <h2>Клиент ${client.Name}, Код ${client.Id}</h2>
 
-<div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
+<div class="MainDiv">
 
 	<% if client.Disabled: %>
 		<div class="Warning">
@@ -183,7 +161,7 @@
 				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
 			</div>
 			<h3>Пользователи</h3>
-			<table style="width:100%;" id=users class="style">
+			<table id=users class="style width100">
 				<tr valign="top" align="left">
 					<th>${app.Sortable("Код пользователя", "Users.Id")}</th>
 					<th>${app.Sortable("Имя пользователя", "Users.Login")}</th>
