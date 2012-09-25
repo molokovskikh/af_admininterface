@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Controllers;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
-using IgorO.ExposedObjectProject;
+using ExposedObject;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -36,20 +37,26 @@ namespace Integration.Controllers
 			Assert.That(user.Enabled, Is.False);
 		}
 
+
 		[Test]
 		public void Update_report_account()
 		{
 			var report = new Report {
 				Allow = true,
 				Comment = "тестовый отчет",
-				Payer = payer,
+				Payer = payer
 			};
-			var account = new ReportAccount(report);
+			var account = new ReportAccount(report) { ReadyForAccounting = true, BeAccounted = false, IsFree = false, FreePeriodEnd = DateTime.Now.AddMonths(1) };
 			account.Save();
 			Flush();
 
+			var acoounts = Account.GetReadyForAccounting(new Pager { PageSize = 1000 }).Select(a => a.ObjectId).ToList();
+			Assert.IsTrue(acoounts.Contains(account.ObjectId));
 			controller.Update(account.Id, true, null, true, 500, null, null);
 			Flush();
+
+			acoounts = Account.GetReadyForAccounting(new Pager()).Select(a => a.ObjectId).ToList();
+			Assert.IsFalse(acoounts.Contains(account.ObjectId));
 
 			account.Refresh();
 			Assert.That(account.Payment, Is.EqualTo(500));
@@ -72,13 +79,13 @@ namespace Integration.Controllers
 			session.SaveOrUpdate(client);
 
 			//анонимные объекты internal для того что бы получить доступ к полям использую exposed object
-			var result = ExposedObject.From(controller.Update(userAccount.Id, null, false, null, null, null, null));
+			var result = Exposed.From(controller.Update(userAccount.Id, null, false, null, null, null, null));
 
 			addressAccount.Refresh();
 			Assert.That(addressAccount.IsFree, Is.False);
 			Assert.That(result.message, Is.EqualTo(String.Format("Следующие адреса доставки стали платными: {0}", address.Value)));
 			Assert.That(result.accounts.Length, Is.EqualTo(1));
-			var resultAccount = ExposedObject.From(result.accounts[0]);
+			var resultAccount = Exposed.From(result.accounts[0]);
 			Assert.That(resultAccount.id, Is.EqualTo(addressAccount.Id));
 			Assert.That(resultAccount.free, Is.EqualTo(addressAccount.IsFree));
 		}

@@ -78,7 +78,7 @@ namespace AdminInterface.Models.Billing
 			Style,
 			Property(Access = PropertyAccess.FieldCamelcaseUnderscore),
 			Description("Обслуживается бесплатно"),
-			Auditable("Обслуживается бесплатно"),
+			Auditable("Бесплатно"),
 			RequiredPermission(PermissionType.CanRegisterClientWhoWorkForFree)
 		]
 		public virtual bool IsFree
@@ -113,6 +113,8 @@ namespace AdminInterface.Models.Billing
 		public abstract LogObjectType ObjectType { get; }
 
 		public abstract uint ObjectId { get; }
+
+		public abstract bool Enabled { get; }
 
 		public virtual string Type
 		{
@@ -189,9 +191,9 @@ namespace AdminInterface.Models.Billing
 			var readyForAccounting = Queryable.Where(a => a.ReadyForAccounting
 				&& !a.BeAccounted
 				&& !(a.IsFree && a.FreePeriodEnd != null && a.FreePeriodEnd > freeEnd));
-
-			pager.Total = readyForAccounting.Count();
-			return pager.DoPage(readyForAccounting).ToList();
+			var allResult = readyForAccounting.ToList().Where(a => a.Enabled);
+			pager.Total = allResult.Count();
+			return pager.DoPage(allResult).ToList();
 		}
 
 		public virtual IAuditRecord GetAuditRecord()

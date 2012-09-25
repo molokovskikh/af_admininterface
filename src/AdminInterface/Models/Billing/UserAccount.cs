@@ -56,6 +56,11 @@ namespace AdminInterface.Models.Billing
 			get { return LogObjectType.User; }
 		}
 
+		public override bool Enabled
+		{
+			get { return User.Enabled; }
+		}
+
 		public override bool ShouldPay()
 		{
 			return !User.RootService.Disabled && User.Enabled && base.ShouldPay();

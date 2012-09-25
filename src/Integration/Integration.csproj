@@ -129,6 +129,7 @@
     <Compile Include="DocumentBuildFilterFixture.cs" />
     <Compile Include="ForTesting\ModelExtension.cs" />
     <Compile Include="ManagepFixture.cs" />
+    <Compile Include="ManagerReportFixture.cs" />
     <Compile Include="MaskedAuditablePropertyFixture.cs" />
     <Compile Include="AuditorFixture.cs" />
     <Compile Include="ClientCardFixture.cs" />

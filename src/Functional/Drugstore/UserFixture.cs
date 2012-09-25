@@ -797,5 +797,16 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 			browser.Button(Find.ByValue("Принять")).Click();
 			Assert.That(browser.ContainsText("Поле содержит запрещенные символы(<, >)."), Is.True);
 		}
+
+		[Test]
+		public void OrdersRegionNoChangedTest()
+		{
+			Open(user);
+			AssertText("Регионы работы");
+			Assert.That(browser.Text, Is.Not.Contains("Изменено 'Регионы заказа'"));
+			browser.Click("Сохранить");
+			AssertText("Сохранено");
+			Assert.That(browser.Text, Is.Not.Contains("Изменено 'Регионы заказа'"));
+		}
 	}
 }

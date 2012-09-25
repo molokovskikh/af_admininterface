@@ -8,7 +8,7 @@ using WatiN.Core;
 namespace Functional
 {
 	[TestFixture]
-	class StatusColorFixture : WatinFixture2
+	public class StatusColorFixture
 	{
 		private const string AllNotRunnigOrUnknownStatus = "order-proc-not-runnig-or-unknown price-processor-master-not-runnig-or-unknown";
 		private const string OrderProcNotRunnigOrUnknownStatus = "order-proc-not-runnig-or-unknown";

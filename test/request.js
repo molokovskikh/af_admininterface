@@ -10,6 +10,7 @@
       handleDialog = function() {
         equal($(".ui-dialog").css("display"), "block");
         $(".ui-dialog input[name=FreePeriodEnd]").val("2012/03/03");
+        $(".ui-dialog input[name=AddComment]").val("TestComment");
         return $(".ui-dialog button:contains('Продолжить')").click();
       };
       done = function(url) {
@@ -17,7 +18,7 @@
           return;
         }
         isDone = true;
-        equal(url, "&FreePeriodEnd=2012%2F03%2F03");
+        equal(url, "&FreePeriodEnd=2012%2F03%2F03&AddComment=TestComment");
         return start();
       };
       setTimeout(handleDialog, 20);

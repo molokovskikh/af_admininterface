@@ -56,6 +56,7 @@
 						<li>${app.LinkTo("Отчеты менеджеров", "ManagerReports", "Index")}</li>
 						<li>${app.LinkTo("Статистика", "Main", "Stat")}</li>
 						<li>${app.LinkTo("Новости", "News", "Index")}</li>
+						<li>${app.LinkTo("Неразобранные накладные", "Logs", "Documents", {"filter.OnlyNoParsed": @true})}</li>
 					</ul>
 				</div>
 				

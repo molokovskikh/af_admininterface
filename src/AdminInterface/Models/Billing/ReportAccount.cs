@@ -46,6 +46,11 @@ namespace AdminInterface.Models.Billing
 			return Report.Allow && base.ShouldPay();
 		}
 
+		public override bool Enabled
+		{
+			get { return Status; }
+		}
+
 		[Style]
 		public bool Disabled
 		{

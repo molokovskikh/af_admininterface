@@ -3,4 +3,5 @@
  <% component CaptureFor, {@id : @Title}: %>
 	Отчеты для менеджеров
 <% end %>
-<a href="${siteroot}/ManagerReports/UsersAndAdresses">Пользователи и адреса</a>
+${app.LinkTo("Пользователи и адреса", @ManagerReports, @UsersAndAdresses)}<br>
+${app.LinkTo("Клиенты и адреса, по которым не принимаются накладные", @ManagerReports, @ClientAddressesMonitor)}<br>

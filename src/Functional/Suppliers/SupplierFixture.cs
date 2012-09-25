@@ -183,5 +183,24 @@ Where pc.PriceCode = :PriceId1")
 			//проверяем RequestInterval
 			Assert.That(source.RequestInterval, Is.EqualTo(86400));
 		}
+
+		[Test]
+		public void OrdersRegionNoChangedTest()
+		{
+			var newUser = new User(supplier.Payer, supplier) {
+				Login = User.GetTempLogin(),
+				OrderRegionMask = 1,
+				Name = "userName"
+			};
+			newUser.Setup();
+			Save(newUser);
+			Flush();
+			Open(newUser);
+			AssertText("Регионы работы");
+			Assert.That(browser.Text, Is.Not.Contains("Регионы заказа"));
+			browser.Click("Сохранить");
+			AssertText("Сохранено");
+			Assert.That(browser.Text, Is.Not.Contains("Регионы заказа"));
+		}
 	}
 }

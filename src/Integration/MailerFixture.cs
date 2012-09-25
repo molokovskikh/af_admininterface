@@ -318,7 +318,7 @@ namespace Integration
 			mailer.Send();
 
 			Assert.That(message.IsBodyHtml, Is.True);
-			Assert.That(message.Subject, Is.EqualTo("Зарегистрирован Плательщик"));
+			Assert.That(message.Subject, Is.EqualTo("Зарегистрирован плательщик"));
 			Assert.That(message.Body, Is.StringContaining("Тестовый плательщик"));
 		}
 

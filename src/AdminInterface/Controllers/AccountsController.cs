@@ -15,6 +15,7 @@ using Castle.MonoRail.Framework;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using Common.Tools;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -44,6 +45,16 @@ namespace AdminInterface.Controllers
 		{
 			var account = Account.TryFind(id);
 			var result = UpdateAccounting(account.Id, accounted, payment, free, freePeriodEnd);
+			DbSession.Save(account);
+			DbSession.Flush();
+			if (freePeriodEnd != null) {
+				var lastLog = DbSession.Query<PayerAuditRecord>().Where(a => a.Payer == account.Payer).OrderByDescending(a => a.WriteTime).FirstOrDefault();
+				if (lastLog != null) {
+					lastLog.Comment = addComment;
+					DbSession.SaveOrUpdate(lastLog);
+				}
+				result = new { data = freePeriodEnd.Value.ToShortDateString() };
+			}
 			if (status != null) {
 				NHibernateUtil.Initialize(account);
 				if (account is UserAccount) {
@@ -58,6 +69,11 @@ namespace AdminInterface.Controllers
 					SetSupplierStatus(((SupplierAccount)account).Supplier, status.Value, addComment);
 				}
 				else {
+					if (account is ReportAccount && account.Status != status.Value)
+						DbSession.Save(new PayerAuditRecord(account.Payer, account) {
+							Message = status.Value ? "$$$Включен" : "$$$Отключен",
+							Comment = addComment
+						});
 					account.Status = status.Value;
 				}
 			}
@@ -146,6 +162,7 @@ namespace AdminInterface.Controllers
 				this.Mailer().AccountChanged(account).Send();
 
 			account.Update();
+
 			return result;
 		}
 
