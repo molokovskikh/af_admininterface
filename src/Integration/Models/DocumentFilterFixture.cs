@@ -88,5 +88,27 @@ namespace Integration.Models
 			log.DocumentDelivered = true;
 			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(true));
 		}
+
+		[Test]
+		public void OnlyNoParcedTest()
+		{
+			var supplier = DataMother.CreateSupplier();
+			Save(supplier);
+			var documentLog = new DocumentReceiveLog(supplier);
+			Save(documentLog);
+			var client = DataMother.CreateClientAndUsers();
+			Save(client);
+			Flush();
+
+			var filter = new DocumentFilter();
+			filter.Supplier = supplier;
+			filter.OnlyNoParsed = true;
+			var documents = filter.Find();
+			Assert.That(documents.Count, Is.GreaterThan(0));
+			var document = DataMother.CreateTestDocument(supplier, client, documentLog);
+			Save(document);
+			documents = filter.Find();
+			Assert.That(documents.Count, Is.EqualTo(0));
+		}
 	}
 }

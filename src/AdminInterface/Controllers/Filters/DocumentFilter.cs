@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
@@ -19,6 +20,8 @@ namespace AdminInterface.Controllers.Filters
 		}
 
 		public DatePeriod Period { get; set; }
+		[Description("Только неразобранные накладные: ")]
+		public bool OnlyNoParsed { get; set; }
 
 		public User User { get; set; }
 		public Client Client { get; set; }
@@ -35,6 +38,11 @@ namespace AdminInterface.Controllers.Filters
 
 			if (Supplier != null)
 				criteria.Add(Expression.Eq("FromSupplier", Supplier));
+
+			if(OnlyNoParsed) {
+				criteria.Add(Expression.IsNull("d.Id"));
+				criteria.Add(Expression.Eq("DocumentType", DocumentType.Waybill));
+			}
 
 			return ArHelper.WithSession(
 				s => criteria

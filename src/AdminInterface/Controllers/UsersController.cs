@@ -252,7 +252,8 @@ namespace AdminInterface.Controllers
 			}
 
 			user.WorkRegionMask = workRegions.Aggregate(0UL, (v, a) => a + v);
-			user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
+			if(user.Client != null)
+				user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
 			user.UpdateContacts(contacts, deletedContacts);
 			user.UpdatePersons(persons, deletedPersons);
 			DbSession.Save(user);
