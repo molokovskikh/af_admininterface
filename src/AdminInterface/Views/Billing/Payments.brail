@@ -739,7 +739,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		</form>
 		<form class=autosubmit>
 			${FormHelper.HiddenField("BillingCode")}
-			<input type="checkbox" value="1" name="filter.Types[1]" ${"checked" if filter.IsSystem}>
+			<label for="filter_Types">Показывать сообщения пользователей, клиентов, поставщиков</label>
+			<input type="checkbox" id="filter_Types" value="1" name="filter.Types[1]" ${"checked" if filter.IsSystem}>
 		</form>
 		<div class="InputGroupHeader" style="margin-bottom:10px;">
 			История

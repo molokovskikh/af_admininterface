@@ -20,7 +20,8 @@ namespace AdminInterface.Queries
 		{
 			Types = new List<LogMessageType> {
 				LogMessageType.User,
-				LogMessageType.System
+				LogMessageType.System,
+				LogMessageType.Payer
 			};
 		}
 
@@ -57,7 +58,7 @@ namespace AdminInterface.Queries
 
 		public IList<AuditRecord> ForPayer(Payer payer)
 		{
-			if (payer != null && Types.Contains(LogMessageType.System)) {
+			if (payer != null && Types.Contains(LogMessageType.Payer)) {
 				var payerMessages = AuditLogRecord.GetLogs(payer, false);
 				return payerMessages.Select(m => new AuditRecord {
 					Message = m.Message,

@@ -54,11 +54,6 @@ namespace AdminInterface.Controllers
 			Types = new List<LogMessageType> { LogMessageType.User };
 		}
 
-		public BillingFilter(params LogMessageType[] types)
-		{
-			Tab = "payments";
-			Types = new List<LogMessageType>(types);
-		}
 
 		public bool IsSystem
 		{
