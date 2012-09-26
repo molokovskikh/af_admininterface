@@ -7,6 +7,7 @@ using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Internal;
 using Common.Web.Ui.Models;
+using NHibernate;
 
 namespace AdminInterface.Models.Logs
 {

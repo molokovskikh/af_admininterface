@@ -439,6 +439,7 @@
     <Content Include="Assets\Javascripts\request.coffee" />
     <Content Include="Assets\Javascripts\table.editor.js" />
     <Content Include="Assets\Stylesheets\billing.css" />
+    <Content Include="Assets\Stylesheets\ClientsShow.css" />
     <Content Include="Assets\Stylesheets\News.css" />
     <Content Include="Css\columns.css" />
     <Content Include="Css\User.css" />
@@ -485,6 +486,7 @@
     <None Include="Views\Logs\OrdersTable.brail" />
     <None Include="Views\Logs\Statistics.brail" />
     <None Include="Views\Mail\RegisterNews.brail" />
+    <Content Include="Views\ManagerReports\ClientAddressesMonitor.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />
@@ -508,7 +510,9 @@
     <None Include="Views\Mail\AccountChanged.brail" />
     <None Include="Views\Messages\Index.brail" />
     <None Include="Views\Acts\Edit.brail" />
-    <None Include="Views\Acts\Index.brail" />
+    <None Include="Views\Acts\Index.brail">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Views\Acts\Print.brail" />
     <None Include="Views\Advertisings\Index.brail" />
     <None Include="Views\Invoices\Index.brail" />

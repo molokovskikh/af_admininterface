@@ -7,6 +7,7 @@ ${FormHelper.HiddenField("filter.Supplier.Id")}
 ${FormHelper.HiddenField("filter.Client.Id")}
 ${FormHelper.HiddenField("filter.User.Id")}
 ${app.FilterFor("filter.Period")}
+${app.FilterFor("filter.OnlyNoParsed")}
 ${app.EndFormFor("filter")}
 
 <div class=block>

@@ -47,7 +47,8 @@ namespace Functional.Billing
 		{
 			var element = (CheckBox)ElementFor(account, r => r.Status);
 			element.Click();
-
+			Css("input[name=AddComment]").AppendText("Disable_report");
+			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
 			report.Refresh();
 			Assert.That(report.Allow, Is.False);
 		}

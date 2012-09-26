@@ -1,0 +1,24 @@
+﻿input[type='text']
+{
+	width: 70%;
+}
+input[id='client_FullName']
+{
+width: 100%;
+}
+span.message
+{
+	display:block;
+	clear:both;
+	font-style:italic;
+}
+span.message.error
+{
+	color:Red;
+}
+
+.MainDiv {
+	padding: 20px 0px 20px 0px;
+	float:left;
+	width: 95%;
+}

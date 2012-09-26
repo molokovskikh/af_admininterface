@@ -104,7 +104,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				hideWaiter(item, waiter);
 				RefreshTotalSum();
 //				showSuccessMessage("Сохранено");
-				processResponse(html);
+				processResponse(html, item);
 				if (success)
 					success();
 			},
@@ -114,7 +114,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		);
 	}
 
-	function processResponse(data) {
+	function processResponse(data, element) {
 		if (data.message)
 			showSuccessMessage(data.message);
 		if (data.accounts) {
@@ -127,6 +127,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				else
 					row.removeClass("free");
 			});
+		}
+		if (data.data) {
+			$(element).parent().append(data.data)
 		}
 	}
 
@@ -157,10 +160,16 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		var sendMessageView = new PayerSendMessage();
 
 		$("input[name=free]").change(function () {
-			if (this.checked)
+			var accounted = $(this).parent().parent().children().children('input[name=accounted]');
+			if (this.checked) {
 				$(this).parents("tr").addClass("free");
-			else
+				accounted.attr("disabled", true);
+				accounted.removeAttr("checked");
+			}
+			else {
 				$(this).parents("tr").removeClass("free");
+				accounted.attr("disabled", false);
+			}
 		});
 
 		$("input[name=status]").change(function () {
@@ -177,6 +186,13 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			var item = $(this);
 			url = buildAjaxUrl(url, item);
 			checkBoxChanger(url, item);
+		});
+
+		$("input[name=free]").each(function () {
+			if (this.checked) {
+				var accounted = $(this).parent().parent().children().children('input[name=accounted]');
+				accounted.attr("disabled", true);
+			}
 		});
 
 		$("div.collapsible, div.autocollapsible").each(function () {
@@ -336,6 +352,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</td>
 					<td class=short>
 						<input name=free data-request="FreePeriodEnd" type="checkbox" ${"checked" if supplier.Account.IsFree} />
+						<%if ((supplier.Account.IsFree) and (supplier.Account.FreePeriodEnd != null)):%>
+							<span>${supplier.Account.FreePeriodEnd.ToShortDateString()}</span>
+						<%end%>
 					</td>
 					<td class=short>
 						<input name=payment class=payment type=text value="${supplier.Account.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
@@ -403,6 +422,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						</td>
 						<td class=short>
 							<input name=free data-request="FreePeriodEnd" type="checkbox" ${"checked" if user.Accounting.IsFree} />
+							<%if ((user.Accounting.IsFree) and (user.Accounting.FreePeriodEnd != null)):%>
+								<span>${user.Accounting.FreePeriodEnd.ToShortDateString()}</span>
+							<%end%>
 						</td>
 						<td class=short>
 							<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
@@ -473,6 +495,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							</td>
 							<td class=short>
 								<input name=free data-request="FreePeriodEnd" type=checkbox ${"checked" if addr.Accounting.IsFree} />
+								<%if ((addr.Accounting.IsFree) and (addr.Accounting.FreePeriodEnd != null)):%>
+									<span>${addr.Accounting.FreePeriodEnd.ToShortDateString()}</span>
+								<%end%>
 							</td>
 							<td class=short>
 								<input name=payment class=payment type=text value="${addr.Accounting.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
@@ -525,13 +550,16 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<td class=short>${app.LinkTo(report, "Редактировать", @Edit)}</td>
 							<td class=short>
 								<input name=id type=hidden value=${report.Id}>
-								<input name=status type="checkbox" ${"checked" if report.Status} />
+								<input name=status data-request="AddComment" unchecked="true" type="checkbox" ${"checked" if report.Status} />
 							</td>
 							<td class=short>
 								<input name=accounted type="checkbox" ${"checked" if report.BeAccounted} />
 							</td>
 							<td class=short>
 								<input name=free data-request="FreePeriodEnd" type=checkbox ${"checked" if report.IsFree} />
+								<%if (report.IsFree and report.FreePeriodEnd != null):%>
+									<span>${report.FreePeriodEnd.ToShortDateString()}</span>
+								<%end%>
 							</td>
 							<td  class=short>
 								<input name=payment class=payment type=text value="${report.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>

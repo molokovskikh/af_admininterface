@@ -72,6 +72,9 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public bool IsHtml { get; set; }
 
+		[Property]
+		public string Comment { get; set; }
+
 		public static IList<PayerAuditRecord> Find(Payer payer)
 		{
 			return ActiveRecordLinqBase<PayerAuditRecord>.Queryable
@@ -89,6 +92,7 @@ namespace AdminInterface.Models.Billing
 				OperatorName = UserName,
 				Message = Message,
 				Name = Name,
+				Comment = Comment
 			};
 		}
 
