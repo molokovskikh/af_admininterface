@@ -129,7 +129,7 @@ namespace Functional.Drugstore
 			clientNameEdit.Value = "test";
 			Click("Сохранить");
 			AssertText("В данном регионе уже существует клиент с таким именем");
-			clientNameEdit = browser.TextField(Find.ByValue("TestToRename"));
+			clientNameEdit = browser.TextField(Find.ByValue("test"));
 			clientNameEdit.Value = "testTest" + client.Id;
 			Click("Сохранить");
 			AssertText("Сохранено");

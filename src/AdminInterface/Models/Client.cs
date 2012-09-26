@@ -97,7 +97,7 @@ namespace AdminInterface.Models
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property, Description("Краткое наименование"), Auditable, Notify, ValidateNonEmpty, NameExistsValidator]
+		[Property, Description("Краткое наименование"), Auditable, Notify, ValidateNonEmpty, NameExistsValidator("В данном регионе уже существует клиент с таким именем")]
 		public override string Name { get; set; }
 
 		[Property, Description("Полное наименование"), Auditable, Notify, ValidateNonEmpty]
