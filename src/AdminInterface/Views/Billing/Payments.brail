@@ -357,7 +357,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<%end%>
 					</td>
 					<td class=short>
-						<input name=payment class=payment type=text value="${supplier.Account.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
+						<input name=payment class=payment type=text value="${supplier.Account.Payment.ToString("0.#")}" ${"disabled" unless admin.CanChangePayment}>
 					</td>
 					<td>${supplier.Id}</td>
 					<td>
