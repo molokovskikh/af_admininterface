@@ -10,6 +10,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
+using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -287,6 +288,24 @@ ORDER BY {Payer}.shortname;";
 				.SetParameter("SearchText", "%" + searchPattern + "%")
 				.List<Payer>().Distinct();
 			return resultList;
+		}
+
+		public virtual IEnumerable<AuditLogRecord> GetAuditLogs()
+		{
+			var messages = ArHelper.WithSession(s => {
+				var usersAuditLogs = Users.SelectMany(u => new MessageQuery(LogMessageType.User).Execute(u, s));
+				var service = Clients.Select(c => (Service)c).Concat(Suppliers.Select(sup => (Service)sup)).Concat(Addresses.Select(a => (Service)a.Client));
+				var serviceMessages = service.SelectMany(ser => new MessageQuery(LogMessageType.User).Execute(ser, s));
+				return usersAuditLogs.Concat(serviceMessages);
+			});
+			return messages.Select(m => new AuditLogRecord {
+				ObjectId = m.ObjectId,
+				Message = m.Message,
+				Name = m.Name,
+				OperatorName = m.Operator,
+				LogType = m.Type,
+				LogTime = m.WriteTime
+			});
 		}
 
 		public virtual decimal TotalSum

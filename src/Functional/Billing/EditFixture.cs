@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Logs;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
@@ -29,7 +31,7 @@ namespace Functional.Billing
 			session.Save(_payer);
 			session.Save(report);
 			session.Save(new ReportAccount(report));
-			session.Flush();
+			Flush();
 		}
 
 		[Test]
@@ -86,6 +88,22 @@ namespace Functional.Billing
 			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
 			browser.Refresh();
 			AssertText("Check_report_status_test");
+		}
+
+		[Test]
+		public void Check_audit_record_messages_for_client()
+		{
+			browser = Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
+
+			var record = new AuditRecord("test_message_for_client", _client);
+			session.Save(record);
+
+			Flush();
+
+			Assert.IsFalse(browser.CheckBox("filter_Types").Checked);
+			browser.CheckBox("filter_Types").Checked = true;
+
+			AssertText("test_message_for_client");
 		}
 	}
 }

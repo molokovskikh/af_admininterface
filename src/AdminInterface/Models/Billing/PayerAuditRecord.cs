@@ -21,6 +21,19 @@ namespace AdminInterface.Models.Billing
 		{
 		}
 
+		public PayerAuditRecord(Payer payer, string message)
+		{
+			Payer = payer;
+			Administrator = SecurityContext.Administrator;
+			UserName = Administrator.UserName;
+			WriteTime = DateTime.Now;
+
+			ObjectId = Payer.Id;
+			ObjectType = LogObjectType.Payer;
+			Name = Payer.Name;
+			Message = message;
+		}
+
 		public PayerAuditRecord(Payer payer, Account accounting)
 		{
 			Payer = payer;

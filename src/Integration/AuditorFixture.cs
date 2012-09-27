@@ -48,7 +48,7 @@ namespace Integration
 			Flush();
 
 			var messages = new MessageQuery().Execute(client, session);
-			var message = messages.Last();
+			var message = messages.First();
 			Assert.That(message.Message,
 				Is.EqualTo("$$$Изменено 'Ассортиментный прайс для преобразования накладной в формат dbf' было '' стало 'Тестовый поставщик - Базовый'"));
 		}
