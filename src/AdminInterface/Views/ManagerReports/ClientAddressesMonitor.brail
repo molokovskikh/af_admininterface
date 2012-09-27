@@ -8,6 +8,7 @@ ${FormHelper.HiddenField("filter.SortBy")}
 ${FormHelper.HiddenField("filter.SortDirection")}
 <table class="CenterBlock">
 <tbody>
+	${app.FilterFor("filter.Period")}
 	<tr>
 		<td class="filter-label">Регион</td>
 		<td>${app.Edit("filter.Region")}</td>
@@ -27,8 +28,9 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<th>${app.Sortable("Код клиента", "ClientId")}</th>
 			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
 			<th>Регион</th>
-			<th>${app.Sortable("Код адреса", "Id")}</th>
-			<th>${app.Sortable("Адрес", "Name")}</th>
+			<th>${app.Sortable("Код адреса", "AddressId")}</th>
+			<th>${app.Sortable("Адрес", "AddressName")}</th>
+			<th>Количество непринятых накладных</th>
 			<th>Клиент отключен</th>
 			<th>Адрес отключен</th>
 			<th>Пользователь не обновлялся более месяца</th>
@@ -44,18 +46,19 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 				${UrlHelper.Link(item.ClientName, {@controller: @Clients, @params: {@id: item.ClientId}})}
 			</td>
 			<td>${item.RegionName}</td>
-			<td>${item.Id}</td>
+			<td>${item.AddressId}</td>
 			<td>
-				${UrlHelper.Link(item.Name, {@controller: @Addresses, @params: {@id: item.Id}})}
+				${UrlHelper.Link(item.AddressName, {@controller: @Addresses, @params: {@id: item.AddressId}})}
 			</td>
+			<td>${item.Count}</td>
 			<td>
-			<%if item.ClientEnabled>0: %>
+			<%if item.ClientStatus>0: %>
 				Нет
 				<%else: %>
 				Да
 				<%end %></td>
 			<td>
-				<%if item.AdressEnabled: %>
+				<%if item.AddressEnabled: %>
 				Нет
 				<%else: %>
 				Да
