@@ -23,6 +23,7 @@ using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models.Billing
 {
@@ -263,14 +264,7 @@ namespace AdminInterface.Models.Billing
 
 		public static IEnumerable<Payer> GetLikeAvaliable(ISession session, string searchPattern)
 		{
-			var sql = @"
-SELECT {Payer.*}
-FROM billing.payers {Payer}
-WHERE {Payer}.ShortName like :SearchText
-ORDER BY {Payer}.shortname;";
-			var resultList = session.CreateSQLQuery(sql).AddEntity(typeof(Payer))
-				.SetParameter("SearchText", "%" + searchPattern + "%")
-				.List<Payer>().Distinct();
+			var resultList = session.Query<Payer>().Where(t => t.Name.Contains(searchPattern)).OrderBy(p => p.Name);
 			return resultList;
 		}
 

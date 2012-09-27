@@ -195,7 +195,7 @@ namespace Integration.Controllers
 				Name = "Тестовый плательщик" + rnd.Next()
 			};
 			controller.Registered(newPayer, new PaymentOptions(), false);
-			controller.SearchPayers("Тестовый");
+			controller.SearchPayers("тестовый");
 			var allPayers = (IEnumerable<Payer>)ControllerContext.PropertyBag["payers"];
 			Assert.That(allPayers.Count(p => p.Name == newPayer.Name && p.Id == newPayer.Id), Is.EqualTo(1));
 		}
