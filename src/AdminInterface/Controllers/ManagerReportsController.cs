@@ -101,7 +101,6 @@ namespace AdminInterface.Controllers
 				.Add(Projections.Property("c.HomeRegion").As("RegionName")));
 			criteria.Add(Expression.Ge("LogTime", Period.Begin.Date))
 				.Add(Expression.Le("LogTime", Period.End.Date));
-			//criteria.Add(Expression.Sql("c.HomeRegion & " + regionMask + " > 0"));
 			return criteria;
 		}
 
@@ -140,29 +139,6 @@ namespace AdminInterface.Controllers
 						row.IsUpdate = address.AvaliableForUsers.Count(u => u.Logs.AFTime >= DateTime.Now.AddMonths(-1)) != 0;
 				}
 			});
-			/*
-			var regionMask = SecurityContext.Administrator.RegionMask;
-			if (Region != null)
-				regionMask &= Region.Id;
-			var list = ArHelper.WithSession(s => s.Query<Address>()
-				.Where(a => (!a.Enabled
-					|| a.Client.Status == ClientStatus.Off
-					|| a.AvaliableForUsers.Count(u => u.Logs.AFTime >= DateTime.Now.AddMonths(-1)) == 0)
-					&& (a.Client.HomeRegion.Id & regionMask) > 0)
-				.ToList());
-			list = Sort(list);
-			RowsCount = list.Count;
-			var showClient = list.Skip(PageSize * CurrentPage).Take(PageSize);
-			var result = showClient.Select(c => new RegistrationInformation {
-				ClientEnabled = c.Client.Status,
-				ClientName = c.Client.Name,
-				RegionName = c.Client.HomeRegion.Name,
-				ClientId = c.Client.Id,
-				Id = c.Id,
-				AdressEnabled = c.Enabled,
-				Name = c.Value,
-				IsUpdate = c.AvaliableForUsers.Count(u => u.Logs.AFTime >= DateTime.Now.AddMonths(-1)) != 0
-			}).ToList();*/
 			return result;
 		}
 	}
