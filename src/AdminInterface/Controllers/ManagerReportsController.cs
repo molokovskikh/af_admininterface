@@ -33,21 +33,76 @@ namespace AdminInterface.Controllers
 		[Description("Адресам")] Addresses
 	}
 
+	public class RejectCounts
+	{
+		public uint ClientId { get; set; }
+		public uint AddressId { get; set; }
+		public int Count { get; set; }
+		public string ClientName { get; set; }
+		public string AddressName { get; set; }
+		public ClientStatus ClientStatus { get; set; }
+		public bool AddressEnabled { get; set; }
+		public bool IsUpdate { get; set; }
+		public string RegionName { get; set; }
+	}
+
 	public class ClientAddressFilter : PaginableSortable
 	{
 		public Region Region { get; set; }
+		public DatePeriod Period { get; set; }
 		public RegistrationFinderType FinderType { get; set; }
-		public int PageSize { get; set; }
 
 		public ClientAddressFilter()
 		{
 			SortKeyMap = new Dictionary<string, string> {
-				{ "Id", "Id" },
-				{ "Name", "Name" },
-				{ "ClientId", "c.Id" },
-				{ "ClientName", "c.Name" }
+				{ "AddressId", "AddressId" },
+				{ "AddressName", "AddressName" },
+				{ "ClientId", "ClientId" },
+				{ "ClientName", "ClientName" }
 			};
 			PageSize = 30;
+			Period = new DatePeriod(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
+		}
+
+		private IList<RejectCounts> AcceptPaginator(DetachedCriteria criteria)
+		{
+			RowsCount = ArHelper.WithSession(s => criteria.GetExecutableCriteria(s).ToList<RejectCounts>()).Count;
+
+			if (CurrentPage > 0)
+				criteria.SetFirstResult(CurrentPage * PageSize);
+
+			criteria.SetMaxResults(PageSize);
+
+			ApplySort(criteria);
+
+			return ArHelper.WithSession(s => criteria.GetExecutableCriteria(s).ToList<RejectCounts>()).ToList();
+		}
+
+		private DetachedCriteria GetCriteria()
+		{
+			var regionMask = SecurityContext.Administrator.RegionMask;
+			if (Region != null)
+				regionMask &= Region.Id;
+
+			var criteria = DetachedCriteria.For<RejectWaybillLog>();
+
+			criteria.CreateCriteria("ForClient", "c", JoinType.LeftOuterJoin)
+				.Add(Expression.Sql("{alias}.RegionCode & " + regionMask + " > 0"));
+			criteria.CreateAlias("Address", "a", JoinType.LeftOuterJoin);
+
+			criteria.SetProjection(Projections.ProjectionList()
+				.Add(Projections.Count("Id").As("Count"))
+				.Add(Projections.GroupProperty("c.Id").As("ClientId"))
+				.Add(Projections.GroupProperty("a.Id").As("AddressId"))
+				.Add(Projections.Property("c.Name").As("ClientName"))
+				.Add(Projections.Property("a.Value").As("AddressName"))
+				.Add(Projections.Property("c.Status").As("ClientStatus"))
+				.Add(Projections.Property("a.Enabled").As("AddressEnabled"))
+				.Add(Projections.Property("c.HomeRegion").As("RegionName")));
+			criteria.Add(Expression.Ge("LogTime", Period.Begin.Date))
+				.Add(Expression.Le("LogTime", Period.End.Date));
+			//criteria.Add(Expression.Sql("c.HomeRegion & " + regionMask + " > 0"));
+			return criteria;
 		}
 
 		public List<Address> Sort(List<Address> list)
@@ -74,8 +129,18 @@ namespace AdminInterface.Controllers
 			return new List<Address>();
 		}
 
-		public IList<RegistrationInformation> Find()
+		public IList<RejectCounts> Find()
 		{
+			var criteria = GetCriteria();
+			var result = AcceptPaginator(criteria);
+			ArHelper.WithSession(s => {
+				foreach (var row in result) {
+					var address = s.Query<Address>().FirstOrDefault(a => a.Id == row.AddressId);
+					if(address != null)
+						row.IsUpdate = address.AvaliableForUsers.Count(u => u.Logs.AFTime >= DateTime.Now.AddMonths(-1)) != 0;
+				}
+			});
+			/*
 			var regionMask = SecurityContext.Administrator.RegionMask;
 			if (Region != null)
 				regionMask &= Region.Id;
@@ -97,7 +162,7 @@ namespace AdminInterface.Controllers
 				AdressEnabled = c.Enabled,
 				Name = c.Value,
 				IsUpdate = c.AvaliableForUsers.Count(u => u.Logs.AFTime >= DateTime.Now.AddMonths(-1)) != 0
-			}).ToList();
+			}).ToList();*/
 			return result;
 		}
 	}

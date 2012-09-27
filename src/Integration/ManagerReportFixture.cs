@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
+using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support;
@@ -12,20 +14,25 @@ namespace Integration
 {
 	public class ManagerReportFixture : IntegrationFixture
 	{
+		private Client _client;
+		[SetUp]
+		public void SetUp()
+		{
+			var log = new RejectWaybillLog();
+			_client = DataMother.CreateTestClientWithAddress();
+			log.ForClient = _client;
+			log.LogTime = DateTime.Now;
+			Save(log);
+			Flush();
+		}
 		[Test]
 		public void ClientAddressFilterTest()
 		{
 			var filter = new ClientAddressFilter();
 			filter.Find();
-			filter.PageSize = filter.RowsCount;
+
 			var results = filter.Find();
-			foreach (var registrationInformation in results) {
-				var address = session.Query<Address>().First(t => t.Id == registrationInformation.Id);
-				if(address.Enabled)
-					if(address.Client.Enabled)
-						if(address.AvaliableForUsers.Count(user => user.Logs.AFTime >= DateTime.Now.AddMonths(-1)) > 0)
-							Assert.Fail(String.Format("Данные адреса {0} выбираются неверно", address.Id));
-			}
+			Assert.That(results.Count(t => t.ClientId == _client.Id), Is.GreaterThan(0));
 		}
 	}
 }
