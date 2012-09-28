@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -183,6 +184,20 @@ namespace Integration.Controllers
 			Assert.That(org.FullName, Is.EqualTo("Тестовый плательщик"));
 			Assert.That(notifications.Count, Is.EqualTo(1));
 			Assert.That(notifications[0].Subject, Is.EqualTo("Зарегистрирован плательщик"));
+		}
+
+		[Test]
+		public void SearchAllPayersTest()
+		{
+			var rnd = new Random();
+
+			var newPayer = new Payer {
+				Name = "Тестовый плательщик" + rnd.Next()
+			};
+			controller.Registered(newPayer, new PaymentOptions(), false);
+			controller.SearchPayers("тестовый");
+			var allPayers = (IEnumerable<Payer>)ControllerContext.PropertyBag["payers"];
+			Assert.That(allPayers.Count(p => p.Name == newPayer.Name && p.Id == newPayer.Id), Is.EqualTo(1));
 		}
 
 		[Test]
