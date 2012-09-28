@@ -427,7 +427,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<%end%>
 						</td>
 						<td class=short>
-							<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
+							<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("0.#")}" ${"disabled" unless admin.CanChangePayment}>
 						</td>
 						<td>
 							<a id="UserLink${user.Id}" href="javascript:" data-filter="User${user.Id}" data-id="${user.Id}">${user.Id}</a>
@@ -500,7 +500,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<%end%>
 							</td>
 							<td class=short>
-								<input name=payment class=payment type=text value="${addr.Accounting.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
+								<input name=payment class=payment type=text value="${addr.Accounting.Payment.ToString("0.#")}" ${"disabled" unless admin.CanChangePayment}>
 							</td>
 							<td>
 								<a id="AddressLink${addr.Id}" href="javascript:" data-filter="Address${addr.Id}">${addr.Value}</a>
@@ -562,7 +562,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<%end%>
 							</td>
 							<td  class=short>
-								<input name=payment class=payment type=text value="${report.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
+								<input name=payment class=payment type=text value="${report.Payment.ToString("0.#")}" ${"disabled" unless admin.CanChangePayment}>
 							</td>
 							<td>
 								<a href="javascript:" data-filter="Report${report.Report.Id}">${report.Report.Id}</a>
