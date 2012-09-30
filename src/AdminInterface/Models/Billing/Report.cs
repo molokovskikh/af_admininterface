@@ -1,16 +1,17 @@
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models.Billing
 {
-	[ActiveRecord("General_Reports", Schema = "reports")]
-	public class Report : ActiveRecordLinqBase<Report>
+	[ActiveRecord("General_Reports", Schema = "reports"), Auditable]
+	public class Report : ActiveRecordLinqBase<Report>, IAuditable
 	{
 		[PrimaryKey("GeneralReportCode")]
 		public virtual uint Id { get; set; }
 
-		[Property]
+		[Property, Auditable("Включен")]
 		public virtual bool Allow { get; set; }
 
 		[Property]
@@ -18,5 +19,12 @@ namespace AdminInterface.Models.Billing
 
 		[BelongsTo("PayerId")]
 		public virtual Payer Payer { get; set; }
+
+		public virtual string ChangeComment { get; set; }
+
+		public IAuditRecord GetAuditRecord()
+		{
+			return new PayerAuditRecord(Payer, "$$$", ChangeComment);
+		}
 	}
 }

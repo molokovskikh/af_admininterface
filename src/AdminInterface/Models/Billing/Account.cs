@@ -94,6 +94,7 @@ namespace AdminInterface.Models.Billing
 		}
 
 		[
+			Auditable,
 			Property,
 			Description("Дата окончания бесплатно периода"),
 			DependOn("IsFree"),
@@ -115,6 +116,8 @@ namespace AdminInterface.Models.Billing
 		public abstract uint ObjectId { get; }
 
 		public abstract bool Enabled { get; }
+
+		public virtual string Comment { get; set; }
 
 		public virtual string Type
 		{
@@ -198,7 +201,7 @@ namespace AdminInterface.Models.Billing
 
 		public virtual IAuditRecord GetAuditRecord()
 		{
-			return new PayerAuditRecord(Payer, this);
+			return new PayerAuditRecord(Payer, this, Comment);
 		}
 	}
 }

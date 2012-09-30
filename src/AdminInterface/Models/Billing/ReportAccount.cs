@@ -2,6 +2,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models.Billing
 {
@@ -60,7 +61,11 @@ namespace AdminInterface.Models.Billing
 		public override bool Status
 		{
 			get { return Report.Allow; }
-			set { Report.Allow = value; }
+			set
+			{
+				Report.Allow = value;
+				Report.ChangeComment = Comment;
+			}
 		}
 
 		public override string DefaultDescription

@@ -44,17 +44,8 @@ namespace AdminInterface.Controllers
 		public object Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment, DateTime? freePeriodEnd, string addComment)
 		{
 			var account = Account.TryFind(id);
+			account.Comment = addComment;
 			var result = UpdateAccounting(account.Id, accounted, payment, free, freePeriodEnd);
-			DbSession.Save(account);
-			DbSession.Flush();
-			if (freePeriodEnd != null) {
-				var lastLog = DbSession.Query<PayerAuditRecord>().Where(a => a.Payer == account.Payer).OrderByDescending(a => a.WriteTime).FirstOrDefault();
-				if (lastLog != null) {
-					lastLog.Comment = addComment;
-					DbSession.SaveOrUpdate(lastLog);
-				}
-				result = new { data = freePeriodEnd.Value.ToShortDateString() };
-			}
 			if (status != null) {
 				NHibernateUtil.Initialize(account);
 				if (account is UserAccount) {
@@ -69,14 +60,10 @@ namespace AdminInterface.Controllers
 					SetSupplierStatus(((SupplierAccount)account).Supplier, status.Value, addComment);
 				}
 				else {
-					if (account is ReportAccount && account.Status != status.Value)
-						DbSession.Save(new PayerAuditRecord(account.Payer, account) {
-							Message = status.Value ? "$$$Включен" : "$$$Отключен",
-							Comment = addComment
-						});
 					account.Status = status.Value;
 				}
 			}
+			DbSession.Save(account);
 			return result;
 		}
 
