@@ -46,21 +46,32 @@ namespace Integration.Controllers
 				Comment = "тестовый отчет",
 				Payer = payer
 			};
-			var account = new ReportAccount(report) { ReadyForAccounting = true, BeAccounted = false, IsFree = false, FreePeriodEnd = DateTime.Now.AddMonths(1) };
+			var account = new ReportAccount(report);
+			account.Save();
+			Flush();
+
+			controller.Update(account.Id, true, null, true, 500, null, null);
+			Flush();
+
+			account.Refresh();
+			Assert.That(account.Payment, Is.EqualTo(500));
+			Assert.That(account.BeAccounted, Is.True);
+		}
+
+		[Test]
+		public void Get_Ready_For_Accounting_if_disabled()
+		{
+			var account = new UserAccount(user) { ReadyForAccounting = true, BeAccounted = false };
 			account.Save();
 			Flush();
 
 			var acoounts = Account.GetReadyForAccounting(new Pager { PageSize = 1000 }).Select(a => a.ObjectId).ToList();
 			Assert.IsTrue(acoounts.Contains(account.ObjectId));
-			controller.Update(account.Id, true, null, true, 500, null, null);
+			controller.Update(account.Id, false, null, false, 500, null, null);
 			Flush();
 
-			acoounts = Account.GetReadyForAccounting(new Pager()).Select(a => a.ObjectId).ToList();
+			acoounts = Account.GetReadyForAccounting(new Pager { PageSize = 1000 }).Select(a => a.ObjectId).ToList();
 			Assert.IsFalse(acoounts.Contains(account.ObjectId));
-
-			account.Refresh();
-			Assert.That(account.Payment, Is.EqualTo(500));
-			Assert.That(account.BeAccounted, Is.True);
 		}
 
 		[Test]
