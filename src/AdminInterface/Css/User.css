@@ -94,7 +94,6 @@ div.LegendMarker.SingleUser
 
 #MemoAboutWritingAddresses {
 	font-size:9px;
-	width:750px;
 	padding-left:10px;
 }
 
@@ -108,4 +107,9 @@ div.LegendMarker.SingleUser
 
 #AddCommentField {
 	width: 250px;
+}
+
+.leftwidth100 {
+	width: 100%;
+	horiz-align: left;
 }
