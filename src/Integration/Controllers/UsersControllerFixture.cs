@@ -135,5 +135,39 @@ namespace Integration.Controllers
 		{
 			return session.Query<User>().Where(u => u.Registration.RegistrationDate >= begin).ToArray().Last();
 		}
+
+		[Test]
+		public void NoChangeOrderRegionIfSupplierTest()
+		{
+			var user = DataMother.CreateSupplierUser();
+			user.Name = "Тестовый пользователь для редактирования";
+			user.OrderRegionMask = 16;
+			session.Save(user);
+			var oldMask = user.OrderRegionMask;
+			controller.Update(user,
+				new ulong[1],
+				new ulong[1],
+				new Contact[1] {
+					new Contact {
+						ContactText = "123"
+					}
+				},
+				new Contact[1] {
+					new Contact {
+						ContactText = "1231"
+					}
+				},
+				new Person[1] {
+					new Person {
+						Name = "321"
+					}
+				},
+				new Person[1] {
+					new Person {
+						Name = "4321"
+					}
+				});
+			Assert.That(user.OrderRegionMask, Is.EqualTo(oldMask));
+		}
 	}
 }
