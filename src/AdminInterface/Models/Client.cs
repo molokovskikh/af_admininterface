@@ -164,6 +164,9 @@ namespace AdminInterface.Models
 		[HasMany(ColumnKey = "ClientId", Inverse = true, Lazy = true, OrderBy = "Name")]
 		public virtual IList<User> Users { get; set; }
 
+		[HasMany(ColumnKey = "ClientId", Inverse = true, Lazy = true)]
+		public virtual IList<ClientLogRecord> Logs { get; set; }
+
 		[HasAndBelongsToMany(typeof(Payer),
 			Lazy = true,
 			ColumnKey = "ClientId",

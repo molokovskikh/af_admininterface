@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AdminInterface.Controllers;
+using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Integration.ForTesting;
@@ -15,6 +16,7 @@ namespace Integration
 	public class ManagerReportFixture : IntegrationFixture
 	{
 		private Client _client;
+
 		[SetUp]
 		public void SetUp()
 		{
@@ -25,6 +27,7 @@ namespace Integration
 			Save(log);
 			Flush();
 		}
+
 		[Test]
 		public void ClientAddressFilterTest()
 		{

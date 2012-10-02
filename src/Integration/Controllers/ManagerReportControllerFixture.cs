@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using AdminInterface.Controllers;
+using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
 using ExcelLibrary.SpreadSheet;
 using Integration.ForTesting;

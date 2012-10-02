@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AdminInterface.Controllers;
+using AdminInterface.ManagerReportsFilters;
 using Functional.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
