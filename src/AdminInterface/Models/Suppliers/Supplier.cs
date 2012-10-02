@@ -91,6 +91,13 @@ namespace AdminInterface.Models.Suppliers
 			}
 		}
 
+		public virtual string INN
+		{
+			get {
+				return "ИНН: " + Payer.INN;
+			}
+		}
+
 		[Nested]
 		public virtual RegistrationInfo Registration { get; set; }
 
