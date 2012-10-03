@@ -64,6 +64,8 @@ namespace AdminInterface.Controllers
 				}
 			}
 			DbSession.Save(account);
+			if(freePeriodEnd.HasValue)
+				result = new { data = freePeriodEnd.Value.ToShortDateString() };
 			return result;
 		}
 
