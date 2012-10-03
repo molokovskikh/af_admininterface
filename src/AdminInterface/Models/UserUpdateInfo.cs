@@ -29,5 +29,8 @@ namespace AdminInterface.Models
 
 		[Property]
 		public virtual uint AFAppVersion { get; set; }
+
+		[Property]
+		public virtual DateTime UpdateDate { get; set; }
 	}
 }

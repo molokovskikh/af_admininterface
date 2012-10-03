@@ -173,6 +173,7 @@
     <Compile Include="ManagerReportsFilters\RegistrationInformation.cs" />
     <Compile Include="ManagerReportsFilters\SwitchOffClientsFilter.cs" />
     <Compile Include="ManagerReportsFilters\UserFinderFilter.cs" />
+    <Compile Include="ManagerReportsFilters\WhoWasNotUpdatedFilter.cs" />
     <Compile Include="Models\Logs\RejectWaybillLog.cs" />
     <Compile Include="Models\Validators\NameExistsValidator.cs" />
     <Compile Include="Mailers\Mailer.cs" />
@@ -493,6 +494,7 @@
     <None Include="Views\Mail\RegisterNews.brail" />
     <Content Include="Views\ManagerReports\ClientAddressesMonitor.brail" />
     <Content Include="Views\ManagerReports\SwitchOffClients.brail" />
+    <Content Include="Views\ManagerReports\WhoWasNotUpdated.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />

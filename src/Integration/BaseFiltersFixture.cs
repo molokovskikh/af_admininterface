@@ -10,12 +10,20 @@ using Test.Support.log4net;
 namespace Integration
 {
 	[TestFixture]
-	public class SwitchOffClientsFixture : IntegrationFixture
+	public class BaseFiltersFixture : IntegrationFixture
 	{
 		[Test]
 		public void Base_filter_test()
 		{
 			var filter = new SwitchOffClientsFilter { SortBy = "ClientName" };
+			QueryCatcher.Catch();
+			filter.Find(session);
+		}
+
+		[Test]
+		public void Who_was_not_updated_filter_test()
+		{
+			var filter = new WhoWasNotUpdatedFilter();
 			QueryCatcher.Catch();
 			filter.Find(session);
 		}
