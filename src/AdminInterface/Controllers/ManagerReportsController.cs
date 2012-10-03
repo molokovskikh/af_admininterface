@@ -44,6 +44,14 @@ namespace AdminInterface.Controllers
 		public bool AddressEnabled { get; set; }
 		public bool IsUpdate { get; set; }
 		public string RegionName { get; set; }
+		public RejectReasonType? RejectReason { get; set; }
+		public string RejectReasonName
+		{
+			get
+			{
+				return RejectReason == null ? "" : RejectReason.Value.GetDescription();
+			}
+		}
 	}
 
 	public class ClientAddressFilter : PaginableSortable
@@ -94,6 +102,7 @@ namespace AdminInterface.Controllers
 				.Add(Projections.Count("Id").As("Count"))
 				.Add(Projections.GroupProperty("c.Id").As("ClientId"))
 				.Add(Projections.GroupProperty("a.Id").As("AddressId"))
+				.Add(Projections.GroupProperty("RejectReason").As("RejectReason"))
 				.Add(Projections.Property("c.Name").As("ClientName"))
 				.Add(Projections.Property("a.Value").As("AddressName"))
 				.Add(Projections.Property("c.Status").As("ClientStatus"))

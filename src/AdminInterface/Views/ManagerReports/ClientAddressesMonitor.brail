@@ -31,9 +31,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<th>${app.Sortable("Код адреса", "AddressId")}</th>
 			<th>${app.Sortable("Адрес", "AddressName")}</th>
 			<th>Количество непринятых накладных</th>
-			<th>Клиент отключен</th>
-			<th>Адрес отключен</th>
-			<th>Пользователь не обновлялся более месяца</th>
+			<th>Причина</th>
 		</tr>
 	</thead>
 <%end %>
@@ -52,23 +50,8 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			</td>
 			<td>${item.Count}</td>
 			<td>
-			<%if item.ClientStatus>0: %>
-				Нет
-				<%else: %>
-				Да
-				<%end %></td>
-			<td>
-				<%if item.AddressEnabled: %>
-				Нет
-				<%else: %>
-				Да
-				<%end %>
-			</td>
-			<td>
-				<%if item.IsUpdate: %>
-				Нет
-				<%else: %>
-				Да
+				<%if item.RejectReason: %>
+					${item.RejectReasonName}
 				<%end %>
 			</td>
 		</tr>
