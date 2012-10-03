@@ -109,3 +109,7 @@ div.LegendMarker.SingleUser
 #AddCommentField {
 	width: 250px;
 }
+
+table thead.CenterHead th {
+	text-align: center;
+}
