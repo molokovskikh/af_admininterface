@@ -164,7 +164,8 @@ ${app.Asset("ClientsShow.css")}
 							</td>
 						</tr>
 				</table>
-
+				</div>
+				</div>
 				<div>
 					<input type=submit value="Сохранить" />
 				</div>
