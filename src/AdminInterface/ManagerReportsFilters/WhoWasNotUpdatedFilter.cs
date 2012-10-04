@@ -117,19 +117,19 @@ UserId INT unsigned,
 AddressId INT unsigned) engine=MEMORY ;
 
 INSERT
-INTO    customers.oneUserDate
-        SELECT u1.id, ua1.AddressId FROM customers.Users U1
-        join customers.UserAddresses ua1 on ua1.UserId = u1.id
-        join customers.Addresses a1 on a1.id = ua1.AddressId
-        join usersettings.UserUpdateInfo uu1 on uu1.userid = u1.id
-        where uu1.UpdateDate >= :beginDate and uu1.UpdateDate <= :endDate
+INTO customers.oneUserDate
+	SELECT u1.id, ua1.AddressId FROM customers.Users U1
+	join customers.UserAddresses ua1 on ua1.UserId = u1.id
+	join customers.Addresses a1 on a1.id = ua1.AddressId
+	join usersettings.UserUpdateInfo uu1 on uu1.userid = u1.id
+	where uu1.UpdateDate >= :beginDate and uu1.UpdateDate <= :endDate
 
-          and (SELECT count(a2.id) FROM customers.Users U2
-              join customers.UserAddresses ua2 on ua2.UserId = u2.id
-              join customers.Addresses a2 on a2.id = ua2.AddressId
-              where ua2.UserId = u1.id) = 1
-        group by u1.id
-        having count(a1.id) = 1;
+		and (SELECT count(a2.id) FROM customers.Users U2
+			join customers.UserAddresses ua2 on ua2.UserId = u2.id
+			join customers.Addresses a2 on a2.id = ua2.AddressId
+			where ua2.UserId = u1.id) = 1
+	group by u1.id
+	having count(a1.id) = 1;
 
 DROP TEMPORARY TABLE IF EXISTS customers.oneUser;
 
@@ -141,29 +141,29 @@ INSERT
 INTO customers.oneUser
 
 SELECT u1.id, ua1.AddressId FROM customers.Users U1
-    join customers.UserAddresses ua1 on ua1.UserId = u1.id
-    join customers.Addresses a1 on a1.id = ua1.AddressId
-    where
-            (SELECT count(a3.id) FROM customers.Users U3
-            join customers.UserAddresses ua3 on ua3.UserId = u3.id
-            join customers.Addresses a3 on a3.id = ua3.AddressId
-            where ua3.UserId = u1.id) = 1
-    group by u1.id
-    having count(a1.id) = 1;
+join customers.UserAddresses ua1 on ua1.UserId = u1.id
+join customers.Addresses a1 on a1.id = ua1.AddressId
+where
+        (SELECT count(a3.id) FROM customers.Users U3
+        join customers.UserAddresses ua3 on ua3.UserId = u3.id
+        join customers.Addresses a3 on a3.id = ua3.AddressId
+        where ua3.UserId = u1.id) = 1
+group by u1.id
+having count(a1.id) = 1;
 
 SELECT
- c.id as ClientId,
- c.Name as ClientName,
- c.RegionCode as RegionName,
- u.Id as UserId,
- u.Name as UserName,
- c.Registrant as Registrant,
- uu.UpdateDate as UpdateDate
+	c.id as ClientId,
+	c.Name as ClientName,
+	c.RegionCode as RegionName,
+	u.Id as UserId,
+	u.Name as UserName,
+	c.Registrant as Registrant,
+	uu.UpdateDate as UpdateDate
 FROM customers.Users U
-join customers.UserAddresses ua on ua.UserId = u.id
-join customers.Addresses a on a.id = ua.AddressId
-join usersettings.UserUpdateInfo uu on uu.userid = u.id
-join customers.Clients c on c.id = u.ClientId
+	join customers.UserAddresses ua on ua.UserId = u.id
+	join customers.Addresses a on a.id = ua.AddressId
+	join usersettings.UserUpdateInfo uu on uu.userid = u.id
+	join customers.Clients c on c.id = u.ClientId
 where uu.UpdateDate >= :beginDate and uu.UpdateDate <= :endDate
 group by u.id
 having count(a.id) > 1
@@ -171,37 +171,38 @@ having count(a.id) > 1
 union
 
 SELECT
- c.id as ClientId,
- c.Name as ClientName,
- c.RegionCode as RegionName,
- u.Id as UserId,
- u.Name as UserName,
- c.Registrant as Registrant,
- uu.UpdateDate as UpdateDate
+	c.id as ClientId,
+	c.Name as ClientName,
+	c.RegionCode as RegionName,
+	u.Id as UserId,
+	u.Name as UserName,
+	c.Registrant as Registrant,
+	uu.UpdateDate as UpdateDate
 FROM customers.Users U
-join customers.UserAddresses ua on ua.UserId = u.id
-join customers.Addresses a on a.id = ua.AddressId
-join usersettings.UserUpdateInfo uu on uu.userid = u.id
-join customers.Clients c on c.id = u.ClientId
+	join customers.UserAddresses ua on ua.UserId = u.id
+	join customers.Addresses a on a.id = ua.AddressId
+	join usersettings.UserUpdateInfo uu on uu.userid = u.id
+	join customers.Clients c on c.id = u.ClientId
 where uu.UpdateDate >= :beginDate and uu.UpdateDate <= :endDate
- and
+and
 u.id in
-    (select if (
-        (select count(oud.UserId) from
-customers.oneUserDate oud
-where
-oud.AddressId = uaddr.AddressId
-   )
-         =
-        (select count(ou.UserId) from
-customers.oneUser ou
-where
-ou.AddressId = uaddr.AddressId
-   )
-         , uaddr.UserId, 0)
-    from customers.UserAddresses as uaddr
-    where uaddr.UserId = u.id
- )
+(select if (
+	(select count(oud.UserId)
+	from
+		customers.oneUserDate oud
+	where
+		oud.AddressId = uaddr.AddressId
+	) = (
+	select count(ou.UserId)
+	from
+		customers.oneUser ou
+	where
+		ou.AddressId = uaddr.AddressId)
+	, uaddr.UserId, 0)
+
+	from customers.UserAddresses as uaddr
+	where uaddr.UserId = u.id
+)
 group by u.id
 having count(a.id) = 1;")
 			.SetParameter("beginDate", Period.Begin)
