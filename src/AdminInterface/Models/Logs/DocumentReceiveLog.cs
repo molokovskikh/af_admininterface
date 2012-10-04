@@ -103,6 +103,9 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual DocumentType DocumentType { get; set; }
 
+		[Property]
+		public virtual bool IsFake { get; set; }
+
 		[HasMany(Inverse = true, Lazy = true)]
 		public virtual IList<DocumentSendLog> SendLogs { get; set; }
 

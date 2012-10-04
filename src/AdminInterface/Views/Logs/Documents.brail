@@ -11,7 +11,7 @@ ${app.FilterFor("filter.OnlyNoParsed")}
 ${app.EndFormFor("filter")}
 
 <div class=block>
-	Всего документов ${logEntities.Count}
+	Всего документов ${filter.RowsCount}
 </div>
 
 <form method=post action="${siteroot}/Logs/Resend">
@@ -78,13 +78,22 @@ ${app.EndFormFor("filter")}
 					${ViewHelper.ConvertToUserFriendlySize(log.DocumentSize) if log.DocumentSize}
 				</td>
 				<td>${app.LinkTo(log.Login, @Users, log.LoginId)}</td>
-				<td>${ViewHelper.ToHumanReadable(log.FileDelivered)}</td>
-				<td>${ViewHelper.ToHumanReadable(log.DocumentDelivered)}</td>
+				<td>
+					<% if not filter.OnlyNoParsed: %>
+						${ViewHelper.ToHumanReadable(log.FileDelivered)}
+					<% end %>
+				</td>
+				<td>
+					<% if not filter.OnlyNoParsed: %>
+						${ViewHelper.ToHumanReadable(log.DocumentDelivered)}
+					<% end %>
+				</td>
 				<td>${log.GetDisplayRequestTime()}</td>
 				<td>
 					<pre>!{log.Addition}</pre>
 				</td>
 			</tr>
+
 		<% end %>
 		<% else: %>
 			<tr class="EmptyData">
@@ -93,6 +102,9 @@ ${app.EndFormFor("filter")}
 				</td>
 			</tr>
 		<% end %>
+			<tr>
+			<td colspan = 3>${paginator.ShowPaginator()}</td>
+			</tr>
 		</table>
 	</div>
 
