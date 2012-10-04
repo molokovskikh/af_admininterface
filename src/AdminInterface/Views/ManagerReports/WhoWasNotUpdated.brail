@@ -1,7 +1,7 @@
-﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+﻿ <% component Bubble, {@bredcrumbs : [("Кто не обновлялся с опред. даты", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
-	Список отключенных клиентов
+	Кто не обновлялся с опред. даты
 <% end %>
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.SortBy")}
@@ -9,10 +9,6 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 <table class="CenterBlock">
 <tbody>
 	${app.FilterFor("filter.Period")}
-	<tr>
-		<td class="filter-label" >Поиск по </td>
-		<td>${app.Edit("filter.FinderType")}</td>
-	</tr>
 	<tr>
 		<td class="filter-label">Регион</td>
 		<td>${app.Edit("filter.Region")}</td>
@@ -33,8 +29,11 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<tr>
 			<th>${app.Sortable("Код клиента", "ClientId")}</th>
 			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
+			<th>Код пользователя</th>
+			<th>Комментарий пользователя</th>
 			<th>Регион</th>
-			<th>Дата отключения</th>
+			<th>Регистратор</th>
+			<th>Дата обносления</th>
 		</tr>
 	</thead>
 <%end %>
@@ -45,6 +44,10 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<td>${item.ClientId}</td>
 			<td>
 				${UrlHelper.Link(item.ClientName, {@controller: @Clients, @params: {@id: item.ClientId}})}
+			</td>
+			<td>${item.UserId}</td>
+			<td>
+				${UrlHelper.Link(item.UserName, {@controller: @Users, @params: {@id: item.UserId}})}
 			</td>
 			<td>${item.RegionName}</td>
 			<td>${item.Registrant}</td>
