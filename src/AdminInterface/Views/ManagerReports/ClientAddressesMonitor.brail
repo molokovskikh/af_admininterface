@@ -30,6 +30,8 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<th>Регион</th>
 			<th>${app.Sortable("Код адреса", "AddressId")}</th>
 			<th>${app.Sortable("Адрес", "AddressName")}</th>
+			<th>${app.Sortable("Код поставщика", "SupplierId")}</th>
+			<th>${app.Sortable("Наименование поставщика", "SupplierName")}</th>
 			<th>Количество непринятых накладных</th>
 			<th>Причина</th>
 		</tr>
@@ -47,6 +49,10 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<td>${item.AddressId}</td>
 			<td>
 				${UrlHelper.Link(item.AddressName, {@controller: @Addresses, @params: {@id: item.AddressId}})}
+			</td>
+			<td>${item.SupplierId}</td>
+			<td>
+				${UrlHelper.Link(item.SupplierName, {@controller: @Suppliers, @params: {@id: item.SupplierId}})}
 			</td>
 			<td>${item.Count}</td>
 			<td>
