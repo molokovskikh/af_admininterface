@@ -62,7 +62,6 @@ where
 	(c.regioncode & :regionMask > 0)
 	and uu.`Updatedate` > :updateDateStart
 	and uu.`Updatedate` < :updateDateEnd
-	and c.firmtype = 1
 	and oh.clientcode is null
 group by u.id
 order by {0} {1};", SortBy, SortDirection))

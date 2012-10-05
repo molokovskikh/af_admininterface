@@ -191,6 +191,7 @@
     <Compile Include="Tasks\UpdateAccountProcessorFixture.cs" />
     <Compile Include="SendPaymentNotificationFixture.cs" />
     <Compile Include="SetupFixture.cs" />
+    <Compile Include="UpdatedAndDidNotDoOrdersАFixture.cs" />
     <Compile Include="WhoWasNotUpdatedFilterFixture.cs" />
   </ItemGroup>
   <ItemGroup>
