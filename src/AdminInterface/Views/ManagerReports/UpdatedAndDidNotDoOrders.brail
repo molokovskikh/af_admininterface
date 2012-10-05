@@ -1,4 +1,4 @@
-﻿ <% component Bubble, {@bredcrumbs : [("Кто не обновлялся с опред. даты", "${siteroot}/ManagerReports/")]} %>
+﻿ <% component Bubble, {@bredcrumbs : [("Кто обновлялся и не делал заказы", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
 	Кто не обновлялся с опред. даты
@@ -8,7 +8,8 @@ ${FormHelper.HiddenField("filter.SortBy")}
 ${FormHelper.HiddenField("filter.SortDirection")}
 <table class="CenterBlock">
 <tbody>
-	${app.FilterFor("filter.Period")}
+	${app.FilterFor("filter.UpdatePeriod")}
+	${app.FilterFor("filter.OrderDate")}
 	<tr>
 		<td class="filter-label">Регион</td>
 		<td>${app.Edit("filter.Region")}</td>

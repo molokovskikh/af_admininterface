@@ -172,6 +172,7 @@
     <Compile Include="ManagerReportsFilters\ClientAddressFilter.cs" />
     <Compile Include="ManagerReportsFilters\RegistrationInformation.cs" />
     <Compile Include="ManagerReportsFilters\SwitchOffClientsFilter.cs" />
+    <Compile Include="ManagerReportsFilters\UpdatedAndDidNotDoOrders.cs" />
     <Compile Include="ManagerReportsFilters\UserFinderFilter.cs" />
     <Compile Include="ManagerReportsFilters\WhoWasNotUpdatedFilter.cs" />
     <Compile Include="Models\Logs\RejectWaybillLog.cs" />
@@ -495,6 +496,8 @@
     <Content Include="Views\ManagerReports\ClientAddressesMonitor.brail" />
     <Content Include="Views\ManagerReports\SwitchOffClients.brail" />
     <Content Include="Views\ManagerReports\WhoWasNotUpdated.brail" />
+    <Content Include="Views\ManagerReports\UniversalTable.brail" />
+    <Content Include="Views\ManagerReports\UpdatedAndDidNotDoOrders.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />

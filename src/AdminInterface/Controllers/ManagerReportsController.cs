@@ -63,5 +63,14 @@ namespace AdminInterface.Controllers
 			PropertyBag["filter"] = filter;
 			PropertyBag["Clients"] = filter.SqlQuery2(DbSession);
 		}
+
+		public void UpdatedAndDidNotDoOrders()
+		{
+			var filter = new UpdatedAndDidNotDoOrdersFilter();
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			PropertyBag["filter"] = filter;
+			PropertyBag["Clients"] = filter.Find(DbSession);
+		}
 	}
 }
