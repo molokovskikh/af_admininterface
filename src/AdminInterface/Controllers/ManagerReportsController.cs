@@ -61,7 +61,7 @@ namespace AdminInterface.Controllers
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			PropertyBag["filter"] = filter;
-			PropertyBag["Clients"] = filter.Find(DbSession);
+			PropertyBag["Clients"] = filter.SqlQuery2(DbSession);
 		}
 	}
 }

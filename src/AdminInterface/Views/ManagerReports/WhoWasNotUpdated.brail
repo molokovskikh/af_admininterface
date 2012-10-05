@@ -29,11 +29,11 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<tr>
 			<th>${app.Sortable("Код клиента", "ClientId")}</th>
 			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
-			<th>Код пользователя</th>
-			<th>Комментарий пользователя</th>
+			<th>${app.Sortable("Код пользователя", "UserId")}</th>
+			<th>${app.Sortable("Комментарий пользователя", "UserName")}</th>
 			<th>Регион</th>
 			<th>Регистратор</th>
-			<th>Дата обносления</th>
+			<th>${app.Sortable("Дата обновления", "UpdateDate")}</th>
 		</tr>
 	</thead>
 <%end %>
@@ -52,7 +52,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<td>${item.RegionName}</td>
 			<td>${item.Registrant}</td>
 			<td>
-				${item.Updatedate}
+				${item.UpdateDate}
 			</td>
 		</tr>
 		<%end %>
