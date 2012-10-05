@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Controllers.Filters;
@@ -92,21 +93,43 @@ namespace Integration.Models
 		[Test]
 		public void OnlyNoParcedTest()
 		{
+			// Создаем поставщика, клиента, лог документа
 			var supplier = DataMother.CreateSupplier();
 			Save(supplier);
 			var documentLog = new DocumentReceiveLog(supplier);
+			documentLog.IsFake = true;
 			Save(documentLog);
 			var client = DataMother.CreateClientAndUsers();
 			Save(client);
-			Flush();
 
+			// создаем фильтр, устанавливаем в качестве параметра созданного поставщика и "искать только неразобранные"
 			var filter = new DocumentFilter();
 			filter.Supplier = supplier;
 			filter.OnlyNoParsed = true;
+			// ищем
 			var documents = filter.Find();
+			// не должны получить сохраненный выше документ из-за установленного IsFake
+			Assert.That(documents.Count, Is.EqualTo(0));
+			// Убираем IsFake
+			documentLog.IsFake = false;
+			Save(documentLog);
+			Flush();
+			documents = filter.Find();
+			// должны получить сохраненный выше документ
 			Assert.That(documents.Count, Is.GreaterThan(0));
+			// Добавляем логи отправки
+			documentLog.SendLogs = new List<DocumentSendLog>();
+			documentLog.SendLogs.Add(new DocumentSendLog(client.Users[0], documentLog));
+			documentLog.SendLogs.Add(new DocumentSendLog(client.Users[1], documentLog));
+			Save(documentLog.SendLogs);
+			Save(documentLog);
+			// проверяем, что два сохраненных лога не дают дублирование документа
+			var documentsWithSendLogs = filter.Find();
+			Assert.That(documents.Count, Is.EqualTo(documentsWithSendLogs.Count));
+			// создаем документ для лога
 			var document = DataMother.CreateTestDocument(supplier, client, documentLog);
 			Save(document);
+			// не должны выбрать запись лога, так как уже есть документ
 			documents = filter.Find();
 			Assert.That(documents.Count, Is.EqualTo(0));
 		}

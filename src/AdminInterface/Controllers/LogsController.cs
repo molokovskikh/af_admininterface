@@ -18,6 +18,7 @@ namespace AdminInterface.Controllers
 	[
 		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
+		Helper(typeof(PaginatorHelper), "paginator"),
 		Secure
 	]
 	public class LogsController : AdminInterfaceController
