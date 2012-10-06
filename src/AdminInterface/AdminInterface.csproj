@@ -169,6 +169,7 @@
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
+    <Compile Include="ManagerReportsFilters\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="ManagerReportsFilters\ClientAddressFilter.cs" />
     <Compile Include="ManagerReportsFilters\RegistrationInformation.cs" />
     <Compile Include="ManagerReportsFilters\SwitchOffClientsFilter.cs" />
@@ -498,6 +499,7 @@
     <Content Include="Views\ManagerReports\WhoWasNotUpdated.brail" />
     <Content Include="Views\ManagerReports\UniversalTable.brail" />
     <Content Include="Views\ManagerReports\UpdatedAndDidNotDoOrders.brail" />
+    <Content Include="Views\ManagerReports\AnalysisOfWorkDrugstores.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />

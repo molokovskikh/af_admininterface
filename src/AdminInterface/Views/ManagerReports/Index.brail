@@ -8,3 +8,4 @@ ${app.LinkTo("Клиенты и адреса, по которым не прин�
 ${app.LinkTo("Список отключенных клиентов", @ManagerReports, @SwitchOffClients)}<br>
 ${app.LinkTo("Кто не обновлялся с опред. даты", @ManagerReports, @WhoWasNotUpdated)}<br>
 ${app.LinkTo("Кто обновлялся и не делал заказы", @ManagerReports, @UpdatedAndDidNotDoOrders)}<br>
+${app.LinkTo("Сравнит. анализ работы аптек за периоды", @ManagerReports, @AnalysisOfWorkDrugstores)}<br>

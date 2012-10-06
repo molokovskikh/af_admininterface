@@ -72,5 +72,14 @@ namespace AdminInterface.Controllers
 			PropertyBag["filter"] = filter;
 			PropertyBag["Clients"] = filter.Find(DbSession);
 		}
+
+		public void AnalysisOfWorkDrugstores()
+		{
+			var filter = new AnalysisOfWorkDrugstoresFilter(DbSession);
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			PropertyBag["filter"] = filter;
+			PropertyBag["Clients"] = filter.Find();
+		}
 	}
 }
