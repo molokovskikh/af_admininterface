@@ -94,7 +94,9 @@ namespace AdminInterface.Models.Suppliers
 		public virtual string INN
 		{
 			get {
-				return "ИНН: " + Payer.INN;
+				if(Payer != null && !string.IsNullOrEmpty(Payer.INN))
+					return "ИНН: " + Payer.INN;
+				return "";
 			}
 		}
 
