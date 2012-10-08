@@ -113,3 +113,9 @@ table thead.CenterHead th
 {
 	text-align: center;
 }
+
+.rowHead {
+	font-weight: bold;
+	text-align: center;
+	font-size: 14px;
+}
