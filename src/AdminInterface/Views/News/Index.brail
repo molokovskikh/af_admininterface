@@ -29,6 +29,11 @@
 					<input type=submit value="Скрыть" />
 				</form>
 			<%end %>
+			<%if news.Deleted: %>
+				<form method=get action="${siteroot}/News/${news.Id}/Open/">
+					<input type=submit value="Восстановить" />
+				</form>
+			<%end %>
 			</td>
 		</tr>
 	<% end %>
