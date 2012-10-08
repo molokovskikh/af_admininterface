@@ -122,7 +122,6 @@
     <Compile Include="Controllers\AccountControllerFixture.cs" />
     <Compile Include="Controllers\CallHistoryControllerFixture.cs" />
     <Compile Include="Controllers\ManagerReportControllerFixture.cs" />
-    <Compile Include="Controllers\NewsControllerFixture.cs" />
     <Compile Include="Controllers\PayersControllerFixture.cs" />
     <Compile Include="Controllers\PaymentsControllerFixture.cs" />
     <Compile Include="Controllers\RevisionActControllerFixture.cs" />
