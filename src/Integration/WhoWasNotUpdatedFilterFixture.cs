@@ -101,7 +101,7 @@ namespace Integration
 			Flush();
 
 			var filter = new WhoWasNotUpdatedFilter { Period = new DatePeriod(DateTime.Now.AddDays(-3), DateTime.Now.AddDays(-1)) };
-			QueryCatcher.Catch();
+
 			var data = filter.SqlQuery2(session);
 			Assert.AreEqual(data.Count, 4);
 		}
@@ -122,7 +122,7 @@ namespace Integration
 			Flush();
 
 			var filter = new WhoWasNotUpdatedFilter { Period = new DatePeriod(DateTime.Now.AddDays(-3), DateTime.Now.AddDays(-1)) };
-			QueryCatcher.Catch();
+
 			var data = filter.SqlQuery2(session);
 			Assert.AreEqual(data.Count, 1);
 			Assert.That(data[0].UserName, Is.EqualTo("user3"));
@@ -144,12 +144,12 @@ namespace Integration
 			Flush();
 
 			var filter = new WhoWasNotUpdatedFilter { Period = new DatePeriod(DateTime.Now.AddDays(-3), DateTime.Now.AddDays(-1)) };
-			QueryCatcher.Catch();
-			var data = filter.SqlQuery2(session);
+
+			var data = filter.SqlQuery2(session).Select(d => d.UserName).ToList();
 			Assert.AreEqual(data.Count, 3);
-			Assert.That(data[0].UserName, Is.EqualTo("user"));
-			Assert.That(data[1].UserName, Is.EqualTo("user1"));
-			Assert.That(data[2].UserName, Is.EqualTo("user2"));
+			Assert.IsTrue(data.Contains("user"));
+			Assert.IsTrue(data.Contains("user1"));
+			Assert.IsTrue(data.Contains("user2"));
 		}
 	}
 }
