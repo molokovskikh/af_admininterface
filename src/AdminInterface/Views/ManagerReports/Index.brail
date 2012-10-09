@@ -3,9 +3,9 @@
  <% component CaptureFor, {@id : @Title}: %>
 	Отчеты для менеджеров
 <% end %>
-${app.LinkTo("Пользователи и адреса", @ManagerReports, @UsersAndAdresses)}<br>
-${app.LinkTo("Клиенты и адреса, по которым не принимаются накладные", @ManagerReports, @ClientAddressesMonitor)}<br>
-${app.LinkTo("Список отключенных клиентов", @ManagerReports, @SwitchOffClients)}<br>
-${app.LinkTo("Кто не обновлялся с опред. даты", @ManagerReports, @WhoWasNotUpdated)}<br>
-${app.LinkTo("Кто обновлялся и не делал заказы", @ManagerReports, @UpdatedAndDidNotDoOrders)}<br>
+${app.LinkTo("Пользователи и адреса", @ManagerReports, @UsersAndAdresses)}<br><br>
+${app.LinkTo("Клиенты и адреса, по которым не принимаются накладные", @ManagerReports, @ClientAddressesMonitor)}<br><br>
+${app.LinkTo("Список отключенных клиентов", @ManagerReports, @SwitchOffClients)}<br><br>
+${app.LinkTo("Кто не обновлялся с опред. даты", @ManagerReports, @WhoWasNotUpdated)}<br><br>
+${app.LinkTo("Кто обновлялся и не делал заказы", @ManagerReports, @UpdatedAndDidNotDoOrders)}<br><br>
 ${app.LinkTo("Сравнительный анализ работы аптек", @ManagerReports, @AnalysisOfWorkDrugstores)}<br>
