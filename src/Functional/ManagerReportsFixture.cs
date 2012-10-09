@@ -45,5 +45,13 @@ namespace Functional
 			Click("Показать");
 			AssertText("Список отключенных клиентов");
 		}
+
+		[Test]
+		public void Analysis_of_work_drugstores()
+		{
+			Open("ManagerReports");
+			Click("Сравнительный анализ работы аптек");
+			AssertText("Сравнительный анализ работы аптек");
+		}
 	}
 }

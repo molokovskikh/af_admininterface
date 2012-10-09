@@ -58,10 +58,10 @@ CREATE TEMPORARY TABLE Customers.Updates (
 Id INT unsigned,
 Name varchar(50) ,
 RegionName varchar(50) ,
-CurWeekObn INT unsigned,
-LastWeekObn INT unsigned,
-CurWeekZak INT unsigned,
-LastWeekZak INT unsigned) engine=MEMORY ;
+CurWeekObn INT,
+LastWeekObn INT,
+CurWeekZak INT,
+LastWeekZak INT) engine=MEMORY ;
 
 insert into Customers.Updates
 SELECT cd.id ,
@@ -102,8 +102,8 @@ reg.Region as RegionName,
 FROM customers.Clients Cd
 left join usersettings.RetClientsSet Rcs on rcs.clientcode = cd.id
 left join farm.Regions reg on reg.RegionCode = Cd.regioncode
-WHERE firmtype = 1
-AND cd.regioncode & :regionMask > 0
+WHERE
+cd.regioncode & :regionMask > 0
 AND rcs.serviceclient = 0
 AND rcs.invisibleonfirm = 0;")
 				.SetParameter("FistPeriodStart", FistPeriod.Begin)
@@ -122,10 +122,10 @@ SELECT
 	RegionName,
 	CurWeekObn,
 	LastWeekObn,
-	IF (CurWeekObn  -LastWeekObn < 0 , ( IF (CurWeekObn <> 0, ROUND((LastWeekObn-CurWeekObn)*100/LastWeekObn), 100) ) ,0) ProblemObn,
+	IF (CurWeekObn - LastWeekObn < 0 , ( IF (CurWeekObn <> 0, ROUND((LastWeekObn-CurWeekObn)*100/LastWeekObn), 100) ) ,0) ProblemObn,
 	CurWeekZak,
 	LastWeekZak,
-	IF (CurWeekZak-LastWeekZak < 0 , ( IF (CurWeekZak <> 0, ROUND((LastWeekZak-CurWeekZak)*100/LastWeekZak), 100 ) ) ,0) ProblemZak
+	IF (CurWeekZak - LastWeekZak < 0 , ( IF (CurWeekZak <> 0, ROUND((LastWeekZak-CurWeekZak)*100/LastWeekZak), 100 ) ) ,0) ProblemZak
 FROM Customers.updates
 ORDER BY {2} {3}
 limit {0}, {1}", CurrentPage * PageSize, PageSize, SortBy, SortDirection))

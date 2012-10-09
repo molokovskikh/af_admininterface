@@ -1,7 +1,7 @@
 ﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
-	Список отключенных клиентов
+	Сравнительный анализ работы аптек
 <% end %>
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.SortBy")}
@@ -74,12 +74,12 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<th>${app.Sortable("Код клиента", "Id")}</th>
 			<th>${app.Sortable("Наименование клиента", "Name")}</th>
 			<th>Регион</th>
-			<th>Обновления (новый период)</th>
-			<th>Обновления (старый период)</th>
-			<th>Падение обновлений (%)</th>
-			<th>Сумма заказов (новый период)</th>
-			<th>Сумма заказов (старый период)</th>
-			<th>Падение заказов (%)</th>
+			<th>${app.Sortable("Обновления (новый период)", "CurWeekObn")}</th>
+			<th>${app.Sortable("Обновления (старый период)", "LastWeekObn")}</th>
+			<th>${app.Sortable("Падение обновлений (%)", "ProblemObn")}</th>
+			<th>${app.Sortable("Сумма заказов (новый период)", "CurWeekZak")}</th>
+			<th>${app.Sortable("Сумма заказов (старый период)", "LastWeekZak")}</th>
+			<th>${app.Sortable("Падение заказов (%)", "ProblemZak")}</th>
 		</tr>
 	</thead>
 <%end %>
