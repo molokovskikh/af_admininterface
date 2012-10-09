@@ -208,7 +208,7 @@ Email: {2}
 			}
 		}
 
-		public static void NotifySupplierAboutAddressRegistration(Address address, DefaultValues defaults)
+	public static void NotifySupplierAboutAddressRegistration(Address address, DefaultValues defaults)
 		{
 			try {
 				new NotificationService(defaults).NotifySupplierAboutAddressRegistration(address);
