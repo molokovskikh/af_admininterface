@@ -236,12 +236,13 @@ namespace AdminInterface.Mailers
 			PropertyBag["idLabel"] = idLabel;
 		}
 
-		public MonorailMailer RegisterNews(News news, string to)
+		public MonorailMailer RegisterOrDeleteNews(News news, string to, string messageSubject)
 		{
 			To = to;
 			IsBodyHtml = true;
 			Template = "RegisterNews";
-			Subject = String.Format("Зарегистрированна новость");
+			Subject = messageSubject;
+			PropertyBag["messageSubject"] = messageSubject;
 			PropertyBag["header"] = news.Header;
 			PropertyBag["body"] = news.Body;
 			PropertyBag["destination"] = news.DestinationType.GetDescription();

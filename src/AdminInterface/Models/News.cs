@@ -16,7 +16,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord(Schema = "Usersettings"), Auditable, Description("Новость")]
-	public class News
+	public class News : IChangesNotificationAware
 	{
 		public News()
 		{
@@ -70,6 +70,11 @@ namespace AdminInterface.Models
 		public virtual bool HiddenNews
 		{
 			get { return Deleted; }
+		}
+
+		public bool ShouldNotify()
+		{
+			return !Deleted;
 		}
 	}
 }
