@@ -326,6 +326,7 @@ where Phone like :phone")
 		{
 			var client = DbSession.Load<Client>(clientId);
 			new NotificationService(Defaults).NotifySupplierAboutDrugstoreRegistration(client, true);
+			DbSession.Save(new AuditRecord("Разослано повторное уведомление о регистрации адреса", client));
 			Notify("Уведомления отправлены");
 			RedirectToReferrer();
 		}

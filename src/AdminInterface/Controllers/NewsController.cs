@@ -63,19 +63,15 @@ namespace AdminInterface.Controllers
 		{
 			var news = DbSession.Load<News>(id);
 			news.PublicationDate = DateTime.Now;
+			// Для того, чтобы не рассылать повторные уведомления
+			DbSession.Save(news);
+			DbSession.Flush();
 			news.Deleted = false;
 			PropertyBag["news"] = news;
-			if (IsPost) {
-				BindObjectInstance(news, "news");
-				if (IsValid(news)) {
-					DbSession.Save(news);
-					new MonorailMailer().RegisterOrDeleteNews(news, "AFNews@subscribe.analit.net", "Восстановлена новость").Send();
-					Notify("Восстановлено");
-					RedirectToAction("Index");
-					return;
-				}
-			}
-			RenderView("Edit");
+			DbSession.Save(news);
+			new MonorailMailer().RegisterOrDeleteNews(news, "AFNews@subscribe.analit.net", "Восстановлена новость").Send();
+			Notify("Восстановлено");
+			RedirectToReferrer();
 		}
 	}
 }
