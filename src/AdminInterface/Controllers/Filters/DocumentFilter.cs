@@ -73,7 +73,7 @@ namespace AdminInterface.Controllers.Filters
 				.CreateAlias("Address", "a", JoinType.LeftOuterJoin)
 				.CreateAlias("Document", "d", JoinType.LeftOuterJoin)
 				.CreateAlias("SendUpdateLogEntity", "ru", JoinType.LeftOuterJoin);
-			if(!OnlyNoParsed) {
+			if(!OnlyNoParsed || User != null) {
 				criteria.CreateAlias("SendLogs", "sl", JoinType.LeftOuterJoin);
 				criteria.CreateAlias("sl.ForUser", "u", JoinType.LeftOuterJoin);
 				criteria.CreateAlias("sl.SendedInUpdate", "su", JoinType.LeftOuterJoin);
