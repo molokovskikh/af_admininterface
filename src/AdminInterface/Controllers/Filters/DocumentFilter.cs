@@ -4,8 +4,10 @@ using System.ComponentModel;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.Security;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Criterion;
@@ -20,7 +22,8 @@ namespace AdminInterface.Controllers.Filters
 			Period = new DatePeriod(DateTime.Today.AddDays(-1), DateTime.Today);
 			PageSize = 30;
 		}
-
+		[Description("Регион")]
+		public Region Region { get; set; }
 		public DatePeriod Period { get; set; }
 		[Description("Только неразобранные накладные: ")]
 		public bool OnlyNoParsed { get; set; }
@@ -66,12 +69,20 @@ namespace AdminInterface.Controllers.Filters
 
 		private DetachedCriteria GetCriteriaForView(DateTime begin, DateTime end)
 		{
+			var regionMask = SecurityContext.Administrator.RegionMask;
+			if (Region != null)
+				regionMask &= Region.Id;
+
 			var criteria = DetachedCriteria.For<DocumentReceiveLog>();
 			criteria.CreateAlias("FromSupplier", "fs", JoinType.InnerJoin)
-				.CreateAlias("ForClient", "fc", JoinType.LeftOuterJoin)
 				.CreateAlias("Address", "a", JoinType.LeftOuterJoin)
 				.CreateAlias("Document", "d", JoinType.LeftOuterJoin)
 				.CreateAlias("SendUpdateLogEntity", "ru", JoinType.LeftOuterJoin);
+			if(OnlyNoParsed)
+				criteria.CreateCriteria("ForClient", "fc", JoinType.LeftOuterJoin).Add(Expression.Sql("{alias}.RegionCode & " + regionMask + " > 0"));
+			else {
+				criteria.CreateAlias("ForClient", "fc", JoinType.LeftOuterJoin);
+			}
 			if(!OnlyNoParsed) {
 				criteria.CreateAlias("SendLogs", "sl", JoinType.LeftOuterJoin);
 				criteria.CreateAlias("sl.ForUser", "u", JoinType.LeftOuterJoin);
