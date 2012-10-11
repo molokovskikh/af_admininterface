@@ -46,6 +46,33 @@ namespace Integration.Models
 			}
 		}
 
+		[Test]
+		public void FilterGetAllDocumentsIfNoOnlyNoParsedTest()
+		{
+			// Создаем поставщика
+			var supplier = DataMother.CreateSupplier();
+			Save(supplier);
+			// Создаем много документов, чтобы не влезали на одну страницу
+			for (int i = 0; i < 33; i++) {
+				var documentLog = new DocumentReceiveLog(supplier);
+				Save(documentLog);
+			}
+			// Создаем фильтр и устанавливаем параметр Только неразобранные
+			var filter = new DocumentFilter();
+			filter.Supplier = supplier;
+			filter.OnlyNoParsed = true;
+
+			var documents = filter.Find();
+			// должны получить документы в количестве равном одной странице
+			Assert.That(documents.Count, Is.EqualTo(filter.PageSize));
+
+			// ищем все документы
+			filter.OnlyNoParsed = false;
+			documents = filter.Find();
+			// должны получить документы в количестве большем одной страницы
+			Assert.That(documents.Count, Is.GreaterThan(filter.PageSize));
+		}
+
 		[Test(Description = "проверям работу DocumentLog")]
 		public void CheckDocumentProcessedSuccessfully()
 		{

@@ -102,9 +102,11 @@ ${app.EndFormFor("filter")}
 				</td>
 			</tr>
 		<% end %>
+		<% if filter.OnlyNoParsed: %>
 			<tr>
 			<td colspan = 3>${paginator.ShowPaginator()}</td>
 			</tr>
+		<% end %>
 		</table>
 	</div>
 

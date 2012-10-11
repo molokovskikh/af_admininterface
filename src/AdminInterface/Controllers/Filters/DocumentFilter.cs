@@ -32,11 +32,12 @@ namespace AdminInterface.Controllers.Filters
 		private IList<DocumentLog> AcceptPaginator(DetachedCriteria criteria)
 		{
 			var countQuery = CriteriaTransformer.TransformToRowCount(criteria);
+			if(OnlyNoParsed) {
+				if (CurrentPage > 0)
+					criteria.SetFirstResult(CurrentPage * PageSize);
 
-			if (CurrentPage > 0)
-				criteria.SetFirstResult(CurrentPage * PageSize);
-
-			criteria.SetMaxResults(PageSize);
+				criteria.SetMaxResults(PageSize);
+			}
 
 			return ArHelper.WithSession(s => {
 				RowsCount = countQuery.GetExecutableCriteria(s).UniqueResult<int>();
