@@ -26,10 +26,11 @@ namespace Integration.Models
 			// Создаем поставщика, клиента, лог документа
 			_supplier = DataMother.CreateSupplier();
 			Save(_supplier);
-			_documentLog = new DocumentReceiveLog(_supplier);
-			Save(_documentLog);
 			_client = DataMother.CreateClientAndUsers();
 			Save(_client);
+			_documentLog = new DocumentReceiveLog(_supplier);
+			_documentLog.ForClient = _client;
+			Save(_documentLog);
 		}
 
 		[Test]
