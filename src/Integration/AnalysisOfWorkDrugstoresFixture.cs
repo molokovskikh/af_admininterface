@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Security;
+using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support;
@@ -34,7 +35,12 @@ namespace Integration
 
 			var result = filter.Find();
 			Assert.That(result.Count, Is.GreaterThan(0));
-			Assert.IsTrue(result.Select(r => r.Id).Contains(client.Id));
+			Assert.IsTrue(result.Any(r => r.Id == client.Id));
+
+			logBuilder.AppendLine(result.Implode());
+			logBuilder.AppendLine(client.Id.ToString());
+
+			File.WriteAllText("AnalysisOfWorkDrugstoresFixture.txt", logBuilder.ToString(), Encoding.UTF8);
 		}
 	}
 }
