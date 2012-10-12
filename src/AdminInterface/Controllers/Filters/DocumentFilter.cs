@@ -32,11 +32,12 @@ namespace AdminInterface.Controllers.Filters
 		private IList<DocumentLog> AcceptPaginator(DetachedCriteria criteria)
 		{
 			var countQuery = CriteriaTransformer.TransformToRowCount(criteria);
+			if(OnlyNoParsed) {
+				if (CurrentPage > 0)
+					criteria.SetFirstResult(CurrentPage * PageSize);
 
-			if (CurrentPage > 0)
-				criteria.SetFirstResult(CurrentPage * PageSize);
-
-			criteria.SetMaxResults(PageSize);
+				criteria.SetMaxResults(PageSize);
+			}
 
 			return ArHelper.WithSession(s => {
 				RowsCount = countQuery.GetExecutableCriteria(s).UniqueResult<int>();
@@ -72,7 +73,7 @@ namespace AdminInterface.Controllers.Filters
 				.CreateAlias("Address", "a", JoinType.LeftOuterJoin)
 				.CreateAlias("Document", "d", JoinType.LeftOuterJoin)
 				.CreateAlias("SendUpdateLogEntity", "ru", JoinType.LeftOuterJoin);
-			if(!OnlyNoParsed) {
+			if(!OnlyNoParsed || User != null) {
 				criteria.CreateAlias("SendLogs", "sl", JoinType.LeftOuterJoin);
 				criteria.CreateAlias("sl.ForUser", "u", JoinType.LeftOuterJoin);
 				criteria.CreateAlias("sl.SendedInUpdate", "su", JoinType.LeftOuterJoin);
