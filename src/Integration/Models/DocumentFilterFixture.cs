@@ -69,9 +69,12 @@ namespace Integration.Models
 			// Создаем поставщика
 			var supplier = DataMother.CreateSupplier();
 			Save(supplier);
+			var client = DataMother.CreateTestClientWithAddress();
+			Save(client);
 			// Создаем много документов, чтобы не влезали на одну страницу
 			for (int i = 0; i < 33; i++) {
 				var documentLog = new DocumentReceiveLog(supplier);
+				documentLog.ForClient = client;
 				Save(documentLog);
 			}
 			// Создаем фильтр и устанавливаем параметр Только неразобранные
