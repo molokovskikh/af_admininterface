@@ -5,6 +5,7 @@ using AdminInterface.Controllers;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Integration.ForTesting;
@@ -16,6 +17,22 @@ namespace Integration.Models
 	[TestFixture]
 	public class DocumentFilterFixture : Test.Support.IntegrationFixture
 	{
+		private Supplier _supplier;
+		private DocumentReceiveLog _documentLog;
+		private Client _client;
+		[SetUp]
+		public void SetUp()
+		{
+			// Создаем поставщика, клиента, лог документа
+			_supplier = DataMother.CreateSupplier();
+			Save(_supplier);
+			_client = DataMother.CreateClientAndUsers();
+			Save(_client);
+			_documentLog = new DocumentReceiveLog(_supplier);
+			_documentLog.ForClient = _client;
+			Save(_documentLog);
+		}
+
 		[Test]
 		public void Get_document_error_for_supplier()
 		{
@@ -118,46 +135,53 @@ namespace Integration.Models
 		}
 
 		[Test]
-		public void OnlyNoParcedTest()
+		public void OnlyNoParsedWithSendLogsTest()
 		{
-			// Создаем поставщика, клиента, лог документа
-			var supplier = DataMother.CreateSupplier();
-			Save(supplier);
-			var documentLog = new DocumentReceiveLog(supplier);
-			documentLog.IsFake = true;
-			Save(documentLog);
-			var client = DataMother.CreateClientAndUsers();
-			Save(client);
-
 			// создаем фильтр, устанавливаем в качестве параметра созданного поставщика и "искать только неразобранные"
 			var filter = new DocumentFilter();
-			filter.Supplier = supplier;
+			filter.Supplier = _supplier;
+			filter.OnlyNoParsed = true;
+			var documents = filter.Find();
+			// Добавляем логи отправки
+			_documentLog.SendLogs = new List<DocumentSendLog>();
+			_documentLog.SendLogs.Add(new DocumentSendLog(_client.Users[0], _documentLog));
+			_documentLog.SendLogs.Add(new DocumentSendLog(_client.Users[1], _documentLog));
+			Save(_documentLog.SendLogs);
+			Save(_documentLog);
+			// проверяем, что два сохраненных лога не дают дублирование документа
+			var documentsWithSendLogs = filter.Find();
+			Assert.That(documents.Count, Is.GreaterThan(0));
+			Assert.That(documents.Count, Is.EqualTo(documentsWithSendLogs.Count));
+		}
+
+		[Test]
+		public void OnlyNoParcedWithDocumentTest()
+		{
+			// создаем фильтр, устанавливаем в качестве параметра созданного поставщика и "искать только неразобранные"
+			var filter = new DocumentFilter();
+			filter.Supplier = _supplier;
+			filter.OnlyNoParsed = true;
+			// создаем документ для лога
+			var document = DataMother.CreateTestDocument(_supplier, _client, _documentLog);
+			Save(document);
+			// не должны выбрать запись лога, так как уже есть документ
+			var documents = filter.Find();
+			Assert.That(documents.Count, Is.EqualTo(0));
+		}
+
+		[Test]
+		public void OnlyNoParcedWithFakeTest()
+		{
+			_documentLog.IsFake = true;
+			Save(_documentLog);
+			Flush();
+			// создаем фильтр, устанавливаем в качестве параметра созданного поставщика и "искать только неразобранные"
+			var filter = new DocumentFilter();
+			filter.Supplier = _supplier;
 			filter.OnlyNoParsed = true;
 			// ищем
 			var documents = filter.Find();
 			// не должны получить сохраненный выше документ из-за установленного IsFake
-			Assert.That(documents.Count, Is.EqualTo(0));
-			// Убираем IsFake
-			documentLog.IsFake = false;
-			Save(documentLog);
-			Flush();
-			documents = filter.Find();
-			// должны получить сохраненный выше документ
-			Assert.That(documents.Count, Is.GreaterThan(0));
-			// Добавляем логи отправки
-			documentLog.SendLogs = new List<DocumentSendLog>();
-			documentLog.SendLogs.Add(new DocumentSendLog(client.Users[0], documentLog));
-			documentLog.SendLogs.Add(new DocumentSendLog(client.Users[1], documentLog));
-			Save(documentLog.SendLogs);
-			Save(documentLog);
-			// проверяем, что два сохраненных лога не дают дублирование документа
-			var documentsWithSendLogs = filter.Find();
-			Assert.That(documents.Count, Is.EqualTo(documentsWithSendLogs.Count));
-			// создаем документ для лога
-			var document = DataMother.CreateTestDocument(supplier, client, documentLog);
-			Save(document);
-			// не должны выбрать запись лога, так как уже есть документ
-			documents = filter.Find();
 			Assert.That(documents.Count, Is.EqualTo(0));
 		}
 	}
