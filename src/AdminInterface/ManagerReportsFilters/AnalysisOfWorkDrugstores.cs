@@ -32,18 +32,22 @@ namespace AdminInterface.ManagerReportsFilters
 		public DatePeriod FistPeriod { get; set; }
 		public DatePeriod LastPeriod { get; set; }
 
-		protected ISession Session;
+		public ISession Session;
 
-		public AnalysisOfWorkDrugstoresFilter(ISession session)
+		public AnalysisOfWorkDrugstoresFilter()
 		{
 			PageSize = 30;
-			Session = session;
 			var firstWeek = DateHelper.GetWeekInterval(DateTime.Now.AddDays(-((int)DateTime.Now.DayOfWeek + 1)));
 			var lastWeek = DateHelper.GetWeekInterval(DateTime.Now.AddDays(-((int)DateTime.Now.DayOfWeek + 8)));
 			FistPeriod = new DatePeriod(firstWeek.StartDate, firstWeek.EndDate);
 			LastPeriod = new DatePeriod(lastWeek.StartDate, lastWeek.EndDate);
-			Region = Session.Query<Region>().First(r => r.Name == "Воронеж");
 			SortBy = "Name";
+		}
+
+		public void SetDefaultRegion()
+		{
+			if (Region == null)
+				Region = Session.Query<Region>().First(r => r.Name == "Воронеж");
 		}
 
 		public IList<AnalysisOfWorkFiled> Find()

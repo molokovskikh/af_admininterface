@@ -21,7 +21,8 @@ namespace Integration
 			var client = DataMother.CreateClientAndUsers();
 			session.Save(client);
 
-			var filter = new AnalysisOfWorkDrugstoresFilter(session);
+			var filter = new AnalysisOfWorkDrugstoresFilter();
+			filter.Session = session;
 
 			var logBuilder = new StringBuilder();
 			logBuilder.AppendLine(client.Settings.ServiceClient.ToString());

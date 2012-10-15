@@ -9,6 +9,7 @@ using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Controllers;
@@ -75,9 +76,10 @@ namespace AdminInterface.Controllers
 
 		public void AnalysisOfWorkDrugstores()
 		{
-			var filter = new AnalysisOfWorkDrugstoresFilter(DbSession);
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
-			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			SetSmartBinder(AutoLoadBehavior.OnlyNested);
+			var filter = (AnalysisOfWorkDrugstoresFilter)BindObject(IsPost ? ParamStore.Form : ParamStore.QueryString, typeof(AnalysisOfWorkDrugstoresFilter), "filter", AutoLoadBehavior.OnlyNested);
+			filter.Session = DbSession;
+			filter.SetDefaultRegion();
 			PropertyBag["filter"] = filter;
 			PropertyBag["Clients"] = filter.Find();
 		}
