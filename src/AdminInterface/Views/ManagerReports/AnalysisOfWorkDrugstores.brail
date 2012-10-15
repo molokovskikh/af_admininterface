@@ -50,10 +50,6 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	</tr>
 
 	<tr>
-		<td class="filter-label" >Поиск по </td>
-		<td>${app.Edit("filter.FinderType")}</td>
-	</tr>
-	<tr>
 		<td class="filter-label">Регион</td>
 		<td>${app.Edit("filter.Region")}</td>
 	</tr>

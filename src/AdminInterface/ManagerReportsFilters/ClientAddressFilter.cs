@@ -30,6 +30,8 @@ namespace AdminInterface.ManagerReportsFilters
 	{
 		public int Count { get; set; }
 		public bool IsUpdate { get; set; }
+		public uint SupplierId { get; set; }
+		public string SupplierName { get; set; }
 		public ClientStatus ClientStatus { get; set; }
 	}
 
