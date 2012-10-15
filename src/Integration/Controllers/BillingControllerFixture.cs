@@ -65,7 +65,7 @@ namespace Integration.Controllers
 		[Test]
 		public void UpdateClientStatusWithComment()
 		{
-			controller.UpdateClientStatus(client.Id, false, "тестовое отключение клиенты");
+			controller.UpdateClientStatus(client.Id, false, "тестовое отключение клиента");
 			var message = notifications.First();
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа клиента"), notifications.Implode(n => n.Subject));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение клиента"));
