@@ -75,16 +75,16 @@ namespace AdminInterface.Controllers.Filters
 				regionMask &= Region.Id;
 
 			var criteria = DetachedCriteria.For<DocumentReceiveLog>();
-			criteria.CreateAlias("FromSupplier", "fs", JoinType.InnerJoin)
+			criteria.CreateAlias("ForClient", "fc", JoinType.LeftOuterJoin)
 				.CreateAlias("Address", "a", JoinType.LeftOuterJoin)
 				.CreateAlias("Document", "d", JoinType.LeftOuterJoin)
 				.CreateAlias("SendUpdateLogEntity", "ru", JoinType.LeftOuterJoin);
 
 
 			if(OnlyNoParsed)
-				criteria.CreateCriteria("ForClient", "fc", JoinType.LeftOuterJoin).Add(Expression.Sql("{alias}.RegionCode & " + regionMask + " > 0"));
+				criteria.CreateCriteria("FromSupplier", "fs", JoinType.InnerJoin).Add(Expression.Sql("{alias}.HomeRegion & " + regionMask + " > 0"));
 			else {
-				criteria.CreateAlias("ForClient", "fc", JoinType.LeftOuterJoin);
+				criteria.CreateAlias("FromSupplier", "fs", JoinType.InnerJoin);
 			}
 			if(!OnlyNoParsed || User != null) {
 				criteria.CreateAlias("SendLogs", "sl", JoinType.LeftOuterJoin);
