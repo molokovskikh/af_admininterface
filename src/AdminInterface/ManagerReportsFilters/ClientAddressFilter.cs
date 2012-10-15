@@ -33,6 +33,14 @@ namespace AdminInterface.ManagerReportsFilters
 		public uint SupplierId { get; set; }
 		public string SupplierName { get; set; }
 		public ClientStatus ClientStatus { get; set; }
+		public RejectReasonType? RejectReason { get; set; }
+		public string RejectReasonName
+		{
+			get
+			{
+				return RejectReason == null ? "" : RejectReason.Value.GetDescription();
+			}
+		}
 	}
 
 	public class ClientAddressFilter : PaginableSortable
@@ -47,7 +55,9 @@ namespace AdminInterface.ManagerReportsFilters
 				{ "AddressId", "AddressId" },
 				{ "AddressName", "AddressName" },
 				{ "ClientId", "ClientId" },
-				{ "ClientName", "ClientName" }
+				{ "ClientName", "ClientName" },
+				{ "SupplierId", "SupplierId" },
+				{ "SupplierName", "SupplierName" }
 			};
 			PageSize = 30;
 			Period = new DatePeriod(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
@@ -64,16 +74,18 @@ namespace AdminInterface.ManagerReportsFilters
 			criteria.CreateCriteria("ForClient", "c", JoinType.LeftOuterJoin)
 				.Add(Expression.Sql("{alias}.RegionCode & " + regionMask + " > 0"));
 			criteria.CreateAlias("Address", "a", JoinType.LeftOuterJoin);
+			criteria.CreateAlias("FromSupplier", "f", JoinType.LeftOuterJoin);
 
 			criteria.SetProjection(Projections.ProjectionList()
 				.Add(Projections.Count("Id").As("Count"))
 				.Add(Projections.GroupProperty("c.Id").As("ClientId"))
 				.Add(Projections.GroupProperty("a.Id").As("AddressId"))
+				.Add(Projections.GroupProperty("f.Id").As("SupplierId"))
+				.Add(Projections.GroupProperty("RejectReason").As("RejectReason"))
 				.Add(Projections.Property("c.Name").As("ClientName"))
 				.Add(Projections.Property("a.Value").As("AddressName"))
-				.Add(Projections.Property("c.Status").As("ClientStatus"))
-				.Add(Projections.Property("a.Enabled").As("AddressEnabled"))
-				.Add(Projections.Property("c.HomeRegion").As("RegionName")));
+				.Add(Projections.Property("c.HomeRegion").As("RegionName"))
+				.Add(Projections.Property("f.Name").As("SupplierName")));
 			criteria.Add(Expression.Ge("LogTime", Period.Begin.Date))
 				.Add(Expression.Le("LogTime", Period.End.Date));
 			return criteria;
