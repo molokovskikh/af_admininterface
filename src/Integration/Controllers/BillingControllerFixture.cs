@@ -52,5 +52,23 @@ namespace Integration.Controllers
 			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == supplier.Id).ToList();
 			Assert.That(logs.FirstOrDefault(l => l.Message == "$$$Клиент отключен" && l.Type == LogObjectType.Supplier), Is.Not.Null, logs.Implode());
 		}
+
+		[Test]
+		public void UpdateSupplierStatusWithComment()
+		{
+			controller.UpdateClientStatus(supplier.Id, false, "тестовое отключение поставщика");
+			var message = notifications.First();
+			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), notifications.Implode(n => n.Subject));
+			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение поставщика"));
+		}
+
+		[Test]
+		public void UpdateClientStatusWithComment()
+		{
+			controller.UpdateClientStatus(client.Id, false, "тестовое отключение клиенты");
+			var message = notifications.First();
+			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа клиента"), notifications.Implode(n => n.Subject));
+			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение клиента"));
+		}
 	}
 }
