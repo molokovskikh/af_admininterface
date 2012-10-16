@@ -18,6 +18,7 @@ namespace AdminInterface.ManagerReportsFilters
 	public class SwitchOffCounts : BaseLogsQueryFields
 	{
 		public string LogTime { get; set; }
+		public string Comment { get; set; }
 	}
 
 	public class SwitchOffClientsFilter : PaginableSortable
@@ -61,6 +62,18 @@ namespace AdminInterface.ManagerReportsFilters
 		{
 			var criteria = GetCriteria();
 			var result = AcceptPaginator<SwitchOffCounts>(criteria, session);
+
+			var logsRecord = ClientLogRecord.GetLogs(result.Select(r => r.ClientId))
+				.GroupBy(g => g.Client)
+				.Select(c => c.Where(l => l.ClientStatus == ClientStatus.Off).OrderBy(l => l.LogTime).LastOrDefault())
+				.ToDictionary(c => c.Client.Id);
+
+			result = result.Select(r => {
+				if (logsRecord.Keys.Contains(r.ClientId))
+					r.Comment = logsRecord[r.ClientId].Comment;
+				return r;
+			}).ToList();
+
 			return result;
 		}
 	}

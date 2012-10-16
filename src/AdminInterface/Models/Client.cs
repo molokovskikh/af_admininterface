@@ -70,7 +70,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Клиент")]
-	public class Client : Service, IChangesNotificationAware
+	public class Client : Service, IChangesNotificationAware, IMultiAuditable
 	{
 		private ClientStatus _status;
 
@@ -184,6 +184,8 @@ namespace AdminInterface.Models
 		{
 			get { return Payers.Count == 1 && Payers[0].JuridicalOrganizations.Count == 1; }
 		}
+
+		public virtual string EditComment { get; set; }
 
 		public static Client FindClietnForBilling(uint clientCode)
 		{
@@ -344,6 +346,13 @@ group by u.ClientId")
 		public override string ToString()
 		{
 			return Name;
+		}
+
+		public virtual IEnumerable<IAuditRecord> GetAuditRecords(IEnumerable<AuditableProperty> properties)
+		{
+			if (properties != null && properties.Any(p => p.Property == typeof(Client).GetProperty("Status")))
+				return Payers.Select(payer => new PayerAuditRecord(payer, "$$$", EditComment) { ObjectType = LogObjectType.Client });
+			return new List<IAuditRecord> { new AuditRecord(this) };
 		}
 
 		public virtual bool ShouldNotify()

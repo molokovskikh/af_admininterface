@@ -31,6 +31,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
 			<th>Регион</th>
 			<th>Дата отключения</th>
+			<th>Комментарий оператора</th>
 		</tr>
 	</thead>
 <%end %>
@@ -43,9 +44,8 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 				${UrlHelper.Link(item.ClientName, {@controller: @Clients, @params: {@id: item.ClientId}})}
 			</td>
 			<td>${item.RegionName}</td>
-			<td>
-				${item.LogTime}
-			</td>
+			<td>${item.LogTime}</td>
+			<td>${item.Comment}</td>
 		</tr>
 		<%end %>
 		<tr>

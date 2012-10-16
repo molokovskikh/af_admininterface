@@ -14,6 +14,7 @@ using Castle.ActiveRecord.Framework.Internal;
 using Castle.Core.Smtp;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
@@ -77,12 +78,12 @@ namespace AdminInterface.Mailers
 				type = "клиента";
 				var client = ActiveRecordMediator<Client>.FindByPrimaryKey(((Service)item).Id); //(Client) item;
 				PropertyBag["service"] = client;
-				var disable = ClientLogRecord.LastOff(client);
+				/*var disable = ClientLogRecord.LastOff(client);
 				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
 					disable.Comment = comment;
 					disable.Save();
-				}
+				}*/
 			}
 			if (clazz == typeof(Supplier)) {
 				type = "поставщика";

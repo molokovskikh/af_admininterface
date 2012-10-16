@@ -1,3 +1,4 @@
+using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
@@ -24,7 +25,7 @@ namespace AdminInterface.Models.Billing
 
 		public IAuditRecord GetAuditRecord()
 		{
-			return new PayerAuditRecord(Payer, "$$$", ChangeComment);
+			return new PayerAuditRecord(Payer, "$$$", ChangeComment) { ObjectType = LogObjectType.Report };
 		}
 	}
 }

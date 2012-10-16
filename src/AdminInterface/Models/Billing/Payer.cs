@@ -316,7 +316,7 @@ namespace AdminInterface.Models.Billing
 			return Name;
 		}
 
-		public virtual IEnumerable<IAuditRecord> GetAuditRecords()
+		public virtual IEnumerable<IAuditRecord> GetAuditRecords(IEnumerable<AuditableProperty> properties)
 		{
 			return Clients.Select(c => new AuditRecord(c));
 		}

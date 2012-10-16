@@ -88,12 +88,10 @@ namespace AdminInterface.Models.Billing
 		{
 			var userLogs = UserLogRecord.GetLogs(payer.Users);
 			var addressLogs = AddressLogRecord.GetLogs(payer.Addresses);
-			var clientLogs = ClientLogRecord.GetLogs(payer.Clients);
 			var supplierLogs = SupplierLog.GetLogs(payer.Suppliers);
 			var auditLogs = PayerAuditRecord.Find(payer);
 
-			var logs = clientLogs.Select(log => GetLogRecord(log))
-				.Concat(userLogs.Select(log => GetLogRecord(log)))
+			var logs = userLogs.Select(log => GetLogRecord(log))
 				.Concat(addressLogs.Select(log => GetLogRecord(log)))
 				.Concat(supplierLogs.Select(log => GetLogRecord(log)))
 				.Concat(auditLogs.Select(r => r.ToAuditRecord()));

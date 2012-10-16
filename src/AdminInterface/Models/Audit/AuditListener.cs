@@ -12,37 +12,37 @@ namespace AdminInterface.Models.Audit
 {
 	public interface IMultiAuditable
 	{
-		IEnumerable<IAuditRecord> GetAuditRecords();
+		IEnumerable<IAuditRecord> GetAuditRecords(IEnumerable<AuditableProperty> properties = null);
 	}
 
 	[EventListener]
 	public class AuditListener : BaseAuditListener
 	{
-		protected override void Log(PostUpdateEvent @event, string message, bool isHtml)
+		protected override void Log(PostUpdateEvent @event, IEnumerable<AuditableProperty> properties, bool isHtml)
 		{
 			var auditable = @event.Entity as IAuditable;
 			var multiAuditable = @event.Entity as IMultiAuditable;
 			if (multiAuditable != null)
-				LogMultiAuditable(@event, multiAuditable, message, isHtml);
+				LogMultiAuditable(@event, multiAuditable, properties, isHtml);
 			else if (auditable != null)
-				base.Log(@event, message, isHtml);
+				base.Log(@event, properties, isHtml);
 			else
-				@event.Session.Save(new AuditRecord(message, @event.Entity) {
+				@event.Session.Save(new AuditRecord(BuildMessage(properties), @event.Entity) {
 					IsHtml = isHtml,
 					MessageType = LogMessageType.System
 				});
 		}
 
-		private void LogMultiAuditable(PostUpdateEvent @event, IMultiAuditable auditable, string message, bool isHtml)
+		private void LogMultiAuditable(PostUpdateEvent @event, IMultiAuditable auditable, IEnumerable<AuditableProperty> properties, bool isHtml)
 		{
 			var session = @event.Session;
-			var records = LoadData(session, () => auditable.GetAuditRecords().ToArray());
+			var records = LoadData(session, () => auditable.GetAuditRecords(properties).ToArray());
 			if (records == null)
 				return;
 
 			foreach (var record in records) {
 				record.IsHtml = isHtml;
-				record.Message = message;
+				record.Message = BuildMessage(properties);
 				@event.Session.Save(record);
 			}
 		}

@@ -1,15 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Tools;
+using Common.Web.Ui.Models.Audit;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
 	[ActiveRecord("ClientLogs", Schema = "logs")]
-	public class ClientLogRecord : ActiveRecordBase<ClientLogRecord>
+	public class ClientLogRecord : ActiveRecordBase<ClientLogRecord>, IAuditRecord
 	{
+		public ClientLogRecord()
+		{
+			OperatorName = SecurityContext.Administrator.UserName;
+			LogTime = DateTime.Now;
+		}
+
+		public ClientLogRecord(Client client, string comment = null) : this()
+		{
+			Client = client;
+			Comment = comment;
+			ClientStatus = client.Status;
+		}
+
 		[PrimaryKey("ID")]
 		public virtual uint Id { get; set; }
 
@@ -28,7 +43,7 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual string Comment { get; set; }
 
-		public static IList<ClientLogRecord> GetLogs(IEnumerable<Client> clients)
+		public static IList<ClientLogRecord> GetLogs(IEnumerable<uint> clients)
 		{
 			if (clients.Count() == 0)
 				return Enumerable.Empty<ClientLogRecord>().ToList();
@@ -42,7 +57,7 @@ where status is not null
 order by logtime desc
 limit 100")
 					.AddEntity(typeof(ClientLogRecord))
-					.SetParameterList("clientId", clients.Select(c => c.Id).ToList())
+					.SetParameterList("clientId", clients.ToList())
 					.List<ClientLogRecord>(), null);
 		}
 
@@ -60,5 +75,8 @@ limit 1")
 					.SetParameter("ClientCode", client.Id)
 					.UniqueResult(), null);
 		}
+
+		public string Message { get; set; }
+		public bool IsHtml { get; set; }
 	}
 }

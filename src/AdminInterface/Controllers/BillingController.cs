@@ -228,14 +228,15 @@ namespace AdminInterface.Controllers
 
 		public void UpdateClientStatus(uint id, bool status, string addComment)
 		{
-			var service = ActiveRecordMediator<Service>.FindByPrimaryKey(id);
+			var service = ActiveRecordMediator<Client>.FindByPrimaryKey(id);
 			var oldDisabled = service.Disabled;
 			service.Disabled = !status;
+			service.EditComment = addComment;
 			ActiveRecordMediator<Service>.Save(service);
 			DbSession.Flush();
 			if (oldDisabled != service.Disabled) {
 				this.Mailer().EnableChanged(service, addComment).Send();
-				AuditRecord.StatusChange(service).Save();
+				//AuditRecord.StatusChange(service).Save();
 			}
 			CancelView();
 		}
