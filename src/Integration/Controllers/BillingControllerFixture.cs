@@ -69,12 +69,15 @@ namespace Integration.Controllers
 		public void UpdateClientStatusWithComment()
 		{
 			controller.UpdateClientStatus(client.Id, false, "тестовое отключение клиента");
-			var message = notifications.First();
+			var message = notifications.Last();
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа клиента"), notifications.Implode(n => n.Subject));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение клиента"));
 			controller.UpdateClientStatus(client.Id, true, null);
 			var disable = ClientLogRecord.LastOff(client);
 			Assert.That(!string.IsNullOrEmpty(disable.Comment));
+			message = notifications.Last();
+			Assert.That(message.Subject, Is.EqualTo("Возобновлена работа клиента"), notifications.Implode(n => n.Subject));
+			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение клиента"));
 		}
 	}
 }
