@@ -86,5 +86,7 @@ namespace AdminInterface.Models.Suppliers
 		{
 			return null;
 		}
+
+		public virtual string EditComment { get; set; }
 	}
 }

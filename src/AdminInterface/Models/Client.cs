@@ -185,8 +185,6 @@ namespace AdminInterface.Models
 			get { return Payers.Count == 1 && Payers[0].JuridicalOrganizations.Count == 1; }
 		}
 
-		public virtual string EditComment { get; set; }
-
 		public static Client FindClietnForBilling(uint clientCode)
 		{
 			return ArHelper.WithSession(

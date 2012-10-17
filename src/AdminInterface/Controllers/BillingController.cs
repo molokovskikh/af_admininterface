@@ -228,7 +228,7 @@ namespace AdminInterface.Controllers
 
 		public void UpdateClientStatus(uint id, bool status, string addComment)
 		{
-			var service = ActiveRecordMediator<Client>.FindByPrimaryKey(id);
+			var service = ActiveRecordMediator<Service>.FindByPrimaryKey(id);
 			var oldDisabled = service.Disabled;
 			service.Disabled = !status;
 			service.EditComment = addComment;
