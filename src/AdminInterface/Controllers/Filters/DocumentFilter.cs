@@ -118,8 +118,10 @@ namespace AdminInterface.Controllers.Filters
 				.Add(Expression.Le("LogTime", end.AddDays(1)))
 				.AddOrder(Order.Desc("LogTime"));
 
-			if(OnlyNoParsed)
+			if(OnlyNoParsed) {
 				criteria.Add(Expression.Eq("IsFake", false));
+				criteria.Add(Expression.Not(Expression.Eq(Projections.Property<DocumentReceiveLog>(d => d.Addition), "Сконвертированный файл")));
+			}
 			return criteria;
 		}
 	}
