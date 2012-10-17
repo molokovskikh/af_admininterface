@@ -61,8 +61,9 @@ namespace Integration.Controllers
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), notifications.Implode(n => n.Subject));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение поставщика"));
 			controller.UpdateClientStatus(supplier.Id, true, null);
-			var disable = session.QueryOver<SupplierLog>().Where(s => s.Supplier == supplier && s.Disabled == true).OrderBy(s => s.LogTime).Desc.List();
-			Assert.That(!string.IsNullOrEmpty(disable.First().Comment));
+			message = notifications.Last();
+			Assert.That(message.Subject, Is.EqualTo("Возобновлена работа поставщика"));
+			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение поставщика"));
 		}
 
 		[Test]
