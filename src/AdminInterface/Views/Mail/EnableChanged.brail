@@ -9,3 +9,4 @@
 <% if item isa Address: %> Код адреса: ${item.Id}
 Адрес: ${item.Name} <% end %>
 Последнее отключение: ${lastDisable}
+Причина отключения: ${reasonDisable}

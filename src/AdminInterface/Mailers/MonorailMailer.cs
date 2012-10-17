@@ -49,6 +49,7 @@ namespace AdminInterface.Mailers
 			To = "RegisterList@subscribe.analit.net";
 			From = "register@analit.net";
 			var lastDisable = "неизвестно";
+			var reasonDisable = "неизвестно";
 
 			var type = "";
 			var clazz = NHibernateUtil.GetClass(item);
@@ -59,6 +60,7 @@ namespace AdminInterface.Mailers
 				var disable = UserLogRecord.LastOff(user.Id);
 				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					reasonDisable = comment;
 					disable.Comment = comment;
 					disable.Save();
 				}
@@ -70,6 +72,7 @@ namespace AdminInterface.Mailers
 				var disable = AddressLogRecord.LastOff(address.Id);
 				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					reasonDisable = comment;
 					disable.Comment = comment;
 					disable.Save();
 				}
@@ -84,6 +87,7 @@ namespace AdminInterface.Mailers
 				PropertyBag["service"] = item;
 				var disable = SupplierLog.Queryable.Where(s => s.Supplier == (Supplier)item && s.Disabled != null).OrderByDescending(s => s.LogTime).FirstOrDefault();
 				if (disable != null) {
+					reasonDisable = comment;
 					disable.Comment = comment;
 					disable.Save();
 				}
@@ -96,6 +100,7 @@ namespace AdminInterface.Mailers
 			PropertyBag["lastDisable"] = lastDisable;
 			PropertyBag["item"] = item;
 			PropertyBag["admin"] = SecurityContext.Administrator;
+			PropertyBag["reasonDisable"] = reasonDisable;
 			return this;
 		}
 
