@@ -57,7 +57,7 @@ namespace Integration.Controllers
 		public void UpdateSupplierStatusWithComment()
 		{
 			controller.UpdateClientStatus(supplier.Id, false, "тестовое отключение поставщика");
-			var message = notifications.First();
+			var message = notifications.Last();
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), notifications.Implode(n => n.Subject));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение поставщика"));
 			controller.UpdateClientStatus(supplier.Id, true, null);
