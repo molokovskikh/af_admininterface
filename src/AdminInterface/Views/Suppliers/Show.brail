@@ -27,13 +27,7 @@ ${app.Asset("search.editor.js")}
 	}
 </script>
 
-<style>
-	input[type='text']
-	{
-		width: 70%;
-	}
-</style>
-
+${app.Asset("ClientsShow.css")}
 <% for action in supplier.Actions: %>
 	${OutputSubView("/Shared/DisplayTemplates/Action", {@action: action})}
 <% end %>
@@ -143,16 +137,34 @@ ${app.Asset("search.editor.js")}
 			${FormHelper.FormTag("", null)}
 				<div>
 					${FormHelper.HiddenField("supplier.Id")}
-					<p>
-						Полное наименование<br>
-						${FormHelper.TextField("supplier.FullName")}
-						${app.GetValidationError(supplier, "FullName")}
-					</p>
-					<p>
-						Краткое наименование<br>
-						${FormHelper.TextField("supplier.Name")}
-						${app.GetValidationError(supplier, "Name")}
-					</p>
+					<div>
+					<table class="width100">
+						<tr class="topvalign">
+							<td class="width70">
+								<p>
+									Полное наименование<br>
+									${FormHelper.TextField("supplier.FullName")}
+									${app.GetValidationError(supplier, @FullName)}
+								</p>
+							</td>
+							<td>
+								<p>
+									<br>
+									<span class="innspan">${supplier.INN}</span>
+								</p>
+							</td>
+						</tr>
+						<tr>
+							<td colspan=2>
+								<p>
+									Краткое наименование<br>
+									${FormHelper.TextField("supplier.Name")}
+									${app.GetValidationError(supplier, @Name)}
+								</p>
+							</td>
+						</tr>
+				</table>
+				</div>
 				</div>
 				<div>
 					<input type=submit value="Сохранить" />

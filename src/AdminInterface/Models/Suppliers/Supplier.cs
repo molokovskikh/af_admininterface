@@ -68,7 +68,7 @@ namespace AdminInterface.Models.Suppliers
 		[Property, ValidateNonEmpty, Auditable, Notify, Description("Полное наименование")]
 		public virtual string FullName { get; set; }
 
-		[Property, Auditable, ValidateGreaterThanZero("Вы не выбрали регионы работы"), Description("Регионы работы"), SetForceReplication]
+		[Property, Auditable, NotifyBilling, ValidateGreaterThanZero("Вы не выбрали регионы работы"), Description("Регионы работы"), SetForceReplication]
 		public virtual ulong RegionMask { get; set; }
 
 		[BelongsTo, Auditable, Description("Домашний регион")]
@@ -88,6 +88,15 @@ namespace AdminInterface.Models.Suppliers
 					if (Payer != null)
 						Payer.UpdatePaymentSum();
 				}
+			}
+		}
+
+		public virtual string INN
+		{
+			get {
+				if(Payer != null && !string.IsNullOrEmpty(Payer.INN))
+					return "ИНН: " + Payer.INN;
+				return "";
 			}
 		}
 

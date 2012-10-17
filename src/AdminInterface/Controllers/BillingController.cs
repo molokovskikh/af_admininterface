@@ -18,6 +18,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.MonoRailExtentions;
 using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
@@ -42,12 +43,21 @@ namespace AdminInterface.Controllers
 		public uint ServiceId { get; set; }
 		public string ActiveTab { get; set; }
 
+		public IList<LogMessageType> Types { get; set; }
+
 		private Service service;
 		private Payer payer;
 
 		public BillingFilter()
 		{
 			Tab = "payments";
+			Types = new List<LogMessageType> { LogMessageType.User };
+		}
+
+
+		public bool IsSystem
+		{
+			get { return Types.Contains(LogMessageType.System); }
 		}
 
 		public Payer Payer
@@ -127,13 +137,13 @@ namespace AdminInterface.Controllers
 		public void Edit(uint billingCode,
 			uint clientCode,
 			string tab,
-			uint currentJuridicalOrganizationId)
+			uint currentJuridicalOrganizationId,
+			[SmartBinder(Expect = "filter.Types")] BillingFilter filter)
 		{
-			var filter = new BillingFilter {
-				ServiceId = clientCode,
-				PayerId = billingCode,
-				Tab = tab
-			};
+			filter.ServiceId = clientCode;
+			filter.PayerId = billingCode;
+			filter.Tab = tab;
+
 			var payer = filter.Payer;
 
 			var userIds = payer.Users.Select(u => u.Id).ToArray();
@@ -142,7 +152,7 @@ namespace AdminInterface.Controllers
 				.ToList();
 
 			PropertyBag["filter"] = filter;
-			PropertyBag["LogRecords"] = AuditLogRecord.GetLogs(payer);
+			PropertyBag["LogRecords"] = AuditLogRecord.GetLogs(payer, filter.Types.Contains(LogMessageType.System));
 			PropertyBag["Instance"] = payer;
 			PropertyBag["payer"] = payer;
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer);
@@ -157,6 +167,14 @@ namespace AdminInterface.Controllers
 
 			if (currentJuridicalOrganizationId > 0)
 				PropertyBag["currentJuridicalOrganizationId"] = currentJuridicalOrganizationId;
+		}
+
+		public void SendMessage(uint BillingCode, string messageText)
+		{
+			var payer = DbSession.Get<Payer>(BillingCode);
+			var message = new PayerAuditRecord(payer, messageText);
+			DbSession.Save(message);
+			RedirectToReferrer();
 		}
 
 		public void Update(

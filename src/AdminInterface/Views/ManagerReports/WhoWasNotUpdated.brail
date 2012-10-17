@@ -1,0 +1,25 @@
+﻿ <% component Bubble, {@bredcrumbs : [("Кто не обновлялся с опред. даты", "${siteroot}/ManagerReports/")]} %>
+
+ <% component CaptureFor, {@id : @Title}: %>
+	Кто не обновлялся с опред. даты
+<% end %>
+${app.BeginFormFor("filter")}
+${FormHelper.HiddenField("filter.SortBy")}
+${FormHelper.HiddenField("filter.SortDirection")}
+<table class="CenterBlock">
+<tbody>
+	${app.FilterFor("filter.Period")}
+	<tr>
+		<td class="filter-label">Регион</td>
+		<td>${app.Edit("filter.Region")}</td>
+	</tr>
+	<tr>
+		<td colspan=3 ><a href="#">Выгрузить отчет в Ехсel</a></td>
+	</tr>
+	<tr>
+		${app.EndFormFor("filter")}
+	</tr>
+</tbody>
+</table>
+
+<% OutputSubView("UniversalTable") %>

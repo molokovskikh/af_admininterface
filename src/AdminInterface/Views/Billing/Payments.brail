@@ -357,7 +357,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<%end%>
 					</td>
 					<td class=short>
-						<input name=payment class=payment type=text value="${supplier.Account.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
+						<input name=payment class=payment type=text value="${supplier.Account.Payment.ToString("0.#")}" ${"disabled" unless admin.CanChangePayment}>
 					</td>
 					<td>${supplier.Id}</td>
 					<td>
@@ -427,7 +427,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<%end%>
 						</td>
 						<td class=short>
-							<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
+							<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("0.#")}" ${"disabled" unless admin.CanChangePayment}>
 						</td>
 						<td>
 							<a id="UserLink${user.Id}" href="javascript:" data-filter="User${user.Id}" data-id="${user.Id}">${user.Id}</a>
@@ -500,7 +500,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<%end%>
 							</td>
 							<td class=short>
-								<input name=payment class=payment type=text value="${addr.Accounting.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
+								<input name=payment class=payment type=text value="${addr.Accounting.Payment.ToString("0.#")}" ${"disabled" unless admin.CanChangePayment}>
 							</td>
 							<td>
 								<a id="AddressLink${addr.Id}" href="javascript:" data-filter="Address${addr.Id}">${addr.Value}</a>
@@ -562,7 +562,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<%end%>
 							</td>
 							<td  class=short>
-								<input name=payment class=payment type=text value="${report.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
+								<input name=payment class=payment type=text value="${report.Payment.ToString("0.#")}" ${"disabled" unless admin.CanChangePayment}>
 							</td>
 							<td>
 								<a href="javascript:" data-filter="Report${report.Report.Id}">${report.Report.Id}</a>
@@ -729,6 +729,19 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	<% end %>
 	
 	<div class="UseCaseGroup">
+		<form id="MessagesForm" action="SendMessage" method="post">
+			${FormHelper.HiddenField("BillingCode")}
+			<h3>Сообщения пользователя</h3>
+			Новое сообщение:
+			<textarea style="height: 150px; width:100%;" name="messageText"></textarea>
+			<br />
+			<input type=submit value="Принять"/>
+		</form>
+		<form class=autosubmit>
+			${FormHelper.HiddenField("BillingCode")}
+			<label for="filter_Types">Показывать сообщения пользователей, клиентов, поставщиков</label>
+			<input type="checkbox" id="filter_Types" value="1" name="filter.Types[1]" ${"checked" if filter.IsSystem}>
+		</form>
 		<div class="InputGroupHeader" style="margin-bottom:10px;">
 			История
 		</div>

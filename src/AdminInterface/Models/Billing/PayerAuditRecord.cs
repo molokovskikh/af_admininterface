@@ -21,7 +21,21 @@ namespace AdminInterface.Models.Billing
 		{
 		}
 
-		public PayerAuditRecord(Payer payer, Account accounting)
+		public PayerAuditRecord(Payer payer, string message, string comment = null)
+		{
+			Payer = payer;
+			Administrator = SecurityContext.Administrator;
+			UserName = Administrator.UserName;
+			WriteTime = DateTime.Now;
+
+			ObjectId = Payer.Id;
+			ObjectType = LogObjectType.Payer;
+			Name = Payer.Name;
+			Message = message;
+			Comment = comment;
+		}
+
+		public PayerAuditRecord(Payer payer, Account accounting, string comment = null)
 		{
 			Payer = payer;
 			Administrator = SecurityContext.Administrator;
@@ -31,6 +45,7 @@ namespace AdminInterface.Models.Billing
 			ObjectId = accounting.ObjectId;
 			ObjectType = accounting.ObjectType;
 			Name = accounting.Name;
+			Comment = comment;
 		}
 
 		[PrimaryKey]

@@ -84,7 +84,7 @@ namespace AdminInterface.Models.Billing
 			return log;
 		}
 
-		public static IList<AuditLogRecord> GetLogs(Payer payer)
+		public static IList<AuditLogRecord> GetLogs(Payer payer, bool showOtherRecords)
 		{
 			var userLogs = UserLogRecord.GetLogs(payer.Users);
 			var addressLogs = AddressLogRecord.GetLogs(payer.Addresses);
@@ -96,9 +96,10 @@ namespace AdminInterface.Models.Billing
 				.Concat(userLogs.Select(log => GetLogRecord(log)))
 				.Concat(addressLogs.Select(log => GetLogRecord(log)))
 				.Concat(supplierLogs.Select(log => GetLogRecord(log)))
-				.Concat(auditLogs.Select(r => r.ToAuditRecord()))
-				.OrderByDescending(r => r.LogTime)
-				.ToList();
+				.Concat(auditLogs.Select(r => r.ToAuditRecord()));
+			if (showOtherRecords)
+				logs = logs.Concat(payer.GetAuditLogs());
+			logs = logs.OrderByDescending(r => r.LogTime).ToList();
 
 			var operators = logs.Select(l => l.OperatorName).Distinct().ToList();
 			var admins = ActiveRecordLinqBase<Administrator>.Queryable
@@ -114,7 +115,7 @@ namespace AdminInterface.Models.Billing
 					log.OperatorName = administrator.ManagerName;
 				}
 			}
-			return logs;
+			return logs.ToList();
 		}
 	}
 }

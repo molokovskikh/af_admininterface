@@ -25,7 +25,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(news, "news");
 				if (IsValid(news)) {
 					DbSession.Save(news);
-					new MonorailMailer().RegisterNews(news, "AFNews@subscribe.analit.net").Send();
+					new MonorailMailer().RegisterOrDeleteNews(news, "AFNews@subscribe.analit.net", "Зарегистрированна новость").Send();
 					Notify("Сохранено");
 					RedirectToAction("Index");
 					return;
@@ -52,8 +52,25 @@ namespace AdminInterface.Controllers
 		{
 			var news = DbSession.Load<News>(id);
 			news.Deleted = true;
+			PropertyBag["news"] = news;
 			DbSession.Save(news);
+			new MonorailMailer().RegisterOrDeleteNews(news, "AFNews@subscribe.analit.net", "Скрыта новость").Send();
 			Notify("Удалено");
+			RedirectToReferrer();
+		}
+
+		public void Open(uint id)
+		{
+			var news = DbSession.Load<News>(id);
+			news.PublicationDate = DateTime.Now;
+			// Для того, чтобы не рассылать повторные уведомления
+			DbSession.Save(news);
+			DbSession.Flush();
+			news.Deleted = false;
+			PropertyBag["news"] = news;
+			DbSession.Save(news);
+			new MonorailMailer().RegisterOrDeleteNews(news, "AFNews@subscribe.analit.net", "Восстановлена новость").Send();
+			Notify("Восстановлено");
 			RedirectToReferrer();
 		}
 	}

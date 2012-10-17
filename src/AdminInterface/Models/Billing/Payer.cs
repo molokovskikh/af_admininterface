@@ -10,6 +10,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
+using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -22,6 +23,7 @@ using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models.Billing
 {
@@ -262,31 +264,26 @@ namespace AdminInterface.Models.Billing
 
 		public static IEnumerable<Payer> GetLikeAvaliable(ISession session, string searchPattern)
 		{
-			var allowViewSuppliers = SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers);
-			var allowViewDrugstore = SecurityContext.Administrator.HavePermisions(PermissionType.ViewDrugstore);
-			var filter = String.Empty;
-			if (!allowViewDrugstore)
-				filter += " and c.FirmType <> 1 ";
-			if (!allowViewSuppliers)
-				filter += " and c.FirmType <> 0 ";
-			var sql = @"
-SELECT {Payer.*}
-FROM billing.payers {Payer}
-WHERE {Payer}.ShortName like :SearchText
-and (exists(
-	select * from Customers.Clients c
-		join Billing.PayerClients pc on pc.ClientId = c.Id
-	where pc.PayerId = {Payer}.PayerId and c.Status = 1 and (c.MaskRegion & :AdminRegionCode > 0) " + filter + @"
-) or exists(
-	select * from Customers.Suppliers s
-	where s.Payer = {Payer}.PayerId and s.Disabled = 0 and (s.RegionMask & :AdminRegionCode > 0)
-))
-ORDER BY {Payer}.shortname;";
-			var resultList = session.CreateSQLQuery(sql).AddEntity(typeof(Payer))
-				.SetParameter("AdminRegionCode", SecurityContext.Administrator.RegionMask)
-				.SetParameter("SearchText", "%" + searchPattern + "%")
-				.List<Payer>().Distinct();
+			var resultList = session.Query<Payer>().Where(t => t.Name.Contains(searchPattern)).OrderBy(p => p.Name);
 			return resultList;
+		}
+
+		public virtual IEnumerable<AuditLogRecord> GetAuditLogs()
+		{
+			var messages = ArHelper.WithSession(s => {
+				var usersAuditLogs = Users.SelectMany(u => new MessageQuery(LogMessageType.User).Execute(u, s));
+				var service = Clients.Select(c => (Service)c).Concat(Suppliers.Select(sup => (Service)sup)).Concat(Addresses.Select(a => (Service)a.Client));
+				var serviceMessages = service.SelectMany(ser => new MessageQuery(LogMessageType.User).Execute(ser, s));
+				return usersAuditLogs.Concat(serviceMessages);
+			});
+			return messages.Select(m => new AuditLogRecord {
+				ObjectId = m.ObjectId,
+				Message = m.Message,
+				Name = m.Name,
+				OperatorName = m.Operator,
+				LogType = m.Type,
+				LogTime = m.WriteTime
+			});
 		}
 
 		public virtual decimal TotalSum

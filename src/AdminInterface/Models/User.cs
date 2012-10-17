@@ -11,6 +11,7 @@ using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.Queries;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
@@ -312,6 +313,13 @@ namespace AdminInterface.Models
 					OrderRegionMask == 0 ||
 					AvaliableAddresses.Count == 0;
 			}
+		}
+
+		public virtual IList<AuditRecord> GetAuditRecord(ISession session, MessageQuery query)
+		{
+			var userMessages = query.Execute(this, session);
+
+			return userMessages.OrderByDescending(o => o.WriteTime).ToList();
 		}
 
 		public virtual bool SupplierUser()

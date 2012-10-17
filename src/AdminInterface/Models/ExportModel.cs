@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
+using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models.Telephony;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
@@ -22,13 +23,15 @@ namespace AdminInterface.Models.Logs
 		[Description("Пользователь")] User,
 		[Description("Адрес")] Address,
 		[Description("Отчет")] Report,
+		[Description("Плательщик")] Payer
 	}
 
 	public enum LogMessageType
 	{
 		[Description("Пользовательское")] User,
 		[Description("Системное")] System,
-		[Description("Статистическое")] Stat
+		[Description("Статистическое")] Stat,
+		[Description("Плательщика")] Payer
 	}
 
 	[ActiveRecord(Table = "clientsinfo", Schema = "logs")]
