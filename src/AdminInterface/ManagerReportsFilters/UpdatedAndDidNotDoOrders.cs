@@ -21,7 +21,7 @@ namespace AdminInterface.ManagerReportsFilters
 		[Style]
 		public virtual bool IsOldUserUpdate
 		{
-			get { return (!string.IsNullOrWhiteSpace(UpdateDate) && DateTime.Now.Subtract(DateTime.Parse(UpdateDate)).Days > 7); }
+			get { return (!string.IsNullOrEmpty(UpdateDate) && DateTime.Now.Subtract(DateTime.Parse(UpdateDate)).Days > 7); }
 		}
 	}
 
