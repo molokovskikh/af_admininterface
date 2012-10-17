@@ -17,6 +17,12 @@ namespace AdminInterface.ManagerReportsFilters
 		public string UserName { get; set; }
 		public string UpdateDate { get; set; }
 		public string Registrant { get; set; }
+
+		[Style]
+		public virtual bool IsOldUserUpdate
+		{
+			get { return !(DateTime.Now.Subtract(DateTime.Parse(UpdateDate)).Days <= 7); }
+		}
 	}
 
 	public class UpdatedAndDidNotDoOrdersFilter : PaginableSortable

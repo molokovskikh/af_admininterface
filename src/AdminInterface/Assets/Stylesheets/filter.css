@@ -62,3 +62,7 @@ form div.submit
 .rigthText {
 	text-align: right;
 }
+
+.fullWidth {
+	width: 100%;
+}

@@ -27,7 +27,7 @@
 			</td>
 			<td>${item.RegionName}</td>
 			<td>${item.Registrant}</td>
-			<td>
+			<td class="${app.Style(item)}">
 				${item.UpdateDate}
 			</td>
 		</tr>
@@ -42,4 +42,11 @@
 	<%end %>
 	</tbody>
 </table>
+	<div class="fullWidth" align="center">
+		<br />
+		<%
+	component Legend, { "LegendItems" : {
+		"Обновление более 7 суток назад" : "old-user-update"}
+		}%>
+	</div>
 <%end %>
