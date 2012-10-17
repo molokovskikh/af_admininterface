@@ -59,9 +59,11 @@ namespace AdminInterface.Mailers
 				var disable = UserLogRecord.LastOff(user.Id);
 				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
-					reasonDisable = comment;
-					disable.Comment = comment;
-					disable.Save();
+					if(!item.Enabled) {
+						disable.Comment = comment;
+						disable.Save();
+					}
+					reasonDisable = disable.Comment;
 				}
 			}
 			if (clazz == typeof(Address)) {
@@ -71,9 +73,11 @@ namespace AdminInterface.Mailers
 				var disable = AddressLogRecord.LastOff(address.Id);
 				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
-					reasonDisable = comment;
-					disable.Comment = comment;
-					disable.Save();
+					if(!item.Enabled) {
+						disable.Comment = comment;
+						disable.Save();
+					}
+					reasonDisable = disable.Comment;
 				}
 			}
 			if (clazz == typeof(Client)) {
@@ -83,19 +87,24 @@ namespace AdminInterface.Mailers
 				var disable = ClientLogRecord.LastOff(client);
 				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
-					reasonDisable = comment;
-					disable.Comment = comment;
-					disable.Save();
+					if(!item.Enabled) {
+						disable.Comment = comment;
+						disable.Save();
+					}
+					reasonDisable = disable.Comment;
 				}
 			}
 			if (clazz == typeof(Supplier)) {
 				type = "поставщика";
 				PropertyBag["service"] = item;
-				var disable = SupplierLog.Queryable.Where(s => s.Supplier == (Supplier)item && s.Disabled != null).OrderByDescending(s => s.LogTime).FirstOrDefault();
+				var disable = SupplierLog.Queryable.Where(s => s.Supplier == (Supplier)item && s.Disabled != null && s.Disabled == true).OrderByDescending(s => s.LogTime).FirstOrDefault();
 				if (disable != null) {
-					reasonDisable = comment;
-					disable.Comment = comment;
-					disable.Save();
+					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					if(!item.Enabled) {
+						disable.Comment = comment;
+						disable.Save();
+					}
+					reasonDisable = disable.Comment;
 				}
 			}
 
