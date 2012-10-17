@@ -236,7 +236,6 @@ namespace AdminInterface.Controllers
 			DbSession.Flush();
 			if (oldDisabled != service.Disabled) {
 				this.Mailer().EnableChanged(service, addComment).Send();
-				//AuditRecord.StatusChange(service).Save();
 			}
 			CancelView();
 		}

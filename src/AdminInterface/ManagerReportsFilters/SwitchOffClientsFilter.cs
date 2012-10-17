@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
 using Common.Web.Ui.Helpers;
@@ -11,6 +12,7 @@ using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Criterion;
+using NHibernate.Linq;
 using NHibernate.SqlCommand;
 
 namespace AdminInterface.ManagerReportsFilters
@@ -63,10 +65,17 @@ namespace AdminInterface.ManagerReportsFilters
 			var criteria = GetCriteria();
 			var result = AcceptPaginator<SwitchOffCounts>(criteria, session);
 
-			var logsRecord = ClientLogRecord.GetLogs(result.Select(r => r.ClientId))
-				.GroupBy(g => g.Client)
-				.Select(c => c.Where(l => l.ClientStatus == ClientStatus.Off).OrderBy(l => l.LogTime).LastOrDefault())
-				.ToDictionary(c => c.Client.Id);
+			var logsRecord = result.Select(r =>
+				session.Query<PayerAuditRecord>().Where(p =>
+					p.ObjectType == LogObjectType.Client &&
+						p.ObjectId == r.ClientId &&
+						(p.Message.Contains("Изменено 'Включен' было 'Включен' стало 'Отключен'") ||
+							p.Message.Contains("Изменено 'Включен' было 'вкл' стало 'откл'")))
+					.ToList())
+				.Select(c => c.OrderBy(l => l.WriteTime).LastOrDefault())
+				.Where(r => r != null)
+				.ToDictionary(c => c.ObjectId);
+
 
 			result = result.Select(r => {
 				if (logsRecord.Keys.Contains(r.ClientId))

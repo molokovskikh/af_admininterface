@@ -22,7 +22,7 @@ namespace AdminInterface.ManagerReportsFilters
 	public class UpdatedAndDidNotDoOrdersFilter : PaginableSortable
 	{
 		public Region Region { get; set; }
-		[Description("Не делались заказы")]
+		[Description("Не делались заказы с")]
 		public DateTime OrderDate { get; set; }
 		public DatePeriod UpdatePeriod { get; set; }
 
@@ -54,7 +54,9 @@ select
 	c.Registrant as Registrant,
 	uu.UpdateDate as UpdateDate
 from customers.Clients C
-join customers.Users u on u.ClientId = c.id
+left join usersettings.RetClientsSet rcs on rcs.ClientCode = c.Id
+join customers.Users u on u.ClientId = c.id and u.PayerId <> 921 and u.OrderRegionMask > 0
+join Customers.UserAddresses ua on ua.UserId = u.Id
 join usersettings.UserUpdateInfo uu on uu.UserId = u.id
 join farm.Regions reg on reg.RegionCode = c.RegionCode
 left join orders.OrdersHead oh on oh.`WriteTime`> :orderDate and (oh.`regioncode` & :regionMask > 0) and oh.UserId = u.id
@@ -63,6 +65,7 @@ where
 	and uu.`Updatedate` > :updateDateStart
 	and uu.`Updatedate` < :updateDateEnd
 	and oh.clientcode is null
+	and rcs.InvisibleOnFirm = 0
 group by u.id
 order by {0} {1};", SortBy, SortDirection))
 			.SetParameter("orderDate", OrderDate)

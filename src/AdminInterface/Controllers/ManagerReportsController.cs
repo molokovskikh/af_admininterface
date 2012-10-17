@@ -81,7 +81,10 @@ namespace AdminInterface.Controllers
 			filter.Session = DbSession;
 			filter.SetDefaultRegion();
 			PropertyBag["filter"] = filter;
-			PropertyBag["Clients"] = filter.Find();
+			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null)
+				PropertyBag["Clients"] = filter.Find();
+			else
+				PropertyBag["Clients"] = new List<AnalysisOfWorkFiled>();
 		}
 	}
 }

@@ -48,3 +48,17 @@ form div.submit
 {
 	width: auto;
 }
+
+.hintInfoBlock {
+	color:grey;
+	text-align: justify;
+	width:400px;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.rigthText {
+	text-align: right;
+}

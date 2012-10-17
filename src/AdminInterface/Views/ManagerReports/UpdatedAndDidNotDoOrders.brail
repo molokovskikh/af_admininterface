@@ -8,6 +8,7 @@ ${FormHelper.HiddenField("filter.SortBy")}
 ${FormHelper.HiddenField("filter.SortDirection")}
 <table class="CenterBlock">
 <tbody>
+	<tr><td colspan=3 class="bold">Период, когда были получены обновления</td></tr>
 	${app.FilterFor("filter.UpdatePeriod")}
 	${app.FilterFor("filter.OrderDate")}
 	<tr>
