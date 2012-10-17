@@ -22,7 +22,7 @@ namespace AdminInterface.Controllers.Filters
 			Period = new DatePeriod(DateTime.Today.AddDays(-1), DateTime.Today);
 			PageSize = 30;
 		}
-		[Description("Регион")]
+		[Description("Регион:")]
 		public Region Region { get; set; }
 		public DatePeriod Period { get; set; }
 		[Description("Только неразобранные накладные: ")]

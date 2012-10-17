@@ -1,4 +1,8 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% if filter.OnlyNoParsed: %>
+ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+ <% end %>
+
+<% component CaptureFor, {"id" : "Title"}: %>
 <% if not filter.OnlyNoParsed: %>
 	История документов
 	<% else: %>
