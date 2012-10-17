@@ -38,6 +38,7 @@ namespace AdminInterface.ManagerReportsFilters
 			SortBy = "c.Name";
 		}
 
+		//Здесь join Customers.UserAddresses ua on ua.UserId = u.Id, чтобы отсеять пользователей, у которых нет адресов доставки.
 		public IList<UpdatedAndDidNotDoOrdersField> Find(ISession session)
 		{
 			var regionMask = SecurityContext.Administrator.RegionMask;

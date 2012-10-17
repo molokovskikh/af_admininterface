@@ -79,7 +79,7 @@ namespace AdminInterface.Mailers
 			}
 			if (clazz == typeof(Client)) {
 				type = "клиента";
-				var client = ActiveRecordMediator<Client>.FindByPrimaryKey(((Service)item).Id); //(Client) item;
+				var client = ActiveRecordMediator<Client>.FindByPrimaryKey(((Service)item).Id);
 				PropertyBag["service"] = client;
 			}
 			if (clazz == typeof(Supplier)) {
