@@ -134,3 +134,9 @@ ${app.EndFormFor("filter")}
 	</div>
 
 </form>
+
+<%
+	component Legend, { "LegendItems" : {
+		"Накладная. загруженная клиентом" : "DocumentNotParsed"},
+		"ByCenter" : true}
+%>
