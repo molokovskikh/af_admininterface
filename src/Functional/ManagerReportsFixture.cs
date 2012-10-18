@@ -77,5 +77,13 @@ namespace Functional
 			Assert.That(browser.Text, Is.Not.Contains("Дата документа"));
 			Assert.That(browser.Text, Is.Not.Contains("Дата отправки"));
 		}
+
+		[Test]
+		public void ClientAddressMonitorTest()
+		{
+			Open("ManagerReports");
+			Click("Клиенты и адреса, по которым не принимаются накладные");
+			AssertText("Клиенты и адреса в регионе, по которым не принимаются накладные");
+		}
 	}
 }
