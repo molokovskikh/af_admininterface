@@ -9,6 +9,7 @@ using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support;
+using Test.Support.log4net;
 
 namespace Integration
 {
@@ -54,6 +55,9 @@ namespace Integration
 		public void Find_test_if_correct_condition()
 		{
 			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
+			var address = new Address(client) { Value = "123" };
+			session.Save(address);
+			user.AvaliableAddresses.Add(address);
 			filter.UpdatePeriod.End = DateTime.Now;
 			session.Save(user);
 			Flush();

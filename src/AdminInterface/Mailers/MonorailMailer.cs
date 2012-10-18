@@ -85,11 +85,13 @@ namespace AdminInterface.Mailers
 				type = "клиента";
 				var client = ActiveRecordMediator<Client>.FindByPrimaryKey(((Service)item).Id);
 				PropertyBag["service"] = client;
+				reasonDisable = comment;
 			}
 			if (clazz == typeof(Supplier)) {
 				type = "поставщика";
 				PropertyBag["service"] = item;
-				var disable = SupplierLog.Queryable.Where(s => s.Supplier == (Supplier)item && s.Disabled != null && s.Disabled == true).OrderByDescending(s => s.LogTime).FirstOrDefault();
+				reasonDisable = comment;
+				/*var disable = SupplierLog.Queryable.Where(s => s.Supplier == (Supplier)item && s.Disabled != null && s.Disabled == true).OrderByDescending(s => s.LogTime).FirstOrDefault();
 				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
 					if(!item.Enabled) {
@@ -97,7 +99,7 @@ namespace AdminInterface.Mailers
 						disable.Save();
 					}
 					reasonDisable = disable.Comment;
-				}
+				}*/
 			}
 
 			if (item.Enabled)

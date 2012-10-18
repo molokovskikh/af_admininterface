@@ -348,9 +348,10 @@ group by u.ClientId")
 
 		public virtual IEnumerable<IAuditRecord> GetAuditRecords(IEnumerable<AuditableProperty> properties)
 		{
-			var statusProperty = typeof(Client).GetProperty("Status");
-			if (properties != null && properties.Any(p => p.Property == statusProperty))
-				return Payers.Select(payer => new PayerAuditRecord(payer, "$$$", EditComment) { ObjectType = LogObjectType.Client, ObjectId = Id });
+			if (properties != null && properties.Any(p => p.Property.Name.Equals("Status")))
+				return Payers.Select(payer => new PayerAuditRecord(payer, "$$$", EditComment) { ObjectType = LogObjectType.Client, ObjectId = Id })
+					.Cast<IAuditRecord>()
+					.Concat(new[] { new AuditRecord(this) });
 			return new List<IAuditRecord> { new AuditRecord(this) };
 		}
 

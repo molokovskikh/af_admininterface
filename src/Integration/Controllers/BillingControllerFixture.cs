@@ -1,11 +1,13 @@
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 
 namespace Integration.Controllers
@@ -34,8 +36,8 @@ namespace Integration.Controllers
 			controller.UpdateClientStatus(client.Id, false, null);
 			Flush();
 
-			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == client.Id).ToList();
-			Assert.That(logs.FirstOrDefault(l => l.Message == "$$$Клиент отключен" && l.Type == LogObjectType.Client), Is.Not.Null, logs.Implode());
+			var logs = session.Query<AuditRecord>().Where(l => l.ObjectId == client.Id).ToList();
+			Assert.That(logs.FirstOrDefault(l => l.Message.Contains("$$$Изменено 'Включен'") && l.Type == LogObjectType.Client), Is.Not.Null, logs.Implode());
 		}
 
 		[Test]
@@ -50,7 +52,7 @@ namespace Integration.Controllers
 			var message = notifications.First();
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), notifications.Implode(n => n.Subject));
 			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == supplier.Id).ToList();
-			Assert.That(logs.FirstOrDefault(l => l.Message == "$$$Клиент отключен" && l.Type == LogObjectType.Supplier), Is.Not.Null, logs.Implode());
+			Assert.That(logs.FirstOrDefault(l => l.Message.Contains("$$$Изменено 'Отключен'") && l.Type == LogObjectType.Supplier), Is.Not.Null, logs.Implode());
 		}
 
 		[Test]
@@ -74,11 +76,8 @@ namespace Integration.Controllers
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа клиента"), notifications.Implode(n => n.Subject));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение клиента"));
 			controller.UpdateClientStatus(client.Id, true, null);
-			var disable = ClientLogRecord.LastOff(client);
-			Assert.That(!string.IsNullOrEmpty(disable.Comment));
 			message = notifications.Last();
 			Assert.That(message.Subject, Is.EqualTo("Возобновлена работа клиента"), notifications.Implode(n => n.Subject));
-			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение клиента"));
 		}
 	}
 }

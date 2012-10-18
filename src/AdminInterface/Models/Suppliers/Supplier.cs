@@ -28,7 +28,7 @@ using log4net;
 namespace AdminInterface.Models.Suppliers
 {
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Поставщик")]
-	public class Supplier : Service, IChangesNotificationAware
+	public class Supplier : Service, IChangesNotificationAware, IMultiAuditable
 	{
 		private ContactGroupType[] _defaultGroups = new[] {
 			ContactGroupType.ClientManagers,
@@ -77,7 +77,7 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public virtual string Address { get; set; }
 
-		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style]
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style, Auditable("Отключен")]
 		public override bool Disabled
 		{
 			get { return _disabled; }
@@ -175,6 +175,16 @@ namespace AdminInterface.Models.Suppliers
 		public override string ToString()
 		{
 			return Name;
+		}
+
+		public virtual IEnumerable<IAuditRecord> GetAuditRecords(IEnumerable<AuditableProperty> properties)
+		{
+			if (properties != null && properties.Any(p => p.Property.Name.Equals("Disabled")))
+				return new List<IAuditRecord> {
+					new PayerAuditRecord(Payer, "$$$", EditComment) { ObjectType = LogObjectType.Supplier, ObjectId = Id },
+					new AuditRecord(this)
+				};
+			return new List<IAuditRecord> { new AuditRecord(this) };
 		}
 
 		public virtual bool ShouldNotify()

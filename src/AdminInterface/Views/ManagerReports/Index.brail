@@ -11,5 +11,6 @@
 		<li>${app.LinkTo("Кто не обновлялся", @ManagerReports, @WhoWasNotUpdated)}</li>
 		<li>${app.LinkTo("Кто обновлялся и не делал заказы", @ManagerReports, @UpdatedAndDidNotDoOrders)}</li>
 		<li>${app.LinkTo("Сравнительный анализ работы аптек", @ManagerReports, @AnalysisOfWorkDrugstores)}</li>
+		<li>${app.LinkTo("Неразобранные накладные", "Logs", "Documents", {"filter.OnlyNoParsed": @true})}</li>
 	</ul>
 </div>
