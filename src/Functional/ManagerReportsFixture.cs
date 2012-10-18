@@ -5,6 +5,7 @@ using System.Text;
 using AdminInterface.Controllers;
 using AdminInterface.ManagerReportsFilters;
 using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
@@ -52,6 +53,29 @@ namespace Functional
 			Open("ManagerReports");
 			Click("Сравнительный анализ работы аптек");
 			AssertText("Сравнительный анализ работы аптек");
+		}
+
+		[Test]
+		public void NoParsedWaybills()
+		{
+			var supplier = DataMother.CreateSupplier();
+			Save(supplier);
+			var client = DataMother.CreateClientAndUsers();
+			Save(client);
+			var documentLog = new AdminInterface.Models.Logs.DocumentReceiveLog(supplier);
+			documentLog.ForClient = client;
+			documentLog.LogTime = DateTime.Now;
+			Save(documentLog);
+
+			Open("ManagerReports");
+			Click("Неразобранные накладные");
+			AssertText("Неразобранные накладные");
+			AssertText("Регион:");
+			Assert.That(browser.Text, Is.Not.Contains("Только неразобранные накладные"));
+			Click("Показать");
+			AssertText("Номер документа");
+			Assert.That(browser.Text, Is.Not.Contains("Дата документа"));
+			Assert.That(browser.Text, Is.Not.Contains("Дата отправки"));
 		}
 	}
 }
