@@ -29,7 +29,6 @@ namespace Integration
 			logBuilder.AppendLine(client.Settings.InvisibleOnFirm.GetDescription());
 			logBuilder.AppendLine(client.HomeRegion.Id.ToString());
 			logBuilder.AppendLine(SecurityContext.Administrator.RegionMask.ToString());
-			logBuilder.AppendLine(filter.Region.Id.ToString());
 			File.WriteAllText("AnalysisOfWorkDrugstoresFixture.txt", logBuilder.ToString(), Encoding.UTF8);
 
 			Flush();
