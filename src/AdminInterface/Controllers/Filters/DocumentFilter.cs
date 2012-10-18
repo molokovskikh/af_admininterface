@@ -22,7 +22,7 @@ namespace AdminInterface.Controllers.Filters
 			Period = new DatePeriod(DateTime.Today.AddDays(-1), DateTime.Today);
 			PageSize = 30;
 		}
-		[Description("Регион")]
+		[Description("Регион:")]
 		public Region Region { get; set; }
 		public DatePeriod Period { get; set; }
 		[Description("Только неразобранные накладные: ")]
@@ -121,8 +121,11 @@ namespace AdminInterface.Controllers.Filters
 				.Add(Expression.Le("LogTime", end.AddDays(1)))
 				.AddOrder(Order.Desc("LogTime"));
 
-			if(OnlyNoParsed)
+			if(OnlyNoParsed) {
 				criteria.Add(Expression.Eq("IsFake", false));
+				criteria.Add(Expression.Or(Expression.IsNull(Projections.Property<DocumentReceiveLog>(d => d.Addition)),
+					Expression.Not(Expression.Eq(Projections.Property<DocumentReceiveLog>(d => d.Addition), "Сконвертированный файл"))));
+			}
 			return criteria;
 		}
 	}

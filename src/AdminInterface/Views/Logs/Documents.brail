@@ -1,5 +1,13 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% if filter.OnlyNoParsed: %>
+ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+ <% end %>
+
+<% component CaptureFor, {"id" : "Title"}: %>
+<% if not filter.OnlyNoParsed: %>
 	История документов
+	<% else: %>
+	Неразобранные накладные
+	<% end %>
 <% end %>
 
 
@@ -7,11 +15,11 @@ ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.Supplier.Id")}
 ${FormHelper.HiddenField("filter.Client.Id")}
 ${FormHelper.HiddenField("filter.User.Id")}
+${FormHelper.HiddenField("filter.OnlyNoParsed")}
 ${app.FilterFor("filter.Period")}
 <% if filter.OnlyNoParsed: %>
 ${app.FilterFor("filter.Region")}
 <% end %>
-${app.FilterFor("filter.OnlyNoParsed")}
 ${app.EndFormFor("filter")}
 
 <div class=block>
@@ -20,39 +28,46 @@ ${app.EndFormFor("filter")}
 
 <form method=post action="${siteroot}/Logs/Resend">
 
+	<% if not filter.OnlyNoParsed: %>
 	<input type=submit value="Повторить">
-
+	<% end %>
 	<div>
 		<table class="DataTable">
 		<% if logEntities.Count != 0: %>
 			<thead>
-				<tr>
+				<tr><% if not filter.OnlyNoParsed: %>
 					<th>
 						<input type=checkbox class="all" />
-					</th>
+					</th><% end %>
 					<th>Номер документа</th>
 					<th>Дата получения</th>
 					<th>Тип документа</th>
+					<% if not filter.OnlyNoParsed: %>
 					<th>Номер поставщика</th>
 					<th>Дата документа</th>
 					<th>Дата разбора</th>
+					<% end %>
 					<th>От поставщика</th>
 					<th>Клиенту</th>
 					<th>На адрес</th>
 					<th>Название файла</th>
 					<th>Размер</th>
+					<% if not filter.OnlyNoParsed: %>
 					<th>Пользователь получивший документ</th>
 					<th>Файл доставлен</th>
 					<th>Документ доставлен</th>
 					<th>Дата отправки</th>
+					<% end %>
 					<th>Комментарий</th>
 				</tr>
 			</thead>
 		<% for i, log in enumerate(logEntities): %>
 			<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${log.Id}">
+				<% if not filter.OnlyNoParsed: %>
 				<td>
 					<input type=checkbox name="ids[${i}]" value="${log.DeliveredId}" >
 				</td>
+				<% end %>
 				<td>${log.Id}</td>
 				<td>${log.LogTime}</td>
 				<td>
@@ -61,9 +76,11 @@ ${app.EndFormFor("filter")}
 						(загрузка документов)
 					<% end %>
 				</td>
+				<% if not filter.OnlyNoParsed: %>
 				<td>${log.ProviderDocumentId}</td>
 				<td>${log.DocumentDate}</td>
 				<td>${log.DocumentWriteTime}</td>
+				<% end %>
 				<td>${app.LinkTo(log.Supplier, @Suppliers, log.SupplierId)}</td>
 				<td>${app.LinkTo(log.Client, @Clients, log.ClientId)}</td>
 				<td>${log.Address}</td>
@@ -81,6 +98,7 @@ ${app.EndFormFor("filter")}
 				<td>
 					${ViewHelper.ConvertToUserFriendlySize(log.DocumentSize) if log.DocumentSize}
 				</td>
+				<% if not filter.OnlyNoParsed: %>
 				<td>${app.LinkTo(log.Login, @Users, log.LoginId)}</td>
 				<td>
 					<% if not filter.OnlyNoParsed: %>
@@ -93,6 +111,7 @@ ${app.EndFormFor("filter")}
 					<% end %>
 				</td>
 				<td>${log.GetDisplayRequestTime()}</td>
+				<% end %>
 				<td>
 					<pre>!{log.Addition}</pre>
 				</td>
@@ -108,7 +127,7 @@ ${app.EndFormFor("filter")}
 		<% end %>
 		<% if filter.OnlyNoParsed: %>
 			<tr>
-			<td colspan = 3>${paginator.ShowPaginator()}</td>
+			<td colspan = 9>${paginator.ShowPaginator()}</td>
 			</tr>
 		<% end %>
 		</table>
