@@ -123,7 +123,8 @@ namespace AdminInterface.Controllers.Filters
 
 			if(OnlyNoParsed) {
 				criteria.Add(Expression.Eq("IsFake", false));
-				criteria.Add(Expression.Not(Expression.Eq(Projections.Property<DocumentReceiveLog>(d => d.Addition), "Сконвертированный файл")));
+				criteria.Add(Expression.Or(Expression.IsNull(Projections.Property<DocumentReceiveLog>(d => d.Addition)),
+					Expression.Not(Expression.Eq(Projections.Property<DocumentReceiveLog>(d => d.Addition), "Сконвертированный файл"))));
 			}
 			return criteria;
 		}

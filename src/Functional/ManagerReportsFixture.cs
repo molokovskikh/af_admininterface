@@ -70,6 +70,12 @@ namespace Functional
 			Open("ManagerReports");
 			Click("Неразобранные накладные");
 			AssertText("Неразобранные накладные");
+			AssertText("Регион:");
+			Assert.That(browser.Text, Is.Not.Contains("Только неразобранные накладные"));
+			Click("Показать");
+			AssertText("Номер документа");
+			Assert.That(browser.Text, Is.Not.Contains("Дата документа"));
+			Assert.That(browser.Text, Is.Not.Contains("Дата отправки"));
 		}
 	}
 }
