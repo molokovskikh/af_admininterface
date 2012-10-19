@@ -351,8 +351,8 @@ group by u.ClientId")
 			if (properties != null && properties.Any(p => p.Property.Name.Equals("Status")))
 				return Payers.Select(payer => new PayerAuditRecord(payer, "$$$", EditComment) { ObjectType = LogObjectType.Client, ObjectId = Id })
 					.Cast<IAuditRecord>()
-					.Concat(new[] { new AuditRecord(this) });
-			return new List<IAuditRecord> { new AuditRecord(this) };
+					.Concat(new[] { new AuditRecord(this) { MessageType = LogMessageType.Payer, Type = LogObjectType.Client } });
+			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.System, Type = LogObjectType.Client } };
 		}
 
 		public virtual bool ShouldNotify()

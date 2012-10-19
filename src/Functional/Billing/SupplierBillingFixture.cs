@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
 using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Billing
 {
@@ -22,6 +23,7 @@ namespace Functional.Billing
 			MakeNameUniq(supplier);
 
 			Open(supplier.Payer);
+
 			var table = GetLogTable();
 			Assert.That(table.Text, Is.StringContaining("Поставщик"));
 			Assert.That(table.Text, Is.StringContaining(supplier.Name));
@@ -44,6 +46,8 @@ namespace Functional.Billing
 
 			Open(payer);
 			Click(supplier.Name);
+			browser.CheckBox("filter_Types").Checked = true;
+
 			var table = GetLogTable();
 			Assert.That(table.Text, Is.StringContaining("Поставщик"));
 			Assert.That(table.Text, Is.StringContaining(supplier.Name));

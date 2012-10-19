@@ -361,7 +361,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</td>
 					<td>${supplier.Id}</td>
 					<td>
-						<a data-filter="${filter.GetFilterValue(supplier)}" href="edit?billingCode=${payer.Id}&ClientCode=${supplier.Id}&tab=payments" ${'class=current-filter' if supplier == filter.Service}>
+						<a data-filter="${filter.GetFilterValue(supplier)}" href="edit?billingCode=${payer.Id}&ClientCode=${supplier.Id}&tab=payments&filter.Types[1]=1" ${'class=current-filter' if supplier == filter.Service}>
 							${supplier.Name}
 						</a>
 					</td>

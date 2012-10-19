@@ -73,11 +73,11 @@ namespace AdminInterface.Controllers
 		{
 			var oldStatus = supplier.Disabled;
 			supplier.Disabled = !status;
+			supplier.EditComment = comment;
 			DbSession.Save(supplier);
 			DbSession.Flush();
 			if (oldStatus != !status) {
 				this.Mailer().EnableChanged(supplier, comment).Send();
-				AuditRecord.StatusChange(supplier).Save();
 			}
 		}
 

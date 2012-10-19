@@ -91,25 +91,18 @@ namespace AdminInterface.Mailers
 				type = "поставщика";
 				PropertyBag["service"] = item;
 				reasonDisable = comment;
-				/*var disable = SupplierLog.Queryable.Where(s => s.Supplier == (Supplier)item && s.Disabled != null && s.Disabled == true).OrderByDescending(s => s.LogTime).FirstOrDefault();
-				if (disable != null) {
-					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
-					if(!item.Enabled) {
-						disable.Comment = comment;
-						disable.Save();
-					}
-					reasonDisable = disable.Comment;
-				}*/
 			}
 
 			if (item.Enabled)
 				Subject = String.Format("Возобновлена работа {0}", type);
 			else
 				Subject = String.Format("Приостановлена работа {0}", type);
-			PropertyBag["lastDisable"] = lastDisable;
+			if (!string.IsNullOrEmpty(lastDisable))
+				PropertyBag["lastDisable"] = lastDisable;
 			PropertyBag["item"] = item;
 			PropertyBag["admin"] = SecurityContext.Administrator;
-			PropertyBag["reasonDisable"] = reasonDisable;
+			if (!string.IsNullOrEmpty(reasonDisable))
+				PropertyBag["reasonDisable"] = reasonDisable;
 			return this;
 		}
 

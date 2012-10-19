@@ -8,5 +8,9 @@
 Комментарий: ${item.Name} <% end %>
 <% if item isa Address: %> Код адреса: ${item.Id}
 Адрес: ${item.Name} <% end %>
+<%if IsDefined("lastDisable"):%>
 Последнее отключение: ${lastDisable}
+<%end%>
+<%if IsDefined("reasonDisable"):%>
 Причина отключения: ${reasonDisable}
+<%end%>

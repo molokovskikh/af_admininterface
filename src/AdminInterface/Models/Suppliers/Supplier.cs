@@ -182,9 +182,9 @@ namespace AdminInterface.Models.Suppliers
 			if (properties != null && properties.Any(p => p.Property.Name.Equals("Disabled")))
 				return new List<IAuditRecord> {
 					new PayerAuditRecord(Payer, "$$$", EditComment) { ObjectType = LogObjectType.Supplier, ObjectId = Id },
-					new AuditRecord(this)
+					new AuditRecord(this) { MessageType = LogMessageType.Payer, Type = LogObjectType.Supplier }
 				};
-			return new List<IAuditRecord> { new AuditRecord(this) };
+			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.Supplier } };
 		}
 
 		public virtual bool ShouldNotify()
