@@ -352,7 +352,7 @@ group by u.ClientId")
 				return Payers.Select(payer => new PayerAuditRecord(payer, "$$$", EditComment) { ObjectType = LogObjectType.Client, ObjectId = Id, Name = Name })
 					.Cast<IAuditRecord>()
 					.Concat(new[] { new AuditRecord(this) { MessageType = LogMessageType.Payer, Type = LogObjectType.Client, Name = Name } });
-			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.System, Type = LogObjectType.Client, Name = Name } };
+			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.Client, Name = Name } };
 		}
 
 		public virtual bool ShouldNotify()
