@@ -19,8 +19,9 @@ namespace Functional.Billing
 		[Test]
 		public void Show_supplier_on_off_logs()
 		{
-			var supplier = DataMother.CreateSupplier();
-			MakeNameUniq(supplier);
+			var supplier = DataMother.CreateSupplier(s => session.Save(s));
+			supplier.Disabled = !supplier.Disabled;
+			session.SaveOrUpdate(supplier);
 
 			Open(supplier.Payer);
 
@@ -46,6 +47,7 @@ namespace Functional.Billing
 
 			Open(payer);
 			Click(supplier.Name);
+
 			browser.CheckBox("filter_Types").Checked = true;
 
 			var table = GetLogTable();
