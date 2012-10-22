@@ -69,7 +69,7 @@ BeAccounted = 0;
 			userAccount.Save();
 			Flush();
 
-			Assert.That(Ready().Any(id => id == userAccount.Id), Is.True, "не нашли аккаунт {0}", userAccount.Id);
+			Assert.That(Ready().Any(id => id == userAccount.Id), Is.True, "РЅРµ РЅР°С€Р»Рё Р°РєРєР°СѓРЅС‚ {0}", userAccount.Id);
 		}
 
 		private static uint[] Ready()

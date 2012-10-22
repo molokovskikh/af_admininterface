@@ -70,7 +70,7 @@ namespace AdminInterface.Models.Billing
 
 		public override string DefaultDescription
 		{
-			get { return "Статистический отчет по фармрынку за {0}"; }
+			get { return "РЎС‚Р°С‚РёСЃС‚РёС‡РµСЃРєРёР№ РѕС‚С‡РµС‚ РїРѕ С„Р°СЂРјСЂС‹РЅРєСѓ Р·Р° {0}"; }
 		}
 	}
 }

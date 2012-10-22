@@ -62,7 +62,7 @@ namespace AdminInterface.Helpers
 				}
 			}
 			catch (Exception ex) {
-				_log.Error("Не удалось отправить письмо", ex);
+				_log.Error("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ РїРёСЃСЊРјРѕ", ex);
 			}
 		}
 
@@ -91,7 +91,7 @@ namespace AdminInterface.Helpers
 				client.Send(message);
 			}
 			catch (Exception ex) {
-				_log.Error("Не удалось отправить письмо", ex);
+				_log.Error("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ РїРёСЃСЊРјРѕ", ex);
 			}
 		}
 
@@ -111,7 +111,7 @@ namespace AdminInterface.Helpers
 				return smtpid.Value;
 			}
 			catch (Exception ex) {
-				_log.Error("Не удалось отправить письмо", ex);
+				_log.Error("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ РїРёСЃСЊРјРѕ", ex);
 			}
 			return 0;
 		}

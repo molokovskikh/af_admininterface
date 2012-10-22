@@ -10,8 +10,8 @@ namespace AdminInterface.Models.Suppliers
 {
 	public enum ServiceType
 	{
-		[Description("Поставщик")] Supplier = 0,
-		[Description("Аптека")] Drugstore = 1
+		[Description("РџРѕСЃС‚Р°РІС‰РёРє")] Supplier = 0,
+		[Description("РђРїС‚РµРєР°")] Drugstore = 1
 	}
 
 	[ActiveRecord(Schema = "Customers", Lazy = true), JoinedBase]

@@ -22,7 +22,7 @@ namespace AdminInterface.Models.Logs
 			LogTime = DateTime.Now;
 		}
 
-		// Используется только в тесте
+		// РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С‚РѕР»СЊРєРѕ РІ С‚РµСЃС‚Рµ
 		public PasswordChangeLogEntity(string target, string userName, string hostName)
 		{
 			UserName = userName;

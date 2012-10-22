@@ -29,15 +29,15 @@ namespace AddUser
 	{
 		private readonly Dictionary<object, string> _configuratedCostTypes
 			= new Dictionary<object, string> {
-				{ 0, "Мультиколоночный" },
-				{ 1, "Многофайловый" },
+				{ 0, "РњСѓР»СЊС‚РёРєРѕР»РѕРЅРѕС‡РЅС‹Р№" },
+				{ 1, "РњРЅРѕРіРѕС„Р°Р№Р»РѕРІС‹Р№" },
 			};
 
 		private readonly Dictionary<object, string> _unconfiguratedCostTypes
 			= new Dictionary<object, string> {
-				{ 0, "Мультиколоночный" },
-				{ 1, "Многофайловый" },
-				{ DBNull.Value, "Не настроенный" },
+				{ 0, "РњСѓР»СЊС‚РёРєРѕР»РѕРЅРѕС‡РЅС‹Р№" },
+				{ 1, "РњРЅРѕРіРѕС„Р°Р№Р»РѕРІС‹Р№" },
+				{ DBNull.Value, "РќРµ РЅР°СЃС‚СЂРѕРµРЅРЅС‹Р№" },
 			};
 
 		private DataSet Data
@@ -53,7 +53,7 @@ namespace AddUser
 			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
 			uint id;
 			if (!UInt32.TryParse(Request["cc"], out id))
-				throw new ArgumentException(String.Format("Не верное значение ClientCode = {0}", id), "ClientCode");
+				throw new ArgumentException(String.Format("РќРµ РІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ ClientCode = {0}", id), "ClientCode");
 
 			supplier = Supplier.Find(id);
 			HandlersLink.NavigateUrl = "~/SpecialHandlers/?supplierId=" + supplier.Id;
@@ -67,7 +67,7 @@ namespace AddUser
 		private void LoadPageData()
 		{
 			Data = GetData(supplier);
-			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", supplier.Name);
+			HeaderLabel.Text = String.Format("РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ РєР»РёРµРЅС‚Р° \"{0}\"", supplier.Name);
 			ConnectDataSource();
 			DataBind();
 			SetRegions();
@@ -198,7 +198,7 @@ order by r.Region;";
 					dataAdapter.Fill(data, "SenRuleRegions");
 					var row = data.Tables["SenRuleRegions"].NewRow();
 					row["RegionCode"] = DBNull.Value;
-					row["Region"] = "Любой регион";
+					row["Region"] = "Р›СЋР±РѕР№ СЂРµРіРёРѕРЅ";
 					data.Tables["SenRuleRegions"].Rows.InsertAt(row, 0);
 				});
 			return data;
@@ -416,7 +416,7 @@ WHERE RowId = ?Id;
 				vipChangeFlag = true;
 			}
 			if (vipChangeFlag) {
-				message = "Все клиенты были отключены от VIP прайсов";
+				message = "Р’СЃРµ РєР»РёРµРЅС‚С‹ Р±С‹Р»Рё РѕС‚РєР»СЋС‡РµРЅС‹ РѕС‚ VIP РїСЂР°Р№СЃРѕРІ";
 			}
 
 
@@ -439,11 +439,11 @@ WHERE RowId = ?Id;
 					ActiveRecordMediator.Save(currentSupplier);
 
 					if (updateIntersection) {
-						//нагрузка балансируется (один запрос может уйти в одну базу, другой в другую)
-						//если код ниже будет выполнен в другой транзакции то в той базе где он выполнится
-						//может еще не быть создаваемого прайса
+						//РЅР°РіСЂСѓР·РєР° Р±Р°Р»Р°РЅСЃРёСЂСѓРµС‚СЃСЏ (РѕРґРёРЅ Р·Р°РїСЂРѕСЃ РјРѕР¶РµС‚ СѓР№С‚Рё РІ РѕРґРЅСѓ Р±Р°Р·Сѓ, РґСЂСѓРіРѕР№ РІ РґСЂСѓРіСѓСЋ)
+						//РµСЃР»Рё РєРѕРґ РЅРёР¶Рµ Р±СѓРґРµС‚ РІС‹РїРѕР»РЅРµРЅ РІ РґСЂСѓРіРѕР№ С‚СЂР°РЅР·Р°РєС†РёРё С‚Рѕ РІ С‚РѕР№ Р±Р°Р·Рµ РіРґРµ РѕРЅ РІС‹РїРѕР»РЅРёС‚СЃСЏ
+						//РјРѕР¶РµС‚ РµС‰Рµ РЅРµ Р±С‹С‚СЊ СЃРѕР·РґР°РІР°РµРјРѕРіРѕ РїСЂР°Р№СЃР°
 
-						//FlushAction.Never - что бы не автоматически не запускать транзакцию
+						//FlushAction.Never - С‡С‚Рѕ Р±С‹ РЅРµ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РЅРµ Р·Р°РїСѓСЃРєР°С‚СЊ С‚СЂР°РЅР·Р°РєС†РёСЋ
 						var addedPriceId = currentSupplier.Prices.Max(p => p.Id);
 						Maintainer.MaintainIntersection(supplier);
 						ArHelper.WithSession(s => {
@@ -544,9 +544,9 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 					Supplier = supplier,
 					Handler = DbSession.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId)
 				};
-				// задаем имя по умолчанию
-				var handlerName = "Специальный формат";
-				// проверяем свободно ли имя и если нет, то ищем свободное
+				// Р·Р°РґР°РµРј РёРјСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+				var handlerName = "РЎРїРµС†РёР°Р»СЊРЅС‹Р№ С„РѕСЂРјР°С‚";
+				// РїСЂРѕРІРµСЂСЏРµРј СЃРІРѕР±РѕРґРЅРѕ Р»Рё РёРјСЏ Рё РµСЃР»Рё РЅРµС‚, С‚Рѕ РёС‰РµРј СЃРІРѕР±РѕРґРЅРѕРµ
 				if(DbSession.Query<SpecialHandler>()
 					.Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName) != 0) {
 					handlerName += DateTime.Now.ToString("yyMMdd");
@@ -681,7 +681,7 @@ ORDER BY region;";
 
 				supplier.RegionMask = newMaskRegion;
 				ActiveRecordMediator.SaveAndFlush(supplier);
-				//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
+				//Р·РґРµСЃСЊ РґР»РёРЅРЅР°СЏ С‚СЂР°РЅР·Р°РєС†РёСЏ activerecord, С‡С‚Рѕ Р±С‹ РёР·РјРµРЅРµРЅРёСЏ Р±С‹Р»Рё РІРёРґРЅС‹ Р·Р°РїСЂРѕСЃР°Рј РєРѕРјРёС‚РµРј
 				SessionScope.Current.Commit();
 
 				var updateCommand = new MySqlCommand(
@@ -728,7 +728,7 @@ WHERE   s.Id = ?ClientCode
 				updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				updateCommand.ExecuteNonQuery();
 
-				//описание см ст 430
+				//РѕРїРёСЃР°РЅРёРµ СЃРј СЃС‚ 430
 				using (new ConnectionScope(connection, FlushAction.Never))
 					Maintainer.MaintainIntersection(supplier);
 			}
@@ -742,7 +742,7 @@ WHERE   s.Id = ?ClientCode
 
 			supplier.HomeRegion = Common.Web.Ui.Models.Region.Find(currentHomeRegion);
 			ActiveRecordMediator.SaveAndFlush(supplier);
-			//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
+			//Р·РґРµСЃСЊ РґР»РёРЅРЅР°СЏ С‚СЂР°РЅР·Р°РєС†РёСЏ activerecord, С‡С‚Рѕ Р±С‹ РёР·РјРµРЅРµРЅРёСЏ Р±С‹Р»Рё РІРёРґРЅС‹ Р·Р°РїСЂРѕСЃР°Рј РєРѕРјРёС‚РµРј
 			SessionScope.Current.Commit();
 		}
 

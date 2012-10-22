@@ -11,10 +11,10 @@ namespace AdminInterface.Controllers.Filters
 {
 	public class StatQuery
 	{
-		[Description("Полностью")]
+		[Description("РџРѕР»РЅРѕСЃС‚СЊСЋ")]
 		public bool Full { get; set; }
 
-		[Description("Регион:")]
+		[Description("Р РµРіРёРѕРЅ:")]
 		public Region Region { get; set; }
 
 		public DataSet Load(DateTime fromDate, DateTime toDate)

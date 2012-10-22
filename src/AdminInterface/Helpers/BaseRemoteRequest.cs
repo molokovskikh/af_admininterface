@@ -31,12 +31,12 @@ namespace AdminInterface.Helpers
 				webRequest.Method = "GET";
 				using (var response = (HttpWebResponse)webRequest.GetResponse()) {
 					if (response.StatusCode == HttpStatusCode.OK) {
-						log.WarnFormat("Выполнения запроса {0} закончилось с неожиданным кодом {1}", requestUri, response.StatusCode);
+						log.WarnFormat("Р’С‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РїСЂРѕСЃР° {0} Р·Р°РєРѕРЅС‡РёР»РѕСЃСЊ СЃ РЅРµРѕР¶РёРґР°РЅРЅС‹Рј РєРѕРґРѕРј {1}", requestUri, response.StatusCode);
 					}
 				}
 			}
 			catch (Exception e) {
-				log.Error(String.Format("Выполнения запроса {0} завершилось с ошибкой", requestUri), e);
+				log.Error(String.Format("Р’С‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РїСЂРѕСЃР° {0} Р·Р°РІРµСЂС€РёР»РѕСЃСЊ СЃ РѕС€РёР±РєРѕР№", requestUri), e);
 			}
 		}
 	}

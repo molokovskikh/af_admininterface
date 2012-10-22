@@ -26,16 +26,16 @@ namespace Functional.Billing
 		public void Build_invoice()
 		{
 			Open(ad, "Edit");
-			browser.Button(Find.ByValue("Сформировать счет")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Счет"));
+			browser.Button(Find.ByValue("РЎС„РѕСЂРјРёСЂРѕРІР°С‚СЊ СЃС‡РµС‚")).Click();
+			Assert.That(browser.Text, Is.StringContaining("РЎС‡РµС‚"));
 		}
 
 		[Test]
 		public void Build_act()
 		{
 			Open(ad, "Edit");
-			browser.Button(Find.ByValue("Сформировать акт")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Акт"));
+			browser.Button(Find.ByValue("РЎС„РѕСЂРјРёСЂРѕРІР°С‚СЊ Р°РєС‚")).Click();
+			Assert.That(browser.Text, Is.StringContaining("РђРєС‚"));
 		}
 	}
 }

@@ -19,19 +19,19 @@ namespace AdminInterface.Models
 
 		public Payer Payer { get; set; }
 
-		[Property, ValidateNonEmpty("Нужно ввести текст сообщения")]
+		[Property, ValidateNonEmpty("РќСѓР¶РЅРѕ РІРІРµСЃС‚Рё С‚РµРєСЃС‚ СЃРѕРѕР±С‰РµРЅРёСЏ")]
 		public string Message { get; set; }
 
 		[Property("MessageShowCount")]
 		public uint ShowMessageCount { get; set; }
 
-		[Description("Тема письма:")]
+		[Description("РўРµРјР° РїРёСЃСЊРјР°:")]
 		public string Subject { get; set; }
 
-		[Description("Отправлять это сообщение также на email")]
+		[Description("РћС‚РїСЂР°РІР»СЏС‚СЊ СЌС‚Рѕ СЃРѕРѕР±С‰РµРЅРёРµ С‚Р°РєР¶Рµ РЅР° email")]
 		public bool SendToEmail { get; set; }
 
-		[Description("Отправлять это сообщение также в минипочту")]
+		[Description("РћС‚РїСЂР°РІР»СЏС‚СЊ СЌС‚Рѕ СЃРѕРѕР±С‰РµРЅРёРµ С‚Р°РєР¶Рµ РІ РјРёРЅРёРїРѕС‡С‚Сѓ")]
 		public bool SendToMinimail { get; set; }
 
 		public bool Mail

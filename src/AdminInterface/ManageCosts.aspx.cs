@@ -101,11 +101,11 @@ namespace AddUser
 set @inHost = ?Host;
 set @inUser = ?UserName;
 
-UPDATE pricescosts 
-SET		BaseCost	 =?BaseCost, 
-		CostName     =?CostName, 
-		Enabled      =?Enabled, 
-		AgencyEnabled=?AgencyEnabled 
+UPDATE pricescosts
+SET		BaseCost	 =?BaseCost,
+		CostName     =?CostName,
+		Enabled      =?Enabled,
+		AgencyEnabled=?AgencyEnabled
 WHERE   CostCode     =?CostCode;
 ";
 				adapter.Update(dataSet, "Costs");
@@ -115,7 +115,7 @@ WHERE   CostCode     =?CostCode;
 					@"
 UPDATE PricesRegionalData
 SET UpCost = ?UpCost,
-	MinReq = ?MinReq, 
+	MinReq = ?MinReq,
 	Enabled = ?Enabled,
 	BaseCost = ?BaseCost
 WHERE RowID = ?Id
@@ -128,7 +128,7 @@ WHERE RowID = ?Id
 				command.Parameters.Add("?BaseCost", MySqlDbType.Decimal, 0, "BaseCost");
 				adapter.Update(dataSet, "PriceRegionSettings");
 
-				UpdateLB.Text = "Сохранено.";
+				UpdateLB.Text = "РЎРѕС…СЂР°РЅРµРЅРѕ.";
 			});
 			DbSession.SessionFactory.Evict(typeof(Price), priceId);
 			PostDataToGrid();
@@ -162,12 +162,12 @@ WHERE RowID = ?Id
 		protected void CreateCost_Click(object sender, EventArgs e)
 		{
 			var collumnCreator = new CostCollumnCreator(field => NotificationHelper.NotifyAboutRegistration(
-				String.Format("\"{0}\" - регистрация ценовой колонки", field.ShortName),
+				String.Format("\"{0}\" - СЂРµРіРёСЃС‚СЂР°С†РёСЏ С†РµРЅРѕРІРѕР№ РєРѕР»РѕРЅРєРё", field.ShortName),
 				String.Format(
-					@"Оператор: {0} 
-Поставщик: {1}
-Регион: {2}
-Прайс-лист: {3}
+					@"РћРїРµСЂР°С‚РѕСЂ: {0}
+РџРѕСЃС‚Р°РІС‰РёРє: {1}
+Р РµРіРёРѕРЅ: {2}
+РџСЂР°Р№СЃ-Р»РёСЃС‚: {3}
 ", field.OperatorName, field.ShortName, field.Region, field.PriceName)));
 
 			collumnCreator.CreateCost(priceId, SecurityContext.Administrator.UserName);
@@ -194,7 +194,7 @@ WHERE RowID = ?Id
 
 				if (price.CostType == 0) {
 					foreach (DataGridColumn column in CostsDG.Columns) {
-						if (column.HeaderText == "Дата ценовой колонки") {
+						if (column.HeaderText == "Р”Р°С‚Р° С†РµРЅРѕРІРѕР№ РєРѕР»РѕРЅРєРё") {
 							column.Visible = false;
 							break;
 						}
@@ -205,12 +205,12 @@ WHERE RowID = ?Id
 				command.Parameters.AddWithValue("?PriceCode", price.Id);
 				command.CommandText =
 					@"
-SELECT  pc.CostCode, 
-		cast(concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) as CHAR) CostID, 
+SELECT  pc.CostCode,
+		cast(concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('в„–', right(Fieldname, length(FieldName)-1)), Fieldname))) as CHAR) CostID,
 		pc.CostName,
-		pi.PriceDate, 
-		pc.BaseCost, 
-		pc.Enabled, 
+		pi.PriceDate,
+		pc.BaseCost,
+		pc.Enabled,
 		pc.AgencyEnabled,
 		exists (select * from PricesRegionalData prd where prd.BaseCost = pc.CostCode) as RegionBaseCode
 FROM usersettings.pricescosts pc
@@ -245,7 +245,7 @@ WHERE PriceCode = ?PriceCode
 			var costId = Convert.ToUInt32(e.CommandArgument);
 
 			var cost = ActiveRecordMediator<Cost>.FindByPrimaryKey(costId);
-			var skipWarning = ((Button)e.CommandSource).Text == "Все равно удалить";
+			var skipWarning = ((Button)e.CommandSource).Text == "Р’СЃРµ СЂР°РІРЅРѕ СѓРґР°Р»РёС‚СЊ";
 			if (!skipWarning && cost.IsConfigured) {
 				warningCostId = costId;
 				PostDataToGrid();
@@ -333,8 +333,8 @@ delete from usersettings.pricescosts where costcode = ?costcode;";
 		protected object DeleteLabel(uint costId)
 		{
 			if (costId == warningCostId)
-				return "Все равно удалить";
-			return "Удалить";
+				return "Р’СЃРµ СЂР°РІРЅРѕ СѓРґР°Р»РёС‚СЊ";
+			return "РЈРґР°Р»РёС‚СЊ";
 		}
 
 		protected void PriceRegionSettings_RowDataBound(object sender, GridViewRowEventArgs e)

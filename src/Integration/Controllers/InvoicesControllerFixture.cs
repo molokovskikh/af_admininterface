@@ -23,7 +23,7 @@ namespace Integration.Controllers
 			PrepareController(controller);
 		}
 
-		[Test, Ignore("НЕ запускается исполняемый файл для печати неправельный путь")]
+		[Test, Ignore("РќР• Р·Р°РїСѓСЃРєР°РµС‚СЃСЏ РёСЃРїРѕР»РЅСЏРµРјС‹Р№ С„Р°Р№Р» РґР»СЏ РїРµС‡Р°С‚Рё РЅРµРїСЂР°РІРµР»СЊРЅС‹Р№ РїСѓС‚СЊ")]
 		public void After_build_redirect_to_index()
 		{
 			var recipient = session.Query<Recipient>().First();

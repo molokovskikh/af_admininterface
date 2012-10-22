@@ -29,8 +29,8 @@ namespace AdminInterface.Controllers.Filters
 			SortDirection = "Desc";
 			SortKeyMap = new Dictionary<string, string> {
 				{ "RequestTime", "RequestTime" },
-				//хак, тк HomeRegion перегружен хибер не может разобраться по какому полю сортировать
-				//по этому сортировка будет в ручную
+				//С…Р°Рє, С‚Рє HomeRegion РїРµСЂРµРіСЂСѓР¶РµРЅ С…РёР±РµСЂ РЅРµ РјРѕР¶РµС‚ СЂР°Р·РѕР±СЂР°С‚СЊСЃСЏ РїРѕ РєР°РєРѕРјСѓ РїРѕР»СЋ СЃРѕСЂС‚РёСЂРѕРІР°С‚СЊ
+				//РїРѕ СЌС‚РѕРјСѓ СЃРѕСЂС‚РёСЂРѕРІРєР° Р±СѓРґРµС‚ РІ СЂСѓС‡РЅСѓСЋ
 				{ "Region", "Id" },
 				{ "ClientName", "c.Name" },
 				{ "UpdateType", "UpdateType" },

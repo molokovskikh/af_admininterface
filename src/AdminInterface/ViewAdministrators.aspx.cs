@@ -69,8 +69,8 @@ public partial class ViewAdministrators : Page
 	protected string GetButtonLabel(string login)
 	{
 		if (ADHelper.IsDisabled(login))
-			return "Разблокировать";
-		return "Блокировать";
+			return "Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ";
+		return "Р‘Р»РѕРєРёСЂРѕРІР°С‚СЊ";
 	}
 
 	protected string GetButtonCommand(string login)

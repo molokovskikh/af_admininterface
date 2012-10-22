@@ -21,7 +21,7 @@ namespace Functional.Suppliers
 			Flush();
 
 			Open(supplier.Payer);
-			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
+			Assert.That(browser.Text, Is.StringContaining("РџР»Р°С‚РµР»СЊС‰РёРє"));
 			browser.CheckBox(Find.ByName("status")).Click();
 			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
 			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();

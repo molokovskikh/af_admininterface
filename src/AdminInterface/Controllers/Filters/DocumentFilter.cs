@@ -22,10 +22,10 @@ namespace AdminInterface.Controllers.Filters
 			Period = new DatePeriod(DateTime.Today.AddDays(-1), DateTime.Today);
 			PageSize = 30;
 		}
-		[Description("Регион:")]
+		[Description("Р РµРіРёРѕРЅ:")]
 		public Region Region { get; set; }
 		public DatePeriod Period { get; set; }
-		[Description("Только неразобранные накладные: ")]
+		[Description("РўРѕР»СЊРєРѕ РЅРµСЂР°Р·РѕР±СЂР°РЅРЅС‹Рµ РЅР°РєР»Р°РґРЅС‹Рµ: ")]
 		public bool OnlyNoParsed { get; set; }
 
 		public User User { get; set; }
@@ -124,7 +124,7 @@ namespace AdminInterface.Controllers.Filters
 			if(OnlyNoParsed) {
 				criteria.Add(Expression.Eq("IsFake", false));
 				criteria.Add(Expression.Or(Expression.IsNull(Projections.Property<DocumentReceiveLog>(d => d.Addition)),
-					Expression.Not(Expression.Eq(Projections.Property<DocumentReceiveLog>(d => d.Addition), "Сконвертированный файл"))));
+					Expression.Not(Expression.Eq(Projections.Property<DocumentReceiveLog>(d => d.Addition), "РЎРєРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ С„Р°Р№Р»"))));
 			}
 			return criteria;
 		}

@@ -17,7 +17,7 @@ namespace AdminInterface.Controllers.Filters
 		public DatePeriod Period { get; set; }
 		public string SearchText { get; set; }
 
-		[Description("Показывать только неопознанные:")]
+		[Description("РџРѕРєР°Р·С‹РІР°С‚СЊ С‚РѕР»СЊРєРѕ РЅРµРѕРїРѕР·РЅР°РЅРЅС‹Рµ:")]
 		public bool ShowOnlyUnknown { get; set; }
 
 		public decimal Sum { get; private set; }

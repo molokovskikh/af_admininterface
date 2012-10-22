@@ -37,7 +37,7 @@ namespace Integration.Controllers
 			Flush();
 
 			var logs = session.Query<AuditRecord>().Where(l => l.ObjectId == client.Id).ToList();
-			Assert.That(logs.FirstOrDefault(l => l.Message.Contains("$$$Èçìåíåíî 'Âêëþ÷åí'") && l.Type == LogObjectType.Client), Is.Not.Null, logs.Implode());
+			Assert.That(logs.FirstOrDefault(l => l.Message.Contains("$$$Ð˜Ð·Ð¼ÐµÐ½ÐµÐ½Ð¾ 'Ð’ÐºÐ»ÑŽÑ‡ÐµÐ½'") && l.Type == LogObjectType.Client), Is.Not.Null, logs.Implode());
 		}
 
 		[Test]
@@ -50,33 +50,33 @@ namespace Integration.Controllers
 			Assert.That(supplier.Disabled, Is.True);
 
 			var message = notifications.First();
-			Assert.That(message.Subject, Is.EqualTo("Ïðèîñòàíîâëåíà ðàáîòà ïîñòàâùèêà"), notifications.Implode(n => n.Subject));
+			Assert.That(message.Subject, Is.EqualTo("ÐŸÑ€Ð¸Ð¾ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð° Ñ€Ð°Ð±Ð¾Ñ‚Ð° Ð¿Ð¾ÑÑ‚Ð°Ð²Ñ‰Ð¸ÐºÐ°"), notifications.Implode(n => n.Subject));
 			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == supplier.Id).ToList();
-			Assert.That(logs.FirstOrDefault(l => l.Message.Contains("$$$Èçìåíåíî 'Îòêëþ÷åí'") && l.Type == LogObjectType.Supplier), Is.Not.Null, logs.Implode());
+			Assert.That(logs.FirstOrDefault(l => l.Message.Contains("$$$Ð˜Ð·Ð¼ÐµÐ½ÐµÐ½Ð¾ 'ÐžÑ‚ÐºÐ»ÑŽÑ‡ÐµÐ½'") && l.Type == LogObjectType.Supplier), Is.Not.Null, logs.Implode());
 		}
 
 		[Test]
 		public void UpdateSupplierStatusWithComment()
 		{
-			controller.UpdateClientStatus(supplier.Id, false, "òåñòîâîå îòêëþ÷åíèå ïîñòàâùèêà");
+			controller.UpdateClientStatus(supplier.Id, false, "Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ðµ Ð¾Ñ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾ÑÑ‚Ð°Ð²Ñ‰Ð¸ÐºÐ°");
 			var message = notifications.Last();
-			Assert.That(message.Subject, Is.EqualTo("Ïðèîñòàíîâëåíà ðàáîòà ïîñòàâùèêà"), notifications.Implode(n => n.Subject));
-			Assert.That(message.Body, Is.StringContaining("Ïðè÷èíà îòêëþ÷åíèÿ: òåñòîâîå îòêëþ÷åíèå ïîñòàâùèêà"));
+			Assert.That(message.Subject, Is.EqualTo("ÐŸÑ€Ð¸Ð¾ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð° Ñ€Ð°Ð±Ð¾Ñ‚Ð° Ð¿Ð¾ÑÑ‚Ð°Ð²Ñ‰Ð¸ÐºÐ°"), notifications.Implode(n => n.Subject));
+			Assert.That(message.Body, Is.StringContaining("ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ñ: Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ðµ Ð¾Ñ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾ÑÑ‚Ð°Ð²Ñ‰Ð¸ÐºÐ°"));
 			controller.UpdateClientStatus(supplier.Id, true, null);
 			message = notifications.Last();
-			Assert.That(message.Subject, Is.EqualTo("Âîçîáíîâëåíà ðàáîòà ïîñòàâùèêà"));
+			Assert.That(message.Subject, Is.EqualTo("Ð’Ð¾Ð·Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð° Ñ€Ð°Ð±Ð¾Ñ‚Ð° Ð¿Ð¾ÑÑ‚Ð°Ð²Ñ‰Ð¸ÐºÐ°"));
 		}
 
 		[Test]
 		public void UpdateClientStatusWithComment()
 		{
-			controller.UpdateClientStatus(client.Id, false, "òåñòîâîå îòêëþ÷åíèå êëèåíòà");
+			controller.UpdateClientStatus(client.Id, false, "Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ðµ Ð¾Ñ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°");
 			var message = notifications.Last();
-			Assert.That(message.Subject, Is.EqualTo("Ïðèîñòàíîâëåíà ðàáîòà êëèåíòà"), notifications.Implode(n => n.Subject));
-			Assert.That(message.Body, Is.StringContaining("Ïðè÷èíà îòêëþ÷åíèÿ: òåñòîâîå îòêëþ÷åíèå êëèåíòà"));
+			Assert.That(message.Subject, Is.EqualTo("ÐŸÑ€Ð¸Ð¾ÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð° Ñ€Ð°Ð±Ð¾Ñ‚Ð° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°"), notifications.Implode(n => n.Subject));
+			Assert.That(message.Body, Is.StringContaining("ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ñ: Ñ‚ÐµÑÑ‚Ð¾Ð²Ð¾Ðµ Ð¾Ñ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°"));
 			controller.UpdateClientStatus(client.Id, true, null);
 			message = notifications.Last();
-			Assert.That(message.Subject, Is.EqualTo("Âîçîáíîâëåíà ðàáîòà êëèåíòà"), notifications.Implode(n => n.Subject));
+			Assert.That(message.Subject, Is.EqualTo("Ð’Ð¾Ð·Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð° Ñ€Ð°Ð±Ð¾Ñ‚Ð° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°"), notifications.Implode(n => n.Subject));
 		}
 	}
 }

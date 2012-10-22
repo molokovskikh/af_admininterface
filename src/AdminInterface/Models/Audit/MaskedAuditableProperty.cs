@@ -33,24 +33,24 @@ namespace AdminInterface.Models.Audit
 			var added = current.Except(old).ToArray();
 			var removed = old.Except(current).ToArray();
 
-			Message = String.Format("$$$Изменено '{0}'", Name);
+			Message = String.Format("$$$РР·РјРµРЅРµРЅРѕ '{0}'", Name);
 
 			if (removed.Length > 0)
-				Message += " Удалено " + ToString(removed);
+				Message += " РЈРґР°Р»РµРЅРѕ " + ToString(removed);
 
 			if (added.Length > 0)
-				Message += " Добавлено " + ToString(added);
+				Message += " Р”РѕР±Р°РІР»РµРЅРѕ " + ToString(added);
 
 			var notifyAdded = ToStringForNotify(added);
 			var notifyRemoved = ToStringForNotify(removed);
 			if (!String.IsNullOrEmpty(notifyAdded) || !String.IsNullOrEmpty(notifyRemoved)) {
-				NotifyMessage = String.Format("Изменено '{0}'", Name);
+				NotifyMessage = String.Format("РР·РјРµРЅРµРЅРѕ '{0}'", Name);
 
 				if (!String.IsNullOrEmpty(notifyAdded))
-					NotifyMessage += " Добавлено " + notifyAdded;
+					NotifyMessage += " Р”РѕР±Р°РІР»РµРЅРѕ " + notifyAdded;
 
 				if (!String.IsNullOrEmpty(notifyRemoved))
-					NotifyMessage += " Удалено " + notifyRemoved;
+					NotifyMessage += " РЈРґР°Р»РµРЅРѕ " + notifyRemoved;
 			}
 		}
 

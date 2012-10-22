@@ -12,7 +12,7 @@ namespace AdminInterface.Models.Billing
 		[PrimaryKey("GeneralReportCode")]
 		public virtual uint Id { get; set; }
 
-		[Property, Auditable("Βκλώχεν")]
+		[Property, Auditable("Π’ΠΊΠ»ΡΡ‡ΠµΠ½")]
 		public virtual bool Allow { get; set; }
 
 		[Property]

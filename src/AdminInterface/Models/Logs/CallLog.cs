@@ -41,7 +41,7 @@ namespace AdminInterface.Models.Logs
 
 		public static string[] LastCalls()
 		{
-			//сломан хибер
+			//СЃР»РѕРјР°РЅ С…РёР±РµСЂ
 /*			return (from call in Queryable
 				where call.Id2 == IdentificationStatus.Unknow && call.Direction == CallDirection.Input
 				orderby call.LogTime descending

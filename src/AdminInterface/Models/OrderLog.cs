@@ -37,20 +37,20 @@ namespace AdminInterface.Models
 		public string GetResult()
 		{
 			if (TransportType == null || ResultCode == 0)
-				return "Не отправлен";
+				return "РќРµ РѕС‚РїСЂР°РІР»РµРЅ";
 
 			if (PriceId == 2647)
-				return "ok (Обезличенный заказ)";
+				return "ok (РћР±РµР·Р»РёС‡РµРЅРЅС‹Р№ Р·Р°РєР°Р·)";
 
 			switch (TransportType) {
 				case 1:
 					return ResultCode.ToString();
 				case 2:
-					return "ok (Ftp Инфорум)";
+					return "ok (Ftp РРЅС„РѕСЂСѓРј)";
 				case 4:
-					return "ok (Ftp Поставщика)";
+					return "ok (Ftp РџРѕСЃС‚Р°РІС‰РёРєР°)";
 				default:
-					return "ok (Собственный отправщик)";
+					return "ok (РЎРѕР±СЃС‚РІРµРЅРЅС‹Р№ РѕС‚РїСЂР°РІС‰РёРє)";
 			}
 		}
 	}

@@ -36,7 +36,7 @@ namespace AdminInterface.Models.Audit
 			var diffs = diff.diff_main(OldValue, NewValue);
 			var asHtml = diffs.Select(ToHtml).ToArray();
 
-			Message = String.Format("$$$Изменено '{0}'<br><div>{1}</div>", Name, String.Join("", asHtml));
+			Message = String.Format("$$$РР·РјРµРЅРµРЅРѕ '{0}'<br><div>{1}</div>", Name, String.Join("", asHtml));
 		}
 
 		public string ToHtml(Diff diff)

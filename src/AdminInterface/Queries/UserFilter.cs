@@ -20,24 +20,24 @@ namespace AdminInterface.Queries
 {
 	public enum SearchUserBy
 	{
-		[Description("Автоматически")] Auto,
-		[Description("Код клиента")] ByClientId,
-		[Description("Код пользователя")] ByUserId,
-		[Description("Логин пользователя")] ByLogin,
-		[Description("Комментарий пользователя")] ByUserName,
-		[Description("Email/телефон")] ByContacts,
-		[Description("Контактное лицо (Ф.И.О.)")] ByPersons,
-		[Description("Имя клиента")] ByClientName,
-		[Description("Юридическое имя")] ByJuridicalName,
-		[Description("Код договора")] ByPayerId,
-		[Description("Адрес для отправки документов")] AddressMail
+		[Description("РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё")] Auto,
+		[Description("РљРѕРґ РєР»РёРµРЅС‚Р°")] ByClientId,
+		[Description("РљРѕРґ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")] ByUserId,
+		[Description("Р›РѕРіРёРЅ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")] ByLogin,
+		[Description("РљРѕРјРјРµРЅС‚Р°СЂРёР№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")] ByUserName,
+		[Description("Email/С‚РµР»РµС„РѕРЅ")] ByContacts,
+		[Description("РљРѕРЅС‚Р°РєС‚РЅРѕРµ Р»РёС†Рѕ (Р¤.Р.Рћ.)")] ByPersons,
+		[Description("РРјСЏ РєР»РёРµРЅС‚Р°")] ByClientName,
+		[Description("Р®СЂРёРґРёС‡РµСЃРєРѕРµ РёРјСЏ")] ByJuridicalName,
+		[Description("РљРѕРґ РґРѕРіРѕРІРѕСЂР°")] ByPayerId,
+		[Description("РђРґСЂРµСЃ РґР»СЏ РѕС‚РїСЂР°РІРєРё РґРѕРєСѓРјРµРЅС‚РѕРІ")] AddressMail
 	}
 
 	public enum StatusStateFilter
 	{
-		[Description("Все")] All,
-		[Description("Включенные")] Enabled,
-		[Description("Отключенные")] Disabled
+		[Description("Р’СЃРµ")] All,
+		[Description("Р’РєР»СЋС‡РµРЅРЅС‹Рµ")] Enabled,
+		[Description("РћС‚РєР»СЋС‡РµРЅРЅС‹Рµ")] Disabled
 	}
 
 	public class SearchTextInfo
@@ -211,8 +211,8 @@ u.Id in ({1})
 
 		private static string ProcessFilter(string filter)
 		{
-			if (filter.Contains('№'))
-				filter = String.Format(" ({0}) or ({1}) ", filter, filter.Replace('№', 'N'));
+			if (filter.Contains('в„–'))
+				filter = String.Format(" ({0}) or ({1}) ", filter, filter.Replace('в„–', 'N'));
 			return filter;
 		}
 

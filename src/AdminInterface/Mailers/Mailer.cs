@@ -21,13 +21,13 @@ namespace AdminInterface.Mailers
 		{
 			try {
 				Func.Mail("register@analit.net",
-					"Новый сотрудник",
+					"РќРѕРІС‹Р№ СЃРѕС‚СЂСѓРґРЅРёРє",
 					String.Format(
-						@"В системе зарегистрирован новый сотрудник
-Ф.И.О.: {0}
-Телефон: {1}
+						@"Р’ СЃРёСЃС‚РµРјРµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ РЅРѕРІС‹Р№ СЃРѕС‚СЂСѓРґРЅРёРє
+Р¤.Р.Рћ.: {0}
+РўРµР»РµС„РѕРЅ: {1}
 Email: {2}
-Подразделение: {3}
+РџРѕРґСЂР°Р·РґРµР»РµРЅРёРµ: {3}
 ", admin.ManagerName,
 						admin.PhoneSupport,
 						admin.Email,
@@ -35,7 +35,7 @@ Email: {2}
 					"RegisterList@subscribe.analit.net");
 			}
 			catch (Exception e) {
-				_log.Error("Ошибка при отправке уведомления", e);
+				_log.Error("РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ", e);
 			}
 		}
 
@@ -43,28 +43,28 @@ Email: {2}
 		{
 			try {
 				Func.Mail("register@analit.net",
-					String.Format("Запрет работы для {0}, {1}", admin.ManagerName, admin.Department.GetDescription()),
+					String.Format("Р—Р°РїСЂРµС‚ СЂР°Р±РѕС‚С‹ РґР»СЏ {0}, {1}", admin.ManagerName, admin.Department.GetDescription()),
 					String.Format(
-						@"В системе ЗАПРЕЩЕНА работа сотрудника
-Ф.И.О.: {0}
-Подразделение: {1}
+						@"Р’ СЃРёСЃС‚РµРјРµ Р—РђРџР Р•Р©Р•РќРђ СЂР°Р±РѕС‚Р° СЃРѕС‚СЂСѓРґРЅРёРєР°
+Р¤.Р.Рћ.: {0}
+РџРѕРґСЂР°Р·РґРµР»РµРЅРёРµ: {1}
 ", admin.ManagerName,
 						admin.Department.GetDescription()),
 					"RegisterList@subscribe.analit.net");
 			}
 			catch (Exception e) {
-				_log.Error("Ошибка при отправке уведомления", e);
+				_log.Error("РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ", e);
 			}
 		}
 
 		public static void RegionalAdminUnblocked(Administrator admin)
 		{
 			Func.Mail("register@analit.net",
-				String.Format("Возобновление работы для {0}, {1}", admin.ManagerName, admin.Department.GetDescription()),
+				String.Format("Р’РѕР·РѕР±РЅРѕРІР»РµРЅРёРµ СЂР°Р±РѕС‚С‹ РґР»СЏ {0}, {1}", admin.ManagerName, admin.Department.GetDescription()),
 				String.Format(
-					@"В системе ВОЗОБНОВЛЕНА работа сотрудника
-Ф.И.О.: {0}
-Подразделение: {1}
+					@"Р’ СЃРёСЃС‚РµРјРµ Р’РћР—РћР‘РќРћР’Р›Р•РќРђ СЂР°Р±РѕС‚Р° СЃРѕС‚СЂСѓРґРЅРёРєР°
+Р¤.Р.Рћ.: {0}
+РџРѕРґСЂР°Р·РґРµР»РµРЅРёРµ: {1}
 ", admin.ManagerName,
 					admin.Department.GetDescription()),
 				"RegisterList@subscribe.analit.net");
@@ -74,13 +74,13 @@ Email: {2}
 		{
 			try {
 				Func.Mail("register@analit.net",
-					"Разослано повторное уведомление о регистрации",
+					"Р Р°Р·РѕСЃР»Р°РЅРѕ РїРѕРІС‚РѕСЂРЅРѕРµ СѓРІРµРґРѕРјР»РµРЅРёРµ Рѕ СЂРµРіРёСЃС‚СЂР°С†РёРё",
 					String.Format(
-						@"Оператор: {0}
-Хост: {1}
-Краткое наименование: {2}
-Полное наименование: {3}
-Домашний регион: {4}",
+						@"РћРїРµСЂР°С‚РѕСЂ: {0}
+РҐРѕСЃС‚: {1}
+РљСЂР°С‚РєРѕРµ РЅР°РёРјРµРЅРѕРІР°РЅРёРµ: {2}
+РџРѕР»РЅРѕРµ РЅР°РёРјРµРЅРѕРІР°РЅРёРµ: {3}
+Р”РѕРјР°С€РЅРёР№ СЂРµРіРёРѕРЅ: {4}",
 						SecurityContext.Administrator.UserName,
 						SecurityContext.Administrator.Host,
 						client.Name,
@@ -89,7 +89,7 @@ Email: {2}
 					"RegisterList@subscribe.analit.net");
 			}
 			catch (Exception e) {
-				_log.Error("Ошибка при отправке уведомления", e);
+				_log.Error("РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ", e);
 			}
 		}
 
@@ -98,14 +98,14 @@ Email: {2}
 			try {
 				var client = address.Client;
 				Func.Mail("register@analit.net",
-					"Разослано повторное уведомление о регистрации адреса",
+					"Р Р°Р·РѕСЃР»Р°РЅРѕ РїРѕРІС‚РѕСЂРЅРѕРµ СѓРІРµРґРѕРјР»РµРЅРёРµ Рѕ СЂРµРіРёСЃС‚СЂР°С†РёРё Р°РґСЂРµСЃР°",
 					String.Format(
-						@"Оператор: {0}
-Хост: {1}
-Краткое наименование: {2}
-Полное наименование: {3}
-Домашний регион: {4}
-Адрес доставки: {5}",
+						@"РћРїРµСЂР°С‚РѕСЂ: {0}
+РҐРѕСЃС‚: {1}
+РљСЂР°С‚РєРѕРµ РЅР°РёРјРµРЅРѕРІР°РЅРёРµ: {2}
+РџРѕР»РЅРѕРµ РЅР°РёРјРµРЅРѕРІР°РЅРёРµ: {3}
+Р”РѕРјР°С€РЅРёР№ СЂРµРіРёРѕРЅ: {4}
+РђРґСЂРµСЃ РґРѕСЃС‚Р°РІРєРё: {5}",
 						SecurityContext.Administrator.UserName,
 						SecurityContext.Administrator.Host,
 						client.Name,
@@ -115,7 +115,7 @@ Email: {2}
 					"RegisterList@subscribe.analit.net");
 			}
 			catch (Exception e) {
-				_log.Error("Ошибка при отправке уведомления", e);
+				_log.Error("РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ", e);
 			}
 		}
 
@@ -123,14 +123,14 @@ Email: {2}
 		{
 			try {
 				Func.Mail("register@analit.net",
-					"Зарегистрирован новый поставщик",
+					"Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ РЅРѕРІС‹Р№ РїРѕСЃС‚Р°РІС‰РёРє",
 					String.Format(
-						@"Краткое наименование: {0}
-Домашний регион: {1}", shortname, homeregion),
+						@"РљСЂР°С‚РєРѕРµ РЅР°РёРјРµРЅРѕРІР°РЅРёРµ: {0}
+Р”РѕРјР°С€РЅРёР№ СЂРµРіРёРѕРЅ: {1}", shortname, homeregion),
 					"farm@analit.net");
 			}
 			catch (Exception e) {
-				_log.Error("Ошибка при отправке уведомления", e);
+				_log.Error("РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ", e);
 			}
 		}
 
@@ -142,14 +142,14 @@ Email: {2}
 				string subject;
 				Account account;
 				if (!String.IsNullOrWhiteSpace(billingMessage))
-					billingMessage = "Сообщение в биллинг: " + billingMessage;
+					billingMessage = "РЎРѕРѕР±С‰РµРЅРёРµ РІ Р±РёР»Р»РёРЅРі: " + billingMessage;
 
 				if (item is User) {
 					var user = ((User)item);
 					account = user.Accounting;
-					var comment = "Комментарий: " + user.Name;
-					body = "Зарегистрирован новый пользователь \r\n" + user.Login;
-					subject = "Регистрация нового пользователя";
+					var comment = "РљРѕРјРјРµРЅС‚Р°СЂРёР№: " + user.Name;
+					body = "Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ РЅРѕРІС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ \r\n" + user.Login;
+					subject = "Р РµРіРёСЃС‚СЂР°С†РёСЏ РЅРѕРІРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ";
 					client = user.Client;
 					if (!String.IsNullOrWhiteSpace(billingMessage))
 						billingMessage += "\r\n";
@@ -160,8 +160,8 @@ Email: {2}
 				else {
 					var address = ((Address)item);
 					account = address.Accounting;
-					body = "Зарегистрирован новый адрес доставки " + address.Value;
-					subject = "Регистрация нового адреса доставки";
+					body = "Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ РЅРѕРІС‹Р№ Р°РґСЂРµСЃ РґРѕСЃС‚Р°РІРєРё " + address.Value;
+					subject = "Р РµРіРёСЃС‚СЂР°С†РёСЏ РЅРѕРІРѕРіРѕ Р°РґСЂРµСЃР° РґРѕСЃС‚Р°РІРєРё";
 					client = address.Client;
 
 					if (!String.IsNullOrEmpty(billingMessage))
@@ -178,9 +178,9 @@ Email: {2}
 
 				Func.Mail("register@analit.net",
 					subject,
-					String.Format(@"Для клиента {0} код {1} регион {2}
+					String.Format(@"Р”Р»СЏ РєР»РёРµРЅС‚Р° {0} РєРѕРґ {1} СЂРµРіРёРѕРЅ {2}
 {3}
-Регистратор {4}",
+Р РµРіРёСЃС‚СЂР°С‚РѕСЂ {4}",
 						client.Name,
 						client.Id,
 						client.HomeRegion.Name,
@@ -194,7 +194,7 @@ Email: {2}
 				}
 			}
 			catch (Exception e) {
-				_log.Error("Ошибка при отправке уведомления", e);
+				_log.Error("РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ", e);
 			}
 		}
 
@@ -204,7 +204,7 @@ Email: {2}
 				Func.Mail("billing@analit.net", message.Subject, message.Message, message.To);
 			}
 			catch (Exception e) {
-				_log.Error("Ошибка при отправке уведомления", e);
+				_log.Error("РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ", e);
 			}
 		}
 
@@ -214,7 +214,7 @@ Email: {2}
 				new NotificationService(defaults).NotifySupplierAboutAddressRegistration(address);
 			}
 			catch (Exception e) {
-				_log.Error("Ошибка при отправке уведомления", e);
+				_log.Error("РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ", e);
 			}
 		}
 
@@ -223,7 +223,7 @@ Email: {2}
 			try {
 				SupplierRegistred(supplier.Name, supplier.HomeRegion.Name);
 				var body = String.Format(
-					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\nТип: {4}",
+					"РћРїРµСЂР°С‚РѕСЂ: {0}\nР РµРіРёРѕРЅ: {1}\nРРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ: {2}\nРљРѕРґ: {3}\nРўРёРї: {4}",
 					SecurityContext.Administrator.UserName,
 					supplier.HomeRegion.Name,
 					supplier.Users.First().Login,
@@ -231,17 +231,17 @@ Email: {2}
 					supplier.Type.GetDescription());
 
 				if (!String.IsNullOrEmpty(billingMessage))
-					body += "\r\nСообщение в биллинг: " + billingMessage;
+					body += "\r\nРЎРѕРѕР±С‰РµРЅРёРµ РІ Р±РёР»Р»РёРЅРі: " + billingMessage;
 
 				if (supplier.Account.IsFree)
 					body += "\r\n" + supplier.Account.RegistrationMessage;
 
 				NotificationHelper.NotifyAboutRegistration(
-					String.Format("\"{0}\" - успешная регистрация", supplier.FullName),
+					String.Format("\"{0}\" - СѓСЃРїРµС€РЅР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ", supplier.FullName),
 					body);
 			}
 			catch (Exception e) {
-				_log.Error("Ошибка при отправке уведомления", e);
+				_log.Error("РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ", e);
 			}
 		}
 
@@ -252,24 +252,24 @@ Email: {2}
 
 				var user = client.Users.FirstOrDefault();
 				var body = new StringWriter();
-				body.WriteLine("Оператор: {0}", SecurityContext.Administrator.UserName);
-				body.WriteLine("Регион: {0}", client.HomeRegion.Name);
+				body.WriteLine("РћРїРµСЂР°С‚РѕСЂ: {0}", SecurityContext.Administrator.UserName);
+				body.WriteLine("Р РµРіРёРѕРЅ: {0}", client.HomeRegion.Name);
 				if (user != null)
-					body.WriteLine("Имя пользователя: {0}", user.Login);
-				body.WriteLine("Код: {0}", client.Id);
+					body.WriteLine("РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ: {0}", user.Login);
+				body.WriteLine("РљРѕРґ: {0}", client.Id);
 
 				if (!String.IsNullOrEmpty(billingMessage))
-					body.WriteLine("Сообщение в биллинг: " + billingMessage);
+					body.WriteLine("РЎРѕРѕР±С‰РµРЅРёРµ РІ Р±РёР»Р»РёРЅРі: " + billingMessage);
 
 				if (user != null && user.Accounting.IsFree)
 					body.WriteLine(user.Accounting.RegistrationMessage);
 
 				NotificationHelper.NotifyAboutRegistration(
-					String.Format("\"{0}\" - успешная регистрация", client.FullName),
+					String.Format("\"{0}\" - СѓСЃРїРµС€РЅР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ", client.FullName),
 					body.ToString());
 			}
 			catch (Exception e) {
-				_log.Error("Ошибка при отправке уведомления", e);
+				_log.Error("РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ", e);
 			}
 		}
 	}

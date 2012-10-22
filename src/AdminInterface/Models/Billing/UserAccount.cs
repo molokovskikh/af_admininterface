@@ -28,7 +28,7 @@ namespace AdminInterface.Models.Billing
 				_payment = User.RootService.HomeRegion.UserPayment;
 		}
 
-		[BelongsTo("ObjectId"), Description("Пользователь")]
+		[BelongsTo("ObjectId"), Description("РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ")]
 		public virtual User User { get; set; }
 
 		public override uint ObjectId

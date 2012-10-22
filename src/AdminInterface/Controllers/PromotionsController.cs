@@ -23,14 +23,14 @@ namespace AdminInterface.Controllers
 {
 	public enum PromotionStatus
 	{
-		[Description("Все")] All,
-		[Description("Включенные")] Enabled,
-		[Description("Отключенные")] Disabled,
+		[Description("Р’СЃРµ")] All,
+		[Description("Р’РєР»СЋС‡РµРЅРЅС‹Рµ")] Enabled,
+		[Description("РћС‚РєР»СЋС‡РµРЅРЅС‹Рµ")] Disabled,
 	}
 
 	public class PromotionFilter : SortableContributor
 	{
-		[Description("Статус:")]
+		[Description("РЎС‚Р°С‚СѓСЃ:")]
 		public PromotionStatus PromotionStatus { get; set; }
 
 		public string SearchText { get; set; }
@@ -255,7 +255,7 @@ namespace AdminInterface.Controllers
 		{
 			var promotion = SupplierPromotion.Find(id);
 			promotion.Delete();
-			Flash["Message"] = "Удалено";
+			Flash["Message"] = "РЈРґР°Р»РµРЅРѕ";
 
 			RedirectToReferrer();
 		}
@@ -282,7 +282,7 @@ namespace AdminInterface.Controllers
 					var file = Request.Files["inputfile"] as HttpPostedFile;
 					if (file != null && file.ContentLength > 0) {
 						if (!IsAllowedExtention(Path.GetExtension(file.FileName))) {
-							PropertyBag["Message"] = Message.Error("Выбранный файл имеет недопустимый формат.");
+							PropertyBag["Message"] = Message.Error("Р’С‹Р±СЂР°РЅРЅС‹Р№ С„Р°Р№Р» РёРјРµРµС‚ РЅРµРґРѕРїСѓСЃС‚РёРјС‹Р№ С„РѕСЂРјР°С‚.");
 							return;
 						}
 
@@ -313,7 +313,7 @@ namespace AdminInterface.Controllers
 		{
 			var promotion = SupplierPromotion.Find(id);
 			promotion.Enabled = !promotion.Enabled;
-			Flash["Message"] = "Сохранено";
+			Flash["Message"] = "РЎРѕС…СЂР°РЅРµРЅРѕ";
 			promotion.Save();
 			RedirectToAction("Index", filter.ToUrl());
 		}
@@ -322,7 +322,7 @@ namespace AdminInterface.Controllers
 		{
 			var promotion = SupplierPromotion.Find(id);
 			promotion.AgencyDisabled = !promotion.AgencyDisabled;
-			Flash["Message"] = "Сохранено";
+			Flash["Message"] = "РЎРѕС…СЂР°РЅРµРЅРѕ";
 			promotion.Save();
 			RedirectToAction("Index", filter.ToUrl());
 		}
@@ -358,7 +358,7 @@ namespace AdminInterface.Controllers
 					var file = Request.Files["inputfile"] as HttpPostedFile;
 					if (file != null && file.ContentLength > 0) {
 						if (!IsAllowedExtention(Path.GetExtension(file.FileName))) {
-							PropertyBag["Message"] = Message.Error("Выбранный файл имеет недопустимый формат.");
+							PropertyBag["Message"] = Message.Error("Р’С‹Р±СЂР°РЅРЅС‹Р№ С„Р°Р№Р» РёРјРµРµС‚ РЅРµРґРѕРїСѓСЃС‚РёРјС‹Р№ С„РѕСЂРјР°С‚.");
 							return;
 						}
 
@@ -409,7 +409,7 @@ namespace AdminInterface.Controllers
 					fileStream.CopyTo(Response.OutputStream);
 				}
 			else
-				throw new Exception(String.Format("Для акции №{0} не существует файл {1}", promotion.Id, promotion.PromoFile));
+				throw new Exception(String.Format("Р”Р»СЏ Р°РєС†РёРё в„–{0} РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ С„Р°Р№Р» {1}", promotion.Id, promotion.PromoFile));
 		}
 
 		public void SelectSupplier([DataBind("filter")] SupplierFilter filter)
@@ -466,7 +466,7 @@ namespace AdminInterface.Controllers
 
 				ActiveRecordMediator.Evict(promotion);
 				if (Validator.IsValid(promotion) && promotion.Catalogs.Count > 0) {
-					Flash["Message"] = "Сохранено";
+					Flash["Message"] = "РЎРѕС…СЂР°РЅРµРЅРѕ";
 					promotion.Save();
 					RedirectToAction("EditCatalogs", filter.ToUrl());
 				}
@@ -476,7 +476,7 @@ namespace AdminInterface.Controllers
 						summary = String.Join(Environment.NewLine, Validator.GetErrorSummary(promotion).ErrorMessages);
 
 					if (promotion.Catalogs.Count == 0)
-						summary = String.Join(Environment.NewLine, summary, "Список препаратов не может быть пустым.");
+						summary = String.Join(Environment.NewLine, summary, "РЎРїРёСЃРѕРє РїСЂРµРїР°СЂР°С‚РѕРІ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј.");
 
 					Flash["Message"] = Message.Error(summary);
 					ActiveRecordMediator.Evict(promotion);

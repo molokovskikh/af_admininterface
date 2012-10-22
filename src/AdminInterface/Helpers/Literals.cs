@@ -13,10 +13,10 @@ namespace AdminInterface.Helpers
 
 	public enum StatisticsType
 	{
-		[Description("Кумулятивные обновления")] UpdateCumulative = 2,
-		[Description("Обычные обновления")] UpdateNormal = 1,
-		[Description("Ошибки подготовки данных")] UpdateError = 6,
-		[Description("Запреты")] UpdateBan = 5,
-		[Description("Частисные комулятивные")] LimitedCumulative = 18
+		[Description("РљСѓРјСѓР»СЏС‚РёРІРЅС‹Рµ РѕР±РЅРѕРІР»РµРЅРёСЏ")] UpdateCumulative = 2,
+		[Description("РћР±С‹С‡РЅС‹Рµ РѕР±РЅРѕРІР»РµРЅРёСЏ")] UpdateNormal = 1,
+		[Description("РћС€РёР±РєРё РїРѕРґРіРѕС‚РѕРІРєРё РґР°РЅРЅС‹С…")] UpdateError = 6,
+		[Description("Р—Р°РїСЂРµС‚С‹")] UpdateBan = 5,
+		[Description("Р§Р°СЃС‚РёСЃРЅС‹Рµ РєРѕРјСѓР»СЏС‚РёРІРЅС‹Рµ")] LimitedCumulative = 18
 	}
 }

@@ -31,7 +31,7 @@ public partial class EditRegionalInfo : Page
 			return;
 		int regionalSettingsCode;
 		if (!int.TryParse(Request["id"], out regionalSettingsCode))
-			throw new ArgumentException(string.Format("Не верный аргумент id = {0}", Request["id"]), "id");
+			throw new ArgumentException(string.Format("РќРµ РІРµСЂРЅС‹Р№ Р°СЂРіСѓРјРµРЅС‚ id = {0}", Request["id"]), "id");
 
 		_regionalSettingsCode = regionalSettingsCode;
 		BindData();
@@ -43,8 +43,8 @@ public partial class EditRegionalInfo : Page
 		ContactInfoText.Text = regionalData.ContactInfo;
 		OperativeInfoText.Text = regionalData.OperativeInfo;
 		_clientCode = regionalData.Supplier.Id;
-		ClientInfoLabel.Text = String.Format("Информация клиента \"{0}\"", regionalData.Supplier.Name);
-		RegionInfoLabel.Text = String.Format("В регионе: {0}", regionalData.Region.Name);
+		ClientInfoLabel.Text = String.Format("РРЅС„РѕСЂРјР°С†РёСЏ РєР»РёРµРЅС‚Р° \"{0}\"", regionalData.Supplier.Name);
+		RegionInfoLabel.Text = String.Format("Р’ СЂРµРіРёРѕРЅРµ: {0}", regionalData.Region.Name);
 		SecurityContext.Administrator.CheckRegion(regionalData.Region.Id);
 	}
 

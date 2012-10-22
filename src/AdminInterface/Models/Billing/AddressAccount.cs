@@ -19,7 +19,7 @@ namespace AdminInterface.Models.Billing
 			_payment = Address.Client.HomeRegion.AddressPayment;
 		}
 
-		[BelongsTo("ObjectId"), Description("Àäðåñ äîñòàâêè")]
+		[BelongsTo("ObjectId"), Description("ÐÐ´Ñ€ÐµÑ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸")]
 		public virtual Address Address { get; set; }
 
 		public override Service Service
@@ -56,7 +56,7 @@ namespace AdminInterface.Models.Billing
 		{
 			get
 			{
-				// Êîë-âî ïîëüçîâàòåëåé, êîòîðûì äîñòóïåí ýòîò àäðåñ è êîòîðûå âêëþ÷åíû ðàáîòàþò ÍÅ áåñïëàòíî, äîëæíî áûòü ÍÅ íóëåâûì
+				// ÐšÐ¾Ð»-Ð²Ð¾ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ð¼ Ð´Ð¾ÑÑ‚ÑƒÐ¿ÐµÐ½ ÑÑ‚Ð¾Ñ‚ Ð°Ð´Ñ€ÐµÑ Ð¸ ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½Ñ‹ Ñ€Ð°Ð±Ð¾Ñ‚Ð°ÑŽÑ‚ ÐÐ• Ð±ÐµÑÐ¿Ð»Ð°Ñ‚Ð½Ð¾, Ð´Ð¾Ð»Ð¶Ð½Ð¾ Ð±Ñ‹Ñ‚ÑŒ ÐÐ• Ð½ÑƒÐ»ÐµÐ²Ñ‹Ð¼
 				return (Address.AvaliableForUsers.Where(user => !user.Accounting.IsFree && user.Enabled).Count() > 0);
 			}
 		}

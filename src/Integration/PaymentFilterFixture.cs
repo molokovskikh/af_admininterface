@@ -16,11 +16,11 @@ namespace Integration
 		public void Search_by_payer_name()
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
-			payer.Name = "Тестовый плательщик " + payer.Id;
+			payer.Name = "РўРµСЃС‚РѕРІС‹Р№ РїР»Р°С‚РµР»СЊС‰РёРє " + payer.Id;
 			var payment = new Payment(payer, DateTime.Now, 800);
 			payment.SaveAndFlush();
 			var filter = new PaymentFilter {
-				SearchText = "Тестовый плательщик " + payer.Id
+				SearchText = "РўРµСЃС‚РѕРІС‹Р№ РїР»Р°С‚РµР»СЊС‰РёРє " + payer.Id
 			};
 			var payments = filter.Find();
 			Assert.That(payments.Count, Is.EqualTo(1));
