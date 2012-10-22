@@ -94,6 +94,7 @@ namespace Integration.Models
 		{
 			Create_payer_message();
 			var messageQuery = new MessageQuery();
+			messageQuery.Types.Add(LogMessageType.Payer);
 			var logs = messageQuery.Execute(_client, session);
 
 			var log = logs.FirstOrDefault(m => m.Message.Contains("test_Payer_Audit_Record"));
@@ -112,6 +113,7 @@ namespace Integration.Models
 		{
 			Create_payer_message();
 			var messageQuery = new MessageQuery();
+			messageQuery.Types.Add(LogMessageType.Payer);
 			var logs = messageQuery.Execute(_client.Users.First(), session);
 
 			var log = logs.FirstOrDefault(m => m.Message.Contains("test_Payer_Audit_Record"));
