@@ -47,6 +47,11 @@ td.old-user-update,
 	background-color: #aaaaaa;
 }
 
+table.DataTable tbody tr.old-user-update
+{
+	background-color: #dfdfdf;
+}
+
 table.DataTable tr.OddRow.disabled,
 table.DataTable tr.EvenRow.disabled,
 table.DataTable tr.OddRow.disabled-by-billing,

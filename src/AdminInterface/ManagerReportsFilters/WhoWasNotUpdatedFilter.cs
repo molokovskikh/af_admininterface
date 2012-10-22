@@ -26,12 +26,12 @@ namespace AdminInterface.ManagerReportsFilters
 	public class WhoWasNotUpdatedFilter : PaginableSortable
 	{
 		public Region Region { get; set; }
-		public DatePeriod Period { get; set; }
+		[Description("Дата последнего обновления")]
+		public DateTime BeginDate { get; set; }
 
 		public WhoWasNotUpdatedFilter()
 		{
-			PageSize = 30;
-			Period = new DatePeriod(DateTime.Now.AddDays(-7), DateTime.Now);
+			BeginDate = DateTime.Now.AddDays(-14);
 			SortBy = "ClientName";
 		}
 
@@ -54,8 +54,10 @@ INTO customers.oneUserDate
 	join customers.UserAddresses ua1 on ua1.UserId = u1.id
 	join customers.Addresses a1 on a1.id = ua1.AddressId
 	join usersettings.UserUpdateInfo uu1 on uu1.userid = u1.id
-	where uu1.UpdateDate >= :beginDate and uu1.UpdateDate <= :endDate
-
+	join usersettings.AssignedPermissions ap1 on ap1.UserId = u1.Id and ap1.PermissionId = 1
+	join customers.Clients c1 on u1.RootService = c1.Id and c1.Status = 1
+	where uu1.UpdateDate < :beginDate
+	and u1.Enabled = true
 		and (SELECT count(a2.id) FROM customers.Users U2
 			join customers.UserAddresses ua2 on ua2.UserId = u2.id
 			join customers.Addresses a2 on a2.id = ua2.AddressId
@@ -75,11 +77,14 @@ INTO customers.oneUser
 SELECT u1.id, ua1.AddressId FROM customers.Users U1
 join customers.UserAddresses ua1 on ua1.UserId = u1.id
 join customers.Addresses a1 on a1.id = ua1.AddressId
+join usersettings.AssignedPermissions ap1 on ap1.UserId = u1.Id and ap1.PermissionId = 1
+join customers.Clients c1 on u1.RootService = c1.Id and c1.Status = 1
 where
 	(SELECT count(a3.id) FROM customers.Users U3
 	join customers.UserAddresses ua3 on ua3.UserId = u3.id
 	join customers.Addresses a3 on a3.id = ua3.AddressId
 	where ua3.UserId = u1.id) = 1
+	and u1.Enabled = true
 group by u1.id
 having count(a1.id) = 1;
 
@@ -95,9 +100,11 @@ FROM customers.Users U
 	join customers.UserAddresses ua on ua.UserId = u.id
 	join customers.Addresses a on a.id = ua.AddressId
 	join usersettings.UserUpdateInfo uu on uu.userid = u.id
-	join customers.Clients c on c.id = u.ClientId
+	join customers.Clients c on c.id = u.ClientId and c.Status = 1
+	join usersettings.AssignedPermissions ap1 on ap1.UserId = u.Id and ap1.PermissionId = 1
 	join farm.Regions reg on reg.RegionCode = c.RegionCode
-where uu.UpdateDate >= :beginDate and uu.UpdateDate <= :endDate
+where uu.UpdateDate < :beginDate
+and u.Enabled = true
 and c.RegionCode & :RegionCode > 0
 group by u.id
 having count(a.id) > 1
@@ -116,9 +123,11 @@ FROM customers.Users U
 	join customers.UserAddresses ua on ua.UserId = u.id
 	join customers.Addresses a on a.id = ua.AddressId
 	join usersettings.UserUpdateInfo uu on uu.userid = u.id
-	join customers.Clients c on c.id = u.ClientId
+	join customers.Clients c on c.id = u.ClientId and c.Status = 1
+	join usersettings.AssignedPermissions ap1 on ap1.UserId = u.Id and ap1.PermissionId = 1
 	join farm.Regions reg on reg.RegionCode = c.RegionCode
-where uu.UpdateDate >= :beginDate and uu.UpdateDate <= :endDate
+where uu.UpdateDate < :beginDate
+and u.Enabled = true
 and c.RegionCode & :RegionCode > 0
 and
 u.id in
@@ -143,8 +152,7 @@ group by u.id
 having count(a.id) = 1
 order by {0} {1}
 ;", SortBy, SortDirection))
-			.SetParameter("beginDate", Period.Begin)
-			.SetParameter("endDate", Period.End)
+			.SetParameter("beginDate", BeginDate)
 			.SetParameter("RegionCode", regionMask)
 			.ToList<WhoWasNotUpdatedField>();
 

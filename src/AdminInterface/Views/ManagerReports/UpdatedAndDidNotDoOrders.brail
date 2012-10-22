@@ -1,7 +1,7 @@
-﻿ <% component Bubble, {@bredcrumbs : [("Кто обновлялся и не делал заказы", "${siteroot}/ManagerReports/")]} %>
+﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
-	Кто не обновлялся с опред. даты
+	Кто обновлялся и не делал заказы
 <% end %>
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.SortBy")}
@@ -24,4 +24,4 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 </tbody>
 </table>
 
-<% OutputSubView("UniversalTable") %>
+${tableHelper.ViewResult(Clients, filter, app)}
