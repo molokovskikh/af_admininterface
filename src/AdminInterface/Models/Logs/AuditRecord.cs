@@ -31,7 +31,7 @@ namespace AdminInterface.Models.Logs
 		[Description("Пользовательское")] User,
 		[Description("Системное")] System,
 		[Description("Статистическое")] Stat,
-		[Description("Плательщика")] Payer
+		[Description("Биллинг")] Payer
 	}
 
 	[ActiveRecord(Table = "clientsinfo", Schema = "logs")]

@@ -20,8 +20,7 @@ namespace AdminInterface.Queries
 		{
 			Types = new List<LogMessageType> {
 				LogMessageType.User,
-				LogMessageType.System,
-				LogMessageType.Payer
+				LogMessageType.System
 			};
 		}
 

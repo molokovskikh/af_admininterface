@@ -699,7 +699,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				</tr>
 				<tr>
 					<td>
-						<textarea name="userMessage.Message" rows="20" style="width:100%"></textarea>
+						<textarea name="userMessage.Message" rows="6" style="width:100%"></textarea>
 					</td>
 				</tr>
 				<tr>
@@ -760,7 +760,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<th>Имя</th>
 					<th>Оператор</th>
 					<th>Событие</th>
-					<th>Комментарий</th>
 				</tr>
 			</thead>
 		<% end %>
@@ -771,8 +770,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<td>${log.ObjectId}</td>
 				<td>${log.Name}</td>
 				<td>${log.OperatorName}</td>
-				<td>${log.Message}</td>
-				<td class="minTd">${log.Comment}</td>
+				<td>${log.Message}<br/>${log.Comment}</td>
 			</tr>
 		<% end %>
 		</table>
