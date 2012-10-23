@@ -383,9 +383,9 @@ namespace AdminInterface.Models
 			if (properties != null && properties.Any(p => p.Property.Name.Equals("Enabled")))
 				return new List<IAuditRecord> {
 					new PayerAuditRecord(Payer, "$$$", EditComment) { ShowOnlyPayer = true, ObjectType = LogObjectType.User, ObjectId = Id, Name = Name },
-					new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.User, Name = Name }
+					new AuditRecord(this) { MessageType = LogMessageType.System, Type = LogObjectType.User, Name = Name }
 				};
-			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.User, Name = Name } };
+			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.System, Type = LogObjectType.User, Name = Name } };
 		}
 
 		public virtual bool ShouldNotify()

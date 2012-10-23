@@ -187,9 +187,9 @@ namespace AdminInterface.Models.Suppliers
 						ObjectId = Id,
 						Name = Name
 					},
-					new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.Supplier, Name = Name }
+					new AuditRecord(this) { MessageType = LogMessageType.System, Type = LogObjectType.Supplier, Name = Name }
 				};
-			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.Supplier, Name = Name } };
+			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.System, Type = LogObjectType.Supplier, Name = Name } };
 		}
 
 		public virtual bool ShouldNotify()

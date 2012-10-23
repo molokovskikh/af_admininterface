@@ -356,8 +356,8 @@ group by u.ClientId")
 					Name = Name
 				})
 					.Cast<IAuditRecord>()
-					.Concat(new[] { new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.Client, Name = Name } });
-			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.Client, Name = Name } };
+					.Concat(new[] { new AuditRecord(this) { MessageType = LogMessageType.System, Type = LogObjectType.Client, Name = Name } });
+			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.System, Type = LogObjectType.Client, Name = Name } };
 		}
 
 		public virtual bool ShouldNotify()
