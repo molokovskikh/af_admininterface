@@ -12,6 +12,7 @@ using AdminInterface.Security;
 using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Castle.MonoRail.Framework.Helpers;
 using Common.Web.Ui.Controllers;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.MonoRailExtentions;
@@ -20,6 +21,7 @@ namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(PaginatorHelper), "paginator"),
+		Helper(typeof(TableHelper), "tableHelper"),
 		Secure(PermissionType.ManagerReport),
 	]
 	public class ManagerReportsController : BaseController
@@ -62,16 +64,24 @@ namespace AdminInterface.Controllers
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			PropertyBag["filter"] = filter;
-			PropertyBag["Clients"] = filter.SqlQuery2(DbSession);
+			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null)
+				PropertyBag["Clients"] = filter.SqlQuery2(DbSession);
+			else
+				PropertyBag["Clients"] = new List<WhoWasNotUpdatedField>();
 		}
 
 		public void UpdatedAndDidNotDoOrders()
 		{
+			var urlHelper = new UrlHelper(Context);
 			var filter = new UpdatedAndDidNotDoOrdersFilter();
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			PropertyBag["filter"] = filter;
-			PropertyBag["Clients"] = filter.Find(DbSession);
+			var result = filter.Find(DbSession);
+			foreach (var updatedAndDidNotDoOrdersField in result) {
+				updatedAndDidNotDoOrdersField.UrlHelper = urlHelper;
+			}
+			PropertyBag["Clients"] = result.Cast<BaseItemForTable>().ToList();
 		}
 
 		public void AnalysisOfWorkDrugstores()
