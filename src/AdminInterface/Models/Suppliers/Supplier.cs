@@ -181,8 +181,13 @@ namespace AdminInterface.Models.Suppliers
 		{
 			if (properties != null && properties.Any(p => p.Property.Name.Equals("Disabled")))
 				return new List<IAuditRecord> {
-					new PayerAuditRecord(Payer, "$$$", EditComment) { ObjectType = LogObjectType.Supplier, ObjectId = Id, Name = Name },
-					new AuditRecord(this) { MessageType = LogMessageType.Payer, Type = LogObjectType.Supplier, Name = Name }
+					new PayerAuditRecord(Payer, "$$$", EditComment) {
+						ShowOnlyPayer = true,
+						ObjectType = LogObjectType.Supplier,
+						ObjectId = Id,
+						Name = Name
+					},
+					new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.Supplier, Name = Name }
 				};
 			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.Supplier, Name = Name } };
 		}

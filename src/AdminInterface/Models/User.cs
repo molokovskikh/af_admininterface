@@ -82,7 +82,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Пользователь")]
-	public class User : IEnablable, IDisabledByParent, IChangesNotificationAware
+	public class User : IEnablable, IDisabledByParent, IChangesNotificationAware, IMultiAuditable
 	{
 		private string _name;
 		private bool _enabled;
@@ -376,6 +376,16 @@ namespace AdminInterface.Models
 		public override string ToString()
 		{
 			return Login;
+		}
+
+		public virtual IEnumerable<IAuditRecord> GetAuditRecords(IEnumerable<AuditableProperty> properties)
+		{
+			if (properties != null && properties.Any(p => p.Property.Name.Equals("Enabled")))
+				return new List<IAuditRecord> {
+					new PayerAuditRecord(Payer, "$$$", EditComment) { ShowOnlyPayer = true, ObjectType = LogObjectType.User, ObjectId = Id, Name = Name },
+					new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.User, Name = Name }
+				};
+			return new List<IAuditRecord> { new AuditRecord(this) { MessageType = LogMessageType.User, Type = LogObjectType.User, Name = Name } };
 		}
 
 		public virtual bool ShouldNotify()
@@ -756,6 +766,8 @@ WHERE
 			PayerAuditRecord.DeleteAuditRecords(Accounting);
 			ActiveRecordMediator.Delete(this);
 		}
+
+		public virtual string EditComment { get; set; }
 	}
 
 	public class ModelAction

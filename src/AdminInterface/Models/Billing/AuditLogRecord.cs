@@ -28,6 +28,8 @@ namespace AdminInterface.Models.Billing
 
 		public string Comment { get; set; }
 
+		public bool ShowOnlyPayer { get; set; }
+
 		private static AuditLogRecord GetLogRecord(ClientLogRecord clientLogRecord)
 		{
 			var log = new AuditLogRecord {
@@ -86,13 +88,11 @@ namespace AdminInterface.Models.Billing
 
 		public static IList<AuditLogRecord> GetLogs(Payer payer, bool showOtherRecords)
 		{
-			var userLogs = UserLogRecord.GetLogs(payer.Users);
 			var addressLogs = AddressLogRecord.GetLogs(payer.Addresses);
 			var auditLogs = PayerAuditRecord.Find(payer);
 
-			var logs = userLogs.Select(log => GetLogRecord(log))
-				.Concat(addressLogs.Select(log => GetLogRecord(log)))
-				.Concat(auditLogs.Select(r => r.ToAuditRecord()));
+			var logs = addressLogs.Select(log => GetLogRecord(log));
+			logs = logs.Concat(auditLogs.Select(r => r.ToAuditRecord()));
 			if (showOtherRecords)
 				logs = logs.Concat(payer.GetAuditLogs());
 			logs = logs.OrderByDescending(r => r.LogTime).ToList();
