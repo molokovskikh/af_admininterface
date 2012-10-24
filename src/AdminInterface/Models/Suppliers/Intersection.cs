@@ -31,16 +31,16 @@ namespace AdminInterface.Models.Suppliers
 		public virtual bool AvailableForClient { get; set; }
 
 		[Property]
-		public double PriceMarkup { get; set; }
+		public virtual double PriceMarkup { get; set; }
 
 		[Property]
-		public string SupplierClientId { get; set; }
+		public virtual string SupplierClientId { get; set; }
 
 		[Property]
-		public string SupplierPaymentId { get; set; }
+		public virtual string SupplierPaymentId { get; set; }
 
 		[HasMany(ColumnKey = "IntersectionId", Inverse = true, Lazy = true)]
-		public IList<AddressIntersection> Addresses { get; set; }
+		public virtual IList<AddressIntersection> Addresses { get; set; }
 	}
 
 	[ActiveRecord("AddressIntersection", Schema = "Customers", Lazy = true)]

@@ -119,6 +119,7 @@
     <Compile Include="ADHelperFixture.cs" />
     <Compile Include="AnalysisOfWorkDrugstoresFixture.cs" />
     <Compile Include="AppHelperFixture.cs" />
+    <Compile Include="ClientConditionsMonitoringFixture.cs" />
     <Compile Include="ClientFixture.cs" />
     <Compile Include="Controllers\AccountControllerFixture.cs" />
     <Compile Include="Controllers\CallHistoryControllerFixture.cs" />
