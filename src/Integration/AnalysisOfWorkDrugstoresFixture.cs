@@ -33,6 +33,7 @@ namespace Integration
 
 			Flush();
 
+			filter.PagesSize = 1000;
 			var result = filter.Find();
 			Assert.That(result.Count, Is.GreaterThan(0));
 			Assert.IsTrue(result.Any(r => r.Id == client.Id));

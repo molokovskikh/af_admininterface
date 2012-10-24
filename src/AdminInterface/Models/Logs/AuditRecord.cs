@@ -123,6 +123,8 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public bool IsHtml { get; set; }
 
+		public bool ShowOnlyPayer { get; set; }
+
 		public string Operator
 		{
 			get
