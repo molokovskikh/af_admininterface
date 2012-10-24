@@ -88,6 +88,9 @@ namespace AdminInterface.Models.Billing
 		public bool IsHtml { get; set; }
 
 		[Property]
+		public bool ShowOnlyPayer { get; set; }
+
+		[Property]
 		public string Comment { get; set; }
 
 		public static IList<PayerAuditRecord> Find(Payer payer)
@@ -107,7 +110,8 @@ namespace AdminInterface.Models.Billing
 				OperatorName = UserName,
 				Message = Message,
 				Name = Name,
-				Comment = Comment
+				Comment = Comment,
+				ShowOnlyPayer = ShowOnlyPayer
 			};
 		}
 

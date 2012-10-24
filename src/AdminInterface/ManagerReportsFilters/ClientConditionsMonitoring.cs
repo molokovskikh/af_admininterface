@@ -36,11 +36,11 @@ namespace AdminInterface.ManagerReportsFilters
 
 		protected Cost Cost { get; set; }
 
-		[Style]
+		/*[Style]
 		public bool CostCollumn
 		{
 			get { return  }
-		}
+		}*/
 	}
 
 	public class ClientConditionsMonitoring : PaginableSortable
@@ -53,6 +53,8 @@ namespace AdminInterface.ManagerReportsFilters
 			Session.Query<Intersection>()
 				.Where(i => i.Client.Id == ClientId)
 				.Select(i => new MonitoringItem(i));
+
+			return null;
 		}
 	}
 }

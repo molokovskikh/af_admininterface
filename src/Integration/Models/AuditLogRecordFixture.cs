@@ -119,5 +119,38 @@ namespace Integration.Models
 			var log = logs.FirstOrDefault(m => m.Message.Contains("test_Payer_Audit_Record"));
 			Assert.That(log, Is.Not.Null, logs.Implode());
 		}
+
+		[Test]
+		public void LogUserNoBilling()
+		{
+			var record = new AuditRecord("testUserAuditRecord", _client.Users.First());
+			session.Save(record);
+			Flush();
+			var messageQuery = new MessageQuery();
+			var logs = messageQuery.Execute(_client.Users.First(), session);
+			var log = logs.FirstOrDefault(m => m.Message.Contains("testUserAuditRecord"));
+			Assert.That(log, Is.Not.Null, logs.Implode());
+		}
+
+		[Test]
+		public void LogUserWithShowOnlyPayer()
+		{
+			var payer = _client.Payers.First();
+
+			var logRecord = new PayerAuditRecord(payer, "$$$testPayerAuditRecordUser");
+			logRecord.ObjectType = LogObjectType.User;
+			logRecord.ObjectId = _client.Users.First().Id;
+			logRecord.ShowOnlyPayer = true;
+			session.Save(logRecord);
+			Flush();
+			var messageQuery = new MessageQuery();
+			messageQuery.Types.Add(LogMessageType.Payer);
+			var logs = messageQuery.Execute(_client.Users.First(), session);
+			var log = logs.FirstOrDefault(m => m.Message.Contains("testPayerAuditRecordUser"));
+			Assert.That(log, Is.Null, logs.Implode());
+			logs = messageQuery.Execute(_client, session);
+			log = logs.FirstOrDefault(m => m.Message.Contains("testPayerAuditRecordUser"));
+			Assert.That(log, Is.Not.Null, logs.Implode());
+		}
 	}
 }

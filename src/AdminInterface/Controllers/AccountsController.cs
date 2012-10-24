@@ -87,6 +87,7 @@ namespace AdminInterface.Controllers
 			var oldStatus = user.Enabled;
 			if (enabled.HasValue)
 				user.Enabled = enabled.Value;
+			user.EditComment = comment;
 			DbSession.Save(user);
 			DbSession.Flush();
 			if (enabled != oldStatus)

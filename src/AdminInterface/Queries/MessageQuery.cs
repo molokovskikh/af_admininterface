@@ -36,7 +36,11 @@ namespace AdminInterface.Queries
 				.OrderByDescending(l => l.WriteTime)
 				.Fetch(l => l.Administrator)
 				.ToList();
-			return userAudit.Concat(ForPayer(user.Payer)).OrderByDescending(o => o.WriteTime).ToList();
+			return userAudit.Concat(
+				ForPayer(user.Payer)
+					.Where(u => !(u.ShowOnlyPayer && u.Type == LogObjectType.User && u.ObjectId == user.Id)))
+				.OrderByDescending(o => o.WriteTime)
+				.ToList();
 		}
 
 		public IList<AuditRecord> ExecuteUser(User user, ISession session)
@@ -47,7 +51,10 @@ namespace AdminInterface.Queries
 				.OrderByDescending(l => l.WriteTime)
 				.Fetch(l => l.Administrator)
 				.ToList();
-			return userAudit.Concat(ForPayer(user.Payer)).OrderByDescending(o => o.WriteTime).ToList();
+			return userAudit.Concat(
+				ForPayer(user.Payer)
+					.Where(u => !(u.ShowOnlyPayer && u.Type == LogObjectType.User && u.ObjectId == user.Id)))
+				.OrderByDescending(o => o.WriteTime).ToList();
 		}
 
 		public IList<AuditRecord> Execute(Service service, ISession session)
@@ -59,10 +66,18 @@ namespace AdminInterface.Queries
 				.Fetch(l => l.Administrator)
 				.ToList();
 			if (service.IsClient()) {
-				return serviceAudit.Concat(((Client)service).Payers.SelectMany(p => ForPayer(p))).OrderByDescending(o => o.WriteTime).ToList();
+				return serviceAudit.Concat(
+					((Client)service).Payers.SelectMany(p => ForPayer(p)
+						.Where(u => !(u.ShowOnlyPayer && u.Type == LogObjectType.Client && u.ObjectId == service.Id))))
+					.OrderByDescending(o => o.WriteTime)
+					.ToList();
 			}
 			else {
-				return serviceAudit.Concat(ForPayer(((Supplier)service).Payer)).OrderByDescending(o => o.WriteTime).ToList();
+				return serviceAudit.Concat(
+					ForPayer(((Supplier)service).Payer)
+						.Where(u => !(u.ShowOnlyPayer && u.Type == LogObjectType.Supplier && u.ObjectId == service.Id)))
+					.OrderByDescending(o => o.WriteTime)
+					.ToList();
 			}
 		}
 
@@ -77,7 +92,8 @@ namespace AdminInterface.Queries
 					Type = m.LogType,
 					WriteTime = m.LogTime,
 					UserName = m.OperatorName,
-					MessageType = LogMessageType.System
+					MessageType = LogMessageType.System,
+					ShowOnlyPayer = m.ShowOnlyPayer
 				}).ToList();
 			}
 			return new List<AuditRecord>();

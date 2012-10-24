@@ -31,7 +31,11 @@ namespace AdminInterface.ManagerReportsFilters
 		public Region Region { get; set; }
 		public DatePeriod FistPeriod { get; set; }
 		public DatePeriod LastPeriod { get; set; }
-
+		public int PagesSize
+		{
+			get { return PageSize; }
+			set { PageSize = value; }
+		}
 		public ISession Session;
 
 		public AnalysisOfWorkDrugstoresFilter()
