@@ -35,6 +35,10 @@ namespace Integration
 			user1 = new User(client) { Login = "user1", Name = "user1" };
 			user2 = new User(client) { Login = "user2", Name = "user2" };
 			user3 = new User(client) { Login = "user3", Name = "user3" };
+			user.AssignDefaultPermission(session);
+			user1.AssignDefaultPermission(session);
+			user2.AssignDefaultPermission(session);
+			user3.AssignDefaultPermission(session);
 			client.AddUser(user);
 			client.AddUser(user1);
 			client.AddUser(user2);
