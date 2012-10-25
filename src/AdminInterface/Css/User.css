@@ -124,3 +124,12 @@ table thead.CenterHead th
 	text-align: center;
 	font-size: 14px;
 }
+
+
+.centerRowHead th{
+	text-align: center;
+}
+
+.fixedHead300 {
+	width: 300px;
+}

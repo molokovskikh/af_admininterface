@@ -173,6 +173,7 @@
     <Compile Include="ManagerReportsFilters\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="ManagerReportsFilters\ClientAddressFilter.cs" />
     <Compile Include="ManagerReportsFilters\ClientConditionsMonitoring.cs" />
+    <Compile Include="ManagerReportsFilters\IFind.cs" />
     <Compile Include="ManagerReportsFilters\RegistrationInformation.cs" />
     <Compile Include="ManagerReportsFilters\SwitchOffClientsFilter.cs" />
     <Compile Include="ManagerReportsFilters\UpdatedAndDidNotDoOrders.cs" />
@@ -497,6 +498,7 @@
     <None Include="Views\Logs\Statistics.brail" />
     <None Include="Views\Mail\RegisterNews.brail" />
     <Content Include="Views\ManagerReports\ClientAddressesMonitor.brail" />
+    <None Include="Views\ManagerReports\ClientConditionsMonitoring.brail" />
     <Content Include="Views\ManagerReports\SwitchOffClients.brail" />
     <Content Include="Views\ManagerReports\WhoWasNotUpdated.brail" />
     <Content Include="Views\ManagerReports\UniversalTable.brail" />

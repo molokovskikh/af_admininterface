@@ -18,7 +18,7 @@ namespace Integration
 		public void Base_filter_work_test()
 		{
 			var region = session.Query<Region>().FirstOrDefault(r => r.Name == "Воронеж");
-			var filter = new ClientConditionsMonitoringFilter { Session = session, Region = region, ClientId = 2136u };
+			var filter = new ClientConditionsMonitoringFilter { Session = session, Region = region, ClientId = 2136 };
 			QueryCatcher.Catch();
 			filter.Find();
 		}

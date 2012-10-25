@@ -73,9 +73,9 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 </tbody>
 </table>
 
-<% if IsDefined("Clients"): %>
+<% if IsDefined("Items"): %>
 <table class="DataTable">
-<%if Clients.Count > 0: %>
+<%if Items.Count > 0: %>
 	<thead class="CenterHead">
 		<tr>
 			<th>${app.Sortable("Код клиента", "Id")}</th>
@@ -91,8 +91,8 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	</thead>
 <%end %>
 	<tbody>
-	<%if Clients.Count > 0: %>
-		<%for i, item in enumerate(Clients): %>
+	<%if Items.Count > 0: %>
+		<%for i, item in enumerate(Items): %>
 		<tr class="${ViewHelper.GetRowStyle(i)} Submit">
 			<td>${item.Id}</td>
 			<td>

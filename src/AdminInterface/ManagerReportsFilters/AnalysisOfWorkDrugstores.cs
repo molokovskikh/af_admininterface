@@ -26,7 +26,7 @@ namespace AdminInterface.ManagerReportsFilters
 		public int ProblemZak { get; set; }
 	}
 
-	public class AnalysisOfWorkDrugstoresFilter : PaginableSortable
+	public class AnalysisOfWorkDrugstoresFilter : PaginableSortable, IFind<AnalysisOfWorkFiled>
 	{
 		public Region Region { get; set; }
 		public DatePeriod FistPeriod { get; set; }
@@ -36,7 +36,8 @@ namespace AdminInterface.ManagerReportsFilters
 			get { return PageSize; }
 			set { PageSize = value; }
 		}
-		public ISession Session;
+
+		public ISession Session { get; set; }
 
 		public AnalysisOfWorkDrugstoresFilter()
 		{

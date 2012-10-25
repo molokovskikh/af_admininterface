@@ -1,4 +1,4 @@
-﻿ <% component Bubble, {@bredcrumbs : [("Кто не обновлялся с опред. даты", "${siteroot}/ManagerReports/")]} %>
+﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
 	Кто не обновлялся с опред. даты

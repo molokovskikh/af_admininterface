@@ -25,3 +25,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 </table>
 
 ${tableHelper.ViewResult(Clients, filter, app)}
+
+<div class="fullWidth" align="center">
+	<%component Legend, { "LegendItems" : {	"Обновление более 7 суток назад" : "old-user-update"}}%>
+</div>

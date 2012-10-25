@@ -86,15 +86,26 @@ namespace AdminInterface.Controllers
 
 		public void AnalysisOfWorkDrugstores()
 		{
+			MakeFilterAction<AnalysisOfWorkDrugstoresFilter, AnalysisOfWorkFiled>(f => f.SetDefaultRegion());
+		}
+
+		public void ClientConditionsMonitoring()
+		{
+			MakeFilterAction<ClientConditionsMonitoringFilter, MonitoringItem>();
+		}
+
+		protected void MakeFilterAction<TFilter, TItem>(Action<TFilter> action = null) where TFilter : IFind<TItem>
+		{
 			SetSmartBinder(AutoLoadBehavior.OnlyNested);
-			var filter = (AnalysisOfWorkDrugstoresFilter)BindObject(IsPost ? ParamStore.Form : ParamStore.QueryString, typeof(AnalysisOfWorkDrugstoresFilter), "filter", AutoLoadBehavior.OnlyNested);
+			var filter = (TFilter)BindObject(IsPost ? ParamStore.Form : ParamStore.QueryString, typeof(TFilter), "filter", AutoLoadBehavior.OnlyNested);
 			filter.Session = DbSession;
-			filter.SetDefaultRegion();
+			if (action != null)
+				action(filter);
 			PropertyBag["filter"] = filter;
 			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null)
-				PropertyBag["Clients"] = filter.Find();
+				PropertyBag["Items"] = filter.Find();
 			else
-				PropertyBag["Clients"] = new List<AnalysisOfWorkFiled>();
+				PropertyBag["Items"] = new List<TItem>();
 		}
 	}
 }

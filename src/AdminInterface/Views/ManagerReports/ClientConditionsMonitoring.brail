@@ -1,0 +1,72 @@
+﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+
+ <% component CaptureFor, {@id : @Title}: %>
+	Мониторинг выставлеия условий новому клиенту
+<% end %>
+${app.BeginFormFor("filter")}
+${FormHelper.HiddenField("filter.SortBy")}
+${FormHelper.HiddenField("filter.SortDirection")}
+<table class="CenterBlock">
+<tbody>
+	<tr>
+		<td class="filter-label">Клиент</td>
+		<td>${app.Edit("filter.ClientId")}</td>
+	</tr>
+	<tr>
+		<td class="filter-label">Регион</td>
+		<td>${app.Edit("filter.Region")}</td>
+	</tr>
+
+	<tr>
+		${app.EndFormFor("filter")}
+	</tr>
+</tbody>
+</table>
+
+<% if IsDefined("Items"): %>
+<table class="DataTable">
+<%if Items.Count > 0: %>
+	<thead>
+		<tr class="centerRowHead">
+			<th>${app.Sortable("Код поставщика", "SupplierCode")}</th>
+			<th>${app.Sortable("Наименование поставщика", "SupplierName")}</th>
+			<th>${app.Sortable("Прайс лист", "PriceName")}</th>
+			<th>${app.Sortable("Ценовая колонка", "CostName")}</th>
+			<th>${app.Sortable("В работе", "AvailableForClient")}</th>
+			<th>${app.Sortable("Подключен к прайсам", "CountAvailableForClient")}</th>
+			<th>${app.Sortable("Наценка", "PriceMarkup")}</th>
+			<th>${app.Sortable("Код клиента", "SupplierClientId")}</th>
+			<th class="fixedHead300">${app.Sortable("Код доставки", "SupplierDeliveryId")}</th>
+			<th>${app.Sortable("Код оплаты", "SupplierPaymentId")}</th>
+			<th>E-mail</th>
+			<th>уведомление</th>
+		</tr>
+	</thead>
+<%end %>
+	<tbody>
+	<%if Items.Count > 0: %>
+		<%for i, item in enumerate(Items): %>
+		<tr class="${ViewHelper.GetRowStyle(i)} Submit">
+			<td>${item.SupplierCode}</td>
+			<td>${item.SupplierName}</td>
+			<td>${item.PriceName}</td>
+			<td class="${app.Style(item.CostCollumn)}">${item.CostName}</td>
+			<td>${item.AvailableForClient}</td>
+			<td>${item.CountAvailableForClient}</td>
+			<td class="${app.Style(item.PriceMarkupStyle)}">${item.PriceMarkup}</td>
+			<td class="${app.Style(item.ClientCodeStyle)}">${item.SupplierClientId}</td>
+			<td class="${app.Style(item.DeliveryStyle)}">${item.SupplierDeliveryId}</td>
+			<td class="${app.Style(item.PaymentCodeStyle)}">${item.SupplierPaymentId}</td>
+		</tr>
+		<%end %>
+		<tr>
+			<td colspan=3>${paginator.ShowPaginator()}</td>
+		</tr>
+	<%else: %>
+	<tr class="EmptyData">
+		<td>Ничего не найдено</td>
+	</tr>
+	<%end %>
+	</tbody>
+</table>
+<%end %>

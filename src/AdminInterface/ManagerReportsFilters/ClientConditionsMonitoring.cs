@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.Security;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -24,6 +26,15 @@ namespace AdminInterface.ManagerReportsFilters
 		public double PriceMarkup { get; set; }
 		public string SupplierPaymentId { get; set; }
 		public string SupplierClientId { get; set; }
+		public string CountAvailableForClient { get; set; }
+
+		private bool _availableForClient;
+
+		public string AvailableForClient
+		{
+			get { return _availableForClient ? "Да" : "Нет"; }
+			set { _availableForClient = Convert.ToBoolean(int.Parse(value)); }
+		}
 
 		public string SupplierDeliveryId
 		{
@@ -88,21 +99,42 @@ namespace AdminInterface.ManagerReportsFilters
 		}
 	}
 
-	public class ClientConditionsMonitoringFilter : PaginableSortable
+	public class ClientConditionsMonitoringFilter : PaginableSortable, IFind<MonitoringItem>
 	{
-		public ISession Session;
-		public uint ClientId { get; set; }
+		public ISession Session { get; set; }
+		public int ClientId { get; set; }
 		public Region Region { get; set; }
+
+		public ClientConditionsMonitoringFilter()
+		{
+			SortBy = "SupplierCode";
+			SortKeyMap = new Dictionary<string, string> {
+				{ "SupplierCode", "s.Id" },
+				{ "SupplierName", "s.Name" },
+				{ "PriceName", "pd.PriceName" },
+				{ "CostName", "pc.CostName" },
+				{ "AvailableForClient", "i.AvailableForClient" },
+				{ "CountAvailableForClient", "CountAvailableForClient" },
+				{ "PriceMarkup", "i.PriceMarkup" },
+				{ "SupplierClientId", "i.SupplierClientId" },
+				{ "SupplierDeliveryId", "SupplierDeliveryId" },
+				{ "SupplierPaymentId", "i.SupplierPaymentId" }
+			};
+		}
 
 		public IList<MonitoringItem> Find()
 		{
+			var regionMask = SecurityContext.Administrator.RegionMask;
+			if (Region != null)
+				regionMask &= Region.Id;
+
 			var aggregates = Session.CreateSQLQuery(@"
 SELECT
 	PriceId,
 	COUNT(*) as AllIntersection,
 	COUNT(IF(i.PriceMarkup > 0,1,NULL)) as PriceMarkup,
-	COUNT(IF(i.SupplierClientId > 0,1,NULL)) as ClientCode,
-	COUNT(IF(i.SupplierPaymentId > 0,1,NULL)) as PaymentCode
+	COUNT(IF(i.SupplierClientId is not null and i.SupplierClientId != '',1,NULL)) as ClientCode,
+	COUNT(IF(i.SupplierPaymentId is not null and i.SupplierPaymentId != '',1,NULL)) as PaymentCode
 FROM customers.Intersection I
 	LEFT JOIN Customers.Clients drugstore ON drugstore.Id = i.ClientId
 	LEFT JOIN usersettings.PricesData pd ON pd.pricecode = i.PriceId
@@ -111,15 +143,13 @@ FROM customers.Intersection I
 WHERE supplier.Disabled = 0
 	and (supplier.RegionMask & i.RegionId) > 0
 	AND (drugstore.maskregion & i.RegionId) > 0
-	AND pd.agencyenabled = 1
 	AND pd.enabled = 1
 	AND pd.pricetype <> 1
 	AND prd.enabled = 1
-	and i.AvailableForClient = 1
 	and i.AgencyEnabled = 1
 	and i.RegionId = :Region
 group by PriceId;")
-				.SetParameter("Region", Region.Id)
+				.SetParameter("Region", regionMask)
 				.ToList<AggregateIntersection>()
 				.ToDictionary(a => a.PriceId);
 
@@ -127,7 +157,7 @@ group by PriceId;")
 SELECT
 	PriceId,
 	Count(*) as AllAddressIntersection,
-	COUNT(IF(ai.SupplierDeliveryId > 0,1,NULL)) as AddressCode
+	COUNT(IF(ai.SupplierDeliveryId is not null and ai.SupplierDeliveryId != '',1,NULL)) as AddressCode
 FROM customers.Intersection I
 	LEFT JOIN Customers.Clients drugstore ON drugstore.Id = i.ClientId
 	LEFT JOIN usersettings.PricesData pd ON pd.pricecode = i.PriceId
@@ -137,15 +167,13 @@ FROM customers.Intersection I
 WHERE  supplier.Disabled = 0
 	and (supplier.RegionMask & i.RegionId) > 0
 	AND (drugstore.maskregion & i.RegionId) > 0
-	AND pd.agencyenabled = 1
 	AND pd.enabled = 1
 	AND pd.pricetype <> 1
 	AND prd.enabled = 1
-	and i.AvailableForClient = 1
 	and i.AgencyEnabled = 1
 	and i.RegionId = :Region
 group by PriceId;")
-				.SetParameter("Region", Region.Id)
+				.SetParameter("Region", regionMask)
 				.ToList<AggregateIntersection>();
 
 			foreach (var aggregateIntersection in aggregateAddresses) {
@@ -153,7 +181,7 @@ group by PriceId;")
 				aggregates[aggregateIntersection.PriceId].AllAddressIntersection = aggregateIntersection.AllAddressIntersection;
 			}
 
-			var result = Session.CreateSQLQuery(@"
+			var result = Session.CreateSQLQuery(string.Format(@"
 SELECT
 	s.Id as SupplierCode,
 	s.Name as SupplierName,
@@ -164,8 +192,26 @@ SELECT
 	i.PriceMarkup as PriceMarkup,
 	i.SupplierClientId as SupplierClientId,
 	i.SupplierPaymentId as SupplierPaymentId,
-	(select count(*) from Usersettings.PricesCosts
-	where PriceCode = i.PriceId) as PricesCosts,
+	i.AvailableForClient as AvailableForClient,
+
+(select
+	count(*)
+from
+	Usersettings.PricesCosts
+where
+	PriceCode = i.PriceId
+) as PricesCosts,
+
+(select
+	concat(cast(count(IF(II.AvailableForClient > 0, 1, NULL)) as char(255)), '/', cast(count(*) as char(255))) as CountAvailableForClient
+from Usersettings.PricesData pd
+	join Usersettings.PricesData pdj on pd.FirmCode = pdj.FirmCode and pdj.Enabled = 1
+	join usersettings.pricesRegionaldata rd on rd.PriceCode = pdj.PriceCode and rd.RegionCode = :Region
+	join customers.Intersection II on ii.RegionId = :Region and II.ClientId = :ClientCode and II.PriceId = pdj.PriceCode
+where
+	pd.PriceCode = I.PriceId
+) as CountAvailableForClient,
+
 	group_concat(ai.SupplierDeliveryId) as SupplierDeliveryId
 FROM customers.Intersection I
 	join Usersettings.PricesData pd on pd.PriceCode = i.PriceId
@@ -176,15 +222,14 @@ where
 	i.RegionId = :Region
 	and i.ClientId = :ClientCode
 	and (s.RegionMask & i.RegionId) > 0
-	and pd.agencyenabled = 1
 	and pd.enabled = 1
 	and pd.pricetype <> 1
-	and i.AvailableForClient = 1
 	and i.AgencyEnabled = 1
 	and s.disabled = 0
-group by i.id;")
-				.SetParameter("Region", Region.Id)
-				.SetParameter("ClientCode", ClientId)
+group by i.id
+order by {0} {1};", SortKeyMap[SortBy], SortDirection))
+				.SetParameter("Region", regionMask)
+				.SetParameter("ClientCode", (uint)ClientId)
 				.ToList<MonitoringItem>();
 
 			foreach (var monitoringItem in result) {
@@ -209,7 +254,8 @@ group by i.id;")
 				}
 			}
 
-			return result.ToList();
+			RowsCount = result.Count;
+			return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
 		}
 	}
 }
