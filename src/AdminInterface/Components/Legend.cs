@@ -21,7 +21,8 @@ namespace AdminInterface.Components
 	<div {0}>
 		<table>
 			<tr>
-", style);
+",
+				style);
 			var legendItems = (IDictionary)ComponentParams["LegendItems"];
 			foreach (var key in legendItems.Keys)
 				writer.WriteLine(@"
@@ -33,7 +34,8 @@ namespace AdminInterface.Components
 					- {1}
 				</td>
 </tr>
-", legendItems[key], key);
+",
+					legendItems[key], key);
 
 			writer.WriteLine(@"
 			</tr>

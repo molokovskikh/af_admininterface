@@ -143,10 +143,10 @@ group by u.id
 having count(a.id) = 1
 order by {0} {1}
 ;", SortBy, SortDirection))
-			.SetParameter("beginDate", Period.Begin)
-			.SetParameter("endDate", Period.End)
-			.SetParameter("RegionCode", regionMask)
-			.ToList<WhoWasNotUpdatedField>();
+				.SetParameter("beginDate", Period.Begin)
+				.SetParameter("endDate", Period.End)
+				.SetParameter("RegionCode", regionMask)
+				.ToList<WhoWasNotUpdatedField>();
 
 			RowsCount = result.Count;
 			return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();

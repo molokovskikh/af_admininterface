@@ -62,7 +62,8 @@ namespace AdminInterface.Models.Telephony
 			var sql = @"
 select {CallRecord.*}
 from logs.RecordCalls {CallRecord}
-where {CallRecord}.WriteTime > :BeginDate and {CallRecord}.WriteTime < :EndDate" + searchCondition + sortFilter + limit;
+where {CallRecord}.WriteTime > :BeginDate and {CallRecord}.WriteTime < :EndDate"
+				+ searchCondition + sortFilter + limit;
 
 			var countSql = @"
 select count(*)

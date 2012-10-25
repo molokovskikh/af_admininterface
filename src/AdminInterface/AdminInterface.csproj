@@ -265,7 +265,10 @@
     <Compile Include="Helpers\AppHelper.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\Extentions.cs" />
-    <Compile Include="Helpers\RemoteServiceHelper.cs" />
+		<!--todo: исправить реакцию stylecop на фигурные скобки в лямбда-выражениях-->
+    <Compile Include="Helpers\RemoteServiceHelper.cs" >
+			<ExcludeFromStyleCop>true</ExcludeFromStyleCop>
+		</Compile>
     <Compile Include="Helpers\SoundHelper.cs" />
     <Compile Include="Helpers\Wav\Structs.cs" />
     <Compile Include="Helpers\Wav\WaveFileReader.cs" />
