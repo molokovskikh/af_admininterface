@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
+using Castle.ActiveRecord.Framework;
+using Castle.MonoRail.Framework.Helpers;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -27,6 +30,33 @@ namespace AdminInterface.ManagerReportsFilters
 		public string SupplierPaymentId { get; set; }
 		public string SupplierClientId { get; set; }
 		public string CountAvailableForClient { get; set; }
+		public string RegionName { get; set; }
+		public string ClientName { get; set; }
+
+		private string _contacts;
+
+		public string Contacts
+		{
+			get
+			{
+				var body = string.Format("Просим Вас произвести настроки клиента {0} в регионе {1}, а именно настроить: \r\n", ClientName, RegionName);
+				if (PriceMarkupStyle)
+					body += "Наценку \r\n";
+				if (PaymentCodeStyle)
+					body += "Код оплаты \r\n";
+				if (ClientCodeStyle)
+					body += "Код клиента \r\n";
+				if (DeliveryStyle)
+					body += "Код доставки \r\n";
+
+				var link = string.Format("mailto:kvasovtest@analit.net?subject={1}, {2} - просьба настроить условия работы&body={3}", _contacts, ClientName, RegionName, body);
+				var uri = new Uri(link);
+				var data = Encoding.UTF8.GetBytes(uri.PathAndQuery);
+				//return urlHelper.Link("Направить уведомление", new Dictionary<string, object> { { "basePath", string.Format("mailto:{0}", _contacts) }, { "params", new Dictionary<string, object> { { "subject", string.Format("{0}, {1} - просьба настроить условия работы", ClientName, RegionName) }, { "body", body } } } });
+				return string.Format("mailto:{0}", _contacts) + Encoding.GetEncoding(1251).GetString(data);
+			}
+			set { _contacts = value; }
+		}
 
 		private bool _availableForClient;
 
@@ -66,6 +96,12 @@ namespace AdminInterface.ManagerReportsFilters
 
 		[Style]
 		public bool DeliveryStyle { get; set; }
+
+		[Style]
+		public bool NoPriceConnected
+		{
+			get { return CountAvailableForClient.Split('/').First().Equals("0"); }
+		}
 	}
 
 	public class AggregateIntersection
@@ -159,11 +195,12 @@ SELECT
 	Count(*) as AllAddressIntersection,
 	COUNT(IF(ai.SupplierDeliveryId is not null and ai.SupplierDeliveryId != '',1,NULL)) as AddressCode
 FROM customers.Intersection I
-	LEFT JOIN Customers.Clients drugstore ON drugstore.Id = i.ClientId
-	LEFT JOIN usersettings.PricesData pd ON pd.pricecode = i.PriceId
-	LEFT JOIN Customers.Suppliers supplier ON supplier.Id = pd.firmcode
-	LEFT JOIN usersettings.PricesRegionalData prd ON prd.regioncode = i.RegionId AND prd.pricecode = pd.pricecode
+	JOIN Customers.Clients drugstore ON drugstore.Id = i.ClientId
+	JOIN usersettings.PricesData pd ON pd.pricecode = i.PriceId
+	JOIN Customers.Suppliers supplier ON supplier.Id = pd.firmcode
+	JOIN usersettings.PricesRegionalData prd ON prd.regioncode = i.RegionId AND prd.pricecode = pd.pricecode
 	JOIN customers.AddressIntersection ai on ai.IntersectionId = i.Id
+	join Customers.Addresses ca on ca.id = ai.AddressId
 WHERE  supplier.Disabled = 0
 	and (supplier.RegionMask & i.RegionId) > 0
 	AND (drugstore.maskregion & i.RegionId) > 0
@@ -172,6 +209,8 @@ WHERE  supplier.Disabled = 0
 	AND prd.enabled = 1
 	and i.AgencyEnabled = 1
 	and i.RegionId = :Region
+	and ca.LegalEntityId = i.LegalEntityId
+	and ca.Enabled = true
 group by PriceId;")
 				.SetParameter("Region", regionMask)
 				.ToList<AggregateIntersection>();
@@ -193,6 +232,8 @@ SELECT
 	i.SupplierClientId as SupplierClientId,
 	i.SupplierPaymentId as SupplierPaymentId,
 	i.AvailableForClient as AvailableForClient,
+	reg.region as RegionName,
+	c.Name as ClientName,
 
 (select
 	count(*)
@@ -212,11 +253,24 @@ where
 	pd.PriceCode = I.PriceId
 ) as CountAvailableForClient,
 
+(
+SELECT group_concat(distinct c.ContactText SEPARATOR ', ') as Contacts
+FROM customers.suppliers s1
+	join contacts.contact_groups cg on cg.ContactGroupOwnerId = s1.ContactGroupOwnerId
+	join contacts.persons p on p.ContactGroupId = cg.id
+	join contacts.contacts c on c.ContactOwnerId = cg.id || c.ContactOwnerId = p.Id
+where s1.id = s.Id
+	and cg.type = 1
+	and c.Type = 0
+) as Contacts,
+
 	group_concat(ai.SupplierDeliveryId) as SupplierDeliveryId
 FROM customers.Intersection I
 	join Usersettings.PricesData pd on pd.PriceCode = i.PriceId
 	join Customers.Suppliers s on s.Id = pd.FirmCode
 	join Usersettings.PricesCosts pc on pc.CostCode = i.CostId
+	join farm.Regions reg on reg.RegionCode = i.RegionId
+	join customers.Clients c on c.id = :ClientCode
 	left join Customers.AddressIntersection ai on ai.IntersectionId = i.id
 where
 	i.RegionId = :Region

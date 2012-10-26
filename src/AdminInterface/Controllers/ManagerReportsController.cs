@@ -22,6 +22,7 @@ namespace AdminInterface.Controllers
 	[
 		Helper(typeof(PaginatorHelper), "paginator"),
 		Helper(typeof(TableHelper), "tableHelper"),
+		Helper(typeof(UrlHelper), "urlHelper"),
 		Secure(PermissionType.ManagerReport),
 	]
 	public class ManagerReportsController : BaseController
@@ -94,7 +95,7 @@ namespace AdminInterface.Controllers
 			MakeFilterAction<ClientConditionsMonitoringFilter, MonitoringItem>();
 		}
 
-		protected void MakeFilterAction<TFilter, TItem>(Action<TFilter> action = null) where TFilter : IFind<TItem>
+		protected TFilter MakeFilterAction<TFilter, TItem>(Action<TFilter> action = null) where TFilter : IFind<TItem>
 		{
 			SetSmartBinder(AutoLoadBehavior.OnlyNested);
 			var filter = (TFilter)BindObject(IsPost ? ParamStore.Form : ParamStore.QueryString, typeof(TFilter), "filter", AutoLoadBehavior.OnlyNested);
@@ -106,6 +107,7 @@ namespace AdminInterface.Controllers
 				PropertyBag["Items"] = filter.Find();
 			else
 				PropertyBag["Items"] = new List<TItem>();
+			return filter;
 		}
 	}
 }
