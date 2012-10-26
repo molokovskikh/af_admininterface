@@ -27,7 +27,8 @@ namespace AdminInterface.Services
 
 Адрес доставки накладных: {4}@waybills.analit.net
 Адрес доставки отказов: {4}@refused.analit.net
-".Replace('\'', '\"');
+"
+				.Replace('\'', '\"');
 
 		private readonly string _messageTemplateForSupplierAfterAddressRegistration =
 			@"Добрый день.
@@ -37,7 +38,8 @@ namespace AdminInterface.Services
 
 Адрес доставки накладных: {4}@waybills.analit.net
 Адрес доставки отказов: {4}@refused.analit.net
-".Replace('\'', '\"');
+"
+				.Replace('\'', '\"');
 
 		private DefaultValues defaults;
 

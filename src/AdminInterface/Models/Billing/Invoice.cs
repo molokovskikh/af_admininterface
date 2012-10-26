@@ -61,13 +61,9 @@ namespace AdminInterface.Models.Billing
 
 		private InvoicePart PartForAd(Advertising ad)
 		{
-			return new InvoicePart(this,
-				"Рекламное объявление в информационной системе",
-				ad.Cost,
-				1,
-				Date) {
-					Ad = ad
-				};
+			return new InvoicePart(this, "Рекламное объявление в информационной системе", ad.Cost, 1, Date) {
+				Ad = ad
+			};
 		}
 
 		public void SetPayer(Payer payer)

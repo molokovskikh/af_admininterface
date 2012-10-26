@@ -39,7 +39,8 @@ FROM orders.ordershead oh
 where pd.FirmCode = :SupplierId
 group by oh.RowId
 having count(ol.RowId) > 0
-limit 5").SetParameter("SupplierId", supplier.Id).List<uint>();
+limit 5")
+				.SetParameter("SupplierId", supplier.Id).List<uint>();
 			PropertyBag["orders"] = orders.Implode();
 			PropertyBag["Formaters"] = OrderHandler.Formaters();
 			PropertyBag["thisFormat"] = supplier.OrderRules.Count > 0 ? supplier.OrderRules.First().Formater.ClassName : string.Empty;

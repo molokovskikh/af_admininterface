@@ -26,6 +26,7 @@ namespace AdminInterface.ManagerReportsFilters
 	public class WhoWasNotUpdatedFilter : PaginableSortable
 	{
 		public Region Region { get; set; }
+
 		[Description("Дата последнего обновления")]
 		public DateTime BeginDate { get; set; }
 
@@ -152,9 +153,9 @@ group by u.id
 having count(a.id) = 1
 order by {0} {1}
 ;", SortBy, SortDirection))
-			.SetParameter("beginDate", BeginDate)
-			.SetParameter("RegionCode", regionMask)
-			.ToList<WhoWasNotUpdatedField>();
+				.SetParameter("beginDate", BeginDate)
+				.SetParameter("RegionCode", regionMask)
+				.ToList<WhoWasNotUpdatedField>();
 
 			RowsCount = result.Count;
 			return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
