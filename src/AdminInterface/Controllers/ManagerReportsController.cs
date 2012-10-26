@@ -8,6 +8,7 @@ using AdminInterface.Helpers;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -25,7 +26,7 @@ namespace AdminInterface.Controllers
 		Helper(typeof(UrlHelper), "urlHelper"),
 		Secure(PermissionType.ManagerReport),
 	]
-	public class ManagerReportsController : BaseController
+	public class ManagerReportsController : AdminInterfaceController
 	{
 		public void UsersAndAdresses()
 		{
@@ -87,27 +88,19 @@ namespace AdminInterface.Controllers
 
 		public void AnalysisOfWorkDrugstores()
 		{
-			MakeFilterAction<AnalysisOfWorkDrugstoresFilter, AnalysisOfWorkFiled>(f => f.SetDefaultRegion());
+			var filter = BindFilter<AnalysisOfWorkDrugstoresFilter, AnalysisOfWorkFiled>();
+			filter.SetDefaultRegion();
+			FindFilter(filter);
 		}
 
 		public void ClientConditionsMonitoring()
 		{
-			MakeFilterAction<ClientConditionsMonitoringFilter, MonitoringItem>();
+			var filter = BindFilter<ClientConditionsMonitoringFilter, MonitoringItem>();
+			FindFilter(filter);
 		}
 
-		protected TFilter MakeFilterAction<TFilter, TItem>(Action<TFilter> action = null) where TFilter : IFind<TItem>
+		public void SendSupplierNotification()
 		{
-			SetSmartBinder(AutoLoadBehavior.OnlyNested);
-			var filter = (TFilter)BindObject(IsPost ? ParamStore.Form : ParamStore.QueryString, typeof(TFilter), "filter", AutoLoadBehavior.OnlyNested);
-			filter.Session = DbSession;
-			if (action != null)
-				action(filter);
-			PropertyBag["filter"] = filter;
-			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null)
-				PropertyBag["Items"] = filter.Find();
-			else
-				PropertyBag["Items"] = new List<TItem>();
-			return filter;
 		}
 	}
 }

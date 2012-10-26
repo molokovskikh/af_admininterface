@@ -8,6 +8,7 @@ using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.Framework.Helpers;
+using Common.MySql;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -53,7 +54,8 @@ namespace AdminInterface.ManagerReportsFilters
 				var uri = new Uri(link);
 				var data = Encoding.UTF8.GetBytes(uri.PathAndQuery);
 				//return urlHelper.Link("Направить уведомление", new Dictionary<string, object> { { "basePath", string.Format("mailto:{0}", _contacts) }, { "params", new Dictionary<string, object> { { "subject", string.Format("{0}, {1} - просьба настроить условия работы", ClientName, RegionName) }, { "body", body } } } });
-				return string.Format("mailto:{0}", _contacts) + Encoding.GetEncoding(1251).GetString(data);
+				//return string.Format("mailto:{0}", _contacts) + Encoding.GetEncoding(1251).GetString(data);
+				return MailHelper.FakeEscape(Uri.UnescapeDataString(string.Format("mailto:{0}?subject={1}, {2} - просьба настроить условия работы&body={3}", _contacts, ClientName, RegionName, body)));
 			}
 			set { _contacts = value; }
 		}
@@ -135,9 +137,10 @@ namespace AdminInterface.ManagerReportsFilters
 		}
 	}
 
-	public class ClientConditionsMonitoringFilter : PaginableSortable, IFind<MonitoringItem>
+	public class ClientConditionsMonitoringFilter : PaginableSortable, IFiltrable<MonitoringItem>
 	{
 		public ISession Session { get; set; }
+		public bool LoadDefault { get; set; }
 		public int ClientId { get; set; }
 		public Region Region { get; set; }
 

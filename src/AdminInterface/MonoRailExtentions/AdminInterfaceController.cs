@@ -1,9 +1,13 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using AddUser;
 using AdminInterface.Helpers;
+using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Castle.MonoRail.ActiveRecordSupport;
+using Castle.MonoRail.Framework;
 using Common.Web.Ui.Controllers;
 using NHibernate.Linq;
 
@@ -41,6 +45,23 @@ namespace AdminInterface.MonoRailExtentions
 			var controller = AppHelper.GetControllerName(entity);
 			var id = ((dynamic)entity).Id;
 			RedirectUsingRoute(controller, action, new { id });
+		}
+
+		public TFilter BindFilter<TFilter, TItem>() where TFilter : IFiltrable<TItem>
+		{
+			SetSmartBinder(AutoLoadBehavior.OnlyNested);
+			var filter = (TFilter)BindObject(IsPost ? ParamStore.Form : ParamStore.QueryString, typeof(TFilter), "filter", AutoLoadBehavior.OnlyNested);
+			filter.Session = DbSession;
+			return filter;
+		}
+
+		public void FindFilter<TItem>(IFiltrable<TItem> filter)
+		{
+			PropertyBag["filter"] = filter;
+			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null || filter.LoadDefault)
+				PropertyBag["Items"] = filter.Find();
+			else
+				PropertyBag["Items"] = new List<object>();
 		}
 	}
 }

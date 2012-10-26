@@ -58,6 +58,13 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<td class="${app.Style(item, @DeliveryStyle)}">${item.SupplierDeliveryId}</td>
 			<td class="${app.Style(item, @PaymentCodeStyle)}">${item.SupplierPaymentId}</td>
 			<td><a href="${item.Contacts}">123 </a></td>
+			<td>
+				${FormHelper.FormTag(@SendSupplierNotification, null)}
+					${FormHelper.HiddenField(@SupplierCode, item.SupplierCode)}
+					${FormHelper.HiddenField(@ClientCode, filter.ClientId)}
+					${FormHelper.ButtonElement("Отправить уведомление", @submit, null)}
+				${FormHelper.EndFormTag()}
+			</td>
 		</tr>
 		<%end %>
 		<tr>

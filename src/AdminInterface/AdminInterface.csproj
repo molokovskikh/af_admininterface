@@ -168,7 +168,7 @@
     <Compile Include="ManagerReportsFilters\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="ManagerReportsFilters\ClientAddressFilter.cs" />
     <Compile Include="ManagerReportsFilters\ClientConditionsMonitoring.cs" />
-    <Compile Include="ManagerReportsFilters\IFind.cs" />
+    <Compile Include="ManagerReportsFilters\IFiltrable.cs" />
     <Compile Include="ManagerReportsFilters\RegistrationInformation.cs" />
     <Compile Include="ManagerReportsFilters\SwitchOffClientsFilter.cs" />
     <Compile Include="ManagerReportsFilters\UpdatedAndDidNotDoOrders.cs" />

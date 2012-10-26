@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -26,7 +27,7 @@ namespace AdminInterface.ManagerReportsFilters
 		public int ProblemZak { get; set; }
 	}
 
-	public class AnalysisOfWorkDrugstoresFilter : PaginableSortable, IFind<AnalysisOfWorkFiled>
+	public class AnalysisOfWorkDrugstoresFilter : PaginableSortable, IFiltrable<AnalysisOfWorkFiled>
 	{
 		public Region Region { get; set; }
 		public DatePeriod FistPeriod { get; set; }
@@ -38,6 +39,7 @@ namespace AdminInterface.ManagerReportsFilters
 		}
 
 		public ISession Session { get; set; }
+		public bool LoadDefault { get; set; }
 
 		public AnalysisOfWorkDrugstoresFilter()
 		{
