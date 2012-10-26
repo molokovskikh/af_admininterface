@@ -224,14 +224,13 @@ namespace AdminInterface.Controllers
 			var name = client.Name.Replace("№", "N").Trim();
 			var currentPayer = RegisterPayer(options, payer, existingPayerId, name, fullName);
 
-			client = new Client(currentPayer,
-				Region.Find(homeRegion)) {
-					FullName = fullName,
-					Name = name,
-					MaskRegion = regionSettings.GetBrowseMask(),
-					Registration = new RegistrationInfo(Admin),
-					ContactGroupOwner = new ContactGroupOwner()
-				};
+			client = new Client(currentPayer, Region.Find(homeRegion)) {
+				FullName = fullName,
+				Name = name,
+				MaskRegion = regionSettings.GetBrowseMask(),
+				Registration = new RegistrationInfo(Admin),
+				ContactGroupOwner = new ContactGroupOwner()
+			};
 			client.Settings.WorkRegionMask = client.MaskRegion;
 			client.Settings.OrderRegionMask = regionSettings.GetOrderMask();
 			var user = new User(client);

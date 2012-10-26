@@ -28,8 +28,8 @@ namespace Integration.Models
 			session.CreateSQLQuery(@"
 update billing.Accounts
 set ReadyForAccounting = 0,
-BeAccounted = 0;
-").ExecuteUpdate();
+BeAccounted = 0;")
+				.ExecuteUpdate();
 
 			var accountings = Account.GetReadyForAccounting(new Pager());
 			Assert.That(accountings.Count(), Is.EqualTo(0));

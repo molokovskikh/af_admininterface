@@ -111,11 +111,11 @@ where
 	and rcs.InvisibleOnFirm = 0
 group by u.id
 order by {0} {1};", SortBy, SortDirection))
-			.SetParameter("orderDate", OrderDate)
-			.SetParameter("updateDateStart", UpdatePeriod.Begin)
-			.SetParameter("updateDateEnd", UpdatePeriod.End)
-			.SetParameter("regionMask", regionMask)
-			.ToList<UpdatedAndDidNotDoOrdersField>();
+				.SetParameter("orderDate", OrderDate)
+				.SetParameter("updateDateStart", UpdatePeriod.Begin)
+				.SetParameter("updateDateEnd", UpdatePeriod.End)
+				.SetParameter("regionMask", regionMask)
+				.ToList<UpdatedAndDidNotDoOrdersField>();
 
 			RowsCount = result.Count;
 			return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
