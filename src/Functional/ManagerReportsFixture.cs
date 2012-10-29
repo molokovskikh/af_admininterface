@@ -76,6 +76,8 @@ namespace Functional
 			AssertText("Номер документа");
 			Assert.That(browser.Text, Is.Not.Contains("Дата документа"));
 			Assert.That(browser.Text, Is.Not.Contains("Дата отправки"));
+			AssertText(client.Name);
+			AssertText(supplier.Name);
 		}
 
 		[Test]
