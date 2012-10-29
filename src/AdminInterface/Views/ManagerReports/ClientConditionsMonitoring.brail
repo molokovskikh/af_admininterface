@@ -1,4 +1,6 @@
-﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+﻿ ${app.JS("ManagerReport.js")}
+
+ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
 	Мониторинг выставлеия условий новому клиенту
@@ -10,13 +12,11 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 <tbody>
 	<tr>
 		<td class="filter-label">Клиент</td>
-		<td>${app.Edit("filter.ClientId")}</td>
+		<td>
+			${app.Edit("filter.ClientName")}
+			${FormHelper.HiddenField("filter.ClientId")}
+		</td>
 	</tr>
-	<tr>
-		<td class="filter-label">Регион</td>
-		<td>${app.Edit("filter.Region")}</td>
-	</tr>
-
 	<tr>
 		${app.EndFormFor("filter")}
 	</tr>
@@ -30,6 +30,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<tr class="centerRowHead">
 			<th>${app.Sortable("Код поставщика", "SupplierCode")}</th>
 			<th>${app.Sortable("Наименование поставщика", "SupplierName")}</th>
+			<th>${app.Sortable("Регион", "SupplierName")}</th>
 			<th>${app.Sortable("Прайс лист", "PriceName")}</th>
 			<th>${app.Sortable("Ценовая колонка", "CostName")}</th>
 			<th>${app.Sortable("В работе", "AvailableForClient")}</th>
@@ -38,8 +39,13 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<th>${app.Sortable("Код клиента", "SupplierClientId")}</th>
 			<th class="fixedHead300">${app.Sortable("Код доставки", "SupplierDeliveryId")}</th>
 			<th>${app.Sortable("Код оплаты", "SupplierPaymentId")}</th>
-			<th>E-mail</th>
-			<th>уведомление</th>
+			<th>Письмо администратору</th>
+			<th>
+				${FormHelper.FormTag(@SendSupplierNotification, null)}
+					${FormHelper.HiddenField(@clientCode, filter.ClientId)}
+					${FormHelper.ButtonElement("Отправить ВСЕМ уведомление", @submit, null)}
+				${FormHelper.EndFormTag()}
+			</th>
 		</tr>
 	</thead>
 <%end %>
@@ -49,6 +55,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<tr class="${ViewHelper.GetRowStyle(i)} Submit">
 			<td>${item.SupplierCode}</td>
 			<td>${item.SupplierName}</td>
+			<td>${item.RegionName}</td>
 			<td>${item.PriceName}</td>
 			<td class="${app.Style(item, @CostCollumn)}">${item.CostName}</td>
 			<td>${item.AvailableForClient}</td>
@@ -57,11 +64,11 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<td class="${app.Style(item, @ClientCodeStyle)}">${item.SupplierClientId}</td>
 			<td class="${app.Style(item, @DeliveryStyle)}">${item.SupplierDeliveryId}</td>
 			<td class="${app.Style(item, @PaymentCodeStyle)}">${item.SupplierPaymentId}</td>
-			<td><a href="${item.Contacts}">123 </a></td>
+			<td><a href="${item.Contacts}">Отправить</a></td>
 			<td>
 				${FormHelper.FormTag(@SendSupplierNotification, null)}
-					${FormHelper.HiddenField(@SupplierCode, item.SupplierCode)}
-					${FormHelper.HiddenField(@ClientCode, filter.ClientId)}
+					${FormHelper.HiddenField(@supplierCode, item.SupplierCode)}
+					${FormHelper.HiddenField(@clientCode, filter.ClientId)}
 					${FormHelper.ButtonElement("Отправить уведомление", @submit, null)}
 				${FormHelper.EndFormTag()}
 			</td>

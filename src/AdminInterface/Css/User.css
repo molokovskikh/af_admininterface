@@ -157,3 +157,11 @@ table thead.CenterHead th
 .delivery-style {
 	background-color: #EDE948;
 }
+
+.minimumHead {
+	width: 50px;
+}
+
+#filter_ClientName {
+	width: 300px;
+}

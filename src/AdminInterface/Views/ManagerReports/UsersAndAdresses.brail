@@ -55,6 +55,15 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 					${UrlHelper.Link(item.ClientName, {@controller: @Suppliers, @params: {@id: item.ClientId}})}
 				<% end %>
 			</td>
+			<td>
+				<%if (item.IsDrugstore):%>
+					${FormHelper.FormTag("${SiteRoot}/ManagerReports/ClientConditionsMonitoring", {@method : @get})}
+						${FormHelper.HiddenField("filter.ClientId", item.ClientId)}
+						${FormHelper.HiddenField("filter.ClientName", item.ClientName)}
+						${FormHelper.ButtonElement("Отчет", @submit, null)}
+					${FormHelper.EndFormTag()}
+				<%end%>
+			</td>
 			<td>${item.RegionName}</td>
 			<td>${item.Id}</td>
 			<td>${app.LinkTo(item)}</td>

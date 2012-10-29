@@ -473,6 +473,7 @@
     <Content Include="JavaScript\jquery.tmpl.js" />
     <Content Include="JavaScript\jquery.tmpl.min.js" />
     <Content Include="JavaScript\jquery.contact.validation.js" />
+    <Content Include="JavaScript\ManagerReport.js" />
     <Content Include="JavaScript\payer.search.js" />
     <Content Include="Assets\Javascripts\search.editor.js" />
     <Content Include="JavaScript\slider.js" />

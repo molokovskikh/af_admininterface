@@ -8,15 +8,20 @@ using AdminInterface.Helpers;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
+using AdminInterface.Services;
 using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Helpers;
+using Common.Tools;
 using Common.Web.Ui.Controllers;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -39,7 +44,7 @@ namespace AdminInterface.Controllers
 
 		public void GetUsersAndAdresses([DataBind("filter")] UserFinderFilter userFilter)
 		{
-			this.RenderFile("Пользовалети_и_адреса.xls", ExportModel.GetUserOrAdressesInformation(userFilter));
+			this.RenderFile("Пользоватети_и_адреса.xls", ExportModel.GetUserOrAdressesInformation(userFilter));
 		}
 
 		public void ClientAddressesMonitor()
@@ -99,8 +104,29 @@ namespace AdminInterface.Controllers
 			FindFilter(filter);
 		}
 
-		public void SendSupplierNotification()
+		public void SendSupplierNotification(uint clientCode, uint supplierCode)
 		{
+			var client = DbSession.Get<Client>(clientCode);
+			var service = new NotificationService(Defaults);
+			if (supplierCode > 0) {
+				var supplier = DbSession.Get<Supplier>(supplierCode);
+				var contacts = supplier.ContactGroupOwner.GetEmails(ContactGroupType.ClientManagers).ToList();
+				service.NotifySupplierAboutDrugstoreRegistration(client, contacts);
+			}
+			else {
+				service.NotifySupplierAboutDrugstoreRegistration(client, true);
+			}
+			Flash["Message"] = Message.Notify("Уведомления отправлены");
+			RedirectToReferrer();
+		}
+
+		[return: JSONReturnBinder]
+		public object GetClientForAutoComplite(string term)
+		{
+			return DbSession.Query<Client>().Where(c => c.Name.Contains(term))
+				.ToList()
+				.Select(c => new { id = c.Id, label = c.Name })
+				.ToList();
 		}
 	}
 }
