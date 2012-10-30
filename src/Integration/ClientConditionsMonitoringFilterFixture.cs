@@ -77,7 +77,10 @@ namespace Integration
 		[TearDown]
 		public void Tear()
 		{
-			session.CreateSQLQuery("delete from  usersettings.pricesdata").ExecuteUpdate();
+			session.CreateSQLQuery(@"
+update ordersendrules.smart_order_rules
+set AssortimentPriceCode = null;
+delete from  usersettings.pricesdata;").ExecuteUpdate();
 		}
 
 		[Test]
