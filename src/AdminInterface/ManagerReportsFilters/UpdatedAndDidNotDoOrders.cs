@@ -99,18 +99,23 @@ select
 	max(oh.`WriteTime`) as LastOrderDate
 from customers.Clients C
 left join usersettings.RetClientsSet rcs on rcs.ClientCode = c.Id
-join customers.Users u on u.ClientId = c.id and u.PayerId <> 921 and u.OrderRegionMask > 0
+join customers.Users u on u.ClientId = c.id and u.PayerId <> 921 and u.OrderRegionMask > 0 and u.SubmitOrders = 0
+join usersettings.AssignedPermissions ap on ap.UserId = u.Id
 join Customers.UserAddresses ua on ua.UserId = u.Id
 join usersettings.UserUpdateInfo uu on uu.UserId = u.id
 join farm.Regions reg on reg.RegionCode = c.RegionCode
-left join orders.OrdersHead oh on oh.`WriteTime`< :orderDate and (oh.`regioncode` & :regionMask > 0) and oh.UserId = u.id
+left join orders.OrdersHead oh on (oh.`regioncode` & :regionMask > 0) and oh.UserId = u.id
 where
 	(c.regioncode & :regionMask > 0)
 	and uu.`Updatedate` > :updateDateStart
 	and uu.`Updatedate` < :updateDateEnd
 	and rcs.InvisibleOnFirm = 0
+	and rcs.ServiceClient = 0
+	and ap.PermissionId = 1
 group by u.id
-order by {0} {1};", SortBy, SortDirection))
+having max(oh.`WriteTime`) < :orderDate
+order by {0} {1}
+;", SortBy, SortDirection))
 				.SetParameter("orderDate", OrderDate)
 				.SetParameter("updateDateStart", UpdatePeriod.Begin)
 				.SetParameter("updateDateEnd", UpdatePeriod.End)
