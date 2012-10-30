@@ -190,3 +190,7 @@ pre.Log {
 .nodisplay {
 	display: none;
 }
+
+.width15 {
+	width: 15%;
+}
