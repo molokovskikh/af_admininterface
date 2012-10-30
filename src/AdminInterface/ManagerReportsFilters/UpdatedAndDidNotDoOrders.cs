@@ -60,12 +60,15 @@ namespace AdminInterface.ManagerReportsFilters
 		}
 	}
 
-	public class UpdatedAndDidNotDoOrdersFilter : PaginableSortable
+	public class UpdatedAndDidNotDoOrdersFilter : PaginableSortable, IFiltrable<UpdatedAndDidNotDoOrdersField>
 	{
 		public Region Region { get; set; }
 		[Description("Не делались заказы с")]
 		public DateTime OrderDate { get; set; }
 		public DatePeriod UpdatePeriod { get; set; }
+
+		public ISession Session { get; set; }
+		public bool LoadDefault { get; set; }
 
 		public UpdatedAndDidNotDoOrdersFilter()
 		{
@@ -81,23 +84,24 @@ namespace AdminInterface.ManagerReportsFilters
 		}
 
 		//Здесь join Customers.UserAddresses ua on ua.UserId = u.Id, чтобы отсеять пользователей, у которых нет адресов доставки.
-		public IList<UpdatedAndDidNotDoOrdersField> Find(ISession session)
+		public IList<UpdatedAndDidNotDoOrdersField> Find()
 		{
 			var regionMask = SecurityContext.Administrator.RegionMask;
 			if (Region != null)
 				regionMask &= Region.Id;
 
-			var result = session.CreateSQLQuery(string.Format(@"
+			var result = Session.CreateSQLQuery(string.Format(@"
 select
 	c.id as ClientId,
 	c.Name as ClientName,
 	reg.Region as RegionName,
 	u.Id as UserId,
 	u.Name as UserName,
-	c.Registrant as Registrant,
+	if (reg.ManagerName is not null, reg.ManagerName, c.Registrant) as Registrant,
 	uu.UpdateDate as UpdateDate,
 	max(oh.`WriteTime`) as LastOrderDate
 from customers.Clients C
+left join accessright.regionaladmins reg on reg.UserName = c.Registrant
 left join usersettings.RetClientsSet rcs on rcs.ClientCode = c.Id
 join customers.Users u on u.ClientId = c.id and u.PayerId <> 921 and u.OrderRegionMask > 0 and u.SubmitOrders = 0
 join usersettings.AssignedPermissions ap on ap.UserId = u.Id

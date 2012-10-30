@@ -80,15 +80,18 @@ namespace AdminInterface.Controllers
 		public void UpdatedAndDidNotDoOrders()
 		{
 			var urlHelper = new UrlHelper(Context);
-			var filter = new UpdatedAndDidNotDoOrdersFilter();
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
-			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			var filter = BindFilter<UpdatedAndDidNotDoOrdersFilter, UpdatedAndDidNotDoOrdersField>();
 			PropertyBag["filter"] = filter;
-			var result = filter.Find(DbSession);
-			foreach (var updatedAndDidNotDoOrdersField in result) {
-				updatedAndDidNotDoOrdersField.UrlHelper = urlHelper;
+			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null || filter.LoadDefault) {
+				var result = filter.Find();
+				foreach (var updatedAndDidNotDoOrdersField in result) {
+					updatedAndDidNotDoOrdersField.UrlHelper = urlHelper;
+				}
+				PropertyBag["Clients"] = result.Cast<BaseItemForTable>().ToList();
 			}
-			PropertyBag["Clients"] = result.Cast<BaseItemForTable>().ToList();
+			else {
+				PropertyBag["Clients"] = new List<BaseItemForTable>();
+			}
 		}
 
 		public void AnalysisOfWorkDrugstores()

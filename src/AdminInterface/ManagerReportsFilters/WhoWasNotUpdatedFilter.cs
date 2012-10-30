@@ -27,7 +27,7 @@ namespace AdminInterface.ManagerReportsFilters
 	{
 		public Region Region { get; set; }
 
-		[Description("Дата последнего обновления")]
+		[Description("Нет обновлений с")]
 		public DateTime BeginDate { get; set; }
 
 		public WhoWasNotUpdatedFilter()
@@ -118,13 +118,14 @@ SELECT
 	reg.Region as RegionName,
 	u.Id as UserId,
 	u.Name as UserName,
-	c.Registrant as Registrant,
+	if (reg.ManagerName is not null, reg.ManagerName, c.Registrant) as Registrant,
 	uu.UpdateDate as UpdateDate
 FROM customers.Users U
 	join customers.UserAddresses ua on ua.UserId = u.id
 	join customers.Addresses a on a.id = ua.AddressId
 	join usersettings.UserUpdateInfo uu on uu.userid = u.id
 	join customers.Clients c on c.id = u.ClientId and c.Status = 1
+	left join accessright.regionaladmins reg on reg.UserName = c.Registrant
 	join usersettings.AssignedPermissions ap1 on ap1.UserId = u.Id and ap1.PermissionId = 1
 	join farm.Regions reg on reg.RegionCode = c.RegionCode
 where uu.UpdateDate < :beginDate

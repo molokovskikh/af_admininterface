@@ -46,9 +46,10 @@ namespace Integration
 		{
 			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
 			filter.UpdatePeriod.End = DateTime.Now.AddDays(-3);
+			filter.Session = session;
 			session.Save(user);
 			Flush();
-			var result = filter.Find(session);
+			var result = filter.Find();
 			Assert.AreEqual(result.Count, 0);
 		}
 
@@ -62,12 +63,13 @@ namespace Integration
 			user.AvaliableAddresses.Add(address);
 			filter.UpdatePeriod.End = DateTime.Now;
 			filter.OrderDate = DateTime.Now.AddDays(-1);
+			filter.Session = session;
 			var region = session.Query<Region>().First();
 			var order = new ClientOrder { Client = client, User = user, WriteTime = DateTime.Now.AddDays(-2), Region = region };
 			session.Save(order);
 			session.Save(user);
 			Flush();
-			var result = filter.Find(session);
+			var result = filter.Find();
 			Assert.AreEqual(result.Count, 1);
 		}
 
@@ -76,12 +78,13 @@ namespace Integration
 		{
 			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
 			filter.UpdatePeriod.End = DateTime.Now;
+			filter.Session = session;
 			session.Save(user);
 			var region = session.Query<Region>().First();
 			var order = new ClientOrder { Client = client, User = user, WriteTime = DateTime.Now.AddDays(-2), Region = region };
 			session.Save(order);
 			Flush();
-			var result = filter.Find(session);
+			var result = filter.Find();
 			Assert.AreEqual(result.Count, 0);
 		}
 	}
