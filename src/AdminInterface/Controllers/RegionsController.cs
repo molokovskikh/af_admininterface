@@ -18,11 +18,15 @@ namespace AdminInterface.Controllers
 			PropertyBag["regions"] = Region.All();
 		}
 
-		public void Edit(ulong id)
+		public void Edit(ulong id,
+			[DataBind("DefaultRegions")] ulong[] defaultRegions,
+			[DataBind("DefaultShowRegion")] ulong[] defaultShowRegion)
 		{
 			var region = Region.Find(id);
 			if (IsPost) {
 				BindObjectInstance(region, "region");
+				region.DefaultRegionMask = defaultRegions.Aggregate(0UL, (v, a) => a + v);
+				region.DefaultShowRegionMask = defaultShowRegion.Aggregate(0UL, (v, a) => a + v);
 				if (IsValid(region)) {
 					region.Save();
 					Notify("Сохранено");
@@ -30,6 +34,7 @@ namespace AdminInterface.Controllers
 				}
 			}
 			PropertyBag["region"] = region;
+			PropertyBag["AllRegions"] = Region.All();
 		}
 
 		public void ShowRegions(uint? clientId, ulong? homeRegionId)

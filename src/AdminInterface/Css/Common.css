@@ -182,3 +182,15 @@ pre.Log {
 	width:100%;
 	white-space:pre-wrap;
 }
+
+.OnCenter {
+	text-align: center;
+}
+
+.nodisplay {
+	display: none;
+}
+
+.width15 {
+	width: 15%;
+}

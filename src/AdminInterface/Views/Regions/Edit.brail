@@ -1,4 +1,5 @@
 ﻿${app.Asset("tinymce/tiny_mce.js")}
+${app.Asset("Regions.js")}
 
 <script type="text/javascript">
 	tinyMCE.init({
@@ -53,6 +54,63 @@ ${FormHelper.FormTag("", {})}
 			<td>
 				${app.Edit("region.SupplierUserPayment")}
 				${app.GetValidationError(region, "SupplierUserPayment")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>${app.GetLabel("region.MoscowBias")}:</label>
+			</td>
+			<td>
+				${app.Edit("region.MoscowBias")}
+				${app.GetValidationError(region, "MoscowBias")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>${app.GetLabel("region.DefaultPhone")}:</label>
+			</td>
+			<td>
+				${app.Edit("region.DefaultPhone", {@class: @phone})}
+				${app.GetValidationError(region, "DefaultPhone")}
+			</td>
+		</tr>
+		<tr id="EditDefaultRegions" class="nodisplay">
+			<td colspan=2>
+				<hr>
+				<table>
+					<tr>
+						<th>
+							Наименование
+						</th>
+						<th>
+							Регионы работы<br>
+							по умолчанию
+						</th>
+						<th>
+							Показываемые Регионы<br>
+							работы по умолчанию
+						</th>
+					</tr>
+				<% for i, regionItem in enumerate(AllRegions): %>
+					<tr>
+						<td>
+							${regionItem.Name}
+						</td>
+						<td class="OnCenter">
+							<input type="checkbox" name="DefaultRegions[${i}]" id="DefaultRegions[${i}]" ${"checked" if (region.DefaultRegionMask & regionItem.Id) > 0} value="${regionItem.Id}"/>
+						</td>
+						<td class="OnCenter">
+							<input type="checkbox" name="DefaultShowRegion[${i}]" id="DefaultShowRegion[${i}]" ${"checked" if (region.DefaultShowRegionMask & regionItem.Id) > 0} value="${regionItem.Id}"/>
+						</td>
+					</tr>
+				<% end %>
+				</table>
+				<hr>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<a href="javascript:" id="ShowRegionsLink" onclick="ShowDefaultRegions()">Редактировать регионы работы по умолчанию</a>
 			</td>
 		</tr>
 		<tr>
