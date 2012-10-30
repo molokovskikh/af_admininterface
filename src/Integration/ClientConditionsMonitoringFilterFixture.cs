@@ -25,6 +25,12 @@ namespace Integration
 		[SetUp]
 		public void SetUp()
 		{
+			session.CreateSQLQuery(@"
+update ordersendrules.smart_order_rules
+set AssortimentPriceCode = null;
+delete from  usersettings.pricesdata;")
+				.ExecuteUpdate();
+
 			supplier = DataMother.CreateSupplier();
 			session.Save(supplier);
 			client = DataMother.CreateTestClientWithAddressAndUser();
@@ -72,16 +78,6 @@ namespace Integration
 				Session = session,
 				ClientId = client.Id
 			};
-		}
-
-		[TearDown]
-		public void Tear()
-		{
-			session.CreateSQLQuery(@"
-update ordersendrules.smart_order_rules
-set AssortimentPriceCode = null;
-delete from  usersettings.pricesdata;")
-				.ExecuteUpdate();
 		}
 
 		[Test]
