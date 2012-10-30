@@ -30,11 +30,11 @@ namespace Functional
 			browser.Link(Find.ById("ShowRegionsLink")).Click();
 			AssertText(@"Регионы работы
  по умолчанию");
-			browser.TextField(Find.ById("region_DefaultPhone")).Value = "123-123321";
+			browser.TextField(Find.ById("region_DefaultPhone")).Value = "123-1233210";
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			AssertText("Сохранено");
 			browser.Link(Find.ByText("Редактирование регионов")).Click();
-			AssertText("123-123321");
+			AssertText("123-1233210");
 		}
 	}
 }
