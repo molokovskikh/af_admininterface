@@ -31,7 +31,6 @@ namespace Functional
 			AssertText(@"Регионы работы
  по умолчанию");
 			browser.TextField(Find.ById("region_DefaultPhone")).Value = "123-123321";
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			AssertText("Сохранено");
 			browser.Link(Find.ByText("Редактирование регионов")).Click();
