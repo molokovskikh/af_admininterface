@@ -80,7 +80,8 @@ namespace Integration
 			session.CreateSQLQuery(@"
 update ordersendrules.smart_order_rules
 set AssortimentPriceCode = null;
-delete from  usersettings.pricesdata;").ExecuteUpdate();
+delete from  usersettings.pricesdata;")
+				.ExecuteUpdate();
 		}
 
 		[Test]
