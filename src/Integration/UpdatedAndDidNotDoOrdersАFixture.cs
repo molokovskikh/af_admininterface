@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NHibernate.Linq;
@@ -55,10 +56,15 @@ namespace Integration
 		public void Find_test_if_correct_condition()
 		{
 			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
+			user.AssignDefaultPermission(session);
 			var address = new Address(client) { Value = "123" };
 			session.Save(address);
 			user.AvaliableAddresses.Add(address);
 			filter.UpdatePeriod.End = DateTime.Now;
+			filter.OrderDate = DateTime.Now.AddDays(-1);
+			var region = session.Query<Region>().First();
+			var order = new ClientOrder { Client = client, User = user, WriteTime = DateTime.Now.AddDays(-2), Region = region };
+			session.Save(order);
 			session.Save(user);
 			Flush();
 			var result = filter.Find(session);

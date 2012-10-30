@@ -50,9 +50,9 @@ form div.submit
 }
 
 .hintInfoBlock {
-	color:grey;
-	text-align: justify;
-	width:400px;
+	color: grey;
+	text-align: initial;
+	width:100%;
 }
 
 .bold {
@@ -65,4 +65,9 @@ form div.submit
 
 .fullWidth {
 	width: 100%;
+}
+
+.page_1_3_broken{
+	float: left;
+	width: 33%;
 }
