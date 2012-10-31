@@ -45,6 +45,7 @@ namespace AdminInterface.ManagerReportsFilters
 		public string ClientName { get; set; }
 
 		public int UserCount { get; set; }
+		public int AddressCount { get; set; }
 		public string UserNames { get; set; }
 		public string RegionName { get; set; }
 

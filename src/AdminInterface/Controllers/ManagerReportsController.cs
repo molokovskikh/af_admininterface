@@ -42,6 +42,25 @@ namespace AdminInterface.Controllers
 			PropertyBag["Users"] = userFilter.Find();
 		}
 
+		[return: JSONReturnBinder]
+		public object GetUserInfo(uint userId)
+		{
+			var thisUser = DbSession.Get<User>(userId);
+			var html = "<div class=\"userInfoDiv\">";
+			html += string.Format("Клиент: {0} <br/>", thisUser.Client.Name);
+			html += "<div>";
+			foreach (var user in thisUser.Client.Users) {
+				html += string.Format("<div class=\"padding5\">{0} - ({1})</div>", user.Name, user.Id);
+				html += "<div class=\"padding10\">";
+				foreach (var avaliableAddress in user.AvaliableAddresses) {
+					html += string.Format("{0} </br>", avaliableAddress.Name);
+				}
+				html += "</div>";
+			}
+			html += "</div> </div>";
+			return html;
+		}
+
 		public void GetUsersAndAdresses([DataBind("filter")] UserFinderFilter userFilter)
 		{
 			this.RenderFile("Пользоватети_и_адреса.xls", ExportModel.GetUserOrAdressesInformation(userFilter));

@@ -14,3 +14,21 @@
 			.appendTo(ul);
 	};
 });
+
+function GetUserInfo(userId, item) {
+	var thisBox = $(item).parent().children(".toggled:first");
+	$(thisBox).empty();
+	if (thisBox.is(":hidden")) {
+		$.ajax({
+			url: "GetUserInfo?userId=" + userId,
+			type: "GET",
+			async: false,
+			success: function(data) {
+				$(thisBox).append(data);
+			}
+		});
+		thisBox.slideDown("slow");
+	} else {
+		thisBox.slideUp("slow");
+	}
+}

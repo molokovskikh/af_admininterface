@@ -15,11 +15,19 @@ using NHibernate.SqlCommand;
 
 namespace AdminInterface.ManagerReportsFilters
 {
+	public enum ExcludesTypes
+	{
+		Hidden,
+		NoOrderPermission,
+		All
+	}
+
 	public class UserFinderFilter : Sortable, IPaginable
 	{
 		public Region Region { get; set; }
 		public RegistrationFinderType FinderType { get; set; }
 		public DatePeriod Period { get; set; }
+		public ExcludesTypes ExcludeType { get; set; }
 
 		private int _lastRowsCount;
 
@@ -109,6 +117,12 @@ namespace AdminInterface.ManagerReportsFilters
 				.SetProjection(Projections.ProjectionList()
 					.Add(Projections.Count("u.Id"))));
 
+			var addressCountProjection = Projections.SubQuery(DetachedCriteria.For<Client>()
+				.CreateAlias("Addresses", "a", JoinType.InnerJoin)
+				.Add(Expression.EqProperty("Id", "c.Id"))
+				.SetProjection(Projections.ProjectionList()
+					.Add(Projections.Count("a.Id"))));
+
 			var regionMask = SecurityContext.Administrator.RegionMask;
 			if (Region != null)
 				regionMask &= Region.Id;
@@ -130,7 +144,8 @@ namespace AdminInterface.ManagerReportsFilters
 					.Add(Projections.Property("s.Disabled").As("ServiceDisabled"))
 					.Add(Projections.Property("s.Type").As("ClientType"))
 					.Add(Projections.Property("s.HomeRegion").As("RegionName"))
-					.Add(Projections.Alias(userCountProjection, "UserCount")))
+					.Add(Projections.Alias(userCountProjection, "UserCount"))
+					.Add(Projections.Alias(addressCountProjection, "AddressCount")))
 					.Add(Expression.Ge("Registration.RegistrationDate", Period.Begin.Date))
 					.Add(Expression.Le("Registration.RegistrationDate", Period.End.Date))
 					.CreateAlias("Payer", "p", JoinType.InnerJoin)
@@ -143,8 +158,12 @@ namespace AdminInterface.ManagerReportsFilters
 			if (FinderType == RegistrationFinderType.Addresses) {
 				var adressCriteria = DetachedCriteria.For<Address>("ad");
 
-				adressCriteria.CreateCriteria("Client", "c", JoinType.InnerJoin)
+				var clientCriteria = adressCriteria.CreateCriteria("Client", "c", JoinType.InnerJoin)
 					.Add(Expression.Sql("{alias}.RegionCode & " + regionMask + " > 0"));
+
+				if (ExcludeType == ExcludesTypes.Hidden)
+					clientCriteria.CreateAlias("Settings", "set")
+						.Add(Expression.Eq("set.InvisibleOnFirm", DrugstoreType.Standart));
 
 				adressCriteria.SetProjection(Projections.ProjectionList()
 					.Add(Projections.Property<Address>(u => u.Id).As("Id"))
@@ -157,6 +176,7 @@ namespace AdminInterface.ManagerReportsFilters
 					.Add(Projections.Property("c.Type").As("ClientType"))
 					.Add(Projections.Property("c.HomeRegion").As("RegionName"))
 					.Add(Projections.Alias(userCountProjection, "UserCount"))
+					.Add(Projections.Alias(addressCountProjection, "AddressCount"))
 					.Add(Projections.Alias(Projections.SubQuery(
 						DetachedCriteria.For<Client>()
 							.Add(Expression.EqProperty("Id", "c.Id"))

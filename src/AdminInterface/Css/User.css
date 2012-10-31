@@ -165,3 +165,20 @@ table thead.CenterHead th
 #filter_ClientName {
 	width: 300px;
 }
+
+.padding5 {
+	padding-left: 15px;
+}
+
+.padding10 {
+	padding-left: 30px;
+}
+
+.userInfoDiv {
+	width: 200px;
+}
+
+.toggled {
+	overflow: hidden;
+	display: none;
+}
