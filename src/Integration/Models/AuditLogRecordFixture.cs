@@ -36,7 +36,7 @@ namespace Integration.Models
 
 			var logs = AuditLogRecord.GetLogs(user.Payer, false);
 			Assert.That(logs.Count, Is.GreaterThan(0), logs.Implode(l => l.Message));
-			Assert.AreEqual("Изменено 'Платеж' было '800,00000' стало '1000'", logs[0].Message, logs.Implode());
+			Assert.AreEqual("Изменено 'Платеж' было '800' стало '1000'", logs[0].Message, logs.Implode());
 		}
 
 		[Test]

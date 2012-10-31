@@ -18,10 +18,10 @@ namespace Functional
 			Open("Main/Index");
 
 			browser.Link(Find.ByText("Регионы")).Click();
-			AssertText("Редактирование регионов");
+			AssertText("Регионы");
 			AssertText("Телефон по умолчанию");
 			AssertText("Регионы работы по умолчанию");
-			AssertText("Стоимость логина для поставщика");
+			AssertText("Стоимость копии для поставщика");
 			AssertText("Регион для справки");
 
 			browser.Link(Find.ByText("Воронеж")).Click();
@@ -33,7 +33,7 @@ namespace Functional
 			browser.TextField(Find.ById("region_DefaultPhone")).Value = "123-1233210";
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			AssertText("Сохранено");
-			browser.Link(Find.ByText("Редактирование регионов")).Click();
+			browser.Link(Find.ByText("Регионы")).Click();
 			AssertText("123-1233210");
 		}
 	}

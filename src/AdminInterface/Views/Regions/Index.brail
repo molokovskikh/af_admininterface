@@ -1,39 +1,52 @@
 ﻿ <% component Bubble, {@bredcrumbs : []} %>
 
  <% component CaptureFor, {@id : @Title}: %>
-	Редактирование регионов
+	Регионы
 <% end %>
 
-<table class=DataTable>
+<table class="HighLightCurrentRow DataTable">
 	<thead>
 		<tr>
 			<th>Название</th>
 			<th>Телефон по умолчанию</th>
-			<th>Временной сдвиг относительно Москвы</th>
+			<th>Временной сдвиг относительно Москвы, в часах</th>
 			<th>Регионы работы по умолчанию</th>
 			<th>Показываемые Регионы<br>работы по умолчанию</th>
 			<th>Стоимость копии</th>
 			<th>Стоимость адреса доставки</th>
-			<th>Стоимость логина для поставщика</th>
+			<th>Стоимость копии для поставщика</th>
 			<th>Регион для справки</th>
 			<th>Не отправлять уведомления</th>
 			<th>Расчитывать цену от цены производителя</th>
 			<th>Комментарий</th>
 		</tr>
 	</thead>
-	<% for region in regions: %>
-		<tr>
+	<% for i, region in enumerate(regions): %>
+		<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(regions)}">
 			<td>${app.LinkTo(region, @Edit)}</td>
 			<td>${region.DefaultPhone}</td>
-			<td>${region.MoscowBias}</td>
+			<td><% if region.MoscowBias != null and region.MoscowBias != 0: %>${region.MoscowBias}
+			<% end %></td>
 			<td class="width15">${region.GetDefaultRegions(false)}</td>
 			<td class="width15">${region.GetDefaultRegions(true)}</td>
-			<td>${region.UserPayment.ToString("0.00###")}</td>
-			<td>${region.AddressPayment.ToString("0.00###")}</td>
-			<td>${region.SupplierUserPayment.ToString("0.00###")}</td>
-			<td>${ViewHelper.ToHumanReadable(region.DrugsSearchRegion)}</td>
-			<td>${ViewHelper.ToHumanReadable(region.DoNotNotify)}</td>
-			<td>${ViewHelper.ToHumanReadable(region.CalculateOnProducerCost)}</td>
+			<td><% if region.UserPayment > 0: %>
+				${region.UserPayment}
+			<% end %></td>
+			<td><% if region.AddressPayment > 0: %>
+				${region.AddressPayment}
+			<% end %></td>
+			<td><% if region.SupplierUserPayment > 0: %>
+				${region.SupplierUserPayment}
+			<% end %></td>
+			<td><% if region.DrugsSearchRegion: %>
+			${ViewHelper.ToHumanReadable(region.DrugsSearchRegion)}
+			<% end %></td>
+			<td><% if region.DoNotNotify: %>
+			${ViewHelper.ToHumanReadable(region.DoNotNotify)}
+			<% end %></td>
+			<td><% if region.CalculateOnProducerCost: %>
+			${ViewHelper.ToHumanReadable(region.CalculateOnProducerCost)}
+			<% end %></td>
 			<td>${region.Comment}</td>
 		</tr>
 	<% end %>
