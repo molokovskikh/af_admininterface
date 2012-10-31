@@ -133,7 +133,7 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public ClientConditionsMonitoringFilter()
 		{
-			SortBy = "SupplierCode";
+			SortBy = "SupplierName";
 			SortKeyMap = new Dictionary<string, string> {
 				{ "SupplierCode", "s.Id" },
 				{ "SupplierName", "s.Name" },
