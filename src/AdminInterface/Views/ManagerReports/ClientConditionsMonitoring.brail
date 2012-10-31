@@ -53,8 +53,8 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	<%if Items.Count > 0: %>
 		<%for i, item in enumerate(Items): %>
 		<tr class="${ViewHelper.GetRowStyle(i)} Submit">
-			<td>${item.SupplierCode}</td>
-			<td>${item.SupplierName}</td>
+			<td>${UrlHelper.Link(item.SupplierCode.ToString(), {@controller: @Suppliers, @params: {@Id : item.SupplierCode} })}</td>
+			<td>${UrlHelper.Link(item.SupplierName, {@controller: @Suppliers, @params: {@Id : item.SupplierCode} })}</td>
 			<td>${item.RegionName}</td>
 			<td>${item.PriceName}</td>
 			<td class="${app.Style(item, @CostCollumn)}">${item.CostName}</td>
