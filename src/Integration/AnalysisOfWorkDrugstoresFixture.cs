@@ -36,7 +36,7 @@ namespace Integration
 			filter.PagesSize = 1000;
 			var result = filter.Find();
 			Assert.That(result.Count, Is.GreaterThan(0));
-			Assert.IsTrue(result.Any(r => r.Id == client.Id));
+			Assert.IsTrue(result.Any(r => ((dynamic)r).Id == client.Id));
 
 			logBuilder.AppendLine(result.Implode());
 			logBuilder.AppendLine(client.Id.ToString());

@@ -115,7 +115,7 @@ namespace AdminInterface.Controllers
 
 		public void AnalysisOfWorkDrugstores()
 		{
-			var filter = BindFilter<AnalysisOfWorkDrugstoresFilter, AnalysisOfWorkFiled>();
+			var filter = BindFilter<AnalysisOfWorkDrugstoresFilter, BaseItemForTable>();
 			filter.SetDefaultRegion();
 			FindFilter(filter);
 		}
@@ -145,7 +145,7 @@ namespace AdminInterface.Controllers
 		[return: JSONReturnBinder]
 		public object GetClientForAutoComplite(string term)
 		{
-			return DbSession.Query<Client>().Where(c => c.Name.Contains(term))
+			return DbSession.Query<Client>().Where(c => c.Name.Contains(term) && c.Status == ClientStatus.On && !c.Settings.IsHiddenFromSupplier)
 				.ToList()
 				.Select(c => new { id = c.Id, label = c.Name })
 				.ToList();
