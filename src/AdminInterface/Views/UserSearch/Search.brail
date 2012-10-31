@@ -83,6 +83,7 @@
 					<th>${app.Sortable("Обновление", "UpdateDate")}</th>
 					<th>${app.Sortable("Версия", "AFVersion")}</th>
 					<th>${app.Sortable("Тип", "ClientType")}</th>
+					<th class="minimumHead">Условия работы</th>
 				</tr>
 			</thead>
 			<tbody id="SearchResults" class="HighLightCurrentRow">
@@ -108,6 +109,15 @@
 					<td class="update-date">${item.UpdateDate}</td>
 					<td class="af-version">${item.AFVersion}</td>
 					<td class="client-type">${BindingHelper.GetDescription(item.ClientType)}</td>
+					<td>
+						<%if (item.IsDrugstore and not item.InvisibleClient):%>
+							${FormHelper.FormTag("${SiteRoot}/ManagerReports/ClientConditionsMonitoring", {@method : @get})}
+								${FormHelper.HiddenField("filter.ClientId", item.ClientId)}
+								${FormHelper.HiddenField("filter.ClientName", item.ClientName)}
+								${FormHelper.ButtonElement("Отчет", @submit, null)}
+							${FormHelper.EndFormTag()}
+						<%end%>
+					</td>
 				</tr>
 			<% end %>
 			</tbody>

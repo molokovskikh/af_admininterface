@@ -3,6 +3,10 @@
  <% component CaptureFor, {@id : @Title}: %>
 	Кто обновлялся и не делал заказы
 <% end %>
+<div class="page_1_3_broken hintInfoBlock">
+	Для исключения излишней информации используется след. принцип: В отчет не попападают пользователи "1-ый стол", т.е. те, к кому не подключен адрес, не разрешен регион для заказа, выставлена опция "Подтверждать заказы", нет права обновлять AnalitF. Плюс пользователи из клиентов, скрытых в интерфейсе поставщика, из клиентов из б.к.=921 и из клиентов с опцией "Не доставлять заказы поставщикам".
+</div>
+<div class="page_1_3_broken">
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.SortBy")}
 ${FormHelper.HiddenField("filter.SortDirection")}
@@ -23,5 +27,11 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	</tr>
 </tbody>
 </table>
+</div>
+<div class="page_1_3_broken"></div>
 
 ${tableHelper.ViewResult(Clients, filter, app)}
+
+<div class="fullWidth" align="center">
+	<%component Legend, { "LegendItems" : {	"Обновление более 7 суток назад" : "old-user-update"}}%>
+</div>

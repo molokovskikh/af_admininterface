@@ -246,6 +246,10 @@ div
 	text-align:center;
 }
 
+.unSubmit {
+	text-align: left;
+}
+
 .CopyRight
 {
 	float:left;

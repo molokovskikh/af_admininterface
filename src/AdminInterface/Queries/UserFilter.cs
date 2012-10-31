@@ -123,7 +123,8 @@ s.Name as ClientName,
 s.Disabled as ServiceDisabled,
 
 p.JuridicalName as JuridicalName,
-r.Region as RegionName
+r.Region as RegionName,
+r.RegionCode as RegionCode
 FROM
 Customers.Users u
 join usersettings.UserUpdateInfo uui ON uui.UserId = u.Id

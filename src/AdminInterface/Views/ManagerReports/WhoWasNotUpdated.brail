@@ -1,32 +1,33 @@
-﻿ <% component Bubble, {@bredcrumbs : [("Кто не обновлялся с опред. даты", "${siteroot}/ManagerReports/")]} %>
+﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
 	Кто не обновлялся с опред. даты
 <% end %>
+<div class="page_1_3_broken hintInfoBlock">
+	Для исключения излишней информации используется след. принцип: Если у пользователя несколько адресов доставки, и он не обновлялся, - включаем его в выборку.
+	Если у пользователя только один адрес, то смотрим на других пользователей, у кот. есть Только этот адрес, - если все они не обновляются, то включаем всех в выборку,
+	а если обновляется хоть один из этих пользователей - не включаем всех этих рассмотренных пользователей в выборку. Так же исключаем из выборки отключенных пользователей, пользователей отключенных клиентов и не обладающих правами обновления AnalitF
+</div>
+<div class="page_1_3_broken">
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.SortBy")}
 ${FormHelper.HiddenField("filter.SortDirection")}
-<table class="CenterBlock">
-<tbody>
-	${app.FilterFor("filter.BeginDate")}
-	<tr>
-		<td class="filter-label">Регион</td>
-		<td>${app.Edit("filter.Region")}</td>
-	</tr>
-	<tr>
-		<td colspan=3 ><a href="#">Выгрузить отчет в Ехсel</a></td>
-	</tr>
-	<tr>
-		<td colspan=3 class="hintInfoBlock">
-		Для исключения излишней информации используется след. принцип: Если у пользователя несколько адресов доставки, и он не обновлялся, - включаем его в выборку.
-Если у пользователя только один адрес, то смотрим на других пользователей, у кот. есть Только этот адрес, - если все они не обновляются, то включаем всех в выборку,
-а если обновляется хоть один из этих пользователей - не включаем всех этих расмотренных пользователей в выборку. Так же исключаем из выборки отключенных пользователей, пользователей отключенных клиентов и не обладающих правами обновления AnalitF
-		</td>
-	</tr>
-	<tr>
-		${app.EndFormFor("filter")}
-	</tr>
-</tbody>
-</table>
+	<table class="CenterBlock">
+	<tbody>
+		${app.FilterFor("filter.BeginDate")}
+		<tr>
+			<td class="filter-label">Регион</td>
+			<td>${app.Edit("filter.Region")}</td>
+		</tr>
+		<tr>
+			<td colspan=3 ><a href="#">Выгрузить отчет в Ехсel</a></td>
+		</tr>
+		<tr>
+			${app.EndFormFor("filter")}
+		</tr>
+	</tbody>
+	</table>
+</div>
+<div class="page_1_3_broken"></div>
 
 <% OutputSubView("UniversalTable") %>

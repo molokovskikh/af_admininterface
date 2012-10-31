@@ -8,23 +8,30 @@ using AdminInterface.Helpers;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
+using AdminInterface.Services;
 using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Helpers;
+using Common.Tools;
 using Common.Web.Ui.Controllers;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(PaginatorHelper), "paginator"),
 		Helper(typeof(TableHelper), "tableHelper"),
+		Helper(typeof(UrlHelper), "urlHelper"),
 		Secure(PermissionType.ManagerReport),
 	]
-	public class ManagerReportsController : BaseController
+	public class ManagerReportsController : AdminInterfaceController
 	{
 		public void UsersAndAdresses()
 		{
@@ -37,7 +44,7 @@ namespace AdminInterface.Controllers
 
 		public void GetUsersAndAdresses([DataBind("filter")] UserFinderFilter userFilter)
 		{
-			this.RenderFile("Пользовалети_и_адреса.xls", ExportModel.GetUserOrAdressesInformation(userFilter));
+			this.RenderFile("Пользоватети_и_адреса.xls", ExportModel.GetUserOrAdressesInformation(userFilter));
 		}
 
 		public void ClientAddressesMonitor()
@@ -73,28 +80,56 @@ namespace AdminInterface.Controllers
 		public void UpdatedAndDidNotDoOrders()
 		{
 			var urlHelper = new UrlHelper(Context);
-			var filter = new UpdatedAndDidNotDoOrdersFilter();
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
-			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			var filter = BindFilter<UpdatedAndDidNotDoOrdersFilter, UpdatedAndDidNotDoOrdersField>();
 			PropertyBag["filter"] = filter;
-			var result = filter.Find(DbSession);
-			foreach (var updatedAndDidNotDoOrdersField in result) {
-				updatedAndDidNotDoOrdersField.UrlHelper = urlHelper;
+			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null || filter.LoadDefault) {
+				var result = filter.Find();
+				foreach (var updatedAndDidNotDoOrdersField in result) {
+					updatedAndDidNotDoOrdersField.UrlHelper = urlHelper;
+				}
+				PropertyBag["Clients"] = result.Cast<BaseItemForTable>().ToList();
 			}
-			PropertyBag["Clients"] = result.Cast<BaseItemForTable>().ToList();
+			else {
+				PropertyBag["Clients"] = new List<BaseItemForTable>();
+			}
 		}
 
 		public void AnalysisOfWorkDrugstores()
 		{
-			SetSmartBinder(AutoLoadBehavior.OnlyNested);
-			var filter = (AnalysisOfWorkDrugstoresFilter)BindObject(IsPost ? ParamStore.Form : ParamStore.QueryString, typeof(AnalysisOfWorkDrugstoresFilter), "filter", AutoLoadBehavior.OnlyNested);
-			filter.Session = DbSession;
+			var filter = BindFilter<AnalysisOfWorkDrugstoresFilter, AnalysisOfWorkFiled>();
 			filter.SetDefaultRegion();
-			PropertyBag["filter"] = filter;
-			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null)
-				PropertyBag["Clients"] = filter.Find();
-			else
-				PropertyBag["Clients"] = new List<AnalysisOfWorkFiled>();
+			FindFilter(filter);
+		}
+
+		public void ClientConditionsMonitoring()
+		{
+			var filter = BindFilter<ClientConditionsMonitoringFilter, MonitoringItem>();
+			FindFilter(filter);
+		}
+
+		public void SendSupplierNotification(uint clientCode, uint supplierCode)
+		{
+			var client = DbSession.Get<Client>(clientCode);
+			var service = new NotificationService(Defaults);
+			if (supplierCode > 0) {
+				var supplier = DbSession.Get<Supplier>(supplierCode);
+				var contacts = supplier.ContactGroupOwner.GetEmails(ContactGroupType.ClientManagers).ToList();
+				service.NotifySupplierAboutDrugstoreRegistration(client, contacts);
+			}
+			else {
+				service.NotifySupplierAboutDrugstoreRegistration(client, true);
+			}
+			Flash["Message"] = Message.Notify("Уведомления отправлены");
+			RedirectToReferrer();
+		}
+
+		[return: JSONReturnBinder]
+		public object GetClientForAutoComplite(string term)
+		{
+			return DbSession.Query<Client>().Where(c => c.Name.Contains(term))
+				.ToList()
+				.Select(c => new { id = c.Id, label = c.Name })
+				.ToList();
 		}
 	}
 }

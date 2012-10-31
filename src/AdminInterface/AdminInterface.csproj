@@ -167,6 +167,8 @@
     <Compile Include="Controllers\PricesController.cs" />
     <Compile Include="ManagerReportsFilters\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="ManagerReportsFilters\ClientAddressFilter.cs" />
+    <Compile Include="ManagerReportsFilters\ClientConditionsMonitoring.cs" />
+    <Compile Include="ManagerReportsFilters\IFiltrable.cs" />
     <Compile Include="ManagerReportsFilters\RegistrationInformation.cs" />
     <Compile Include="ManagerReportsFilters\SwitchOffClientsFilter.cs" />
     <Compile Include="ManagerReportsFilters\UpdatedAndDidNotDoOrders.cs" />
@@ -472,6 +474,7 @@
     <Content Include="JavaScript\jquery.tmpl.js" />
     <Content Include="JavaScript\jquery.tmpl.min.js" />
     <Content Include="JavaScript\jquery.contact.validation.js" />
+    <Content Include="JavaScript\ManagerReport.js" />
     <Content Include="JavaScript\payer.search.js" />
     <Content Include="Assets\Javascripts\search.editor.js" />
     <Content Include="JavaScript\slider.js" />
@@ -495,6 +498,7 @@
     <None Include="Views\Logs\Statistics.brail" />
     <None Include="Views\Mail\RegisterNews.brail" />
     <Content Include="Views\ManagerReports\ClientAddressesMonitor.brail" />
+    <None Include="Views\ManagerReports\ClientConditionsMonitoring.brail" />
     <Content Include="Views\ManagerReports\SwitchOffClients.brail" />
     <Content Include="Views\ManagerReports\WhoWasNotUpdated.brail" />
     <Content Include="Views\ManagerReports\UniversalTable.brail" />

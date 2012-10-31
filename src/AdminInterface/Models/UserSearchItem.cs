@@ -20,6 +20,8 @@ namespace AdminInterface.Models
 
 		public string RegionName { get; set; }
 
+		public ulong RegionCode { get; set; }
+
 		public uint AFVersion { get; set; }
 
 		public SearchClientType ClientType { get; set; }

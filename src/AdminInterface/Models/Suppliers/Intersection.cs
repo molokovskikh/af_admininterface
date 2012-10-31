@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -28,6 +29,18 @@ namespace AdminInterface.Models.Suppliers
 
 		[Property]
 		public virtual bool AvailableForClient { get; set; }
+
+		[Property]
+		public virtual double PriceMarkup { get; set; }
+
+		[Property]
+		public virtual string SupplierClientId { get; set; }
+
+		[Property]
+		public virtual string SupplierPaymentId { get; set; }
+
+		[HasMany(ColumnKey = "IntersectionId", Inverse = true, Lazy = true)]
+		public virtual IList<AddressIntersection> Addresses { get; set; }
 	}
 
 	[ActiveRecord("AddressIntersection", Schema = "Customers", Lazy = true)]

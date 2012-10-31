@@ -124,3 +124,44 @@ table thead.CenterHead th
 	text-align: center;
 	font-size: 14px;
 }
+
+
+.centerRowHead th{
+	text-align: center;
+}
+
+.fixedHead300 {
+	width: 300px;
+}
+
+.no-price-connected {
+	background-color: #fbafaf;
+}
+
+.cost-collumn {
+	background-color: #e5cb8e;
+}
+
+.price-markup-style {
+	background-color: #afc1fb;
+}
+
+.payment-code-style {
+	background-color: #98CBCB;
+}
+
+.client-code-style {
+	background-color: #fbafe4;
+}
+
+.delivery-style {
+	background-color: #EDE948;
+}
+
+.minimumHead {
+	width: 50px;
+}
+
+#filter_ClientName {
+	width: 300px;
+}
