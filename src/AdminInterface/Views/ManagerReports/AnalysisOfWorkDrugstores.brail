@@ -1,40 +1,16 @@
-﻿ ${app.CSS("AnalysisOfWorkDrugStores.css")}
+﻿${app.CSS("AnalysisOfWorkDrugStores.css")}
+${app.JS("ManagerReport.js")}
  <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
 	Сравнительный анализ работы аптек
 <% end %>
-${app.BeginFormFor("filter")}
+${FormHelper.FormTag("${SiteRoot}/ManagerReports/AnalysisOfWorkDrugstores",{@id : @FilterForm, @method : @get})}
 ${FormHelper.HiddenField("filter.SortBy")}
 ${FormHelper.HiddenField("filter.SortDirection")}
 <table class="CenterBlock">
 <tbody>
 	<tr>
-		<td>
-			<table>
-				<tbody>
-					<tr>
-						<td colspan="3" class="rowHead">Новый период</td>
-					</tr>
-					<tr>
-						<td></td>
-						<td style='text-align:center;' class='filter-label'>С</td>
-						<td style='text-align:center;' class='filter-label'>По</td>
-					</tr>
-					<tr>
-						<td valign='top' class='filter-label'>Выберите период:</td>
-						<td>
-							${FormHelper.HiddenField("filter.FistPeriod.Begin")}
-							<div class=calendar id='FistPeriodBegin'></div>
-						</td>
-						<td>
-							${FormHelper.HiddenField("filter.FistPeriod.End")}
-							<div class=calendar id='FistPeriodEnd'></div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</td>
 		<td>
 			<table>
 				<tbody>
@@ -60,18 +36,48 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 				</tbody>
 			</table>
 		</td>
+		<td>
+			<table>
+				<tbody>
+					<tr>
+						<td colspan="3" class="rowHead">Новый период</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td style='text-align:center;' class='filter-label'>С</td>
+						<td style='text-align:center;' class='filter-label'>По</td>
+					</tr>
+					<tr>
+						<td valign='top' class='filter-label'>Выберите период:</td>
+						<td>
+							${FormHelper.HiddenField("filter.FistPeriod.Begin")}
+							<div class=calendar id='FistPeriodBegin'></div>
+						</td>
+						<td>
+							${FormHelper.HiddenField("filter.FistPeriod.End")}
+							<div class=calendar id='FistPeriodEnd'></div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</td>
 	</tr>
 	<tr>
 		<td ></td>
 		<td class="filter-label rigthText">Регион ${app.Edit("filter.Region")}</td>
 	</tr>
 	<tr>
+		<td colspan=3 class="rigthText">
+			${FormHelper.ButtonElement("Показать", @submit, null)}
+		</td>
+	</tr>
+	<tr>
 		<td colspan=3 class="rigthText"><a href="#">Выгрузить отчет в Ехсel</a></td>
 	</tr>
 	<tr>
-		${app.EndFormFor("filter")}
 	</tr>
 </tbody>
 </table>
+${FormHelper.EndFormTag()}
 
 ${tableHelper.ViewResult(Items, filter, app)}

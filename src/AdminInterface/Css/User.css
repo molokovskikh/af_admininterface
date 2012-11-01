@@ -182,3 +182,11 @@ table thead.CenterHead th
 	overflow: hidden;
 	display: none;
 }
+
+.userInfoDivTable {
+	text-align: left;
+}
+
+.adressNoOrder {
+	background-color: #f9be67;
+}

@@ -32,3 +32,29 @@ function GetUserInfo(userId, item) {
 		thisBox.slideUp("slow");
 	}
 }
+
+function GetAnalysInfo(objectId, item, type) {
+	var thisBox = $('#toggledRow' + objectId);
+	if (thisBox.length == 0) {
+		var params = $('#FilterForm').serializeArray();
+		params.push({ name: 'filter.ObjectId', value: objectId });
+		params.push({ name: 'filter.Type', value: type });
+		params.push({ name: 'filter.ForSubQuery', value: true });
+		$.ajax({
+			url: "GetAnalysUserInfo?clientId=" + objectId,
+			data: params,
+			type: "POST",
+			dataType: "html",
+			async: false,
+			success: function(data) {
+				$(JSON.parse(data)).insertAfter($(item).parent().parent());
+			}
+		});
+	}
+	thisBox = $('#toggledRow' + objectId);
+	if (thisBox.is(":hidden")) {
+		thisBox.slideDown("slow");
+	} else {
+		thisBox.slideUp("slow");
+	}
+}

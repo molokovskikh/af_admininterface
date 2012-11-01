@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
@@ -16,17 +17,61 @@ namespace AdminInterface.ManagerReportsFilters
 {
 	public class AnalysisOfWorkFiled : BaseItemForTable
 	{
+		private string _id;
+
 		[Display(Name = "Код", Order = 0)]
-		public uint Id { get; set; }
+		public string Id
+		{
+			get { return Link(_id, ReportType.GetDescription(), new System.Tuple<string, object>("Id", _id)); }
+			set { _id = value; }
+		}
+
+
+		private string _name;
+
 		[Display(Name = "Наименование", Order = 1)]
-		public string Name { get; set; }
-		[Display(Name = "Регион", Order = 2)]
+		public string Name
+		{
+			get { return Link(_name, ReportType.GetDescription(), new System.Tuple<string, object>("Id", _id)); }
+			set { _name = value; }
+		}
+
+		private string _userCount;
+
+		[Display(Name = "Количество пользователей", Order = 2)]
+		public string UserCount
+		{
+			get
+			{
+				if (!ForSubQuery)
+					return string.Format("<a href=\"javascript:\" onclick=\"GetAnalysInfo({1}, this, 'User')\">{0}</a>", _userCount, _id);
+				else {
+					return string.Empty;
+				}
+			}
+			set { _userCount = value; }
+		}
+
+		private string _addressCount;
+
+		[Display(Name = "Количество адресов доставки", Order = 3)]
+		public string AddressCount
+		{
+			get
+			{
+				if (!ForSubQuery) return _addressCount;
+				else return string.Empty;
+			}
+			set { _addressCount = value; }
+		}
+
+		[Display(Name = "Регион", Order = 4)]
 		public string RegionName { get; set; }
 
 		public int CurWeekObn { get; set; }
 		public int LastWeekObn { get; set; }
 
-		[Display(Name = "Обновления (Новый/Старый)", Order = 3)]
+		[Display(Name = "Обновления (Новый/Старый)", Order = 5)]
 		public string Obn
 		{
 			get { return string.Format("{0}/{1}", CurWeekObn, LastWeekObn); }
@@ -35,22 +80,28 @@ namespace AdminInterface.ManagerReportsFilters
 		public int CurWeekZak { get; set; }
 		public int LastWeekZak { get; set; }
 
-		[Display(Name = "Заказы (Новый/Старый)", Order = 5)]
+		[Display(Name = "Заказы (Новый/Старый)", Order = 7)]
 		public string Zak
 		{
 			get { return string.Format("{0}/{1}", CurWeekZak, LastWeekZak); }
 		}
 
-		[Display(Name = "Падение обновлений", Order = 4)]
+		[Display(Name = "Падение обновлений", Order = 6)]
 		public int ProblemObn { get; set; }
-		[Display(Name = "Падение заказов", Order = 6)]
+		[Display(Name = "Падение заказов", Order = 8)]
 		public int ProblemZak { get; set; }
+
+		public bool ForSubQuery;
+		public AnalysisReportType ReportType;
 	}
 
 	public enum AnalysisReportType
 	{
+		[Description("Clients")]
 		Client,
+		[Description("Users")]
 		User,
+		[Description("Addresses")]
 		Address
 	}
 
@@ -61,6 +112,7 @@ namespace AdminInterface.ManagerReportsFilters
 		public DatePeriod LastPeriod { get; set; }
 		public uint ObjectId { get; set; }
 		public AnalysisReportType Type { get; set; }
+		public bool ForSubQuery { get; set; }
 
 		public int PagesSize
 		{
@@ -234,7 +286,11 @@ where u.id = au.Id;
 			Type = AnalysisReportType.Client;
 			SortKeyMap = new Dictionary<string, string> {
 				{ "Id", "Id" },
-				{ "Name", "Name" }
+				{ "Name", "Name" },
+				{ "UserCount", "UserCount" },
+				{ "AddressCount", "AddressCount" },
+				{ "ProblemObn", "ProblemObn" },
+				{ "ProblemZak", "ProblemZak" },
 			};
 		}
 
@@ -274,7 +330,7 @@ LastWeekZak INT) engine=MEMORY;";
 						currentQuery = " and u.id = :ObjectId";
 						break;
 					case AnalysisReportType.Address:
-						currentQuery = " and a.Id = ObjectId";
+						currentQuery = " and a.Id = :ObjectId";
 						break;
 				}
 			}
@@ -319,16 +375,22 @@ SELECT
 	Id,
 	Name,
 	RegionName,
+	(select count(u.Id) from Customers.Users u where u.ClientId = up.Id) as UserCount,
+	(select count(a.Id) from Customers.Addresses a where a.ClientId = up.Id) as AddressCount,
 	CurWeekObn,
 	LastWeekObn,
 	IF (CurWeekObn - LastWeekObn < 0 , ( IF (CurWeekObn <> 0, ROUND((LastWeekObn-CurWeekObn)*100/LastWeekObn), 100) ) ,0) ProblemObn,
 	CurWeekZak,
 	LastWeekZak,
 	IF (CurWeekZak - LastWeekZak < 0 , ( IF (CurWeekZak <> 0, ROUND((LastWeekZak-CurWeekZak)*100/LastWeekZak), 100 ) ) ,0) ProblemZak
-FROM Customers.updates
+FROM Customers.updates up
 ORDER BY {2} {3}
 limit {0}, {1}", CurrentPage * PageSize, PageSize, SortBy, SortDirection))
 				.ToList<AnalysisOfWorkFiled>();
+
+			foreach (var analysisOfWorkFiled in result) {
+				analysisOfWorkFiled.ForSubQuery = ForSubQuery;
+			}
 
 			return result.Cast<BaseItemForTable>().ToList();
 		}
