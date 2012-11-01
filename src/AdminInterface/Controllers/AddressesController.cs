@@ -48,13 +48,13 @@ namespace AdminInterface.Controllers
 
 			client.AddAddress(address);
 			address.UpdateContacts(contacts);
-			address.SaveAndFlush();
+			DbSession.Save(address);
 			address.Maintain();
 
 			address.CreateFtpDirectory();
 			address.AddBillingComment(comment);
 			Mailer.Registred(address, comment, Defaults);
-			Flash["Message"] = new Message("Адрес доставки создан");
+			Notify("Адрес доставки создан");
 			RedirectUsingRoute("client", "show", new { client.Id });
 		}
 

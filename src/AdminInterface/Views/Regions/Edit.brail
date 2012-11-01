@@ -8,7 +8,7 @@ ${app.Asset("Regions.js")}
 	});
 </script>
 
- <% component Bubble, {@bredcrumbs : [("Редактирование регионов", "${siteroot}/Regions/")]} %>
+ <% component Bubble, {@bredcrumbs : [("Регионы", "${siteroot}/Regions/")]} %>
 
 <% component CaptureFor, {@id : @Title}: %>
 	${Region.Name}
@@ -25,7 +25,7 @@ ${FormHelper.FormTag("", {})}
 		</tr>
 		<tr>
 			<td colspan=2>
-				${app.Edit("region.DoNotNotify")}
+				${app.Edit("region.DoNotNotify")}*
 				${app.GetValidationError("region.DoNotNotify")}
 			</td>
 		</tr>
@@ -72,6 +72,13 @@ ${FormHelper.FormTag("", {})}
 			<td>
 				${app.Edit("region.DefaultPhone", {@class: @phone})}
 				${app.GetValidationError(region, "DefaultPhone")}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<label>${app.GetLabel("region.Comment")}:</label> <br/>
+				${app.Edit("region.Comment", {@class: @width100})}
+				${app.GetValidationError(region, "Comment")}
 			</td>
 		</tr>
 		<tr id="EditDefaultRegions" class="nodisplay">
@@ -125,6 +132,15 @@ ${FormHelper.FormTag("", {})}
 				<label>${app.GetLabel("region.TechOperatingMode")}:</label> <br/>
 				${FormHelper.TextArea("region.TechOperatingMode", {@class: @tinymce})}
 				${app.GetValidationError(region, "TechOperatingMode")}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+			<div  class="hintInfoBlockRegion">
+				<p>
+					* При добавлении или удалении текущего региона из какого-либо списка регионов (например, регионы работы, регионы заказа) если эта опция отмечена, то регион не будет включен в соответствующее уведомление об изменении свойства.
+				</p>
+			</div>
 			</td>
 		</tr>
 		<tr>
