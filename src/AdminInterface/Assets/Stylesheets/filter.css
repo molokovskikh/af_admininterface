@@ -55,6 +55,12 @@ form div.submit
 	width:100%;
 }
 
+.hintInfoBlockRegion {
+	color: grey;
+	text-align: justify;
+	width: 380px;
+}
+
 .bold {
 	font-weight: bold;
 }
