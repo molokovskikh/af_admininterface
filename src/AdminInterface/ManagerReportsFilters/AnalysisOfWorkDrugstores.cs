@@ -44,7 +44,7 @@ namespace AdminInterface.ManagerReportsFilters
 			get
 			{
 				if (!ForSubQuery)
-					return string.Format("<a href=\"javascript:\" onclick=\"GetAnalysInfo({1}, this, 'User')\">{0}</a>", _userCount, _id);
+					return string.Format("<a href=\"javascript:\" id=\"{1}\" onclick=\"GetAnalysInfo({1}, this, 'User')\">{0}</a>", _userCount, _id);
 				else {
 					return string.Empty;
 				}

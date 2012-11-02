@@ -152,8 +152,8 @@ namespace AdminInterface.ManagerReportsFilters
 					.Add(Projections.Property("set.InvisibleOnFirm").As("InvisibleOnFirm"))
 					.Add(Projections.Alias(userCountProjection, "UserCount"))
 					.Add(Projections.Alias(addressCountProjection, "AddressCount")))
-					.Add(Expression.Ge("Registration.RegistrationDate", Period.Begin.Date))
-					.Add(Expression.Le("Registration.RegistrationDate", Period.End.Date))
+					.Add(Expression.Ge("Registration.RegistrationDate", Period.Begin))
+					.Add(Expression.Le("Registration.RegistrationDate", Period.End))
 					.CreateAlias("Payer", "p", JoinType.InnerJoin)
 					.CreateAlias("Client", "c", JoinType.LeftOuterJoin)
 					.CreateAlias("c.Settings", "set", JoinType.LeftOuterJoin)
@@ -227,8 +227,8 @@ namespace AdminInterface.ManagerReportsFilters
 										Projections.Property("u.Name"),
 										Projections.Constant(")")))))),
 						"UserNames")))
-					.Add(Expression.Ge("Registration.RegistrationDate", Period.Begin.Date))
-					.Add(Expression.Le("Registration.RegistrationDate", Period.End.Date));
+					.Add(Expression.Ge("Registration.RegistrationDate", Period.Begin))
+					.Add(Expression.Le("Registration.RegistrationDate", Period.End));
 
 				return adressCriteria;
 			}

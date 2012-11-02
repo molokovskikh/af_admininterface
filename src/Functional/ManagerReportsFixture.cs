@@ -10,6 +10,7 @@ using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
 using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 
 namespace Functional
 {
@@ -96,6 +97,36 @@ namespace Functional
 			AssertText("Мониторинг выставлеия условий новому клиенту");
 			Click("Показать");
 			AssertText("Мониторинг выставлеия условий новому клиенту");
+		}
+
+		[Test]
+		public void AnalisOfWorkFixture()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var user = client.Users.First();
+			var address = client.Addresses.First();
+			user.AvaliableAddresses.Add(address);
+			session.Save(user);
+			Open("ManagerReports");
+			Click("Сравнительный анализ работы аптек");
+			Click("Показать");
+			browser.Link(client.Id.ToString()).Click();
+			AssertText(string.Format("Клиент: {0}", client.Name));
+			AssertText(user.Id.ToString());
+			AssertText(address.Name);
+		}
+
+		[Test]
+		public void UserAndAddresseTest()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			Open("ManagerReports");
+			Click("Зарегистрированные пользователи и адреса");
+			browser.Link(client.Id.ToString()).Click();
+			AssertText(string.Format("Клиент: {0}", client.Name));
+			foreach (var user in client.Users) {
+				AssertText(string.Format("{0} - ({1})", user.Name, user.Id));
+			}
 		}
 	}
 }

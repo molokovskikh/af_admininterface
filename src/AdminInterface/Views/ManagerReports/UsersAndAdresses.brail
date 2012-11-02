@@ -64,7 +64,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 				<% end %>
 			</td>
 			<td>
-				<a href="javascript:" onclick="GetUserInfo(${item.Id}, this)">${item.UserCount}</a>
+				<a href="javascript:" id="${item.ClientId}" onclick="GetUserInfo(${item.Id}, this)">${item.UserCount}</a>
 				<div class="toggled"></div>
 			</td>
 			<td>${item.AddressCount}</td>
