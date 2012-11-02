@@ -8,6 +8,7 @@ using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Billing
 {
@@ -57,6 +58,9 @@ namespace Functional.Billing
 		public void Show_unaccounted_report()
 		{
 			Open("/Accounts/Index");
+			var link = browser.Links.FirstOrDefault(l => l.Text == "Последняя »");
+			if(link != null)
+				link.Click();
 			AssertText("тестовый отчет");
 		}
 
