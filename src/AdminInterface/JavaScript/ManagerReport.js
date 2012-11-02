@@ -13,6 +13,14 @@
 			.append("<a href='#'>" + item.label + "</a>")
 			.appendTo(ul);
 	};
+
+	$('#filter_FinderType').change(function() {
+		if ($(this).val() == 0) {
+			$('#hideBlock').css("display", "table-row");
+		} else {
+			$('#hideBlock').css("display", "none");
+		}
+	});
 });
 
 function GetUserInfo(userId, item) {

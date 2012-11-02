@@ -190,3 +190,11 @@ table thead.CenterHead th
 .adressNoOrder {
 	background-color: #f9be67;
 }
+
+.DataTable tbody tr.hidden-from-supplier td.forSelectHiddenClient {
+	background-color: #fffaa0;
+}
+
+.UserAndAddresses .calendar {
+	width: 250px;
+}

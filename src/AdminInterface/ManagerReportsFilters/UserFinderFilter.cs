@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Web;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
@@ -17,9 +19,12 @@ namespace AdminInterface.ManagerReportsFilters
 {
 	public enum ExcludesTypes
 	{
+		[Description("Показывать всех")]
+		All,
+		[Description("Скрытых в интерфейсе поставщика")]
 		Hidden,
+		[Description("Не имеющих права заказа")]
 		NoOrderPermission,
-		All
 	}
 
 	public class UserFinderFilter : Sortable, IPaginable
@@ -128,7 +133,7 @@ namespace AdminInterface.ManagerReportsFilters
 				regionMask &= Region.Id;
 
 			if (FinderType == RegistrationFinderType.Users) {
-				var userCriteria = DetachedCriteria.For<User>();
+				var userCriteria = DetachedCriteria.For<User>("rootUser");
 
 				userCriteria.CreateCriteria("RootService", "s", JoinType.InnerJoin)
 					.Add(Expression.Sql("{alias}.HomeRegion & " + regionMask + " > 0"))
@@ -138,19 +143,38 @@ namespace AdminInterface.ManagerReportsFilters
 					.Add(Projections.Property<User>(u => u.Id).As("Id"))
 					.Add(Projections.Property<User>(u => u.Name).As("Name"))
 					.Add(Projections.Property<User>(u => u.Registration.RegistrationDate).As("RegistrationDate"))
-					.Add(Projections.Property("Enabled").As("UserEnabled"))
+					.Add(Projections.Property("rootUser.Enabled").As("UserEnabled"))
 					.Add(Projections.Property("s.Id").As("ClientId"))
 					.Add(Projections.Property("s.Name").As("ClientName"))
 					.Add(Projections.Property("s.Disabled").As("ServiceDisabled"))
 					.Add(Projections.Property("s.Type").As("ClientType"))
 					.Add(Projections.Property("s.HomeRegion").As("RegionName"))
+					.Add(Projections.Property("set.InvisibleOnFirm").As("InvisibleOnFirm"))
 					.Add(Projections.Alias(userCountProjection, "UserCount"))
 					.Add(Projections.Alias(addressCountProjection, "AddressCount")))
 					.Add(Expression.Ge("Registration.RegistrationDate", Period.Begin.Date))
 					.Add(Expression.Le("Registration.RegistrationDate", Period.End.Date))
 					.CreateAlias("Payer", "p", JoinType.InnerJoin)
 					.CreateAlias("Client", "c", JoinType.LeftOuterJoin)
+					.CreateAlias("c.Settings", "set", JoinType.LeftOuterJoin)
 					.Add(Expression.Or(Expression.Gt("p.PayerID", 921u), Expression.Lt("p.PayerID", 921u)));
+
+				if (ExcludeType == ExcludesTypes.Hidden)
+					userCriteria.Add(Expression.Eq("set.InvisibleOnFirm", DrugstoreType.Standart));
+
+				if (ExcludeType == ExcludesTypes.NoOrderPermission) {
+					userCriteria.Add(Expression.Gt("OrderRegionMask", (ulong)0))
+						.Add(Expression.Eq("SubmitOrders", false))
+						.Add(Expression.Eq("set.ServiceClient", false))
+						.Add(Expression.Eq("set.InvisibleOnFirm", DrugstoreType.Standart))
+						.Add(Expression.Gt(
+							Projections.Alias(Projections.SubQuery(DetachedCriteria.For<User>("user")
+								.CreateAlias("AssignedPermissions", "ap")
+								.Add(Expression.EqProperty("user.Id", "rootUser.Id"))
+								.Add(Expression.Eq("ap.Id", 1u))
+								.SetProjection(Projections.ProjectionList()
+									.Add(Projections.Count("ap.Id")))), "per"), 0));
+				}
 
 				return userCriteria;
 			}
@@ -158,12 +182,8 @@ namespace AdminInterface.ManagerReportsFilters
 			if (FinderType == RegistrationFinderType.Addresses) {
 				var adressCriteria = DetachedCriteria.For<Address>("ad");
 
-				var clientCriteria = adressCriteria.CreateCriteria("Client", "c", JoinType.InnerJoin)
+				adressCriteria.CreateCriteria("Client", "c", JoinType.InnerJoin)
 					.Add(Expression.Sql("{alias}.RegionCode & " + regionMask + " > 0"));
-
-				if (ExcludeType == ExcludesTypes.Hidden)
-					clientCriteria.CreateAlias("Settings", "set")
-						.Add(Expression.Eq("set.InvisibleOnFirm", DrugstoreType.Standart));
 
 				adressCriteria.SetProjection(Projections.ProjectionList()
 					.Add(Projections.Property<Address>(u => u.Id).As("Id"))

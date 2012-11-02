@@ -53,6 +53,14 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public RegistrationFinderType ObjectType;
 
+		public DrugstoreType InvisibleOnFirm { get; set; }
+
+		[Style]
+		public virtual bool IsHiddenFromSupplier
+		{
+			get { return InvisibleOnFirm == DrugstoreType.Hidden; }
+		}
+
 		[Style]
 		public bool DisabledByBilling
 		{
