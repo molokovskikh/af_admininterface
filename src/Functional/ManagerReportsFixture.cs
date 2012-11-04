@@ -100,7 +100,7 @@ namespace Functional
 		}
 
 		[Test]
-		public void AnalisOfWorkFixture()
+		public void AnalisOfWorkTest()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			var user = client.Users.First();

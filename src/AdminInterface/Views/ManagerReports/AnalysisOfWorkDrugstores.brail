@@ -19,8 +19,8 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 					</tr>
 					<tr>
 						<td></td>
-						<td style='text-align:center;' class='filter-label'>С</td>
-						<td style='text-align:center;' class='filter-label'>По</td>
+						<td class='filter-label'>С</td>
+						<td class='filter-label'>По</td>
 					</tr>
 					<tr>
 						<td valign='top' class='filter-label'>Выберите период:</td>
@@ -44,8 +44,8 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 					</tr>
 					<tr>
 						<td></td>
-						<td style='text-align:center;' class='filter-label'>С</td>
-						<td style='text-align:center;' class='filter-label'>По</td>
+						<td class='filter-label'>С</td>
+						<td class='filter-label'>По</td>
 					</tr>
 					<tr>
 						<td valign='top' class='filter-label'>Выберите период:</td>
