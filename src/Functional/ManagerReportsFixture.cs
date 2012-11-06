@@ -108,6 +108,8 @@ namespace Functional
 			var client = session.Query<Client>().First();
 			var user = client.Users.First();
 			var address = client.Addresses.First();
+			user.AvaliableAddresses.Add(address);
+			session.Save(user);
 			Open("ManagerReports");
 			Click("Сравнительный анализ работы аптек");
 			Click("Показать");
