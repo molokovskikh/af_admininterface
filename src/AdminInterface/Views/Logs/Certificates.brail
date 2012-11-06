@@ -4,6 +4,9 @@
 		<div id="Certificates${line.Id}">
 			<% if line.CatalogProduct: %>
 				Сопоставлен с "${line.CatalogProduct.Catalog.Name}"<br>
+				<%if line.Producer: %>
+				По производителю с "${line.CatalogProducer.Name}"
+				<%end%>
 				<% if line.Certificate and line.Certificate.Files: %>
 				<p>
 					<strong>Сертификаты:</strong><br>
