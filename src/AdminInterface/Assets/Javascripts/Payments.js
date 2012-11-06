@@ -17,17 +17,17 @@ function ShowAdditionalInfo(id, selectorAdditionalInfo, selectorInfoCell, ajaxLi
 
 function ShowAdditionalInfoForUser(userId, cssClass) {
 	ShowAdditionalInfo(userId, "#additionalUserInfo", "#additionalUserInfoCell",
-		"../../Billing/AdditionalUserInfo.rails?userId=" + userId + "&cssClassName=" + cssClass);
+		"AdditionalUserInfo.rails?userId=" + userId + "&cssClassName=" + cssClass);
 }
 
 function ShowAdditionalInfoForSupplier(supplierId, cssClass) {
 	ShowAdditionalInfo(supplierId, "#additionalSupplierInfo", "#additionalSupplierInfoCell",
-		"../../Billing/AdditionalSupplierInfo.rails?supplierId=" + supplierId + "&cssClassName=" + cssClass);
+		"AdditionalSupplierInfo.rails?supplierId=" + supplierId + "&cssClassName=" + cssClass);
 }
 
 function ShowAdditionalInfoForAddress(addressId, cssClass) {
 	ShowAdditionalInfo(addressId, "#additionalAddressInfo", "#additionalAddressInfoCell",
-		"../../Billing/AdditionalAddressInfo.rails?addressId=" + addressId + "&cssClassName=" + cssClass);
+		"AdditionalAddressInfo.rails?addressId=" + addressId + "&cssClassName=" + cssClass);
 }
 
 function updateChildren(id, status) {
@@ -42,7 +42,7 @@ function updateChildren(id, status) {
 }
 
 function SetClientStatus(clientId, item) {
-	var link = "../../Billing/UpdateClientStatus?id=" + clientId + "&status=" + item.checked;
+	var link = "UpdateClientStatus?id=" + clientId + "&status=" + item.checked;
 	checkBoxChanger(link, $(item));
 }
 
@@ -159,7 +159,7 @@ $(function () {
 	});
 
 	$("#addresses input, #users input, #reports input, #suppliers input").change(function () {
-		var url = "../../Accounts/Update";
+		var url = "../Accounts/Update";
 		var item = $(this);
 		url = buildAjaxUrl(url, item);
 		checkBoxChanger(url, item);
