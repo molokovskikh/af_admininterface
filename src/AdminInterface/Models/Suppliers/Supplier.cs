@@ -407,7 +407,8 @@ where s.Id = :supplierId")
 			get
 			{
 				var res = Prices.Where(p => p.Enabled && p.AgencyEnabled)
-					.SelectMany(p => p.RegionalData.Select(r => r.Region));
+					.SelectMany(p => p.RegionalData.Where(d => d.Enabled).Select(r => r.Region));
+				res = res.Where(r => (r.Id & RegionMask) > 0);
 				return res.Distinct().OrderBy(r => r.Name).ToList();
 			}
 		}
