@@ -9,7 +9,9 @@ using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Controllers;
+using Common.Web.Ui.Helpers;
 using NHibernate.Linq;
+using AppHelper = AdminInterface.Helpers.AppHelper;
 
 namespace AdminInterface.MonoRailExtentions
 {
@@ -61,7 +63,7 @@ namespace AdminInterface.MonoRailExtentions
 			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null || filter.LoadDefault)
 				PropertyBag["Items"] = filter.Find();
 			else
-				PropertyBag["Items"] = new List<object>();
+				PropertyBag["Items"] = new List<TItem>();
 		}
 	}
 }

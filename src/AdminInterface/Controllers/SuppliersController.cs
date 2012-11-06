@@ -18,6 +18,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 
@@ -34,7 +35,17 @@ namespace AdminInterface.Controllers
 			var supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["users"] = supplier.Users;
-			PropertyBag["contactGroups"] = supplier.ContactGroupOwner.ContactGroups;
+
+			// перемещаем контакты с общей информацией в начало списка
+			var contactGroups = supplier.ContactGroupOwner.ContactGroups
+				.Where(c => c.Type == ContactGroupType.General);
+			if(!contactGroups.Any())
+				contactGroups = supplier.ContactGroupOwner.ContactGroups;
+			else
+				contactGroups = contactGroups.Concat(supplier.ContactGroupOwner.ContactGroups
+					.Where(c => c.Type != ContactGroupType.General));
+
+			PropertyBag["contactGroups"] = contactGroups;
 			PropertyBag["usersInfo"] = ADHelper.GetPartialUsersInformation(supplier.Users);
 
 			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;

@@ -3,45 +3,53 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using AdminInterface.Controllers;
 using AdminInterface.ManagerReportsFilters;
+using AdminInterface.Models;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
+using Castle.MonoRail.Framework.Helpers;
+using Castle.MonoRail.Framework.Routing;
+using Castle.MonoRail.Framework.Services;
+using Castle.MonoRail.Framework.Test;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
+using Common.Web.Ui.MonoRailExtentions;
+using Common.Web.Ui.Test;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Rhino.Mocks;
 using Test.Support;
 
 namespace Integration
 {
 	[TestFixture]
-	public class AnalysisOfWorkDrugstoresFixture : IntegrationFixture
+	public class AnalysisOfWorkDrugstoresFixture : BaseHelperFixture
 	{
 		[Test]
 		public void BaseTest()
 		{
-			var client = DataMother.CreateClientAndUsers();
-			session.Save(client);
+			var client = new Client();
+			using (var scope = new SessionScope()) {
+				ArHelper.WithSession(s => {
+					client = DataMother.CreateClientAndUsers();
+					s.Save(client);
 
-			var filter = new AnalysisOfWorkDrugstoresFilter();
-			filter.Session = session;
+					var filter = new AnalysisOfWorkDrugstoresFilter { Session = s, PagesSize = 1000 };
+					var result = filter.Find();
 
-			var logBuilder = new StringBuilder();
-			logBuilder.AppendLine(client.Settings.ServiceClient.ToString());
-			logBuilder.AppendLine(client.Settings.InvisibleOnFirm.GetDescription());
-			logBuilder.AppendLine(client.HomeRegion.Id.ToString());
-			logBuilder.AppendLine(SecurityContext.Administrator.RegionMask.ToString());
-			File.WriteAllText("AnalysisOfWorkDrugstoresFixture.txt", logBuilder.ToString(), Encoding.UTF8);
+					var urlHelper = new UrlHelper(context);
+					PrepareHelper(urlHelper);
+					urlHelper.SetController(new ManagerReportsController(), context.CurrentControllerContext);
+					urlHelper.UrlBuilder = new DefaultUrlBuilder();
 
-			Flush();
-
-			filter.PagesSize = 1000;
-			var result = filter.Find();
-			Assert.That(result.Count, Is.GreaterThan(0));
-			Assert.IsTrue(result.Any(r => r.Id == client.Id));
-
-			logBuilder.AppendLine(result.Implode());
-			logBuilder.AppendLine(client.Id.ToString());
-
-			File.WriteAllText("AnalysisOfWorkDrugstoresFixture.txt", logBuilder.ToString(), Encoding.UTF8);
+					foreach (var baseItemForTable in result) {
+						baseItemForTable.SetUrlHelper(urlHelper);
+					}
+					Assert.That(result.Count, Is.GreaterThan(0));
+					Assert.IsTrue(result.Any(r => ((dynamic)r).Id.Contains(client.Id.ToString())));
+				});
+			}
 		}
 	}
 }
