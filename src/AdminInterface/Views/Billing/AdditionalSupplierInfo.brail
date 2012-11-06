@@ -1,0 +1,17 @@
+﻿<div id="additionalSupplierInfo${supplier.Id}">
+	<div class="block">
+<h4>
+	Регионы размещения прайс-листов
+</h4>
+		<table>
+			<% for i, region in enumerate(PricesRegions): %>
+			<tr>
+				<td>
+					${region.Name}
+				</td>
+			</tr>
+			<% end %>
+		</table>
+	</div>
+
+	</div>

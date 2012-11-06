@@ -398,6 +398,19 @@ where s.Id = :supplierId")
 			if (payer.CanDelete(session))
 				payer.Delete();
 		}
+
+		/// <summary>
+		/// Регионы, в которых размещены прайс-листы
+		/// </summary>
+		public virtual List<Region> PricesRegions
+		{
+			get
+			{
+				var res = Prices.Where(p => p.Enabled && p.AgencyEnabled)
+					.SelectMany(p => p.RegionalData.Select(r => r.Region));
+				return res.Distinct().OrderBy(r => r.Name).ToList();
+			}
+		}
 	}
 
 	[ActiveRecord("RegionalData", Schema = "Usersettings")]
