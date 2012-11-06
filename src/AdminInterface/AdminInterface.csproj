@@ -452,6 +452,7 @@
     <Content Include="Assets\Stylesheets\billing.css" />
     <Content Include="Assets\Stylesheets\ClientsShow.css" />
     <Content Include="Assets\Stylesheets\News.css" />
+    <Content Include="Css\AnalysisOfWorkDrugstores.css" />
     <Content Include="Css\columns.css" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
@@ -506,6 +507,7 @@
     <Content Include="Views\ManagerReports\UniversalTable.brail" />
     <Content Include="Views\ManagerReports\UpdatedAndDidNotDoOrders.brail" />
     <Content Include="Views\ManagerReports\AnalysisOfWorkDrugstores.brail" />
+    <Content Include="Views\ManagerReports\SimpleTable.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />
