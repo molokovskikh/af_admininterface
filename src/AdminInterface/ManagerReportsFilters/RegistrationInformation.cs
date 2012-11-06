@@ -45,12 +45,21 @@ namespace AdminInterface.ManagerReportsFilters
 		public string ClientName { get; set; }
 
 		public int UserCount { get; set; }
+		public int AddressCount { get; set; }
 		public string UserNames { get; set; }
 		public string RegionName { get; set; }
 
 		public ServiceType ClientType { get; set; }
 
 		public RegistrationFinderType ObjectType;
+
+		public DrugstoreType InvisibleOnFirm { get; set; }
+
+		[Style]
+		public virtual bool IsHiddenFromSupplier
+		{
+			get { return InvisibleOnFirm == DrugstoreType.Hidden; }
+		}
 
 		[Style]
 		public bool DisabledByBilling
