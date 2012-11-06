@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
+using AdminInterface.Models.Suppliers;
 using Common.Tools;
 using NHibernate.Linq;
 using NUnit.Framework;
@@ -22,6 +23,7 @@ namespace Functional.Billing
 	public class BillingFixture : WatinFixture2
 	{
 		private Client client;
+		private Supplier _supplier;
 		private Payer payer;
 		private Address address;
 		private User user;
@@ -38,6 +40,10 @@ namespace Functional.Billing
 			user = client.Users[0];
 			address = client.Addresses[0];
 			session.SaveOrUpdate(client);
+
+			_supplier = DataMother.CreateSupplier();
+			_supplier.Payer = payer;
+			session.Save(_supplier);
 
 			Open(payer);
 			browser.WaitUntilContainsText("Плательщик", 2);
@@ -110,6 +116,23 @@ namespace Functional.Billing
 			// Щелкаем второй раз. Дополнительная информация должна быть скрыта
 			browser.Link(Find.ById(userId)).Click();
 			additionalInfoDiv = browser.Div(Find.ById("additionalAddressInfo" + user.Id));
+			Assert.That(additionalInfoDiv.Exists, Is.False);
+		}
+
+		[Test]
+		public void ViewAdditionalSupplierInfo()
+		{
+			var supplierId = "pricesRegions" + _supplier.Id;
+			browser.Link(Find.ById(supplierId)).Click();
+			Thread.Sleep(500);
+			Assert.That(browser.Text, Is.StringContaining("Регионы размещения прайс-листов"));
+
+			var additionalInfoDiv = browser.Div(Find.ById("additionalSupplierInfo" + _supplier.Id));
+			Assert.That(additionalInfoDiv.Exists, Is.True);
+			Assert.That(additionalInfoDiv.Enabled, Is.True);
+
+			browser.Link(Find.ById(supplierId)).Click();
+			additionalInfoDiv = browser.Div(Find.ById("additionalSupplierInfo" + _supplier.Id));
 			Assert.That(additionalInfoDiv.Exists, Is.False);
 		}
 
