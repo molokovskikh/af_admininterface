@@ -1,0 +1,13 @@
+﻿table.DataTable {
+	width: 800px;
+	background-color: #EBEBEB;
+	border: solid 1px #DADADA;
+	text-align: center;
+}
+
+.userInfoDiv .DataTable {
+	width: 750px;
+	background-color: #EBEBEB;
+	border: solid 1px #DADADA;
+	text-align: center;
+}

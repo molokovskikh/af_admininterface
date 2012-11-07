@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using AdminInterface.Controllers;
 using AdminInterface.ManagerReportsFilters;
+using AdminInterface.Models;
 using Functional.ForTesting;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
 using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 
 namespace Functional
 {
@@ -96,6 +100,37 @@ namespace Functional
 			AssertText("Мониторинг выставлеия условий новому клиенту");
 			Click("Показать");
 			AssertText("Мониторинг выставлеия условий новому клиенту");
+		}
+
+		[Test]
+		public void AnalisOfWorkTest()
+		{
+			var client = session.Query<Client>().First();
+			var user = client.Users.First();
+			var address = client.Addresses.First();
+			user.AvaliableAddresses.Add(address);
+			session.Save(user);
+			Open("ManagerReports");
+			Click("Сравнительный анализ работы аптек");
+			Click("Показать");
+			Click("Код");
+			browser.Link(client.Id.ToString()).Click();
+			AssertText(string.Format("Клиент: {0}", client.Name));
+			AssertText(user.Id.ToString());
+			AssertText(address.Name);
+		}
+
+		[Test]
+		public void UserAndAddresseTest()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			Open("ManagerReports");
+			Click("Зарегистрированные пользователи и адреса");
+			browser.Link(client.Id.ToString()).Click();
+			AssertText(string.Format("Клиент: {0}", client.Name));
+			foreach (var user in client.Users) {
+				AssertText(string.Format("{0} - ({1})", user.Name, user.Id));
+			}
 		}
 	}
 }

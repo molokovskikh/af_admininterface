@@ -1,4 +1,6 @@
-﻿using AdminInterface.Models.Suppliers;
+﻿using System.Collections.Generic;
+using AdminInterface.Models.Suppliers;
+using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using Test.Support;
 using NUnit.Framework;

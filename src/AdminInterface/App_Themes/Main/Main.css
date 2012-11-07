@@ -240,7 +240,7 @@ div
 	float: left;
 }
 
-.Submit
+.DataTable.Submit, th.Submit
 {
 	padding-top: 10px;
 	text-align:center;

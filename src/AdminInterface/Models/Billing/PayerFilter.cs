@@ -53,6 +53,9 @@ namespace AdminInterface.Models.Billing
 	{
 		public string SearchText { get; set; }
 
+		[Description("Игнорировать плательщиков, содержащих Поставщиков, кроме Справки")]
+		public bool WithoutSuppliers { get; set; }
+
 		[Description("Получатель платежей:")]
 		public Recipient Recipient { get; set; }
 
@@ -84,6 +87,7 @@ namespace AdminInterface.Models.Billing
 
 		public PayerFilter()
 		{
+			WithoutSuppliers = true;
 			Period = new Period();
 			ClientStatus = SearchClientStatus.Enabled;
 			SearchBy = SearchBy.Name;
@@ -155,6 +159,9 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			switch (ClientType) {
 				case SearchClientType.Drugstore:
 					And(groupFilter, "cd.Id is not null");
+					if(WithoutSuppliers) {
+						And(where, "(s.Id is null OR exists (select * from farm.Regions rg where rg.RegionCode & s.RegionMask > 0 and rg.DrugsSearchRegion = 1))");
+					}
 					break;
 				case SearchClientType.Supplier:
 					And(groupFilter, "s.Id is not null");

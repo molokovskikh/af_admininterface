@@ -287,6 +287,14 @@ namespace AdminInterface.Controllers
 			CancelView();
 		}
 
+		public void AdditionalSupplierInfo(uint supplierId, string cssClassName)
+		{
+			CancelLayout();
+			var supplier = DbSession.Load<Supplier>(supplierId);
+			PropertyBag["supplier"] = supplier;
+			PropertyBag["PricesRegions"] = supplier.PricesRegions;
+		}
+
 		public void AdditionalUserInfo(uint userId, string cssClassName)
 		{
 			CancelLayout();
