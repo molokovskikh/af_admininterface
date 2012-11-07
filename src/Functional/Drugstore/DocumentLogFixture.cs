@@ -96,14 +96,7 @@ namespace Functional.Drugstore
 			session.Save(documentLog);
 
 			Open("Logs/Documents?filter.Client.Id={0}", client.Id);
-			Thread.Sleep(1000);
-			Console.WriteLine(client.Id);
 
-			//browser.Links.First(l => l.Id.Contains("ShowDocumentDetailsLink")).Click();
-			Console.WriteLine(browser.Html);
-			//browser.
-
-			//browser.Link(Find.ByClass("DownloadResult")).Click();
 			Click("SpecialFileNameForThisReport");
 			Click("123");
 			AssertText("Сопоставлен с \"testCatName testForm\"");
