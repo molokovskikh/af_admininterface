@@ -18,7 +18,7 @@ namespace AdminInterface.Components
 				style = "class='CenterBlock' style='width:30%;'";
 			var writer = new StringWriter();
 			writer.WriteLine(@"
-	<div {0}>
+	<div class='legendDiv' {0}>
 		<table>
 			<tr>
 ",

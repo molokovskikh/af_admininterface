@@ -69,7 +69,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			</td>
 			<td>${item.AddressCount}</td>
 			<td>
-				<%if (item.IsDrugstore):%>
+				<%if (item.IsDrugstore and (not item.IsHiddenFromSupplier)):%>
 					${FormHelper.FormTag("${SiteRoot}/ManagerReports/ClientConditionsMonitoring", {@method : @get})}
 						${FormHelper.HiddenField("filter.ClientId", item.ClientId)}
 						${FormHelper.HiddenField("filter.ClientName", item.ClientName)}
@@ -78,7 +78,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 				<%end%>
 			</td>
 			<td>${item.RegionName}</td>
-			<td>${item.Id}</td>
+			<td class="${app.Style(item)}">${item.Id}</td>
 			<td>${app.LinkTo(item)}</td>
 			<td>${item.RegistrationDate}</td>
 			<%if filter.ShowUserNames(): %>
@@ -99,8 +99,11 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 <%end %>
 <div align="center" style="width: 100%;">
 <% 
-	component Legend, { "LegendItems" : {	"Пользователь или адрес отключен биллингом" : "disabled",
-											"Клиент имеет единственного пользователя" : "SingleUser"},
-						"ByCenter" : false}
+	component Legend, { "LegendItems" : {
+	"Пользователь или адрес отключен биллингом" : "disabled",
+	"Клиент имеет единственного пользователя" : "SingleUser",
+	"Не имеющие права заказа" : "no-order-style",
+	"Скрыты в интерфейсе поставщика" : "hidden-from-supplier"},
+	"ByCenter" : false}
 %>
 </div>

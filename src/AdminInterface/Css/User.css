@@ -191,10 +191,14 @@ table thead.CenterHead th
 	background-color: #f9be67;
 }
 
-.DataTable tbody tr.hidden-from-supplier td.forSelectHiddenClient {
+.DataTable tbody tr.hidden-from-supplier td.forSelectHiddenClient, div.legendDiv .hidden-from-supplier {
 	background-color: #fffaa0;
 }
 
 .UserAndAddresses .calendar {
 	width: 250px;
+}
+
+.DataTable tbody tr td.no-order-style, div.legendDiv .no-order-style {
+	background-color: #9999ff;
 }

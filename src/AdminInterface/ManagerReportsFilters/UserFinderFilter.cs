@@ -128,6 +128,22 @@ namespace AdminInterface.ManagerReportsFilters
 				.SetProjection(Projections.ProjectionList()
 					.Add(Projections.Count("a.Id"))));
 
+			var noOrderCriteria = DetachedCriteria.For<User>()
+				.CreateAlias("Client", "cSub", JoinType.LeftOuterJoin)
+				.CreateAlias("cSub.Settings", "setSub", JoinType.LeftOuterJoin);
+
+			NoOrderPermission(noOrderCriteria);
+
+			noOrderCriteria.Add(Expression.EqProperty("Id", "rootUser.Id"))
+				.Add(Expression.EqProperty("cSub.Id", "c.Id"))
+				.Add(Expression.EqProperty("setSub.Id", "set.Id"));
+
+			noOrderCriteria.SetProjection(Projections.ProjectionList()
+				.Add(Projections.Count("Id")));
+
+			var noOrderProjection = Projections.SubQuery(noOrderCriteria);
+
+
 			var regionMask = SecurityContext.Administrator.RegionMask;
 			if (Region != null)
 				regionMask &= Region.Id;
@@ -151,7 +167,8 @@ namespace AdminInterface.ManagerReportsFilters
 					.Add(Projections.Property("s.HomeRegion").As("RegionName"))
 					.Add(Projections.Property("set.InvisibleOnFirm").As("InvisibleOnFirm"))
 					.Add(Projections.Alias(userCountProjection, "UserCount"))
-					.Add(Projections.Alias(addressCountProjection, "AddressCount")))
+					.Add(Projections.Alias(addressCountProjection, "AddressCount"))
+					.Add(Projections.Alias(noOrderProjection, "NoOrder")))
 					.Add(Expression.Ge("Registration.RegistrationDate", Period.Begin))
 					.Add(Expression.Le("Registration.RegistrationDate", Period.End))
 					.CreateAlias("Payer", "p", JoinType.InnerJoin)
@@ -163,17 +180,7 @@ namespace AdminInterface.ManagerReportsFilters
 					userCriteria.Add(Expression.Eq("set.InvisibleOnFirm", DrugstoreType.Standart));
 
 				if (ExcludeType == ExcludesTypes.NoOrderPermission) {
-					userCriteria.Add(Expression.Gt("OrderRegionMask", (ulong)0))
-						.Add(Expression.Eq("SubmitOrders", false))
-						.Add(Expression.Eq("set.ServiceClient", false))
-						.Add(Expression.Eq("set.InvisibleOnFirm", DrugstoreType.Standart))
-						.Add(Expression.Gt(
-							Projections.Alias(Projections.SubQuery(DetachedCriteria.For<User>("user")
-								.CreateAlias("AssignedPermissions", "ap")
-								.Add(Expression.EqProperty("user.Id", "rootUser.Id"))
-								.Add(Expression.Eq("ap.Id", 1u))
-								.SetProjection(Projections.ProjectionList()
-									.Add(Projections.Count("ap.Id")))), "per"), 0));
+					NoOrderPermission(userCriteria);
 				}
 
 				return userCriteria;
@@ -234,6 +241,21 @@ namespace AdminInterface.ManagerReportsFilters
 			}
 
 			return null;
+		}
+
+		private void NoOrderPermission(DetachedCriteria criteria)
+		{
+			criteria.Add(Expression.Gt("OrderRegionMask", (ulong)0))
+				.Add(Expression.Eq("SubmitOrders", false))
+				.Add(Expression.Eq("set.ServiceClient", false))
+				.Add(Expression.Eq("set.InvisibleOnFirm", DrugstoreType.Standart))
+				.Add(Expression.Gt(
+					Projections.Alias(Projections.SubQuery(DetachedCriteria.For<User>("user")
+						.CreateAlias("AssignedPermissions", "ap")
+						.Add(Expression.EqProperty("user.Id", "rootUser.Id"))
+						.Add(Expression.Eq("ap.Id", 1u))
+						.SetProjection(Projections.ProjectionList()
+							.Add(Projections.Count("ap.Id")))), "per"), 0));
 		}
 
 		public IList<RegistrationInformation> Find()

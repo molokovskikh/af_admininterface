@@ -14,14 +14,20 @@
 			.appendTo(ul);
 	};
 
+	HiddenIfAddressPage($('#filter_FinderType'));
+
 	$('#filter_FinderType').change(function() {
-		if ($(this).val() == 0) {
-			$('#hideBlock').css("display", "table-row");
-		} else {
-			$('#hideBlock').css("display", "none");
-		}
+		HiddenIfAddressPage(this);
 	});
 });
+
+function HiddenIfAddressPage(item) {
+	if ($(item).val() == 0) {
+		$('#hideBlock').css("display", "table-row");
+	} else {
+		$('#hideBlock').css("display", "none");
+	}
+}
 
 function GetUserInfo(userId, item) {
 	var thisBox = $(item).parent().children(".toggled:first");

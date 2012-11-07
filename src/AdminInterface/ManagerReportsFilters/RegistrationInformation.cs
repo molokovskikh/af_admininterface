@@ -55,6 +55,14 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public DrugstoreType InvisibleOnFirm { get; set; }
 
+		public virtual int NoOrder { get; set; }
+
+		[Style]
+		public virtual bool NoOrderStyle
+		{
+			get { return NoOrder <= 0 && IsDrugstore; }
+		}
+
 		[Style]
 		public virtual bool IsHiddenFromSupplier
 		{
