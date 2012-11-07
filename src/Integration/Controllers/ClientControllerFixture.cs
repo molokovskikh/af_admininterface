@@ -35,6 +35,15 @@ namespace Integration.Controllers
 			client = DataMother.CreateTestClientWithUser();
 		}
 
+		[Test]
+		public void NotifySuppliersTest()
+		{
+			controller.NotifySuppliers(client.Id);
+			var objectType = AuditRecord.GetLogObjectType(client);
+			var audit = session.Query<AuditRecord>().Where(a => a.ObjectId == client.Id && a.Type == objectType).ToList();
+			Assert.IsTrue(audit.Any(a => a.Message.Contains("Разослано повторное уведомление о регистрации клиента")));
+		}
+
 		[Test, Ignore("нет доступа к ad")]
 		public void Unlock_every_locked_login()
 		{
