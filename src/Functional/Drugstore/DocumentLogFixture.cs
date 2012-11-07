@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support;
 using Test.Support.Web;
 using WatiN.Core;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Drugstore
 {
@@ -64,6 +69,45 @@ namespace Functional.Drugstore
 
 			session.Refresh(sendLog);
 			Assert.That(sendLog.Committed, Is.False);
+		}
+
+		[Test]
+		public void Producer_in_document_detalization_for_position()
+		{
+			var catalogName = new TestCatalogName { Name = "testCatName" };
+			var catalogForm = new TestCatalogForm { Form = "testForm" };
+			Save(catalogName, catalogForm);
+
+			document.FileName = "SpecialFileNameForThisReport";
+			session.Save(document);
+			var documentLog = new FullDocument(document);
+			var catalog = new Catalog { Name = "testCatalog", NameId = catalogName.Id, FormId = catalogForm.Id };
+			var product = new Product(catalog);
+			var producer = new Producer { Name = "testProducer" };
+			Save(catalog, producer, product);
+			var line = new DocumentLine {
+				CatalogProducer = producer,
+				CatalogProduct = product,
+				Product = "123",
+				Document = documentLog
+			};
+			documentLog.Lines = new List<DocumentLine>();
+			documentLog.Lines.Add(line);
+			session.Save(documentLog);
+
+			Open("Logs/Documents?filter.Client.Id={0}", client.Id);
+			Thread.Sleep(1000);
+			Console.WriteLine(client.Id);
+
+			//browser.Links.First(l => l.Id.Contains("ShowDocumentDetailsLink")).Click();
+			Console.WriteLine(browser.Html);
+			//browser.
+
+			//browser.Link(Find.ByClass("DownloadResult")).Click();
+			Click("SpecialFileNameForThisReport");
+			Click("123");
+			AssertText("Сопоставлен с \"testCatName testForm\"");
+			AssertText("По производителю с \"testProducer\"");
 		}
 
 		[Test]
