@@ -36,16 +36,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["users"] = supplier.Users;
 
-			// перемещаем контакты с общей информацией в начало списка
-			var contactGroups = supplier.ContactGroupOwner.ContactGroups
-				.Where(c => c.Type == ContactGroupType.General);
-			if(!contactGroups.Any())
-				contactGroups = supplier.ContactGroupOwner.ContactGroups;
-			else
-				contactGroups = contactGroups.Concat(supplier.ContactGroupOwner.ContactGroups
-					.Where(c => c.Type != ContactGroupType.General));
-
-			PropertyBag["contactGroups"] = contactGroups;
+			PropertyBag["contactGroups"] = supplier.ContactGroupOwner.ContactGroups.OrderBy(s => s.Type == ContactGroupType.General ? 0 : 1);
 			PropertyBag["usersInfo"] = ADHelper.GetPartialUsersInformation(supplier.Users);
 
 			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
