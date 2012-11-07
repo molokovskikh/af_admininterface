@@ -3,7 +3,7 @@
 <% end %>
 
 <% component Bubble, {"bredcrumbs" : []} %>
-
+${app.Asset("billing.search.js")}
 <div class="CenterBlock FilterBlock">
 	<h3>
 		Фильтр плательщиков
@@ -36,6 +36,7 @@
 				${app.FilterFor("filter.PayerState")}
 				${app.FilterFor("filter.Region")}
 				${app.FilterFor("filter.ClientType")}
+				${app.FilterFor("filter.WithoutSuppliers")}
 				${app.FilterFor("filter.ClientStatus")}
 				${app.FilterFor("filter.Recipient")}
 				${app.FilterFor("filter.InvoiceType")}

@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
 using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Billing
 {
@@ -30,6 +31,15 @@ namespace Functional.Billing
 				address.Enabled = false;
 				address.UpdateAndFlush();
 			}
+		}
+
+		[Test]
+		public void WithoutPayersSearchTest()
+		{
+			Open("Billing/Search");
+
+			browser.SelectList(Find.ById("filter_ClientType")).SelectByValue("1");
+			AssertText("Игнорировать плательщиков, содержащих Поставщиков");
 		}
 
 		[Test]

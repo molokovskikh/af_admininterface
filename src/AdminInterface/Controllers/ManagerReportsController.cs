@@ -191,7 +191,12 @@ namespace AdminInterface.Controllers
 		[return: JSONReturnBinder]
 		public object GetClientForAutoComplite(string term)
 		{
-			return DbSession.Query<Client>().Where(c => c.Name.Contains(term) && c.Status == ClientStatus.On && !c.Settings.IsHiddenFromSupplier)
+			uint id = 0;
+			uint.TryParse(term, out id);
+			return DbSession.Query<Client>().Where(c =>
+				(c.Name.Contains(term) || c.Id == id) &&
+					c.Status == ClientStatus.On &&
+					c.Settings.InvisibleOnFirm == DrugstoreType.Standart)
 				.ToList()
 				.Select(c => new { id = c.Id, label = c.Name })
 				.ToList();
