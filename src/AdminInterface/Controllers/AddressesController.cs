@@ -99,7 +99,7 @@ namespace AdminInterface.Controllers
 			var address = Address.Find(id);
 			Mailer.NotifySupplierAboutAddressRegistration(address, Defaults);
 			Mailer.AddressRegistrationResened(address);
-			DbSession.Save(new AuditRecord("Разослано повторное уведомление о регистрации адреса", address));
+			DbSession.Save(new AuditRecord(string.Format("Разослано повторное уведомление о регистрации адреса {0}", address.Name), address));
 			Notify("Уведомления отправлены");
 			RedirectToReferrer();
 		}
