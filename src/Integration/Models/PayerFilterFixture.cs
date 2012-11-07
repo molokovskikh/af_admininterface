@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
+using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
@@ -14,6 +16,59 @@ namespace Integration.Models
 	[TestFixture]
 	public class PayerFilterFixture : Test.Support.IntegrationFixture
 	{
+		[Test]
+		public void SearchPayerForDrugstoreWithoutSuppliers()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var payer = client.Payers.First();
+			var recipient = session.Query<Recipient>().First();
+			payer.Recipient = recipient;
+			session.Save(payer);
+			var homeRegion = session.Load<Region>(1UL);
+			var supplier = new Supplier(homeRegion, payer) {
+				Name = "Тестовый поставщик",
+				FullName = "Тестовый поставщик",
+				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
+			};
+			session.Save(supplier);
+
+			var filter = new PayerFilter {
+				SearchBy = SearchBy.PayerId,
+				SearchText = payer.Id.ToString(),
+				ClientType = SearchClientType.Drugstore,
+				WithoutSuppliers = true
+			};
+			var items = filter.Find();
+			Assert.That(items.Count, Is.EqualTo(0));
+		}
+
+		[Test]
+		public void SearchPayerForDrugstoreWithoutSuppliersWithDrugsSearchRegion()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var payer = client.Payers.First();
+			var recipient = session.Query<Recipient>().First();
+			payer.Recipient = recipient;
+			session.Save(payer);
+			var homeRegion = session.Load<Region>(1UL);
+			var supplier = new Supplier(homeRegion, payer) {
+				Name = "Тестовый поставщик",
+				FullName = "Тестовый поставщик",
+				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
+			};
+			supplier.AddRegion(session.Query<Region>().First(r => r.DrugsSearchRegion));
+			session.Save(supplier);
+
+			var filter = new PayerFilter {
+				SearchBy = SearchBy.PayerId,
+				SearchText = payer.Id.ToString(),
+				ClientType = SearchClientType.Drugstore,
+				WithoutSuppliers = true
+			};
+			var items = filter.Find();
+			Assert.That(items.Count, Is.EqualTo(1));
+		}
+
 		[Test]
 		public void Search_payer()
 		{
