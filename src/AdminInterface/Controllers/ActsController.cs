@@ -8,9 +8,11 @@ using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -38,9 +40,12 @@ namespace AdminInterface.Controllers
 
 		public void Build([ARDataBind("buildFilter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] DocumentBuilderFilter filter, DateTime actDate)
 		{
-			var invoices = filter.Find<Invoice>();
-			foreach (var act in Act.Build(invoices, actDate))
+			var sourceInvoices = filter.Find<Invoice>();
+			var invoices = ArHelper.WithSession(s => sourceInvoices
+				.Where(i => !s.Query<Act>().Any(a => a.Payer == i.Payer && a.Period == i.Period)).ToList());
+			foreach (var act in Act.Build(invoices, actDate)) {
 				act.Save();
+			}
 
 			RedirectToAction("Index", filter.ToDocumentFilter().GetQueryString());
 		}
