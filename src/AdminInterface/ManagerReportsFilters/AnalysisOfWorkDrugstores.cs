@@ -71,24 +71,24 @@ namespace AdminInterface.ManagerReportsFilters
 		public int CurWeekObn { get; set; }
 		public int LastWeekObn { get; set; }
 
-		[Display(Name = "Обновления (Старый/Новый)", Order = 5)]
+		[Display(Name = "Обновления (Новый/Старый)", Order = 5)]
 		public string Obn
 		{
-			get { return string.Format("{0}/{1}", LastWeekObn, CurWeekObn); }
+			get { return string.Format("{0}/{1}", CurWeekObn, LastWeekObn); }
 		}
 
 		public int CurWeekZak { get; set; }
 		public int LastWeekZak { get; set; }
 
-		[Display(Name = "Заказы (Старый/Новый)", Order = 7)]
+		[Display(Name = "Заказы (Новый/Старый)", Order = 7)]
 		public string Zak
 		{
-			get { return string.Format("{0}/{1}", LastWeekZak, CurWeekZak); }
+			get { return string.Format("{0}/{1}", CurWeekZak, LastWeekZak); }
 		}
 
-		[Display(Name = "Падение обновлений %", Order = 6)]
+		[Display(Name = "Падение обновлений", Order = 6)]
 		public int ProblemObn { get; set; }
-		[Display(Name = "Падение заказов %", Order = 8)]
+		[Display(Name = "Падение заказов", Order = 8)]
 		public int ProblemZak { get; set; }
 
 		public bool ForSubQuery;
@@ -123,11 +123,11 @@ namespace AdminInterface.ManagerReportsFilters
 		public ISession Session { get; set; }
 		public bool LoadDefault { get; set; }
 
-		public string ClientTypeSqlPart = @"
-SELECT cd.id as Id,
-cd.name as Name,
+		public string ClientTypeSqlPart = @"insert into Customers.Updates
+SELECT cd.id,
+cd.name,
 reg.Region as RegionName,
-@CurWeekObn = (SELECT COUNT(o.id)
+(SELECT COUNT(o.id)
 	FROM logs.analitfupdates au1,
 	customers.users O
 	WHERE requesttime BETWEEN :FistPeriodStart AND :FistPeriodEnd
@@ -136,7 +136,7 @@ reg.Region as RegionName,
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
 ) as CurWeekObn,
-@LastWeekObn = (SELECT COUNT(au2.Updateid)
+(SELECT COUNT(au2.Updateid)
 	FROM logs.analitfupdates au2,
 	customers.users O
 	WHERE requesttime BETWEEN :LastPeriodStart AND :LastPeriodEnd
@@ -145,7 +145,7 @@ reg.Region as RegionName,
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
 ) LastWeekObn,
-@CurWeekZak = (SELECT ROUND(sum(cost*quantity), 2)
+(SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh1,
 	orders.orderslist ol1
 	WHERE writetime BETWEEN :FistPeriodStart AND :FistPeriodEnd
@@ -153,21 +153,14 @@ reg.Region as RegionName,
 	AND oh1.clientcode = cd.id
 	AND oh1.RegionCode = :regionCode
 ) CurWeekZak,
-@LastWeekZak = (SELECT ROUND(sum(cost*quantity), 2)
+(SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh2,
 	orders.orderslist ol2
 	WHERE writetime BETWEEN :LastPeriodStart AND :LastPeriodEnd
 	AND ol2.orderid = oh2.rowid
 	AND oh2.clientcode = cd.id
 	AND oh2.RegionCode = :regionCode
-) LastWeekZak,
-
-(select count(u.Id) from Customers.Users u where u.ClientId = cd.Id) as UserCount,
-(select count(a.Id) from Customers.Addresses a where a.ClientId = cd.Id) as AddressCount,
-
-IF (@CurWeekObn - @LastWeekObn < 0 , ( IF (@CurWeekObn <> 0, ROUND((@LastWeekObn-@CurWeekObn)*100/@LastWeekObn), 100) ) ,0) ProblemObn,
-IF (@CurWeekZak - @LastWeekZak < 0 , ( IF (@CurWeekZak <> 0, ROUND((@LastWeekZak-@CurWeekZak)*100/@LastWeekZak), 100 ) ) ,0) ProblemZak
-
+) LastWeekZak
 FROM customers.Clients Cd
 left join usersettings.RetClientsSet Rcs on rcs.clientcode = cd.id
 left join farm.Regions reg on reg.RegionCode = Cd.regioncode
@@ -175,7 +168,7 @@ WHERE
 cd.regioncode & :regionCode > 0
 {0}
 AND rcs.serviceclient = 0
-AND rcs.invisibleonfirm = 0";
+AND rcs.invisibleonfirm = 0;";
 
 		public string UserTypeSqlPart = @"insert into Customers.Updates
 SELECT u.id,
@@ -373,20 +366,11 @@ LastWeekZak INT) engine=MEMORY;";
 
 		public IList<BaseItemForTable> Find()
 		{
-			var regionMask = SecurityContext.Administrator.RegionMask;
+			PrepareAggregatesData();
 
-			if (Region != null)
-				regionMask &= Region.Id;
+			RowsCount = Convert.ToInt32(Session.CreateSQLQuery("select count(*) from Customers.updates;").UniqueResult());
 
-			if (Type != AnalysisReportType.Client) {
-				PrepareAggregatesData();
-				RowsCount = Convert.ToInt32(Session.CreateSQLQuery("select count(*) from Customers.updates;").UniqueResult());
-			}
-
-			IList<AnalysisOfWorkFiled> result;
-
-			if (Type != AnalysisReportType.Client) {
-				result = Session.CreateSQLQuery(string.Format(@"
+			var result = Session.CreateSQLQuery(string.Format(@"
 SELECT
 	Id,
 	Name,
@@ -402,21 +386,7 @@ SELECT
 FROM Customers.updates up
 ORDER BY {2} {3}
 limit {0}, {1}", CurrentPage * PageSize, PageSize, SortBy, SortDirection))
-					.ToList<AnalysisOfWorkFiled>();
-			}
-			else {
-				result = Session.CreateSQLQuery(string.Format(ClientTypeSqlPart, string.Empty) + string.Format(" ORDER BY {0} {1};", SortBy, SortDirection))
-					.SetParameter("FistPeriodStart", FistPeriod.Begin)
-					.SetParameter("FistPeriodEnd", FistPeriod.End)
-					.SetParameter("LastPeriodStart", LastPeriod.Begin)
-					.SetParameter("LastPeriodEnd", LastPeriod.End)
-					.SetParameter("regionCode", regionMask)
-					.ToList<AnalysisOfWorkFiled>();
-			}
-
-			RowsCount = result.Count;
-
-			result = result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
+				.ToList<AnalysisOfWorkFiled>();
 
 			foreach (var analysisOfWorkFiled in result) {
 				analysisOfWorkFiled.ForSubQuery = ForSubQuery;
