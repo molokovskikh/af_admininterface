@@ -1,27 +1,32 @@
-﻿using AdminInterface.Models.Logs;
+﻿using System.ComponentModel;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord("smart_order_rules", Schema = "ordersendrules", Lazy = true)]
+	[ActiveRecord("smart_order_rules", Schema = "ordersendrules", Lazy = true), Auditable]
 	public class SmartOrderRules : ActiveRecordLinqBase<SmartOrderRules>
 	{
 		[PrimaryKey("Id")]
 		public virtual uint Id { get; set; }
 
-		[Property]
+		[Property, Description("Парсер для автозаказа"), Auditable]
 		public virtual string ParseAlgorithm { get; set; }
 
-		[Property]
-		public virtual uint? AssortimentPriceCode { get; set; }
+		[BelongsTo, Description("Ассортиментный прайс лист для автозаказа"), Auditable]
+		public virtual Price AssortimentPriceCode { get; set; }
+
+		[OneToOne(PropertyRef = "SmartOrderRules")]
+		public virtual DrugstoreSettings Settings { get; set; }
 
 		public static SmartOrderRules TestSmartOrder()
 		{
 			var testOrder = new SmartOrderRules {
 #if !DEBUG
-				AssortimentPriceCode = 4662,
+				AssortimentPriceCode = ActiveRecordMediator<Price>.FindByPrimaryKey(4662u),
 #endif
 				ParseAlgorithm = "TestSource",
 			};
@@ -30,9 +35,8 @@ namespace AdminInterface.Models
 
 		public virtual string GetAssortimentPriceName()
 		{
-			if (AssortimentPriceCode.HasValue) {
-				var price = ActiveRecordMediator<Price>.FindByPrimaryKey(AssortimentPriceCode.Value);
-				return string.Format("{0} - {1}", price.Supplier.Name, price.Name);
+			if (AssortimentPriceCode != null) {
+				return string.Format("{0} - {1}", AssortimentPriceCode.Supplier.Name, AssortimentPriceCode.Name);
 			}
 			return string.Empty;
 		}
