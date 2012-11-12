@@ -432,13 +432,28 @@ namespace AdminInterface.Controllers
 		{
 			uint id;
 			UInt32.TryParse(text, out id);
-			return DbSession.Query<User>()
-				.Where(u => (u.Name.Contains(text) || u.Id == id))
+			var result = DbSession.Query<User>()
+				.Where(u =>
+					u.Login.Contains(text) ||
+						u.Name.Contains(text) ||
+						u.Id == id ||
+						(u.RootService != null && u.RootService.Name.Contains(text)))
 				.OrderBy(u => u.Id)
 				.Take(50)
-				.ToArray()
-				.Select(p => new { id = p.Id, name = String.Format("{0} - {1}", p.Id, p.Name) })
-				.ToArray();
+				.Fetch(u => u.RootService)
+				.Fetch(u => u.Logs)
+				.ToList();
+
+			var returned = new List<object>();
+			foreach (var user in result) {
+				if (user.Login.ToLower().Contains(text.ToLower()))
+					returned.Add(new { id = user.Id, name = string.Format("Код: {0} - login: {1}", user.Id, user.Login) });
+				if (user.Name.ToLower().Contains(text.ToLower()))
+					returned.Add(new { id = user.Id, name = string.Format("Код: {0} - комментарий: {1}", user.Id, user.Name) });
+				if (user.RootService != null && user.RootService.Name.ToLower().Contains(text.ToLower()))
+					returned.Add(new { id = user.Id, name = string.Format("Код: {0} - клиент: {1} - {2}", user.Id, user.RootService.Id, user.RootService.Name) });
+			}
+			return returned.ToArray();
 		}
 	}
 }
