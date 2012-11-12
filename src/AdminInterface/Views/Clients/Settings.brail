@@ -177,7 +177,7 @@
 						<label>Автозаказ</label>
 					</td>
 					<td>
-						${FormHelper.HiddenField("drugstore.SmartOrderRules.AssortimentPriceCode",
+						${FormHelper.HiddenField("drugstore.SmartOrderRules.AssortimentPriceCode.Id",
 							{"data-search-editor": "assortmentPrice"})}
 
 						${FormHelper.HiddenField("drugstore.SmartOrderRules.ParseAlgorithm",

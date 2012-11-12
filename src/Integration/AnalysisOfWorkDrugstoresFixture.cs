@@ -14,12 +14,14 @@ using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Test;
 using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.Test;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Rhino.Mocks;
 using Test.Support;
+using Test.Support.log4net;
 
 namespace Integration
 {
@@ -30,26 +32,26 @@ namespace Integration
 		public void BaseTest()
 		{
 			var client = new Client();
-			using (var scope = new SessionScope()) {
-				ArHelper.WithSession(s => {
-					client = DataMother.CreateClientAndUsers();
-					s.Save(client);
+			IList<BaseItemForTable> result = new List<BaseItemForTable>();
+			using (new SessionScope())
+				client = DataMother.CreateClientAndUsers();
 
-					var filter = new AnalysisOfWorkDrugstoresFilter { Session = s, PagesSize = 1000 };
-					var result = filter.Find();
+			var filter = new AnalysisOfWorkDrugstoresFilter { PagesSize = 10000 };
+			result = filter.Find();
 
-					var urlHelper = new UrlHelper(context);
-					PrepareHelper(urlHelper);
-					urlHelper.SetController(new ManagerReportsController(), context.CurrentControllerContext);
-					urlHelper.UrlBuilder = new DefaultUrlBuilder();
+			var urlHelper = new UrlHelper(context);
+			PrepareHelper(urlHelper);
+			urlHelper.SetController(new ManagerReportsController(), context.CurrentControllerContext);
+			urlHelper.UrlBuilder = new DefaultUrlBuilder();
 
-					foreach (var baseItemForTable in result) {
-						baseItemForTable.SetUrlHelper(urlHelper);
-					}
-					Assert.That(result.Count, Is.GreaterThan(0));
-					Assert.IsTrue(result.Any(r => ((dynamic)r).Id.Contains(client.Id.ToString())));
-				});
+			foreach (var baseItemForTable in result) {
+				baseItemForTable.SetUrlHelper(urlHelper);
 			}
+			Assert.That(result.Count, Is.GreaterThan(0));
+
+			var clientIds = result.Select(r => ((AnalysisOfWorkFiled)r).Id).ToList();
+			var Id = client.Id.ToString();
+			Assert.IsTrue(clientIds.Where(r => r.Contains(Id)).Any());
 		}
 	}
 }

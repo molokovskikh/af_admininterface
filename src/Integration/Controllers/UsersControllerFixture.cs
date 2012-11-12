@@ -169,5 +169,24 @@ namespace Integration.Controllers
 				});
 			Assert.That(user.OrderRegionMask, Is.EqualTo(oldMask));
 		}
+
+		[Test]
+		public void Search_user_for_show_user_test()
+		{
+			var client = DataMother.CreateClientAndUsers();
+			client.Name = "testClientForShowUserFindTest";
+			var user = client.Users.First();
+			user.Login = Guid.NewGuid().ToString().Replace("-", string.Empty);
+			session.Save(user);
+			session.Save(client);
+
+			Flush();
+			QueryCatcher.Catch();
+			var loginObj = controller.SearchForShowUser(user.Login.Substring(0, 5));
+			Assert.AreEqual(loginObj.Count(), 1);
+
+			var clientObj = controller.SearchForShowUser("ForShowUserFind");
+			Assert.AreEqual(clientObj.Count(), 2);
+		}
 	}
 }
