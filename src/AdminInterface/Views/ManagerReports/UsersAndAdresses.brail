@@ -40,7 +40,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
 			<th>Пользователей</th>
 			<th>Адресов</th>
-			<th>Отчет</th>
+			<th>Показать</th>
 			<th>${app.Sortable("Регион", "RegionName")}</th>
 			<th>${app.Sortable(filter.HeadCodeName, "Id")}</th>
 			<th>${app.Sortable(filter.HeadName, "Name")}</th>
@@ -64,16 +64,26 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 				<% end %>
 			</td>
 			<td>
+				<%if item.UserCount > 0:%>
 				<a href="javascript:" id="${item.ClientId}" onclick="GetUserInfo(${item.Id}, this)">${item.UserCount}</a>
 				<div class="toggled"></div>
+				<%else:%>
+					Нет
+				<%end%>
 			</td>
-			<td>${item.AddressCount}</td>
+			<td>
+			<%if item.AddressCount > 0:%>
+				${item.AddressCount}
+			<%else:%>
+				Нет
+			<%end%>
+			</td>
 			<td>
 				<%if (item.IsDrugstore and (not item.IsHiddenFromSupplier)):%>
 					${FormHelper.FormTag("${SiteRoot}/ManagerReports/ClientConditionsMonitoring", {@method : @get})}
 						${FormHelper.HiddenField("filter.ClientId", item.ClientId)}
 						${FormHelper.HiddenField("filter.ClientName", item.ClientName)}
-						${FormHelper.ButtonElement("Отчет", @submit, null)}
+						${FormHelper.ButtonElement("Отчет", @submit, {@title : "Мониторинг выставления условий новому клиенту"})}
 					${FormHelper.EndFormTag()}
 				<%end%>
 			</td>

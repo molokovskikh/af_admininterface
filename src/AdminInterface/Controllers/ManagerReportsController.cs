@@ -170,6 +170,7 @@ namespace AdminInterface.Controllers
 		{
 			var filter = BindFilter<ClientConditionsMonitoringFilter, MonitoringItem>();
 			FindFilter(filter);
+			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
 		}
 
 		public void SendSupplierNotification(uint clientCode, uint supplierCode)

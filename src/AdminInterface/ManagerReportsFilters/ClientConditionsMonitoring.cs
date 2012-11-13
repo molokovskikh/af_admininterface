@@ -24,6 +24,7 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public uint PriceCode { get; set; }
 		public uint SupplierCode { get; set; }
+		public uint RegionCode { get; set; }
 		public string SupplierName { get; set; }
 		public string PriceName { get; set; }
 		public string CostName { get; set; }
@@ -33,6 +34,27 @@ namespace AdminInterface.ManagerReportsFilters
 		public string CountAvailableForClient { get; set; }
 		public string RegionName { get; set; }
 		public string ClientName { get; set; }
+
+		private string _priceType;
+
+		public string PriceType
+		{
+			get { return _priceType; }
+			set
+			{
+				switch (value) {
+					case "0":
+						_priceType = "Обычный";
+						break;
+					case "1":
+						_priceType = "Ассортиментный";
+						break;
+					case "2":
+						_priceType = "VIP";
+						break;
+				}
+			}
+		}
 
 		private string _contacts;
 
@@ -55,13 +77,19 @@ namespace AdminInterface.ManagerReportsFilters
 			set { _availableForClient = Convert.ToBoolean(int.Parse(value)); }
 		}
 
+		public int SupplierDeliveryCount { get; set; }
+		public int SupplierDeliveryCountFill { get; set; }
+
 		public string SupplierDeliveryId
 		{
 			get { return _supplierDeliveryId; }
 			set
 			{
-				if (!string.IsNullOrEmpty(value))
-					_supplierDeliveryId = value.Split(',').Where(v => !string.IsNullOrEmpty(v)).Implode();
+				if (!string.IsNullOrEmpty(value)) {
+					var fillItems = value.Split(',').Where(v => !string.IsNullOrEmpty(v)).ToList();
+					SupplierDeliveryCountFill = fillItems.Count;
+					_supplierDeliveryId = fillItems.Implode();
+				}
 			}
 		}
 
@@ -118,9 +146,10 @@ namespace AdminInterface.ManagerReportsFilters
 			return (double)ClientCode / AllIntersection >= 0.5;
 		}
 
-		public bool DeliveryStyle()
+		public bool DeliveryStyle(MonitoringItem monitoringItem)
 		{
-			return (double)AddressCode / AllAddressIntersection >= 0.5;
+			var monitor = monitoringItem.SupplierDeliveryCountFill > 0 && monitoringItem.SupplierDeliveryCountFill < monitoringItem.SupplierDeliveryCount;
+			return ((double)AddressCode / AllAddressIntersection >= 0.5) || monitor;
 		}
 	}
 
@@ -136,8 +165,9 @@ namespace AdminInterface.ManagerReportsFilters
 			SortBy = "SupplierName";
 			SortKeyMap = new Dictionary<string, string> {
 				{ "SupplierCode", "s.Id" },
-				{ "SupplierName", "s.Name" },
+				{ "SupplierName", "supplier.Name" },
 				{ "PriceName", "pd.PriceName" },
+				{ "PriceType", "pd.PriceType" },
 				{ "CostName", "pc.CostName" },
 				{ "AvailableForClient", "i.AvailableForClient" },
 				{ "CountAvailableForClient", "CountAvailableForClient" },
@@ -166,18 +196,22 @@ SELECT
 	COUNT(IF(i.PriceMarkup > 0,1,NULL)) as PriceMarkup,
 	COUNT(IF(i.SupplierClientId is not null and i.SupplierClientId != '',1,NULL)) as ClientCode,
 	COUNT(IF(i.SupplierPaymentId is not null and i.SupplierPaymentId != '',1,NULL)) as PaymentCode
-FROM customers.Intersection I
-	LEFT JOIN Customers.Clients drugstore ON drugstore.Id = i.ClientId
-	LEFT JOIN usersettings.PricesData pd ON pd.pricecode = i.PriceId
-	LEFT JOIN Customers.Suppliers supplier ON supplier.Id = pd.firmcode
-	LEFT JOIN usersettings.PricesRegionalData prd ON prd.regioncode = i.RegionId AND prd.pricecode = pd.pricecode
-WHERE supplier.Disabled = 0
+FROM  Customers.Intersection i
+	JOIN Customers.Clients drugstore ON drugstore.Id = i.ClientId
+	JOIN usersettings.RetClientsSet r ON r.clientcode = drugstore.Id
+	JOIN usersettings.PricesData pd ON pd.pricecode = i.PriceId
+	JOIN Customers.Suppliers supplier ON supplier.Id = pd.firmcode
+	JOIN usersettings.PricesRegionalData prd ON prd.regioncode = i.RegionId AND prd.pricecode = pd.pricecode
+	JOIN usersettings.RegionalData rd ON rd.RegionCode = i.RegionId AND rd.FirmCode = pd.firmcode
+WHERE   supplier.Disabled = 0
 	and (supplier.RegionMask & i.RegionId) > 0
 	AND (drugstore.maskregion & i.RegionId) > 0
+	AND (r.WorkRegionMask & i.RegionId) > 0
+	AND pd.agencyenabled = 1
 	AND pd.enabled = 1
 	AND pd.pricetype <> 1
 	AND prd.enabled = 1
-	and i.AgencyEnabled = 1
+	AND if(not r.ServiceClient, supplier.Id != 234, 1)
 	and (i.RegionId & :Region) > 0
 group by PriceId;")
 				.SetParameter("Region", regionMask)
@@ -188,21 +222,24 @@ group by PriceId;")
 SELECT
 	PriceId,
 	Count(*) as AllAddressIntersection,
-	COUNT(IF(ai.SupplierDeliveryId is not null and ai.SupplierDeliveryId != '',1,NULL)) as AddressCode
-FROM customers.Intersection I
+	COUNT(IF(ai.SupplierDeliveryId is not null and ai.SupplierDeliveryId != '', 1 ,NULL)) as AddressCode
+FROM Customers.Intersection i
 	JOIN Customers.Clients drugstore ON drugstore.Id = i.ClientId
+	JOIN usersettings.RetClientsSet r ON r.clientcode = drugstore.Id
 	JOIN usersettings.PricesData pd ON pd.pricecode = i.PriceId
 	JOIN Customers.Suppliers supplier ON supplier.Id = pd.firmcode
 	JOIN usersettings.PricesRegionalData prd ON prd.regioncode = i.RegionId AND prd.pricecode = pd.pricecode
 	JOIN customers.AddressIntersection ai on ai.IntersectionId = i.Id
 	join Customers.Addresses ca on ca.id = ai.AddressId
-WHERE  supplier.Disabled = 0
+WHERE supplier.Disabled = 0
 	and (supplier.RegionMask & i.RegionId) > 0
 	AND (drugstore.maskregion & i.RegionId) > 0
+	AND (r.WorkRegionMask & i.RegionId) > 0
+	AND pd.agencyenabled = 1
 	AND pd.enabled = 1
 	AND pd.pricetype <> 1
 	AND prd.enabled = 1
-	and i.AgencyEnabled = 1
+	AND if(not r.ServiceClient, supplier.Id != 234, 1)
 	and (i.RegionId & :Region) > 0
 	and ca.LegalEntityId = i.LegalEntityId
 	and ca.Enabled = true
@@ -217,8 +254,8 @@ group by PriceId;")
 
 			var result = Session.CreateSQLQuery(string.Format(@"
 SELECT
-	s.Id as SupplierCode,
-	s.Name as SupplierName,
+	supplier.Id as SupplierCode,
+	supplier.Name as SupplierName,
 	i.PriceId as PriceCode,
 	pd.PriceName as PriceName,
 	pc.CostName as CostName,
@@ -227,8 +264,10 @@ SELECT
 	i.SupplierClientId as SupplierClientId,
 	i.SupplierPaymentId as SupplierPaymentId,
 	i.AvailableForClient as AvailableForClient,
+	reg.RegionCode as RegionCode,
 	reg.region as RegionName,
 	c.Name as ClientName,
+	pd.pricetype as PriceType,
 
 (select
 	count(*)
@@ -246,6 +285,10 @@ from Usersettings.PricesData pd
 	join customers.Intersection II on (ii.RegionId & :Region) > 0 and II.ClientId = :ClientCode and II.PriceId = pdj.PriceCode
 where
 	pd.PriceCode = I.PriceId
+	and pd.pricetype <> 1
+	and pd.enabled = 1
+	AND pd.agencyenabled = 1
+	and rd.Enabled = 1
 ) as CountAvailableForClient,
 
 (
@@ -254,27 +297,36 @@ FROM customers.suppliers s1
 	join contacts.contact_groups cg on cg.ContactGroupOwnerId = s1.ContactGroupOwnerId
 	join contacts.persons p on p.ContactGroupId = cg.id
 	join contacts.contacts c on c.ContactOwnerId = cg.id || c.ContactOwnerId = p.Id
-where s1.id = s.Id
+where s1.id = supplier.Id
 	and cg.type = 1
 	and c.Type = 0
 ) as Contacts,
 
-	group_concat(ai.SupplierDeliveryId) as SupplierDeliveryId
-FROM customers.Intersection I
-	join Usersettings.PricesData pd on pd.PriceCode = i.PriceId
-	join Customers.Suppliers s on s.Id = pd.FirmCode
+	group_concat(ai.SupplierDeliveryId) as SupplierDeliveryId,
+	count(i.Id) as SupplierDeliveryCount
+FROM Customers.Intersection i
+	JOIN Customers.Clients c ON c.Id = i.ClientId
+	JOIN usersettings.RetClientsSet r ON r.clientcode = c.Id
+	JOIN usersettings.PricesData pd ON pd.pricecode = i.PriceId
+	JOIN Customers.Suppliers supplier ON supplier.Id = pd.firmcode
+	JOIN usersettings.PricesRegionalData prd ON prd.regioncode = i.RegionId AND prd.pricecode = pd.pricecode
+	JOIN usersettings.RegionalData rd ON rd.RegionCode = i.RegionId AND rd.FirmCode = pd.firmcode
 	join Usersettings.PricesCosts pc on pc.CostCode = i.CostId
 	join farm.Regions reg on reg.RegionCode = i.RegionId
-	join customers.Clients c on c.id = :ClientCode
 	left join Customers.AddressIntersection ai on ai.IntersectionId = i.id
 where
 	(i.RegionId & :Region) > 0
 	and i.ClientId = :ClientCode
-	and (s.RegionMask & i.RegionId) > 0
-	and pd.enabled = 1
-	and pd.pricetype <> 1
-	and i.AgencyEnabled = 1
-	and s.disabled = 0
+	and supplier.Disabled = 0
+	and (supplier.RegionMask & i.RegionId) > 0
+	AND (c.maskregion & i.RegionId) > 0
+	AND (r.WorkRegionMask & i.RegionId) > 0
+	AND pd.agencyenabled = 1
+	AND pd.enabled = 1
+	AND pd.pricetype <> 1
+	AND prd.enabled = 1
+	AND if(not r.ServiceClient, supplier.Id != 234, 1)
+	AND if(pd.PriceType = 2, i.AvailableForClient = 1, 1)
 group by i.id
 order by {0} {1};", SortKeyMap[SortBy], SortDirection))
 				.SetParameter("Region", regionMask)
@@ -297,9 +349,8 @@ order by {0} {1};", SortKeyMap[SortBy], SortDirection))
 					monitoringItem.PaymentCodeStyle = aggregates[monitoringItem.PriceCode].PaymentCodeStyle();
 				}
 
-				if (string.IsNullOrEmpty(monitoringItem.SupplierDeliveryId)
-					&& aggregates.Keys.Contains(monitoringItem.PriceCode)) {
-					monitoringItem.DeliveryStyle = aggregates[monitoringItem.PriceCode].DeliveryStyle();
+				if (aggregates.Keys.Contains(monitoringItem.PriceCode)) {
+					monitoringItem.DeliveryStyle = aggregates[monitoringItem.PriceCode].DeliveryStyle(monitoringItem);
 				}
 			}
 

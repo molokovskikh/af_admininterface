@@ -198,7 +198,7 @@ namespace AdminInterface.Controllers
 		{
 			var user = DbSession.Load<User>(id);
 			NHibernateUtil.Initialize(user.RootService);
-			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
+			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl + "auth/logon.aspx";
 			PropertyBag["user"] = user;
 			if (user.Client != null)
 				PropertyBag["client"] = user.Client;

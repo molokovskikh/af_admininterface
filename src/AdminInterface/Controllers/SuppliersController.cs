@@ -40,7 +40,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["usersInfo"] = ADHelper.GetPartialUsersInformation(supplier.Users);
 
 			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
-			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
+			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl + "auth/logon.aspx";
 
 			PropertyBag["filter"] = filter;
 			PropertyBag["messages"] = filter.Execute(supplier, DbSession);

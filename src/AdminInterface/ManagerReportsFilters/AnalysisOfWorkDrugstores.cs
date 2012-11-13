@@ -178,6 +178,7 @@ left join farm.Regions reg on reg.RegionCode = Cd.regioncode
 WHERE
 cd.regioncode & ?regionCode > 0
 {0}
+And cd.Status = 1
 AND rcs.serviceclient = 0
 AND rcs.invisibleonfirm = 0";
 
