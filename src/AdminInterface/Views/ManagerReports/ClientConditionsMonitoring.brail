@@ -1,5 +1,6 @@
-﻿ ${app.JS("ManagerReport.js")}
-
+﻿<% import  System.Collections.Generic %>
+ ${app.JS("ManagerReport.js")}
+ ${app.Asset("ManagerReport.css")}
  <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
@@ -24,7 +25,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 </table>
 
 <% if IsDefined("Items"): %>
-<table class="DataTable">
+<table class="DataTable" id="ClientConditionsTable">
 <%if Items.Count > 0: %>
 	<thead>
 		<tr class="centerRowHead">
@@ -51,9 +52,16 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	</thead>
 <%end %>
 	<tbody>
+	<%styleCount = 0
+		beforeSupplierCode = 0
+	%>
 	<%if Items.Count > 0: %>
 		<%for i, item in enumerate(Items): %>
-		<tr class="${ViewHelper.GetRowStyle(i)} Submit">
+		<%if beforeSupplierCode != item.SupplierCode:
+			beforeSupplierCode = item.SupplierCode;
+			styleCount = styleCount + 1
+		end%>
+		<tr class="${ViewHelper.GetRowStyle(styleCount)} Submit">
 			<td>${UrlHelper.Link(item.SupplierCode.ToString(), {@controller: @Suppliers, @params: {@Id : item.SupplierCode} })}</td>
 			<td><a href="${CiUrl}Settings/Clients.rails?priceId=${item.PriceCode}&regionId=${item.RegionCode}&searchText=${filter.ClientName}"> ${item.SupplierName}</td>
 			<td>${item.RegionName}</td>
@@ -89,12 +97,13 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 <%end %>
 
 <%
-	component Legend, { "LegendItems" : {
-		"Не подключен ни к одному из проайсов" : "no-price-connected",
-		"Если у поставщика есть 5 и более ценовых колонок, а аптеке назначена базовая" : "cost-collumn",
-		"Более половины аптек, подключенных к прайсу имеют наценку, отличную от Нуля, а для рассматриваемой аптеки наценка 0" : "price-markup-style",
-		"Более половины аптек, подключенных к прайсу имеют код оплаты, а для рассматриваемой аптеки этот код не прописан" : "payment-code-style",
-		"Более половины аптек, подключенных к прайсу имеют код клиента, а для рассматриваемой аптеки этот код не прописан" : "client-code-style",
-		"Более половины аптек, подключенных к прайсу имеют адрес доставки, а для рассматриваемой аптеки этот код не прописан" : "delivery-style"},
-		"ByCenter" : true}
+legendItems = Dictionary[of string, string]()
+legendItems.Add("Если у поставщика есть 5 и более ценовых колонок, а аптеке назначена базовая", "cost-collumn")
+legendItems.Add("Не подключен ни к одному из проайсов", "no-price-connected")
+legendItems.Add("Более половины аптек, подключенных к прайсу имеют наценку, отличную от Нуля, а для рассматриваемой аптеки наценка 0", "price-markup-style")
+legendItems.Add("Более половины аптек, подключенных к прайсу имеют код клиента, а для рассматриваемой аптеки этот код не прописан", "client-code-style")
+legendItems.Add("Более половины аптек, подключенных к прайсу имеют коды адресов доставки, а для рассматриваемой аптеки этоти код не прописан, либо для рассмастриваемой аптеки прописаны не все коды адресов доставки", "delivery-style")
+legendItems.Add("Более половины аптек, подключенных к прайсу имеют код оплаты, а для рассматриваемой аптеки этот код не прописан", "payment-code-style")
+component Legend, { "LegendItems" : legendItems,
+	"ByCenter" : true}
 %>

@@ -1,4 +1,4 @@
-﻿${app.CSS("AnalysisOfWorkDrugStores.css")}
+﻿${app.Asset("ManagerReport.css")}
 ${app.JS("ManagerReport.js")}
  <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
@@ -79,5 +79,6 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 </tbody>
 </table>
 ${FormHelper.EndFormTag()}
-
+<div id="AnalysisOfWorkDrugstoresTable">
 ${tableHelper.ViewResult(Items, filter, app)}
+</div>

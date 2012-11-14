@@ -32,7 +32,9 @@ namespace AdminInterface.ManagerReportsFilters
 		{
 			SortKeyMap = new Dictionary<string, string> {
 				{ "ClientId", "c.Id" },
-				{ "ClientName", "c.Name" }
+				{ "ClientName", "c.Name" },
+				{ "HomeRegion", "c.HomeRegion" },
+				{ "LogTime", "LogTime" }
 			};
 			PageSize = 30;
 			Period = new DatePeriod(DateTime.Now.AddMonths(-1), DateTime.Now);

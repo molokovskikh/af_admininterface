@@ -29,8 +29,8 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<tr>
 			<th>${app.Sortable("Код клиента", "ClientId")}</th>
 			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
-			<th>Регион</th>
-			<th>Дата отключения</th>
+			<th>${app.Sortable("Регион", "HomeRegion")}</th>
+			<th>${app.Sortable("Дата отключения", "LogTime")}</th>
 			<th>Комментарий оператора</th>
 		</tr>
 	</thead>

@@ -6,6 +6,7 @@ using System.Web;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
@@ -174,7 +175,8 @@ namespace AdminInterface.ManagerReportsFilters
 					.CreateAlias("Payer", "p", JoinType.InnerJoin)
 					.CreateAlias("Client", "c", JoinType.LeftOuterJoin)
 					.CreateAlias("c.Settings", "set", JoinType.LeftOuterJoin)
-					.Add(Expression.Or(Expression.Gt("p.PayerID", 921u), Expression.Lt("p.PayerID", 921u)));
+					.Add(Expression.Or(Expression.Gt("p.PayerID", 921u), Expression.Lt("p.PayerID", 921u)))
+					.Add(Expression.Eq("s.Type", ServiceType.Drugstore));
 
 				if (ExcludeType == ExcludesTypes.Hidden)
 					userCriteria.Add(Expression.Eq("set.InvisibleOnFirm", DrugstoreType.Standart));

@@ -76,7 +76,9 @@ namespace AdminInterface.ManagerReportsFilters
 				{ "ClientId", "c.Id" },
 				{ "ClientName", "c.Name" },
 				{ "UserId", "u.Id" },
-				{ "UserName", "u.Name" }
+				{ "UserName", "u.Name" },
+				{ "RegionName", "reg.RegionCode" },
+				{ "Registrant", "if (reg.ManagerName is not null, reg.ManagerName, c.Registrant)" },
 			};
 			OrderDate = DateTime.Now.AddDays(-7);
 			UpdatePeriod = new DatePeriod(DateTime.Now.AddDays(-7), DateTime.Now);

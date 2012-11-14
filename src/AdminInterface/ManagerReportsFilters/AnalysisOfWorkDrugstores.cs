@@ -131,7 +131,7 @@ namespace AdminInterface.ManagerReportsFilters
 SELECT cd.id as Id,
 cd.name as Name,
 reg.Region as RegionName,
-@CurWeekObn := (SELECT COUNT(o.id)
+@CurWeekObn := (SELECT COUNT(au1.Updateid)
 	FROM logs.analitfupdates au1,
 	customers.users O
 	WHERE requesttime BETWEEN ?FistPeriodStart AND ?FistPeriodEnd
@@ -441,10 +441,10 @@ limit {0}, {1}", CurrentPage * PageSize, PageSize, SortBy, SortDirection))
 						item.LastWeekZak = Convert.ToDecimal(row[6]);
 
 					if (row[7] != DBNull.Value)
-						item.ProblemObn = Convert.ToDecimal(row[7]);
+						item.ProblemObn = Convert.ToDecimal(row[9]);
 
 					if (row[8] != DBNull.Value)
-						item.ProblemZak = Convert.ToDecimal(row[8]);
+						item.ProblemZak = Convert.ToDecimal(row[10]);
 
 					result.Add(item);
 				}

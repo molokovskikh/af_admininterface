@@ -1,0 +1,23 @@
+﻿#AnalysisOfWorkDrugstoresTable .DataTable {
+	width: 800px;
+	background-color: #EBEBEB;
+	border: solid 1px #DADADA;
+	text-align: center;
+	margin: 0 auto;
+}
+
+#AnalysisOfWorkDrugstoresTable .userInfoDiv .DataTable {
+	width: 750px;
+	background-color: #EBEBEB;
+	border: solid 1px #DADADA;
+	text-align: center;
+}
+
+#ClientConditionsTable .EvenRow {
+	background-color: #D9E5E7;
+}
+
+
+#ClientConditionsTable tbody tr.OddRow {
+	background-color: #E4DADA;
+}

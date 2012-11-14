@@ -136,26 +136,32 @@ table thead.CenterHead th
 
 .no-price-connected {
 	background-color: #fbafaf;
+	border: 1px double #AAA;
 }
 
 .cost-collumn {
 	background-color: #e5cb8e;
+	border: 1px double #AAA;
 }
 
 .price-markup-style {
 	background-color: #afc1fb;
+	border: 1px double #AAA;
 }
 
 .payment-code-style {
 	background-color: #98CBCB;
+	border: 1px double #AAA;
 }
 
 .client-code-style {
 	background-color: #fbafe4;
+	border: 1px double #AAA;
 }
 
 .delivery-style {
-	background-color: #EDE948;
+	background-color: #C4D3A5;
+	border: 1px double #AAA;
 }
 
 .minimumHead {
@@ -191,7 +197,7 @@ table thead.CenterHead th
 	background-color: #f9be67;
 }
 
-.DataTable tbody tr.hidden-from-supplier td.forSelectHiddenClient, div.legendDiv .hidden-from-supplier {
+.DataTable tbody tr.hidden-from-supplier td.forSelectHiddenClient, div.hidden-from-supplier {
 	background-color: #fffaa0;
 }
 
@@ -199,6 +205,6 @@ table thead.CenterHead th
 	width: 250px;
 }
 
-.DataTable tbody tr td.no-order-style, div.legendDiv .no-order-style {
+.DataTable tbody tr td.no-order-style, div.no-order-style {
 	background-color: #9999ff;
 }

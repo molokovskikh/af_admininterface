@@ -23,7 +23,7 @@ namespace AdminInterface.ManagerReportsFilters
 		private string _supplierDeliveryId;
 
 		public uint PriceCode { get; set; }
-		public uint SupplierCode { get; set; }
+		public int SupplierCode { get; set; }
 		public uint RegionCode { get; set; }
 		public string SupplierName { get; set; }
 		public string PriceName { get; set; }
@@ -292,7 +292,7 @@ where
 ) as CountAvailableForClient,
 
 (
-SELECT group_concat(distinct c.ContactText SEPARATOR ', ') as Contacts
+SELECT group_concat(distinct c.ContactText SEPARATOR '; ') as Contacts
 FROM customers.suppliers s1
 	join contacts.contact_groups cg on cg.ContactGroupOwnerId = s1.ContactGroupOwnerId
 	join contacts.persons p on p.ContactGroupId = cg.id

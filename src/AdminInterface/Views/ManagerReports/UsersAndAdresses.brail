@@ -79,7 +79,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<%end%>
 			</td>
 			<td>
-				<%if (item.IsDrugstore and (not item.IsHiddenFromSupplier)):%>
+				<%if (not item.NoOrderStyle):%>
 					${FormHelper.FormTag("${SiteRoot}/ManagerReports/ClientConditionsMonitoring", {@method : @get})}
 						${FormHelper.HiddenField("filter.ClientId", item.ClientId)}
 						${FormHelper.HiddenField("filter.ClientName", item.ClientName)}
