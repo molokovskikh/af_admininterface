@@ -1,0 +1,9 @@
+﻿<tr>
+	<td>
+		${app.Label(target)}
+	</td>
+	<td>
+		${FormHelper.TextArea(target, {@cols: "40", @rows: "3"})}
+		${app.Validation(target)}
+	</td>
+</tr>

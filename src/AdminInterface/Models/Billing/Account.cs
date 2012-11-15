@@ -153,15 +153,7 @@ namespace AdminInterface.Models.Billing
 			}
 		}
 
-		public virtual string DefaultDescription
-		{
-			get
-			{
-				if (Payer.Recipient != null)
-					return Payer.Recipient.Description;
-				return "";
-			}
-		}
+		public abstract string DefaultDescription { get; }
 
 		public virtual string RegistrationMessage
 		{

@@ -65,5 +65,15 @@ namespace AdminInterface.Models.Billing
 		{
 			return !User.RootService.Disabled && User.Enabled && base.ShouldPay();
 		}
+
+		public override string DefaultDescription
+		{
+			get
+			{
+				if (Payer.Recipient != null)
+					return Payer.Recipient.UserDescription;
+				return "";
+			}
+		}
 	}
 }

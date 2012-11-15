@@ -19,7 +19,7 @@ namespace Unit.Models
 		public void Setup()
 		{
 			payer = new Payer("Тестовый плательщик") {
-				Recipient = new Recipient(),
+				Recipient = Recipient.CreateWithDefaults(),
 			};
 			client = new Client(payer, Data.DefaultRegion);
 			payer.Clients.Add(client);
