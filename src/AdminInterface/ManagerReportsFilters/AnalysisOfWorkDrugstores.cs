@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using AdminInterface.Security;
+using Castle.MonoRail.Framework.Helpers;
 using Common.MySql;
 using Common.Tools.Calendar;
 using Common.Web.Ui.Helpers;
@@ -75,16 +76,16 @@ namespace AdminInterface.ManagerReportsFilters
 		public int CurWeekObn { get; set; }
 		public int LastWeekObn { get; set; }
 
-		[Display(Name = "Обновления (Старый/Новый)", Order = 5)]
+		[Display(Name = "Обновления (Новый/Старый)", Order = 5)]
 		public string Obn
 		{
-			get { return string.Format("{0}/{1}", LastWeekObn, CurWeekObn); }
+			get { return string.Format("{0}/{1}", CurWeekObn, LastWeekObn); }
 		}
 
-		public decimal CurWeekZak { get; set; }
-		public decimal LastWeekZak { get; set; }
+		public int CurWeekZak { get; set; }
+		public int LastWeekZak { get; set; }
 
-		[Display(Name = "Заказы (Старый/Новый)", Order = 7)]
+		[Display(Name = "Заказы (Новый/Старый)", Order = 7)]
 		public string Zak
 		{
 			get { return string.Format("{0}/{1}", LastWeekZak.ToString("C"), CurWeekZak.ToString("C")); }
@@ -92,6 +93,7 @@ namespace AdminInterface.ManagerReportsFilters
 
 		[Display(Name = "Падение обновлений %", Order = 6)]
 		public decimal ProblemObn { get; set; }
+
 		[Display(Name = "Падение заказов %", Order = 8)]
 		public decimal ProblemZak { get; set; }
 
@@ -101,12 +103,9 @@ namespace AdminInterface.ManagerReportsFilters
 
 	public enum AnalysisReportType
 	{
-		[Description("Clients")]
-		Client,
-		[Description("Users")]
-		User,
-		[Description("Addresses")]
-		Address
+		[Description("Clients")] Client,
+		[Description("Users")] User,
+		[Description("Addresses")] Address
 	}
 
 	public class AnalysisOfWorkDrugstoresFilter : PaginableSortable, IFiltrable<BaseItemForTable>
@@ -118,69 +117,57 @@ namespace AdminInterface.ManagerReportsFilters
 		public AnalysisReportType Type { get; set; }
 		public bool ForSubQuery { get; set; }
 
-		public int PagesSize
-		{
-			get { return PageSize; }
-			set { PageSize = value; }
-		}
 
 		public ISession Session { get; set; }
 		public bool LoadDefault { get; set; }
 
-		public string ClientTypeSqlPart = @"
-SELECT cd.id as Id,
-cd.name as Name,
+		public string ClientTypeSqlPart = @"insert into Customers.Updates
+SELECT cd.id,
+cd.name,
 reg.Region as RegionName,
-@CurWeekObn := (SELECT COUNT(au1.Updateid)
+(SELECT COUNT(o.id)
 	FROM logs.analitfupdates au1,
 	customers.users O
-	WHERE requesttime BETWEEN ?FistPeriodStart AND ?FistPeriodEnd
+	WHERE requesttime BETWEEN :FistPeriodStart AND :FistPeriodEnd
 	AND au1.userid =o.id
 	AND o.clientid=cd.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
 ) as CurWeekObn,
-@LastWeekObn := (SELECT COUNT(au2.Updateid)
+(SELECT COUNT(au2.Updateid)
 	FROM logs.analitfupdates au2,
 	customers.users O
-	WHERE requesttime BETWEEN ?LastPeriodStart AND ?LastPeriodEnd
+	WHERE requesttime BETWEEN :LastPeriodStart AND :LastPeriodEnd
 	AND au2.userid = o.id
 	AND o.clientid = cd.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
 ) LastWeekObn,
-@CurWeekZak := (SELECT ROUND(sum(cost*quantity), 2)
+(SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh1,
 	orders.orderslist ol1
-	WHERE writetime BETWEEN ?FistPeriodStart AND ?FistPeriodEnd
+	WHERE writetime BETWEEN :FistPeriodStart AND :FistPeriodEnd
 	AND ol1.orderid = oh1.rowid
 	AND oh1.clientcode = cd.id
-	AND oh1.RegionCode = ?regionCode
+	AND oh1.RegionCode = :regionCode
 ) CurWeekZak,
-@LastWeekZak := (SELECT ROUND(sum(cost*quantity), 2)
+(SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh2,
 	orders.orderslist ol2
-	WHERE writetime BETWEEN ?LastPeriodStart AND ?LastPeriodEnd
+	WHERE writetime BETWEEN :LastPeriodStart AND :LastPeriodEnd
 	AND ol2.orderid = oh2.rowid
 	AND oh2.clientcode = cd.id
-	AND oh2.RegionCode = ?regionCode
-) LastWeekZak,
-
-(select count(u.Id) from Customers.Users u where u.ClientId = cd.Id) as UserCount,
-(select count(a.Id) from Customers.Addresses a where a.ClientId = cd.Id) as AddressCount,
-
-IF (@CurWeekObn - @LastWeekObn < 0 , ( IF (@CurWeekObn <> 0, ROUND((@LastWeekObn-@CurWeekObn)*100/@LastWeekObn), 100) ) ,0) ProblemObn,
-IF (@CurWeekZak - @LastWeekZak < 0 , ( IF (@CurWeekZak <> 0, ROUND((@LastWeekZak-@CurWeekZak)*100/@LastWeekZak), 100 ) ) ,0) ProblemZak
-
+	AND oh2.RegionCode = :regionCode
+) LastWeekZak
 FROM customers.Clients Cd
 left join usersettings.RetClientsSet Rcs on rcs.clientcode = cd.id
 left join farm.Regions reg on reg.RegionCode = Cd.regioncode
 WHERE
-cd.regioncode & ?regionCode > 0
+cd.regioncode & :regionCode > 0
 {0}
 And cd.Status = 1
 AND rcs.serviceclient = 0
-AND rcs.invisibleonfirm = 0";
+AND rcs.invisibleonfirm = 0;";
 
 		public string UserTypeSqlPart = @"insert into Customers.Updates
 SELECT u.id,
@@ -306,6 +293,11 @@ where u.id = au.Id;
 			};
 		}
 
+		public AnalysisOfWorkDrugstoresFilter(int pageSize) : this()
+		{
+			PageSize = pageSize;
+		}
+
 		public void SetDefaultRegion()
 		{
 			if (Region == null)
@@ -320,7 +312,7 @@ where u.id = au.Id;
 				regionMask &= Region.Id;
 
 			string createTemporaryTablePart =
-@"DROP TEMPORARY TABLE IF EXISTS Customers.Updates;
+				@"DROP TEMPORARY TABLE IF EXISTS Customers.Updates;
 
 CREATE TEMPORARY TABLE Customers.Updates (
 Id INT unsigned,
@@ -378,20 +370,11 @@ LastWeekZak INT) engine=MEMORY;";
 
 		public IList<BaseItemForTable> Find()
 		{
-			var regionMask = SecurityContext.Administrator.RegionMask;
+			PrepareAggregatesData();
 
-			if (Region != null)
-				regionMask &= Region.Id;
+			RowsCount = Convert.ToInt32(Session.CreateSQLQuery("select count(*) from Customers.updates;").UniqueResult());
 
-			if (Type != AnalysisReportType.Client) {
-				PrepareAggregatesData();
-				RowsCount = Convert.ToInt32(Session.CreateSQLQuery("select count(*) from Customers.updates;").UniqueResult());
-			}
-
-			IList<AnalysisOfWorkFiled> result = new List<AnalysisOfWorkFiled>();
-
-			if (Type != AnalysisReportType.Client) {
-				result = Session.CreateSQLQuery(string.Format(@"
+			var result = Session.CreateSQLQuery(string.Format(@"
 SELECT
 	Id,
 	Name,
@@ -407,52 +390,7 @@ SELECT
 FROM Customers.updates up
 ORDER BY {2} {3}
 limit {0}, {1}", CurrentPage * PageSize, PageSize, SortBy, SortDirection))
-					.ToList<AnalysisOfWorkFiled>();
-			}
-			else {
-				var dsResult = new DataSet();
-
-				With.Connection(c => {
-					var dataAdapter = new MySqlDataAdapter(string.Format(ClientTypeSqlPart, string.Empty) + string.Format(" ORDER BY {0} {1};", SortBy, SortDirection), c);
-					dataAdapter.SelectCommand.Parameters.Add(new MySqlParameter("FistPeriodStart", FistPeriod.Begin));
-					dataAdapter.SelectCommand.Parameters.Add(new MySqlParameter("FistPeriodEnd", FistPeriod.End));
-					dataAdapter.SelectCommand.Parameters.Add(new MySqlParameter("LastPeriodStart", LastPeriod.Begin));
-					dataAdapter.SelectCommand.Parameters.Add(new MySqlParameter("LastPeriodEnd", LastPeriod.End));
-					dataAdapter.SelectCommand.Parameters.Add(new MySqlParameter("regionCode", regionMask));
-
-					dataAdapter.Fill(dsResult, "result");
-				});
-
-				foreach (DataRow row in dsResult.Tables["result"].Rows) {
-					var item = new AnalysisOfWorkFiled {
-						Id = row[0].ToString(),
-						Name = row[1].ToString(),
-						RegionName = row[2].ToString(),
-						UserCount = row[7].ToString(),
-						AddressCount = row[8].ToString(),
-						CurWeekObn = Convert.ToInt32(row[3]),
-						LastWeekObn = Convert.ToInt32(row[4]),
-					};
-
-					if (row[5] != DBNull.Value)
-						item.CurWeekZak = Convert.ToDecimal(row[5]);
-
-					if (row[6] != DBNull.Value)
-						item.LastWeekZak = Convert.ToDecimal(row[6]);
-
-					if (row[7] != DBNull.Value)
-						item.ProblemObn = Convert.ToDecimal(row[9]);
-
-					if (row[8] != DBNull.Value)
-						item.ProblemZak = Convert.ToDecimal(row[10]);
-
-					result.Add(item);
-				}
-			}
-
-			RowsCount = result.Count;
-
-			result = result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
+				.ToList<AnalysisOfWorkFiled>();
 
 			foreach (var analysisOfWorkFiled in result) {
 				analysisOfWorkFiled.ForSubQuery = ForSubQuery;

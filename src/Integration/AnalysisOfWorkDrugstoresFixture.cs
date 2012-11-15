@@ -36,7 +36,7 @@ namespace Integration
 			using (new SessionScope())
 				client = DataMother.CreateClientAndUsers();
 
-			var filter = new AnalysisOfWorkDrugstoresFilter { PagesSize = 10000 };
+			var filter = new AnalysisOfWorkDrugstoresFilter(1000);
 			result = filter.Find();
 
 			var urlHelper = new UrlHelper(context);
