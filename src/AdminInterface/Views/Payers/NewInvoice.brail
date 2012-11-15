@@ -59,7 +59,7 @@ ${app.GetValidationError(invoice, "Recipient")}
 			<thead>
 				<tr>
 					<th><a href="javascript:" class=add>Добавить</a></th>
-					<th>Услуга</th>
+					<th>Наименование работы (услуги)</th>
 					<th>Дата платежа</th>
 					<th>Стоимость</th>
 					<th>Количество</th>

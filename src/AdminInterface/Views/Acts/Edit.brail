@@ -50,7 +50,7 @@ ${app.GetValidationError(act, "Recipient")}
 			<thead>
 				<tr>
 					<th><a href="javascript:" class=add>Добавить</a></th>
-					<th>Услуга</th>
+					<th>Наименование работы (услуги)</th>
 					<th>Стоимость</th>
 					<th>Количество</th>
 				</tr>
