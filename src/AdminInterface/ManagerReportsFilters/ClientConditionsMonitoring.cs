@@ -24,6 +24,7 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public uint PriceCode { get; set; }
 		public int SupplierCode { get; set; }
+		public int SupplierUserCode { get; set; }
 		public uint RegionCode { get; set; }
 		public string SupplierName { get; set; }
 		public string PriceName { get; set; }
@@ -67,6 +68,15 @@ namespace AdminInterface.ManagerReportsFilters
 				return string.Format("mailto:{0}{1}", _contacts, uri.PathAndQuery);
 			}
 			set { _contacts = value; }
+		}
+
+		public string LinkToClientInterface
+		{
+			get
+			{
+				var uri = new Uri(string.Format("{0}Logon/Login?UserId={1}&sourceUrl=Settings/Clients.rails?priceId={2}&regionId={3}&searchText={4}", Properties.Settings.Default.ClientInterfaceUrl, SupplierUserCode, PriceCode, RegionCode, ClientName));
+				return string.Format("<a href='{0}' target='_blank'>{1}</a>", uri.AbsoluteUri, SupplierName);
+			}
 		}
 
 		private bool _availableForClient;
@@ -301,6 +311,8 @@ where s1.id = supplier.Id
 	and cg.type = 1
 	and c.Type = 0
 ) as Contacts,
+
+(select u.Id from customers.Users u where u.RootService = supplier.Id limit 1) as SupplierUserCode,
 
 	group_concat(ai.SupplierDeliveryId) as SupplierDeliveryId,
 	count(i.Id) as SupplierDeliveryCount

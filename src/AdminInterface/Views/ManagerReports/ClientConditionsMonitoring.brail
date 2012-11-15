@@ -63,7 +63,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		end%>
 		<tr class="${ViewHelper.GetRowStyle(styleCount)} Submit">
 			<td>${UrlHelper.Link(item.SupplierCode.ToString(), {@controller: @Suppliers, @params: {@Id : item.SupplierCode} })}</td>
-			<td><a href="${CiUrl}Settings/Clients.rails?priceId=${item.PriceCode}&regionId=${item.RegionCode}&searchText=${filter.ClientName}"> ${item.SupplierName}</td>
+			<td>${item.LinkToClientInterface}</td>
 			<td>${item.RegionName}</td>
 			<td>${item.PriceName}</td>
 			<td>${item.PriceType}</td>
