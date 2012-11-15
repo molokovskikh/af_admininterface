@@ -5,6 +5,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
@@ -25,11 +26,12 @@ namespace Functional.Billing
 		{
 			client = DataMother.CreateTestClientWithAddressAndUser();
 			payer = client.Payers.First();
+
 			account = DataMother.Report(payer);
 			report = account.Report;
-			account.Save();
+			session.Save(account);
 
-			payer.Reports = new List<Report>();
+			payer.Recipient = session.Query<Recipient>().First();
 			payer.Reports.Add(report);
 
 			Open(payer);
@@ -50,7 +52,7 @@ namespace Functional.Billing
 			element.Click();
 			Css("input[name=AddComment]").AppendText("Disable_report");
 			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
-			report.Refresh();
+			session.Refresh(report);
 			Assert.That(report.Allow, Is.False);
 		}
 
@@ -68,7 +70,7 @@ namespace Functional.Billing
 		public void Show_accounted_report()
 		{
 			account.Accounted();
-			account.Save();
+			session.Save(account);
 
 			Open("/Accounts/Index");
 			Click("История поставленных на учет");
@@ -85,7 +87,7 @@ namespace Functional.Billing
 			Click("Сохранить");
 			AssertText("Сохранено");
 
-			account.Refresh();
+			session.Refresh(account);
 			Assert.That(account.Description, Is.EqualTo("Стат. отчет"));
 		}
 
