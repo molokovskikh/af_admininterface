@@ -514,6 +514,7 @@
     <None Include="Views\Orders\Make.brail" />
     <None Include="Views\Prices\Edit.brail" />
     <None Include="Views\Shared\DisplayTemplates\RegistrationInfo.brail" />
+    <Content Include="Views\Shared\EditorTemplates\TableFormBlock.brail" />
     <None Include="Views\Shared\EditorTemplates\TimeSpan.brail" />
     <None Include="Views\SpecialHandlers\Index.brail" />
     <None Include="Views\SpecialHandlers\New.brail" />

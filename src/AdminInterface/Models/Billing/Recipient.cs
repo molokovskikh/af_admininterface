@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Castle.Components.Validator;
 using Common.Web.Ui.ActiveRecordExtentions;
 using NHibernate;
 using NHibernate.Linq;
@@ -51,15 +53,17 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public virtual string AccountWarranty { get; set; }
 
-		public string Description
-		{
-			get
-			{
-				if (Id == 4)
-					return "Обеспечение доступа к ИС (мониторингу фармрынка) в {0}";
-				return "Мониторинг оптового фармрынка за {0}";
-			}
-		}
+		[Property, ValidateNonEmpty, Description("Наименование работы (услуги) для пользователя:")]
+		public virtual string UserDescription { get; set; }
+
+		[Property, ValidateNonEmpty, Description("Наименование работы (услуги) для адреса:")]
+		public virtual string AddressDescription { get; set; }
+
+		[Property, ValidateNonEmpty, Description("Наименование работы (услуги) для отчета:")]
+		public virtual string ReportDescription { get; set; }
+
+		[Property, ValidateNonEmpty, Description("Наименование работы (услуги) для поставщика:")]
+		public virtual string SupplierDescription { get; set; }
 
 		public static IList<Recipient> All()
 		{
@@ -69,6 +73,16 @@ namespace AdminInterface.Models.Billing
 		public static IList<Recipient> All(ISession session)
 		{
 			return session.Query<Recipient>().OrderBy(r => r.Name).ToList();
+		}
+
+		public static Recipient CreateWithDefaults()
+		{
+			return new Recipient {
+				UserDescription = "Мониторинг оптового фармрынка за {0}",
+				AddressDescription = "Дополнительный адрес доставки медикаментов за {0}",
+				ReportDescription = "Статистический отчет по фармрынку за {0}",
+				SupplierDescription = "Справочно-информационные услуги за {0}"
+			};
 		}
 	}
 }

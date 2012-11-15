@@ -37,14 +37,14 @@ namespace AdminInterface.Controllers
 		public void Edit(uint id)
 		{
 			var recipient = DbSession.Load<Recipient>(id);
+			PropertyBag["recipient"] = recipient;
 			if (IsPost) {
 				BindObjectInstance(recipient, "recipient");
-				DbSession.Save(recipient);
-				Notify("Сохранено");
-				RedirectToReferrer();
-			}
-			else {
-				PropertyBag["recipient"] = recipient;
+				if (IsValid(recipient)) {
+					DbSession.Save(recipient);
+					Notify("Сохранено");
+					RedirectToReferrer();
+				}
 			}
 		}
 	}

@@ -20,7 +20,7 @@ namespace Unit.Models
 		{
 			payer = new Payer {
 				JuridicalName = "ООО 'Рога и копыта'",
-				Recipient = new Recipient(),
+				Recipient = Recipient.CreateWithDefaults(),
 				Addresses = new List<Address>(),
 				Ads = new List<Advertising>()
 			};

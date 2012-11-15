@@ -55,7 +55,12 @@ namespace AdminInterface.Models.Billing
 
 		public override string DefaultDescription
 		{
-			get { return "Справочно-информационные услуги за {0}"; }
+			get
+			{
+				if (Payer.Recipient != null)
+					return Payer.Recipient.SupplierDescription;
+				return "";
+			}
 		}
 	}
 }

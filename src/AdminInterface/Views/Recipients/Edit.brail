@@ -5,6 +5,8 @@
 <% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "${siteroot}/Recipients/"), 
 									  ("Редактирование получателя платежей", "")]} %>
 
+<% app.FormBlockTemplate = "shared/EditorTemplates/TableFormBlock" %>
+
 <form method="post">
 	${FormHelper.HiddenField("callback.Id")}
 	<table>
@@ -102,6 +104,10 @@
 				${FormHelper.TextField("recipient.AccountWarranty")}
 			</td>
 		</tr>
+		${app.FormBlock("recipient.UserDescription")}
+		${app.FormBlock("recipient.AddressDescription")}
+		${app.FormBlock("recipient.SupplierDescription")}
+		${app.FormBlock("recipient.ReportDescription")}
 		<tr>
 			<td colspan="2">
 				<input type=submit value="Сохранить" />

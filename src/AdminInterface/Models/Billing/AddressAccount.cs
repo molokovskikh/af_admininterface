@@ -65,5 +65,15 @@ namespace AdminInterface.Models.Billing
 		{
 			return Address.Client.Enabled && Address.Enabled && HasPaidUsers && base.ShouldPay();
 		}
+
+		public override string DefaultDescription
+		{
+			get
+			{
+				if (Payer.Recipient != null)
+					return Payer.Recipient.AddressDescription;
+				return "";
+			}
+		}
 	}
 }

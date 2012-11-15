@@ -13,6 +13,8 @@ namespace AdminInterface.Helpers
 {
 	public class AppHelper : Common.Web.Ui.Helpers.AppHelper
 	{
+		public string FormBlockTemplate;
+
 		public AppHelper()
 		{
 			RegisterEditor();
@@ -37,6 +39,28 @@ namespace AdminInterface.Helpers
 			});
 		}
 
+		public string Validation(string target)
+		{
+			return GetValidationError(target);
+		}
+
+		public string FormBlock(string target)
+		{
+			if (String.IsNullOrEmpty(FormBlockTemplate))
+				return null;
+
+			if (!Context.Services.ViewEngineManager.HasTemplate(FormBlockTemplate))
+				return null;
+
+			using (var writer = new StringWriter()) {
+				var context = new ControllerContext {
+					Helpers = ControllerContext.Helpers
+				};
+				context.PropertyBag["target"] = target;
+				Context.Services.ViewEngineManager.ProcessPartial(FormBlockTemplate, writer, Context, Controller, context);
+				return writer.ToString();
+			}
+		}
 
 		protected override string GetBuiltinEdit(string name, Type valueType, object value, object options, PropertyInfo propertyInfo)
 		{
