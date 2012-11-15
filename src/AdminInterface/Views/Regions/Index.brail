@@ -29,15 +29,9 @@
 			<% end %></td>
 			<td class="width15">${region.GetDefaultRegions(false)}</td>
 			<td class="width15">${region.GetDefaultRegions(true)}</td>
-			<td><% if region.UserPayment > 0: %>
-				${region.UserPayment}
-			<% end %></td>
-			<td><% if region.AddressPayment > 0: %>
-				${region.AddressPayment}
-			<% end %></td>
-			<td><% if region.SupplierUserPayment > 0: %>
-				${region.SupplierUserPayment}
-			<% end %></td>
+			<td>${region.UserPayment.ToString("#")}</td>
+			<td>${region.AddressPayment.ToString("#")}</td>
+			<td>${region.SupplierUserPayment.ToString("#")}</td>
 			<td><% if region.DrugsSearchRegion: %>
 			${ViewHelper.ToHumanReadable(region.DrugsSearchRegion)}
 			<% end %></td>
