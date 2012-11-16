@@ -33,25 +33,29 @@ namespace Integration
 		{
 			var client = new Client();
 			IList<BaseItemForTable> result = new List<BaseItemForTable>();
-			using (new SessionScope())
-				client = DataMother.CreateClientAndUsers();
+			using (new SessionScope()) {
+				ArHelper.WithSession(s => {
+					client = DataMother.CreateClientAndUsers();
 
-			var filter = new AnalysisOfWorkDrugstoresFilter(1000);
-			result = filter.Find();
+					var filter = new AnalysisOfWorkDrugstoresFilter(1000);
+					filter.Session = s;
+					result = filter.Find();
 
-			var urlHelper = new UrlHelper(context);
-			PrepareHelper(urlHelper);
-			urlHelper.SetController(new ManagerReportsController(), context.CurrentControllerContext);
-			urlHelper.UrlBuilder = new DefaultUrlBuilder();
+					var urlHelper = new UrlHelper(context);
+					PrepareHelper(urlHelper);
+					urlHelper.SetController(new ManagerReportsController(), context.CurrentControllerContext);
+					urlHelper.UrlBuilder = new DefaultUrlBuilder();
 
-			foreach (var baseItemForTable in result) {
-				baseItemForTable.SetUrlHelper(urlHelper);
+					foreach (var baseItemForTable in result) {
+						baseItemForTable.SetUrlHelper(urlHelper);
+					}
+					Assert.That(result.Count, Is.GreaterThan(0));
+
+					var clientIds = result.Select(r => ((AnalysisOfWorkFiled)r).Id).ToList();
+					var Id = client.Id.ToString();
+					Assert.IsTrue(clientIds.Where(r => r.Contains(Id)).Any());
+				});
 			}
-			Assert.That(result.Count, Is.GreaterThan(0));
-
-			var clientIds = result.Select(r => ((AnalysisOfWorkFiled)r).Id).ToList();
-			var Id = client.Id.ToString();
-			Assert.IsTrue(clientIds.Where(r => r.Contains(Id)).Any());
 		}
 	}
 }
