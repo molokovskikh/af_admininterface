@@ -13,6 +13,20 @@ namespace Functional.Suppliers
 	public class RegistrationFixture : WatinFixture2
 	{
 		[Test]
+		public void AddPhoneAndEmailTest()
+		{
+			Open();
+			Click("Поставщик");
+			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			var phoneCount = browser.TableCells.Count(l => l.Text == "Номер телефона:");
+			var emailCount = browser.TableCells.Count(l => l.Text == "Email:");
+			browser.Link(Find.ById("supplieraddPhoneLink")).Click();
+			browser.Link(Find.ById("supplieraddEmailLink")).Click();
+			Assert.That(browser.TableCells.Count(l => l.Text == "Номер телефона:"), Is.EqualTo(phoneCount + 1));
+			Assert.That(browser.TableCells.Count(l => l.Text == "Email:"), Is.EqualTo(emailCount + 1));
+		}
+
+		[Test]
 		public void Register()
 		{
 			Open();
