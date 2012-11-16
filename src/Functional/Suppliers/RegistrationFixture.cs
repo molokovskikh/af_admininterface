@@ -136,8 +136,8 @@ namespace Functional.Suppliers
 		{
 			Css("#supplier_FullName").TypeText("тестовый поставщик");
 			Css("#supplier_Name").TypeText("тестовый");
-			Css("#ClientContactPhone").TypeText("473-2606000");
-			Css("#ClientContactEmail").TypeText("kvasovtest@analit.net");
+			Css("#SupplierContactPhone").TypeText("473-2606000");
+			Css("#SupplierContactEmail").TypeText("kvasovtest@analit.net");
 			Css("#ClientManagersContactEmail").TypeText("kvasovtest@analit.net");
 			Css("#OrderManagersContactEmail").TypeText("kvasovtest@analit.net");
 			Css("#user_Name").TypeText("Тестовый пользователь");
