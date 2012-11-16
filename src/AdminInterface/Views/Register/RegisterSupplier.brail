@@ -108,15 +108,18 @@ ${FormHelper.FormTag("", {})}
 			<tr valign="top">
 				<td colspan="2">
 					<div class="contextualNoTopSpace">
-						<a id="clientaddPhoneLink" class="icon icon-add" name="2" href="javascript:"
+						<a id="supplieraddPhoneLink" class="icon icon-add" name="2" href="javascript:"
 							onclick="addPhone('supplier')">Добавить</a>
 					</div>
 					<h4>Телефоны</h4>
-					<table id = "clientPhones" cellpadding="0" cellspacing="0" width="100%" border="0">
+					<table id = "supplierPhones" cellpadding="0" cellspacing="0" width="100%" border="0">
 						<tr>
+						<td>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0">
+							<tr>
 							<td width="30%">Номер телефона:</td>
 							<td>
-								<input type="text" id="ClientContactPhone" name="supplierContacts[0].ContactText" class="phone" style="width: 100%" />
+								<input type="text" id="SupplierContactPhone" name="supplierContacts[0].ContactText" class="phone" style="width: 100%" />
 								<input type="hidden" name="supplierContacts[0].Type" value="1" />
 							</td>
 							</tr>
@@ -124,6 +127,9 @@ ${FormHelper.FormTag("", {})}
 								<td>Примечание:</td>
 								<td><input type="text" name="supplierContacts[0].Comment" style="width: 100%" /></td>
 							</tr>
+						</table>
+						</td>
+						</tr>
 					</table>
 				</td>
 				<td></td>
@@ -132,15 +138,18 @@ ${FormHelper.FormTag("", {})}
 			<tr valign="top">
 				<td colspan="2">
 					<div class="contextualNoTopSpace">
-						<a id="clientaddEmailLink" class="icon icon-add" name="500" href="javascript:"
+						<a id="supplieraddEmailLink" class="icon icon-add" name="500" href="javascript:"
 							onclick="addEmail('supplier')">Добавить</a>
 					</div>
 					<h4>Email</h4>
-					<table id = "clientEmails" cellpadding="0" cellspacing="0" width="100%" border="0">
+					<table id = "supplierEmails" cellpadding="0" cellspacing="0" width="100%" border="0">
+					<tr>
+						<td>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0">
 							<tr>
 								<td width="30%">Email:</td>
 								<td>
-									<input type="text" id="ClientContactEmail" name="supplierContacts[1].ContactText" class="email" style="width: 100%" />
+									<input type="text" id="SupplierContactEmail" name="supplierContacts[1].ContactText" class="email" style="width: 100%" />
 									<input type="hidden" name="supplierContacts[1].Type" value="0" />
 								</td>
 							</tr>
@@ -148,6 +157,9 @@ ${FormHelper.FormTag("", {})}
 								<td>Примечание:</td>
 								<td><input type="text" name="supplierContacts[1].Comment" style="width: 100%" /></td>
 							</tr>
+							</table>
+						</td>
+						</tr>
 					</table>
 				</td>
 				<td></td>
