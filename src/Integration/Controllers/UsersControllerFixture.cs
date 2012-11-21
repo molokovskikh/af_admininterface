@@ -181,7 +181,6 @@ namespace Integration.Controllers
 			session.Save(client);
 
 			Flush();
-			QueryCatcher.Catch();
 			var loginObj = controller.SearchForShowUser(user.Login.Substring(0, 5));
 			Assert.AreEqual(loginObj.Count(), 1);
 

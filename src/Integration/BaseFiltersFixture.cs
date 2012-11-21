@@ -20,7 +20,6 @@ namespace Integration
 		public void Base_filter_test()
 		{
 			var filter = new SwitchOffClientsFilter { SortBy = "ClientName" };
-			QueryCatcher.Catch();
 			filter.Find(session);
 		}
 	}

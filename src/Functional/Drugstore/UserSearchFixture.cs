@@ -271,7 +271,6 @@ namespace Functional.Drugstore
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			var person = String.Format("testPerson{0}", client.Id);
-			QueryCatcher.Catch();
 			client.Users[0].AddContactGroup();
 			client.Users[0].ContactGroup.Save();
 			client.Users[0].ContactGroup.AddPerson(person);

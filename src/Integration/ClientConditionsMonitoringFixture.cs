@@ -19,7 +19,6 @@ namespace Integration
 		{
 			var region = session.Query<Region>().FirstOrDefault(r => r.Name == "Воронеж");
 			var filter = new ClientConditionsMonitoringFilter { Session = session, Region = region, ClientId = 2136 };
-			QueryCatcher.Catch();
 			filter.Find();
 		}
 	}

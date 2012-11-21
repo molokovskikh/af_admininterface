@@ -21,7 +21,6 @@ namespace Integration.Models
 			filter.ExcludeType = ExcludesTypes.Hidden;
 			var criteria = filter.GetCriteria();
 			filter.ApplySort(criteria);
-			QueryCatcher.Catch();
 			var client = ArHelper.WithSession(s => criteria.GetExecutableCriteria(s).ToList<RegistrationInformation>()).ToList();
 		}
 	}
