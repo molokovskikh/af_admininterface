@@ -26,6 +26,8 @@ namespace AdminInterface.Controllers.Filters
 		public int Count { get; private set; }
 		public decimal Sum { get; private set; }
 
+		public DateTime? CreatedOn { get; set; }
+
 		public PayerDocumentFilter()
 		{
 			SortBy = "PayerName";
@@ -75,6 +77,10 @@ namespace AdminInterface.Controllers.Filters
 					criteria.Add(Expression.In("p.PayerID", ids));
 				else
 					criteria.Add(Expression.Like("p.Name", SearchText, MatchMode.Anywhere));
+			}
+
+			if(CreatedOn != null) {
+				criteria.Add(Expression.Ge("CreatedOn", CreatedOn));
 			}
 
 			if (typeof(T) == typeof(Act))

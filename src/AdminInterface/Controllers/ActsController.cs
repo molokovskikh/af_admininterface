@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AdminInterface.Controllers.Filters;
@@ -43,11 +44,13 @@ namespace AdminInterface.Controllers
 			var sourceInvoices = filter.Find<Invoice>();
 			var invoices = ArHelper.WithSession(s => sourceInvoices
 				.Where(i => !s.Query<Act>().Any(a => a.Payer == i.Payer && a.Period == i.Period)).ToList());
+			var createdTime = DateTime.Now;
 			foreach (var act in Act.Build(invoices, actDate)) {
 				act.Save();
 			}
-
-			RedirectToAction("Index", filter.ToDocumentFilter().GetQueryString());
+			var destinationFilter = filter.ToDocumentFilter();
+			destinationFilter.CreatedOn = createdTime;
+			RedirectToAction("Index", destinationFilter.GetQueryString());
 		}
 
 		public void Process([ARDataBind("acts", AutoLoadBehavior.Always)] Act[] acts)

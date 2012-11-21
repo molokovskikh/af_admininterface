@@ -107,10 +107,13 @@ namespace AdminInterface.Controllers
 
 		public void Build([ARDataBind("buildFilter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] DocumentBuilderFilter filter, DateTime invoiceDate, string printer)
 		{
+			var createdTime = DateTime.Now;
 			filter.BuildInvoices(invoiceDate);
 
 			Notify("Счета сформированы");
-			RedirectToAction("Index", filter.ToDocumentFilter().GetQueryString());
+			var destinationFilter = filter.ToDocumentFilter();
+			destinationFilter.CreatedOn = createdTime;
+			RedirectToAction("Index", destinationFilter.GetQueryString());
 		}
 	}
 }

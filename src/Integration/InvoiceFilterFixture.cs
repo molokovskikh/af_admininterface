@@ -41,5 +41,19 @@ namespace Integration
 			var invoices = filter.Find<Invoice>();
 			Assert.That(invoices, Is.EquivalentTo(new[] { invoice1, invoice2 }));
 		}
+
+		[Test]
+		public void FindByCreatedOnTest()
+		{
+			var created = DateTime.Now;
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
+			var invoice = new Invoice(payer, DateTime.Now);
+			session.Save(invoice);
+			var filter = new PayerDocumentFilter {
+				CreatedOn = created
+			};
+			var result = filter.Find<Invoice>();
+			Assert.That(result.Any(invoice1 => invoice1.Id == invoice.Id), Is.True);
+		}
 	}
 }

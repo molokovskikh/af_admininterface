@@ -15,6 +15,7 @@ namespace AdminInterface.Models.Billing
 		public Act()
 		{
 			Parts = new List<ActPart>();
+			CreatedOn = DateTime.Now;
 		}
 
 		public Act(Payer payer, DateTime date)
@@ -53,6 +54,8 @@ namespace AdminInterface.Models.Billing
 
 			foreach (var invoice in invoices)
 				invoice.Act = this;
+
+			CreatedOn = DateTime.Now;
 		}
 
 		public void SetPayer(Payer payer)
@@ -86,6 +89,9 @@ namespace AdminInterface.Models.Billing
 
 		[Property]
 		public string Customer { get; set; }
+
+		[Property]
+		public DateTime CreatedOn { get; set; }
 
 		[HasMany(Lazy = true)]
 		public IList<Invoice> Invoices { get; set; }
