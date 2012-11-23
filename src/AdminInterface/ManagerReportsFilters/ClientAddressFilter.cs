@@ -10,6 +10,7 @@ using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Linq;
 using NHibernate.SqlCommand;
@@ -48,6 +49,7 @@ namespace AdminInterface.ManagerReportsFilters
 		public Region Region { get; set; }
 		public DatePeriod Period { get; set; }
 		public RegistrationFinderType FinderType { get; set; }
+		public uint ClientId { get; set; }
 
 		public ClientAddressFilter()
 		{
@@ -57,9 +59,12 @@ namespace AdminInterface.ManagerReportsFilters
 				{ "ClientId", "ClientId" },
 				{ "ClientName", "ClientName" },
 				{ "SupplierId", "SupplierId" },
-				{ "SupplierName", "SupplierName" }
+				{ "Region", "c.HomeRegion" },
+				{ "SupplierName", "SupplierName" },
+				{ "Count", "Count" }
 			};
-			PageSize = 30;
+			SortBy = "ClientName";
+			PageSize = 100;
 			Period = new DatePeriod(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
 		}
 
@@ -72,7 +77,8 @@ namespace AdminInterface.ManagerReportsFilters
 			var criteria = DetachedCriteria.For<RejectWaybillLog>();
 
 			criteria.CreateCriteria("ForClient", "c", JoinType.LeftOuterJoin)
-				.Add(Expression.Sql("{alias}.RegionCode & " + regionMask + " > 0"));
+				.Add(Expression.Sql("{alias}.RegionCode & " + regionMask + " > 0"))
+				.CreateAlias("HomeRegion", "r", JoinType.LeftOuterJoin);
 			criteria.CreateAlias("Address", "a", JoinType.LeftOuterJoin);
 			criteria.CreateAlias("FromSupplier", "f", JoinType.LeftOuterJoin);
 
@@ -84,48 +90,36 @@ namespace AdminInterface.ManagerReportsFilters
 				.Add(Projections.GroupProperty("RejectReason").As("RejectReason"))
 				.Add(Projections.Property("c.Name").As("ClientName"))
 				.Add(Projections.Property("a.Value").As("AddressName"))
-				.Add(Projections.Property("c.HomeRegion").As("RegionName"))
+				.Add(Projections.Property("r.Name").As("RegionName"))
 				.Add(Projections.Property("f.Name").As("SupplierName")));
 			criteria.Add(Expression.Ge("LogTime", Period.Begin.Date))
 				.Add(Expression.Le("LogTime", Period.End.Date));
+			if (ClientId > 0)
+				criteria.Add(Expression.Eq("c.Id", ClientId));
 			return criteria;
 		}
 
-		public List<Address> Sort(List<Address> list)
-		{
-			var sortProperty = GetSortProperty();
-			switch (sortProperty) {
-				case "Id":
-					if (SortDirection == "asc")
-						return list.OrderBy(t => t.Id).ToList();
-					return list.OrderByDescending(t => t.Id).ToList();
-				case "c.Id":
-					if (SortDirection == "asc")
-						return list.OrderBy(t => t.Client.Id).ToList();
-					return list.OrderByDescending(t => t.Client.Id).ToList();
-				case "Name":
-					if (SortDirection == "asc")
-						return list.OrderBy(t => t.Value).ToList();
-					return list.OrderByDescending(t => t.Value).ToList();
-				case "c.Name":
-					if (SortDirection == "asc")
-						return list.OrderBy(t => t.Client.Name).ToList();
-					return list.OrderByDescending(t => t.Client.Name).ToList();
-			}
-			return new List<Address>();
-		}
-
-		public IList<RejectCounts> Find()
+		public IList<RejectCounts> Find(ISession session)
 		{
 			var criteria = GetCriteria();
-			var result = ArHelper.WithSession(s => AcceptPaginator<RejectCounts>(criteria, s));
-			ArHelper.WithSession(s => {
-				foreach (var row in result) {
-					var address = s.Query<Address>().FirstOrDefault(a => a.Id == row.AddressId);
-					if (address != null)
-						row.IsUpdate = address.AvaliableForUsers.Count(u => u.Logs.AFTime >= DateTime.Now.AddMonths(-1)) != 0;
-				}
-			});
+			var result = AcceptPaginator<RejectCounts>(criteria, session);
+			var addressIds = result.Select(r => r.AddressId).ToList();
+			/*var addresses = session.Query<Address>().Where(a => addressIds.Contains(a.Id))
+				.FetchMany(a => a.AvaliableForUsers)
+				.ThenFetch(u => u.Logs)
+				.ToDictionary(a => a.Id);*/
+
+			var addressCriteria = DetachedCriteria.For<Address>();
+			addressCriteria.CreateCriteria("AvaliableForUsers", "au", JoinType.InnerJoin)
+				.CreateAlias("au.Logs", "l", JoinType.InnerJoin);
+			addressCriteria.SetProjection(Projections.Count("l.AFTime"));
+			addressCriteria.Add(Expression.Ge("l.AFTime", DateTime.Now.AddMonths(-1)));
+
+			var addresses = addressCriteria.GetExecutableCriteria(session).ToList<Address>().ToDictionary(a => a.Id);
+			foreach (var row in result) {
+				if (addresses.Keys.Contains(row.AddressId))
+					row.IsUpdate = addresses[row.AddressId].AvaliableForUsers.Count(u => u.Logs.AFTime >= DateTime.Now.AddMonths(-1)) != 0;
+			}
 			return result;
 		}
 	}

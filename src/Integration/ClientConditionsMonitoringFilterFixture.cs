@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using AdminInterface.ManagerReportsFilters;
@@ -78,6 +79,12 @@ delete from  usersettings.pricesdata;")
 				Session = session,
 				ClientId = client.Id
 			};
+		}
+
+		[Test]
+		public void Test()
+		{
+			Console.WriteLine(File.ReadAllText("c:/text.txt"));
 		}
 
 		[Test]

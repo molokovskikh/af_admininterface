@@ -25,6 +25,7 @@ namespace AdminInterface.ManagerReportsFilters
 		public uint PriceCode { get; set; }
 		public int SupplierCode { get; set; }
 		public int SupplierUserCode { get; set; }
+		public int ItemsCount { get; set; }
 		public uint RegionCode { get; set; }
 		public string SupplierName { get; set; }
 		public string PriceName { get; set; }
@@ -79,13 +80,7 @@ namespace AdminInterface.ManagerReportsFilters
 			}
 		}
 
-		private bool _availableForClient;
-
-		public string AvailableForClient
-		{
-			get { return _availableForClient ? "Да" : "Нет"; }
-			set { _availableForClient = Convert.ToBoolean(int.Parse(value)); }
-		}
+		public bool AvailableForClient { get; set; }
 
 		public int SupplierDeliveryCount { get; set; }
 		public int SupplierDeliveryCountFill { get; set; }
@@ -104,12 +99,12 @@ namespace AdminInterface.ManagerReportsFilters
 		}
 
 		public bool BaseCost { get; set; }
-		public int PricesCosts { get; set; }
+		public float BasePersent { get; set; }
 
 		[Style]
 		public bool CostCollumn
 		{
-			get { return PricesCosts >= 5 && BaseCost; }
+			get { return BasePersent < 0.7 && BaseCost; }
 		}
 
 		[Style]
@@ -172,7 +167,8 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public ClientConditionsMonitoringFilter()
 		{
-			SortBy = "SupplierName";
+			SortBy = "ItemsCount";
+			SortDirection = "desc";
 			SortKeyMap = new Dictionary<string, string> {
 				{ "SupplierCode", "s.Id" },
 				{ "SupplierName", "supplier.Name" },
@@ -279,13 +275,12 @@ SELECT
 	c.Name as ClientName,
 	pd.pricetype as PriceType,
 
-(select
-	count(*)
-from
-	Usersettings.PricesCosts
-where
-	PriceCode = i.PriceId
-) as PricesCosts,
+(SELECT
+(count(IF(tpc.basecost, 1, NULL)) / count(ti.id))
+ FROM customers.Intersection tI
+join usersettings.pricescosts tpc on tpc.costCode = ti.costId
+where tI.priceid = i.priceid
+and tI.regionid =  i.RegionId) as BasePersent,
 
 (select
 	concat(cast(count(IF(II.AvailableForClient > 0, 1, NULL)) as char(255)), '/', cast(count(*) as char(255))) as CountAvailableForClient
@@ -314,8 +309,13 @@ where s1.id = supplier.Id
 
 (select u.Id from customers.Users u where u.RootService = supplier.Id limit 1) as SupplierUserCode,
 
-	group_concat(ai.SupplierDeliveryId) as SupplierDeliveryId,
-	count(i.Id) as SupplierDeliveryCount
+(SELECT avg(pi.rowCount) FROM userSettings.pricescosts p
+join userSettings.priceitems pi on pi.id = p.PriceItemId
+where p.pricecode = pd.pricecode) as ItemsCount,
+
+group_concat(ifnull(ai.SupplierDeliveryId, Address.Address)) as SupplierDeliveryId,
+count(i.Id) as SupplierDeliveryCount
+
 FROM Customers.Intersection i
 	JOIN Customers.Clients c ON c.Id = i.ClientId
 	JOIN usersettings.RetClientsSet r ON r.clientcode = c.Id
@@ -326,6 +326,7 @@ FROM Customers.Intersection i
 	join Usersettings.PricesCosts pc on pc.CostCode = i.CostId
 	join farm.Regions reg on reg.RegionCode = i.RegionId
 	left join Customers.AddressIntersection ai on ai.IntersectionId = i.id
+	join Customers.Addresses Address on Address.id = ai.AddressId and Address.Enabled = true
 where
 	(i.RegionId & :Region) > 0
 	and i.ClientId = :ClientCode

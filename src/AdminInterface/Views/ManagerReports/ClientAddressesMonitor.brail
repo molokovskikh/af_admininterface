@@ -27,12 +27,12 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<tr>
 			<th>${app.Sortable("Код клиента", "ClientId")}</th>
 			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
-			<th>Регион</th>
+			<th>${app.Sortable("Регион", "Region")}</th>
 			<th>${app.Sortable("Код адреса", "AddressId")}</th>
 			<th>${app.Sortable("Адрес", "AddressName")}</th>
 			<th>${app.Sortable("Код поставщика", "SupplierId")}</th>
 			<th>${app.Sortable("Наименование поставщика", "SupplierName")}</th>
-			<th>Количество непринятых накладных</th>
+			<th>${app.Sortable("Количество непринятых накладных", "Count")}</th>
 			<th>Причина</th>
 		</tr>
 	</thead>

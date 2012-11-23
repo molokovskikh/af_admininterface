@@ -21,3 +21,11 @@
 #ClientConditionsTable tbody tr.OddRow {
 	background-color: #E4DADA;
 }
+
+#ClientConditionsTable tbody {
+	text-align: center;
+}
+
+#ClientConditionsTable tbody .leftText {
+	text-align: left;
+}

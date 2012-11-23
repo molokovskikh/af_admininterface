@@ -72,7 +72,7 @@ namespace AdminInterface.Controllers
 			var filter = new ClientAddressFilter();
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
-			PropertyBag["Clients"] = filter.Find();
+			PropertyBag["Clients"] = filter.Find(DbSession);
 			PropertyBag["filter"] = filter;
 		}
 
