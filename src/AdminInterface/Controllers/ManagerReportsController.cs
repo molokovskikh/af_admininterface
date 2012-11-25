@@ -47,7 +47,7 @@ namespace AdminInterface.Controllers
 		public object GetUserInfo(uint userId)
 		{
 			var thisUser = DbSession.Get<User>(userId);
-			var html = "<div class=\"userInfoDiv\">";
+			var html = string.Format("<tr class=\"toggled\" id=\"toggledRow{0}\"><td colspan=9>", userId);
 			html += string.Format("Клиент: {0} <br/>", thisUser.Client.Name);
 			html += "<div>";
 			foreach (var user in thisUser.Client.Users) {
@@ -58,7 +58,7 @@ namespace AdminInterface.Controllers
 				}
 				html += "</div>";
 			}
-			html += "</div> </div>";
+			html += "</div></td></tr>";
 			return html;
 		}
 

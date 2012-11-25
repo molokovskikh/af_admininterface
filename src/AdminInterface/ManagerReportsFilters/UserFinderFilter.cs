@@ -44,7 +44,7 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public int PageSize
 		{
-			get { return 30; }
+			get { return 100; }
 		}
 
 		public int CurrentPage { get; set; }

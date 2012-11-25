@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Web;
 using AdminInterface.Controllers;
@@ -17,6 +18,12 @@ using NHibernate.SqlCommand;
 
 namespace AdminInterface.ManagerReportsFilters
 {
+	public class AddressLogs
+	{
+		public uint Id { get; set; }
+		public int Count { get; set; }
+	}
+
 	public class BaseLogsQueryFields
 	{
 		public uint AddressId { get; set; }
@@ -50,6 +57,8 @@ namespace AdminInterface.ManagerReportsFilters
 		public DatePeriod Period { get; set; }
 		public RegistrationFinderType FinderType { get; set; }
 		public uint ClientId { get; set; }
+		[Description("Клиент")]
+		public string ClientName { get; set; }
 
 		public ClientAddressFilter()
 		{
@@ -104,21 +113,21 @@ namespace AdminInterface.ManagerReportsFilters
 			var criteria = GetCriteria();
 			var result = AcceptPaginator<RejectCounts>(criteria, session);
 			var addressIds = result.Select(r => r.AddressId).ToList();
-			/*var addresses = session.Query<Address>().Where(a => addressIds.Contains(a.Id))
-				.FetchMany(a => a.AvaliableForUsers)
-				.ThenFetch(u => u.Logs)
-				.ToDictionary(a => a.Id);*/
 
 			var addressCriteria = DetachedCriteria.For<Address>();
 			addressCriteria.CreateCriteria("AvaliableForUsers", "au", JoinType.InnerJoin)
 				.CreateAlias("au.Logs", "l", JoinType.InnerJoin);
-			addressCriteria.SetProjection(Projections.Count("l.AFTime"));
+			addressCriteria.SetProjection(
+				Projections.ProjectionList().Add(Projections.Property("Id").As("Id"))
+					.Add(Projections.Count("l.AFTime").As("Count"))
+					.Add(Projections.GroupProperty("Id")));
+			addressCriteria.Add(Expression.In("Id", addressIds));
 			addressCriteria.Add(Expression.Ge("l.AFTime", DateTime.Now.AddMonths(-1)));
 
-			var addresses = addressCriteria.GetExecutableCriteria(session).ToList<Address>().ToDictionary(a => a.Id);
+			var addresses = addressCriteria.GetExecutableCriteria(session).ToList<AddressLogs>().ToDictionary(a => a.Id);
 			foreach (var row in result) {
 				if (addresses.Keys.Contains(row.AddressId))
-					row.IsUpdate = addresses[row.AddressId].AvaliableForUsers.Count(u => u.Logs.AFTime >= DateTime.Now.AddMonths(-1)) != 0;
+					row.IsUpdate = addresses[row.AddressId].Count != 0;
 			}
 			return result;
 		}

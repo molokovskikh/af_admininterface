@@ -26,7 +26,7 @@ namespace AdminInterface.ManagerReportsFilters
 		public int SupplierCode { get; set; }
 		public int SupplierUserCode { get; set; }
 		public int ItemsCount { get; set; }
-		public uint RegionCode { get; set; }
+		public UInt64 RegionCode { get; set; }
 		public string SupplierName { get; set; }
 		public string PriceName { get; set; }
 		public string CostName { get; set; }
@@ -84,6 +84,18 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public int SupplierDeliveryCount { get; set; }
 		public int SupplierDeliveryCountFill { get; set; }
+
+		private string _supplierDeliveryAdresses;
+
+		public string SupplierDeliveryAdresses
+		{
+			get { return _supplierDeliveryAdresses; }
+			set
+			{
+				if (!string.IsNullOrEmpty(value))
+					_supplierDeliveryAdresses = value.Replace("$", "</br>");
+			}
+		}
 
 		public string SupplierDeliveryId
 		{
@@ -154,7 +166,7 @@ namespace AdminInterface.ManagerReportsFilters
 		public bool DeliveryStyle(MonitoringItem monitoringItem)
 		{
 			var monitor = monitoringItem.SupplierDeliveryCountFill > 0 && monitoringItem.SupplierDeliveryCountFill < monitoringItem.SupplierDeliveryCount;
-			return ((double)AddressCode / AllAddressIntersection >= 0.5) || monitor;
+			return (((double)AddressCode / AllAddressIntersection >= 0.5) && (monitor || monitoringItem.SupplierDeliveryCountFill == 0)) || monitor;
 		}
 	}
 
@@ -180,7 +192,8 @@ namespace AdminInterface.ManagerReportsFilters
 				{ "PriceMarkup", "i.PriceMarkup" },
 				{ "SupplierClientId", "i.SupplierClientId" },
 				{ "SupplierDeliveryId", "SupplierDeliveryId" },
-				{ "SupplierPaymentId", "i.SupplierPaymentId" }
+				{ "SupplierPaymentId", "i.SupplierPaymentId" },
+				{ "ItemsCount", "ItemsCount" }
 			};
 		}
 
@@ -313,7 +326,8 @@ where s1.id = supplier.Id
 join userSettings.priceitems pi on pi.id = p.PriceItemId
 where p.pricecode = pd.pricecode) as ItemsCount,
 
-group_concat(ifnull(ai.SupplierDeliveryId, Address.Address)) as SupplierDeliveryId,
+group_concat(ai.SupplierDeliveryId) as SupplierDeliveryId,
+group_concat(if(((ai.SupplierDeliveryId is null) or (ai.SupplierDeliveryId = '')), Address.Address, null) separator '$') as SupplierDeliveryAdresses,
 count(i.Id) as SupplierDeliveryCount
 
 FROM Customers.Intersection i
