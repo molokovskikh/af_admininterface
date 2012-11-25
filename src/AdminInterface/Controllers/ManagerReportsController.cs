@@ -40,7 +40,7 @@ namespace AdminInterface.Controllers
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(userFilter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			PropertyBag["filter"] = userFilter;
-			PropertyBag["Users"] = userFilter.Find();
+			PropertyBag["Users"] = userFilter.Find(DbSession);
 		}
 
 		[return: JSONReturnBinder]
