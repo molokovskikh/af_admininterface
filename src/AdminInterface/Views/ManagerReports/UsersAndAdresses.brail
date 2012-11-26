@@ -83,7 +83,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 					${FormHelper.FormTag("${SiteRoot}/ManagerReports/ClientConditionsMonitoring", {@method : @get})}
 						${FormHelper.HiddenField("filter.ClientId", item.ClientId)}
 						${FormHelper.HiddenField("filter.ClientName", item.ClientName)}
-						${FormHelper.ButtonElement("Отчет", @submit, {@title : "Мониторинг выставления условий новому клиенту"})}
+						${FormHelper.ButtonElement("Отчет", @submit, {@title : "Мониторинг выставления условий клиенту"})}
 					${FormHelper.EndFormTag()}
 				<%end%>
 			</td>

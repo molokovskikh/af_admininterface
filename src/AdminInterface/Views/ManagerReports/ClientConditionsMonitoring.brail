@@ -4,7 +4,7 @@
  <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
-	Мониторинг выставления условий новому клиенту
+	Мониторинг выставления условий клиенту
 <% end %>
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.SortBy")}
