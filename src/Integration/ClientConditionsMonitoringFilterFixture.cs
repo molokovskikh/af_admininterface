@@ -51,21 +51,12 @@ delete from  usersettings.pricesdata;")
 
 			session.Flush();
 
-			var price = supplier.Prices.First();
-			price.AddCost();
-			price.AddCost();
-			price.AddCost();
-			price.AddCost();
-			price.AddCost();
-			session.Save(price);
-
 			var intersections = session.Query<Intersection>().Where(i => i.Client == twoClient).ToList();
 			foreach (var intersection in intersections) {
 				intersection.SupplierClientId = "123";
 				intersection.SupplierPaymentId = "123";
 				intersection.AvailableForClient = true;
 				intersection.PriceMarkup = 0.5;
-				intersection.Cost = price.Costs.First(c => c.BaseCost);
 				foreach (var addressIntersection in intersection.Addresses) {
 					addressIntersection.SupplierDeliveryId = "123";
 					session.Save(addressIntersection);
@@ -90,7 +81,6 @@ delete from  usersettings.pricesdata;")
 			Assert.IsTrue(result.All(r => r.PaymentCodeStyle));
 			Assert.IsTrue(result.All(r => r.PriceMarkupStyle));
 			Assert.IsTrue(result.All(r => r.NoPriceConnected));
-			Assert.IsTrue(result.All(r => r.CostCollumn));
 		}
 
 		[Test]
@@ -107,7 +97,6 @@ delete from  usersettings.pricesdata;")
 			Assert.IsTrue(result.All(r => r.PaymentCodeStyle));
 			Assert.IsTrue(result.All(r => r.PriceMarkupStyle));
 			Assert.IsTrue(result.All(r => r.NoPriceConnected));
-			Assert.IsTrue(result.All(r => r.CostCollumn));
 		}
 
 		[Test]
@@ -124,7 +113,6 @@ delete from  usersettings.pricesdata;")
 			Assert.IsTrue(result.All(r => r.PaymentCodeStyle));
 			Assert.IsTrue(result.All(r => r.PriceMarkupStyle));
 			Assert.IsTrue(result.All(r => r.NoPriceConnected));
-			Assert.IsTrue(result.All(r => r.CostCollumn));
 		}
 
 		[Test]
@@ -141,7 +129,6 @@ delete from  usersettings.pricesdata;")
 			Assert.IsFalse(result.All(r => r.PaymentCodeStyle));
 			Assert.IsTrue(result.All(r => r.PriceMarkupStyle));
 			Assert.IsTrue(result.All(r => r.NoPriceConnected));
-			Assert.IsTrue(result.All(r => r.CostCollumn));
 		}
 
 		[Test]
@@ -158,7 +145,6 @@ delete from  usersettings.pricesdata;")
 			Assert.IsTrue(result.All(r => r.PaymentCodeStyle));
 			Assert.IsFalse(result.All(r => r.PriceMarkupStyle));
 			Assert.IsTrue(result.All(r => r.NoPriceConnected));
-			Assert.IsTrue(result.All(r => r.CostCollumn));
 		}
 
 		[Test]
@@ -176,7 +162,6 @@ delete from  usersettings.pricesdata;")
 			Assert.IsTrue(result.All(r => r.PaymentCodeStyle));
 			Assert.IsTrue(result.All(r => r.PriceMarkupStyle));
 			Assert.IsTrue(result.All(r => r.NoPriceConnected));
-			Assert.IsFalse(result.All(r => r.CostCollumn));
 		}
 
 		[Test]
@@ -193,7 +178,6 @@ delete from  usersettings.pricesdata;")
 			Assert.IsTrue(result.All(r => r.PaymentCodeStyle));
 			Assert.IsTrue(result.All(r => r.PriceMarkupStyle));
 			Assert.IsFalse(result.All(r => r.NoPriceConnected));
-			Assert.IsTrue(result.All(r => r.CostCollumn));
 		}
 
 		private List<Intersection> AllIntersection()

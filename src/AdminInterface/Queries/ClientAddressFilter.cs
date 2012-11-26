@@ -102,7 +102,7 @@ namespace AdminInterface.ManagerReportsFilters
 				.Add(Projections.Property("r.Name").As("RegionName"))
 				.Add(Projections.Property("f.Name").As("SupplierName")));
 			criteria.Add(Expression.Ge("LogTime", Period.Begin.Date))
-				.Add(Expression.Le("LogTime", Period.End.Date));
+				.Add(Expression.Le("LogTime", Period.End));
 			if (ClientId > 0)
 				criteria.Add(Expression.Eq("c.Id", ClientId));
 			return criteria;
