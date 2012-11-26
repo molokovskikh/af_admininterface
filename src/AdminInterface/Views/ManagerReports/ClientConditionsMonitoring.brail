@@ -106,7 +106,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 
 <%
 legendItems = Dictionary[of string, string]()
-legendItems.Add("Если у поставщика есть 5 и более ценовых колонок, а аптеке назначена базовая", "cost-collumn")
+legendItems.Add("Если у поставщика менее 30% клиентов подключены к базовой ценовой колонке и данной аптеке назначена базовая", "cost-collumn")
 legendItems.Add("Не подключен ни к одному из проайсов", "no-price-connected")
 legendItems.Add("Более половины аптек, подключенных к прайсу имеют наценку, отличную от Нуля, а для рассматриваемой аптеки наценка 0", "price-markup-style")
 legendItems.Add("Более половины аптек, подключенных к прайсу имеют код клиента, а для рассматриваемой аптеки этот код не прописан", "client-code-style")

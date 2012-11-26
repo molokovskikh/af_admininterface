@@ -112,23 +112,7 @@ namespace AdminInterface.ManagerReportsFilters
 		{
 			var criteria = GetCriteria();
 			var result = AcceptPaginator<RejectCounts>(criteria, session);
-			var addressIds = result.Select(r => r.AddressId).ToList();
 
-			var addressCriteria = DetachedCriteria.For<Address>();
-			addressCriteria.CreateCriteria("AvaliableForUsers", "au", JoinType.InnerJoin)
-				.CreateAlias("au.Logs", "l", JoinType.InnerJoin);
-			addressCriteria.SetProjection(
-				Projections.ProjectionList().Add(Projections.Property("Id").As("Id"))
-					.Add(Projections.Count("l.AFTime").As("Count"))
-					.Add(Projections.GroupProperty("Id")));
-			addressCriteria.Add(Expression.In("Id", addressIds));
-			addressCriteria.Add(Expression.Ge("l.AFTime", DateTime.Now.AddMonths(-1)));
-
-			var addresses = addressCriteria.GetExecutableCriteria(session).ToList<AddressLogs>().ToDictionary(a => a.Id);
-			foreach (var row in result) {
-				if (addresses.Keys.Contains(row.AddressId))
-					row.IsUpdate = addresses[row.AddressId].Count != 0;
-			}
 			return result;
 		}
 	}
