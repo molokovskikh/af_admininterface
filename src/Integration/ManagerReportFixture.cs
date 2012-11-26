@@ -33,7 +33,6 @@ namespace Integration
 		[Test]
 		public void ClientAddressFilterTest()
 		{
-			QueryCatcher.Catch();
 			var filter = new ClientAddressFilter { Period = new DatePeriod(DateTime.Now.AddDays(-14), DateTime.Now) };
 			var results = filter.Find(session);
 			Assert.That(results.Count(t => t.ClientId == _client.Id), Is.GreaterThan(0));

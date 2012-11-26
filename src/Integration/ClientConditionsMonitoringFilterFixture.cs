@@ -82,12 +82,6 @@ delete from  usersettings.pricesdata;")
 		}
 
 		[Test]
-		public void Test()
-		{
-			Console.WriteLine(File.ReadAllText("c:/text.txt"));
-		}
-
-		[Test]
 		public void All_style_test()
 		{
 			var result = filter.Find();
