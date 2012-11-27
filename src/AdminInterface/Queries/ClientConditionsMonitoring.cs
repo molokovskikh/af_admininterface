@@ -182,7 +182,7 @@ namespace AdminInterface.ManagerReportsFilters
 			SortBy = "ItemsCount";
 			SortDirection = "desc";
 			SortKeyMap = new Dictionary<string, string> {
-				{ "SupplierCode", "s.Id" },
+				{ "SupplierCode", "supplier.Id" },
 				{ "SupplierName", "supplier.Name" },
 				{ "PriceName", "pd.PriceName" },
 				{ "PriceType", "pd.PriceType" },
@@ -336,7 +336,7 @@ where s1.id = supplier.Id
 
 (select u.Id from customers.Users u where u.RootService = supplier.Id limit 1) as SupplierUserCode,
 
-(SELECT avg(pi.rowCount) FROM userSettings.pricescosts p
+(SELECT max(pi.rowCount) FROM userSettings.pricescosts p
 join userSettings.priceitems pi on pi.id = p.PriceItemId
 where p.pricecode = pd.pricecode) as ItemsCount,
 
@@ -369,7 +369,7 @@ where
 	AND if(not r.ServiceClient, supplier.Id != 234, 1)
 	AND if(pd.PriceType = 2, i.AvailableForClient = 1, 1)
 group by i.id
-order by {0} {1};", SortKeyMap[SortBy], SortDirection))
+order by {0} {1}", SortKeyMap[SortBy], SortDirection))
 				.SetParameter("Region", regionMask)
 				.SetParameter("ClientCode", (uint)ClientId)
 				.ToList<MonitoringItem>();
@@ -396,6 +396,10 @@ order by {0} {1};", SortKeyMap[SortBy], SortDirection))
 			}
 
 			RowsCount = result.Count;
+
+			if (SortBy == "ItemsCount")
+				result = result.GroupBy(g => g.SupplierCode).OrderByDescending(g => g.Max(i => i.ItemsCount)).SelectMany(i => i).ToList();
+
 			return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
 		}
 	}
