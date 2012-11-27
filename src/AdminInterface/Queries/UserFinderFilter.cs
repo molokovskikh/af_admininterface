@@ -44,7 +44,7 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public int PageSize
 		{
-			get { return 30; }
+			get { return 100; }
 		}
 
 		public int CurrentPage { get; set; }
@@ -95,10 +95,10 @@ namespace AdminInterface.ManagerReportsFilters
 			return FinderType == RegistrationFinderType.Addresses;
 		}
 
-		private IList<RegistrationInformation> AcceptPaginator(DetachedCriteria criteria)
+		private IList<RegistrationInformation> AcceptPaginator(DetachedCriteria criteria, ISession session)
 		{
 			var countSubquery = CriteriaTransformer.TransformToRowCount(criteria);
-			_lastRowsCount = ArHelper.WithSession(s => countSubquery.GetExecutableCriteria(s).UniqueResult<int>());
+			_lastRowsCount = countSubquery.GetExecutableCriteria(session).UniqueResult<int>();
 
 			if (CurrentPage > 0)
 				criteria.SetFirstResult(CurrentPage * PageSize);
@@ -107,7 +107,7 @@ namespace AdminInterface.ManagerReportsFilters
 
 			ApplySort(criteria);
 
-			return ArHelper.WithSession(s => criteria.GetExecutableCriteria(s).ToList<RegistrationInformation>()).ToList();
+			return criteria.GetExecutableCriteria(session).ToList<RegistrationInformation>().ToList();
 		}
 
 		public DetachedCriteria GetCriteria()
@@ -260,9 +260,9 @@ namespace AdminInterface.ManagerReportsFilters
 							.Add(Projections.Count("ap.Id")))), "per"), 0));
 		}
 
-		public IList<RegistrationInformation> Find()
+		public IList<RegistrationInformation> Find(ISession session)
 		{
-			var result = AcceptPaginator(GetCriteria());
+			var result = AcceptPaginator(GetCriteria(), session);
 
 			foreach (var registrationInformation in result) {
 				registrationInformation.ObjectType = FinderType;

@@ -40,14 +40,14 @@ namespace AdminInterface.Controllers
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(userFilter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			PropertyBag["filter"] = userFilter;
-			PropertyBag["Users"] = userFilter.Find();
+			PropertyBag["Users"] = userFilter.Find(DbSession);
 		}
 
 		[return: JSONReturnBinder]
 		public object GetUserInfo(uint userId)
 		{
 			var thisUser = DbSession.Get<User>(userId);
-			var html = "<div class=\"userInfoDiv\">";
+			var html = string.Format("<tr class=\"toggled\" id=\"toggledRow{0}\"><td colspan=9>", userId);
 			html += string.Format("Клиент: {0} <br/>", thisUser.Client.Name);
 			html += "<div>";
 			foreach (var user in thisUser.Client.Users) {
@@ -58,7 +58,7 @@ namespace AdminInterface.Controllers
 				}
 				html += "</div>";
 			}
-			html += "</div> </div>";
+			html += "</div></td></tr>";
 			return html;
 		}
 
@@ -72,7 +72,7 @@ namespace AdminInterface.Controllers
 			var filter = new ClientAddressFilter();
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
-			PropertyBag["Clients"] = filter.Find();
+			PropertyBag["Clients"] = filter.Find(DbSession);
 			PropertyBag["filter"] = filter;
 		}
 

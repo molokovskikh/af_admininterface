@@ -4,7 +4,7 @@
  <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
-	Мониторинг выставления условий новому клиенту
+	Мониторинг выставления условий клиенту
 <% end %>
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.SortBy")}
@@ -63,16 +63,24 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		end%>
 		<tr class="${ViewHelper.GetRowStyle(styleCount)} Submit">
 			<td>${UrlHelper.Link(item.SupplierCode.ToString(), {@controller: @Suppliers, @params: {@Id : item.SupplierCode} })}</td>
-			<td>${item.LinkToClientInterface}</td>
+			<td class="leftText">${item.LinkToClientInterface}</td>
 			<td>${item.RegionName}</td>
-			<td>${item.PriceName}</td>
+			<td class="leftText">${item.PriceName}</td>
 			<td>${item.PriceType}</td>
 			<td class="${app.Style(item, @CostCollumn)}">${item.CostName}</td>
-			<td>${item.AvailableForClient}</td>
+			<td><%if not item.AvailableForClient: %>Нет<%end%></td>
 			<td class="${app.Style(item, @NoPriceConnected)}">${item.CountAvailableForClient}</td>
-			<td class="${app.Style(item, @PriceMarkupStyle)}">${item.PriceMarkup}</td>
+			<td class="${app.Style(item, @PriceMarkupStyle)}">
+				<%if item.PriceMarkup > 0 :%>
+					${item.PriceMarkup}
+				<%end%>
+			</td>
 			<td class="${app.Style(item, @ClientCodeStyle)}">${item.SupplierClientId}</td>
-			<td class="${app.Style(item, @DeliveryStyle)}">${item.SupplierDeliveryId}</td>
+			<td class="${app.Style(item, @DeliveryStyle)}">
+			<%if item.DeliveryStyle :%>
+				${item.SupplierDeliveryAdresses}
+			<%end%>
+			</td>
 			<td class="${app.Style(item, @PaymentCodeStyle)}">${item.SupplierPaymentId}</td>
 			<td><a href="${item.Contacts}">Отправить</a></td>
 			<td>
@@ -98,11 +106,11 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 
 <%
 legendItems = Dictionary[of string, string]()
-legendItems.Add("Если у поставщика есть 5 и более ценовых колонок, а аптеке назначена базовая", "cost-collumn")
+legendItems.Add("Если у поставщика менее 30% клиентов подключены к базовой ценовой колонке и данной аптеке назначена базовая", "cost-collumn")
 legendItems.Add("Не подключен ни к одному из проайсов", "no-price-connected")
 legendItems.Add("Более половины аптек, подключенных к прайсу имеют наценку, отличную от Нуля, а для рассматриваемой аптеки наценка 0", "price-markup-style")
 legendItems.Add("Более половины аптек, подключенных к прайсу имеют код клиента, а для рассматриваемой аптеки этот код не прописан", "client-code-style")
-legendItems.Add("Более половины аптек, подключенных к прайсу имеют коды адресов доставки, а для рассматриваемой аптеки этоти код не прописан, либо для рассмастриваемой аптеки прописаны не все коды адресов доставки", "delivery-style")
+legendItems.Add("Более половины аптек, подключенных к прайсу имеют коды адресов доставки, а для рассматриваемой аптеки этот код не прописан, либо для рассмастриваемой аптеки прописаны не все коды адресов доставки", "delivery-style")
 legendItems.Add("Более половины аптек, подключенных к прайсу имеют код оплаты, а для рассматриваемой аптеки этот код не прописан", "payment-code-style")
 component Legend, { "LegendItems" : legendItems,
 	"ByCenter" : true}

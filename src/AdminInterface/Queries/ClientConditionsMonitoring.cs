@@ -25,7 +25,8 @@ namespace AdminInterface.ManagerReportsFilters
 		public uint PriceCode { get; set; }
 		public int SupplierCode { get; set; }
 		public int SupplierUserCode { get; set; }
-		public uint RegionCode { get; set; }
+		public int ItemsCount { get; set; }
+		public UInt64 RegionCode { get; set; }
 		public string SupplierName { get; set; }
 		public string PriceName { get; set; }
 		public string CostName { get; set; }
@@ -79,16 +80,22 @@ namespace AdminInterface.ManagerReportsFilters
 			}
 		}
 
-		private bool _availableForClient;
-
-		public string AvailableForClient
-		{
-			get { return _availableForClient ? "Да" : "Нет"; }
-			set { _availableForClient = Convert.ToBoolean(int.Parse(value)); }
-		}
+		public bool AvailableForClient { get; set; }
 
 		public int SupplierDeliveryCount { get; set; }
 		public int SupplierDeliveryCountFill { get; set; }
+
+		private string _supplierDeliveryAdresses;
+
+		public string SupplierDeliveryAdresses
+		{
+			get { return _supplierDeliveryAdresses; }
+			set
+			{
+				if (!string.IsNullOrEmpty(value))
+					_supplierDeliveryAdresses = value.Replace("$", "</br>");
+			}
+		}
 
 		public string SupplierDeliveryId
 		{
@@ -104,12 +111,12 @@ namespace AdminInterface.ManagerReportsFilters
 		}
 
 		public bool BaseCost { get; set; }
-		public int PricesCosts { get; set; }
+		public float BasePersent { get; set; }
 
 		[Style]
 		public bool CostCollumn
 		{
-			get { return PricesCosts >= 5 && BaseCost; }
+			get { return BasePersent < 0.3 && BaseCost; }
 		}
 
 		[Style]
@@ -159,7 +166,7 @@ namespace AdminInterface.ManagerReportsFilters
 		public bool DeliveryStyle(MonitoringItem monitoringItem)
 		{
 			var monitor = monitoringItem.SupplierDeliveryCountFill > 0 && monitoringItem.SupplierDeliveryCountFill < monitoringItem.SupplierDeliveryCount;
-			return ((double)AddressCode / AllAddressIntersection >= 0.5) || monitor;
+			return (((double)AddressCode / AllAddressIntersection >= 0.5) && (monitor || monitoringItem.SupplierDeliveryCountFill == 0)) || monitor;
 		}
 	}
 
@@ -172,9 +179,10 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public ClientConditionsMonitoringFilter()
 		{
-			SortBy = "SupplierName";
+			SortBy = "ItemsCount";
+			SortDirection = "desc";
 			SortKeyMap = new Dictionary<string, string> {
-				{ "SupplierCode", "s.Id" },
+				{ "SupplierCode", "supplier.Id" },
 				{ "SupplierName", "supplier.Name" },
 				{ "PriceName", "pd.PriceName" },
 				{ "PriceType", "pd.PriceType" },
@@ -184,7 +192,8 @@ namespace AdminInterface.ManagerReportsFilters
 				{ "PriceMarkup", "i.PriceMarkup" },
 				{ "SupplierClientId", "i.SupplierClientId" },
 				{ "SupplierDeliveryId", "SupplierDeliveryId" },
-				{ "SupplierPaymentId", "i.SupplierPaymentId" }
+				{ "SupplierPaymentId", "i.SupplierPaymentId" },
+				{ "ItemsCount", "ItemsCount" }
 			};
 		}
 
@@ -269,7 +278,7 @@ SELECT
 	i.PriceId as PriceCode,
 	pd.PriceName as PriceName,
 	pc.CostName as CostName,
-	pc.BaseCost as BaseCost,
+	if (pc.BaseCost or prd.BaseCost=i.CostId, true, false) as BaseCost,
 	i.PriceMarkup as PriceMarkup,
 	i.SupplierClientId as SupplierClientId,
 	i.SupplierPaymentId as SupplierPaymentId,
@@ -279,13 +288,26 @@ SELECT
 	c.Name as ClientName,
 	pd.pricetype as PriceType,
 
-(select
-	count(*)
-from
-	Usersettings.PricesCosts
+(SELECT
+(count(IF(ti.CostId=prd.BaseCost or pc.BaseCost, 1, NULL)) / count(ti.id))
+ FROM customers.Intersection tI
+join Usersettings.PricesCosts pc on pc.CostCode = ti.CostId
+JOIN Customers.Clients c ON c.Id = ti.ClientId
+JOIN usersettings.RetClientsSet r ON r.clientcode = c.Id
+JOIN usersettings.PricesData pd ON pd.pricecode = ti.PriceId
+JOIN usersettings.PricesRegionalData prd ON prd.regioncode = ti.RegionId AND prd.pricecode = pd.pricecode
 where
-	PriceCode = i.PriceId
-) as PricesCosts,
+pd.agencyenabled = 1
+AND pd.enabled = 1
+and ti.AgencyEnabled = true
+and c.status = 1
+and r.InvisibleOnFirm = 0
+and c.MaskRegion & i.RegionId > 0
+and supplier.Disabled = 0
+AND prd.enabled = 1
+and (supplier.RegionMask & i.RegionId) > 0
+and tI.priceid = i.priceid
+and tI.regionid =  i.RegionId) as BasePersent,
 
 (select
 	concat(cast(count(IF(II.AvailableForClient > 0, 1, NULL)) as char(255)), '/', cast(count(*) as char(255))) as CountAvailableForClient
@@ -314,8 +336,14 @@ where s1.id = supplier.Id
 
 (select u.Id from customers.Users u where u.RootService = supplier.Id limit 1) as SupplierUserCode,
 
-	group_concat(ai.SupplierDeliveryId) as SupplierDeliveryId,
-	count(i.Id) as SupplierDeliveryCount
+(SELECT max(pi.rowCount) FROM userSettings.pricescosts p
+join userSettings.priceitems pi on pi.id = p.PriceItemId
+where p.pricecode = pd.pricecode) as ItemsCount,
+
+group_concat(ai.SupplierDeliveryId) as SupplierDeliveryId,
+group_concat(if(((ai.SupplierDeliveryId is null) or (ai.SupplierDeliveryId = '')), Address.Address, null) separator '$') as SupplierDeliveryAdresses,
+count(i.Id) as SupplierDeliveryCount
+
 FROM Customers.Intersection i
 	JOIN Customers.Clients c ON c.Id = i.ClientId
 	JOIN usersettings.RetClientsSet r ON r.clientcode = c.Id
@@ -326,6 +354,7 @@ FROM Customers.Intersection i
 	join Usersettings.PricesCosts pc on pc.CostCode = i.CostId
 	join farm.Regions reg on reg.RegionCode = i.RegionId
 	left join Customers.AddressIntersection ai on ai.IntersectionId = i.id
+	join Customers.Addresses Address on Address.id = ai.AddressId and Address.Enabled = true
 where
 	(i.RegionId & :Region) > 0
 	and i.ClientId = :ClientCode
@@ -340,7 +369,7 @@ where
 	AND if(not r.ServiceClient, supplier.Id != 234, 1)
 	AND if(pd.PriceType = 2, i.AvailableForClient = 1, 1)
 group by i.id
-order by {0} {1};", SortKeyMap[SortBy], SortDirection))
+order by {0} {1}", SortKeyMap[SortBy], SortDirection))
 				.SetParameter("Region", regionMask)
 				.SetParameter("ClientCode", (uint)ClientId)
 				.ToList<MonitoringItem>();
@@ -367,6 +396,10 @@ order by {0} {1};", SortKeyMap[SortBy], SortDirection))
 			}
 
 			RowsCount = result.Count;
+
+			if (SortBy == "ItemsCount")
+				result = result.GroupBy(g => g.SupplierCode).OrderByDescending(g => g.Max(i => i.ItemsCount)).SelectMany(i => i).ToList();
+
 			return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
 		}
 	}

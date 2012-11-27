@@ -3,6 +3,7 @@
  <% component CaptureFor, {@id : @Title}: %>
 	Клиенты и адреса в регионе, по которым не принимаются накладные
 <% end %>
+ ${app.JS("ManagerReport.js")}
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.SortBy")}
 ${FormHelper.HiddenField("filter.SortDirection")}
@@ -13,7 +14,13 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<td class="filter-label">Регион</td>
 		<td>${app.Edit("filter.Region")}</td>
 	</tr>
-
+	<tr>
+		<td class="filter-label">Клиент</td>
+		<td>
+			${app.Edit("filter.ClientName")}
+			${FormHelper.HiddenField("filter.ClientId")}
+		</td>
+	</tr>
 	<tr>
 		${app.EndFormFor("filter")}
 	</tr>
@@ -27,12 +34,12 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<tr>
 			<th>${app.Sortable("Код клиента", "ClientId")}</th>
 			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
-			<th>Регион</th>
+			<th>${app.Sortable("Регион", "Region")}</th>
 			<th>${app.Sortable("Код адреса", "AddressId")}</th>
 			<th>${app.Sortable("Адрес", "AddressName")}</th>
 			<th>${app.Sortable("Код поставщика", "SupplierId")}</th>
 			<th>${app.Sortable("Наименование поставщика", "SupplierName")}</th>
-			<th>Количество непринятых накладных</th>
+			<th>${app.Sortable("Количество непринятых накладных", "Count")}</th>
 			<th>Причина</th>
 		</tr>
 	</thead>

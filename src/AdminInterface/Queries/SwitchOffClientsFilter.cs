@@ -36,7 +36,8 @@ namespace AdminInterface.ManagerReportsFilters
 				{ "HomeRegion", "c.HomeRegion" },
 				{ "LogTime", "LogTime" }
 			};
-			PageSize = 30;
+			SortBy = "ClientName";
+			PageSize = 100;
 			Period = new DatePeriod(DateTime.Now.AddMonths(-1), DateTime.Now);
 		}
 

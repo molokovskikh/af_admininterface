@@ -30,17 +30,21 @@ function HiddenIfAddressPage(item) {
 }
 
 function GetUserInfo(userId, item) {
-	var thisBox = $(item).parent().children(".toggled:first");
-	$(thisBox).empty();
-	if (thisBox.is(":hidden")) {
+	var thisBox = $('#toggledRow' + userId);
+	if (thisBox.length == 0) {
+		$(thisBox).empty();
 		$.ajax({
 			url: "GetUserInfo?userId=" + userId,
 			type: "GET",
 			async: false,
 			success: function(data) {
-				$(thisBox).append(data);
+				$(data).insertAfter($(item).parent().parent());
 			}
 		});
+	}
+
+	thisBox = $('#toggledRow' + userId);
+	if (thisBox.is(":hidden")) {
 		thisBox.slideDown("slow");
 	} else {
 		thisBox.slideUp("slow");

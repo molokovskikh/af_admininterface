@@ -27,7 +27,7 @@ namespace AdminInterface.Models.Logs
 		public virtual Supplier FromSupplier { get; set; }
 
 		[BelongsTo("ClientCode")]
-		public virtual Client ForClient { get; set; }
+		public virtual ClientForReading ForClient { get; set; }
 
 		[BelongsTo("AddressId")]
 		public virtual Address Address { get; set; }

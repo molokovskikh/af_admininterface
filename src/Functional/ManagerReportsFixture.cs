@@ -96,10 +96,10 @@ namespace Functional
 		public void ClientConditionMonitoring()
 		{
 			Open("ManagerReports");
-			Click("Мониторинг выставления условий новому клиенту");
-			AssertText("Мониторинг выставления условий новому клиенту");
+			Click("Мониторинг выставления условий клиенту");
+			AssertText("Мониторинг выставления условий клиенту");
 			Click("Показать");
-			AssertText("Мониторинг выставления условий новому клиенту");
+			AssertText("Мониторинг выставления условий клиенту");
 		}
 
 		[Test]
