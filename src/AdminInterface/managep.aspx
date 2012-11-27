@@ -100,6 +100,11 @@
 									<asp:CheckBox ID="BuyingMatrix" runat="server" Checked='<%# Convert.ToBoolean(Eval("BuyingMatrix")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
+							<asp:TemplateField HeaderText="Локальный">
+								<ItemTemplate>
+									<asp:CheckBox ID="IsLocal" runat="server" Checked='<%# Convert.ToBoolean(Eval("IsLocal")) %>' />
+								</ItemTemplate>
+							</asp:TemplateField>
 						</Columns>
 						<EmptyDataTemplate>
 							<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить прайс лист" />
