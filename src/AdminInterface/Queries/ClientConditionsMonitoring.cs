@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -75,8 +76,18 @@ namespace AdminInterface.ManagerReportsFilters
 		{
 			get
 			{
-				var uri = new Uri(string.Format("{0}Logon/Login?UserId={1}&sourceUrl=Settings/Clients.rails?priceId={2}&regionId={3}&searchText={4}", Properties.Settings.Default.ClientInterfaceUrl, SupplierUserCode, PriceCode, RegionCode, ClientName));
-				return string.Format("<a href='{0}' target='_blank'>{1}</a>", uri.AbsoluteUri, SupplierName);
+				NameValueCollection subQueryString = HttpUtility.ParseQueryString(string.Empty);
+				subQueryString.Add("priceId", PriceCode.ToString());
+				subQueryString.Add("regionId", RegionCode.ToString());
+				subQueryString.Add("searchText", ClientName);
+				var subBulder = new UriBuilder("Settings/Clients");
+				subBulder.Query = subQueryString.ToString();
+				NameValueCollection queryString = HttpUtility.ParseQueryString(string.Empty);
+				queryString.Add("UserId", SupplierUserCode.ToString());
+				queryString.Add("sourceUrl", subBulder.ToString());
+				var bulder = new UriBuilder(string.Format("{0}Logon/Login", Properties.Settings.Default.ClientInterfaceUrl));
+				bulder.Query = queryString.ToString();
+				return string.Format("<a href='{0}' target='_blank'>{1}</a>", bulder, SupplierName);
 			}
 		}
 
