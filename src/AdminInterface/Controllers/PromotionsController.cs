@@ -28,7 +28,7 @@ namespace AdminInterface.Controllers
 		[Description("Отключенные")] Disabled,
 	}
 
-	public class PromotionFilter : SortableContributor
+	public class PromotionFilter : Sortable
 	{
 		[Description("Статус:")]
 		public PromotionStatus PromotionStatus { get; set; }
@@ -38,6 +38,15 @@ namespace AdminInterface.Controllers
 		public PromotionFilter()
 		{
 			PromotionStatus = PromotionStatus.Enabled;
+			SortKeyMap = new Dictionary<string, string> {
+				{ "Id", "Id" },
+				{ "Enabled", "Enabled" },
+				{ "AgencyDisabled", "AgencyDisabled" },
+				{ "Name", "Name" },
+				{ "SupplierName", "s.Name" }
+			};
+			SortDirection = "Asc";
+			SortBy = "SupplierName";
 		}
 
 		public List<T> Find<T>()
@@ -53,7 +62,7 @@ namespace AdminInterface.Controllers
 			if (!String.IsNullOrEmpty(SearchText))
 				criteria.Add(Expression.Like("Name", SearchText, MatchMode.Anywhere));
 
-			criteria.AddOrder(Order.Asc("Name"));
+			ApplySort(criteria);
 
 			return ArHelper.WithSession(s => criteria
 				.GetExecutableCriteria(s).List<T>())
@@ -246,7 +255,7 @@ namespace AdminInterface.Controllers
 		public void Index([DataBind("filter")] PromotionFilter filter)
 		{
 			PropertyBag["filter"] = filter;
-			PropertyBag["promotions"] = filter.Find<SupplierPromotion>().SortBy(Request["SortBy"], Request["Direction"] == "desc");
+			PropertyBag["promotions"] = filter.Find<SupplierPromotion>();
 			PropertyBag["SortBy"] = Request["SortBy"];
 			PropertyBag["Direction"] = Request["Direction"];
 		}
