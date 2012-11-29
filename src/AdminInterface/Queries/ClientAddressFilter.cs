@@ -56,9 +56,8 @@ namespace AdminInterface.ManagerReportsFilters
 		public Region Region { get; set; }
 		public DatePeriod Period { get; set; }
 		public RegistrationFinderType FinderType { get; set; }
-		public uint ClientId { get; set; }
 		[Description("Клиент")]
-		public string ClientName { get; set; }
+		public string ClientText { get; set; }
 
 		public ClientAddressFilter()
 		{
@@ -103,8 +102,8 @@ namespace AdminInterface.ManagerReportsFilters
 				.Add(Projections.Property("f.Name").As("SupplierName")));
 			criteria.Add(Expression.Ge("LogTime", Period.Begin.Date))
 				.Add(Expression.Le("LogTime", Period.End));
-			if (ClientId > 0)
-				criteria.Add(Expression.Eq("c.Id", ClientId));
+			if (!string.IsNullOrEmpty(ClientText))
+				criteria.Add(Expression.Like("c.Name", ClientText, MatchMode.Anywhere));
 			return criteria;
 		}
 

@@ -17,8 +17,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	<tr>
 		<td class="filter-label">Клиент</td>
 		<td>
-			${app.Edit("filter.ClientName")}
-			${FormHelper.HiddenField("filter.ClientId")}
+			${app.Edit("filter.ClientText")}
 		</td>
 	</tr>
 	<tr>
