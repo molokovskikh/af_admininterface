@@ -80,11 +80,11 @@ namespace AdminInterface.ManagerReportsFilters
 				subQueryString.Add("priceId", PriceCode.ToString());
 				subQueryString.Add("regionId", RegionCode.ToString());
 				subQueryString.Add("searchText", ClientName);
-				var subBulder = new UriBuilder("Settings/Clients");
-				subBulder.Query = subQueryString.ToString();
+				var noCodedLink = string.Format("{0}Settings/Clients?" + subQueryString, Properties.Settings.Default.ClientInterfaceUrl);
+				var codedLink = Convert.ToBase64String(Encoding.ASCII.GetBytes(noCodedLink));
 				NameValueCollection queryString = HttpUtility.ParseQueryString(string.Empty);
 				queryString.Add("UserId", SupplierUserCode.ToString());
-				queryString.Add("sourceUrl", subBulder.ToString());
+				queryString.Add("sourceUrl", codedLink);
 				var bulder = new UriBuilder(string.Format("{0}Logon/Login", Properties.Settings.Default.ClientInterfaceUrl));
 				bulder.Query = queryString.ToString();
 				return string.Format("<a href='{0}' target='_blank'>{1}</a>", bulder, SupplierName);
