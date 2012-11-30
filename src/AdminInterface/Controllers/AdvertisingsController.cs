@@ -56,6 +56,7 @@ namespace AdminInterface.Controllers
 			}
 			ad.Invoice = new Invoice(ad);
 			DbSession.Save(ad);
+			DbSession.Flush();
 
 			RedirectTo(ad.Invoice, "Print");
 		}
@@ -74,6 +75,7 @@ namespace AdminInterface.Controllers
 
 			ad.Act = new Act(invoice.Date, invoice);
 			DbSession.Save(ad);
+			DbSession.Flush();
 
 			RedirectTo(ad.Act, "Print");
 		}
