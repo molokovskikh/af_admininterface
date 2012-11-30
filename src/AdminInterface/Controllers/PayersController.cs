@@ -11,6 +11,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate;
+using NHibernate.Linq;
 using NHibernate.SqlCommand;
 
 namespace AdminInterface.Controllers
@@ -159,8 +160,10 @@ namespace AdminInterface.Controllers
 		{
 			var payer = DbSession.Load<Payer>(id);
 			PropertyBag["payer"] = payer;
-			PropertyBag["ads"] = Advertising.Queryable.Where(a => a.Payer == payer)
-				.OrderBy(a => a.Begin).ToList();
+			PropertyBag["ads"] = DbSession.Query<Advertising>()
+				.Where(a => a.Payer == payer)
+				.OrderBy(a => a.Begin)
+				.ToList();
 		}
 
 		public void NewAd(uint id)
@@ -170,7 +173,7 @@ namespace AdminInterface.Controllers
 			if (IsPost) {
 				BindObjectInstance(ad, "ad");
 				if (!HasValidationError(ad)) {
-					ad.Save();
+					DbSession.Save(ad);
 					Redirect("Payers", "Ad", new { payer.Id });
 				}
 			}
@@ -190,7 +193,7 @@ namespace AdminInterface.Controllers
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 				var accounts = BindObject<Account[]>(ParamStore.Form, "accounts");
 				foreach (var account in accounts)
-					account.Save();
+					DbSession.Save(account);
 
 				Notify("Сохранено");
 				RedirectToReferrer();

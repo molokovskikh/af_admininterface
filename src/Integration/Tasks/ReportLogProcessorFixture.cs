@@ -18,8 +18,8 @@ namespace Integration.Tasks
 			payer = DataMother.CreatePayer();
 			account = DataMother.Report(payer);
 			report = account.Report;
-			payer.Save();
-			account.Save();
+			session.Save(payer);
+			session.Save(account);
 
 			payer.Reports.Add(report);
 			account.Payment = 5000;
@@ -31,7 +31,7 @@ namespace Integration.Tasks
 		{
 			Assert.That(payer.PaymentSum, Is.EqualTo(5000));
 			report.Allow = false;
-			report.Save();
+			session.Save(report);
 			Flush();
 			Close();
 
@@ -48,7 +48,7 @@ namespace Integration.Tasks
 			var newPayer = DataMother.CreatePayer();
 			newPayer.Save();
 			report.Payer = newPayer;
-			report.Save();
+			session.Save(report);
 			Flush();
 			Close();
 

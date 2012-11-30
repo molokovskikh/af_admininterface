@@ -7,7 +7,7 @@ using Common.Web.Ui.Models.Audit;
 namespace AdminInterface.Models.Billing
 {
 	[ActiveRecord("General_Reports", Schema = "reports"), Auditable]
-	public class Report : ActiveRecordLinqBase<Report>, IAuditable
+	public class Report : IAuditable
 	{
 		[PrimaryKey("GeneralReportCode")]
 		public virtual uint Id { get; set; }

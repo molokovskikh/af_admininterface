@@ -6,6 +6,7 @@ using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
+using NHibernate;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Controllers
@@ -18,7 +19,7 @@ namespace AdminInterface.Controllers
 		[Description("Показачать только неоплаченную:")]
 		public bool ShowWithoutPayment { get; set; }
 
-		public List<Advertising> Filter()
+		public List<Advertising> Filter(ISession session)
 		{
 			var criteria = DetachedCriteria.For<Advertising>();
 
@@ -30,8 +31,9 @@ namespace AdminInterface.Controllers
 
 			criteria.AddOrder(Order.Asc("Begin"));
 
-			return ArHelper.WithSession(s => criteria
-				.GetExecutableCriteria(s).List<Advertising>())
+			return criteria
+				.GetExecutableCriteria(session)
+				.List<Advertising>()
 				.ToList();
 		}
 	}
@@ -41,26 +43,26 @@ namespace AdminInterface.Controllers
 		public void Index([DataBind("filter")] AdvertisingFilter filter)
 		{
 			PropertyBag["filter"] = filter;
-			PropertyBag["ads"] = filter.Filter();
+			PropertyBag["ads"] = filter.Filter(DbSession);
 		}
 
 		public void BuildInvoice(uint id)
 		{
-			var ad = Advertising.Find(id);
+			var ad = DbSession.Load<Advertising>(id);
 			if (ad.Invoice != null) {
 				Error("Для рекламы уже сформирован счет");
 				RedirectToReferrer();
 				return;
 			}
 			ad.Invoice = new Invoice(ad);
-			ad.UpdateAndFlush();
+			DbSession.Save(ad);
 
 			RedirectTo(ad.Invoice, "Print");
 		}
 
 		public void BuildAct(uint id)
 		{
-			var ad = Advertising.Find(id);
+			var ad = DbSession.Load<Advertising>(id);
 			if (ad.Act != null) {
 				Error("Для рекламы уже сформирован счет");
 				RedirectToReferrer();
@@ -71,15 +73,15 @@ namespace AdminInterface.Controllers
 				invoice = new Invoice(ad);
 
 			ad.Act = new Act(invoice.Date, invoice);
-			ad.UpdateAndFlush();
+			DbSession.Save(ad);
 
 			RedirectTo(ad.Act, "Print");
 		}
 
 		public void Delete(uint id)
 		{
-			var ad = Advertising.Find(id);
-			ad.Delete();
+			var ad = DbSession.Load<Advertising>(id);
+			DbSession.Delete(ad);
 			Notify("Удалено");
 			RedirectToReferrer();
 		}
@@ -88,11 +90,11 @@ namespace AdminInterface.Controllers
 		{
 			RenderView("/Payers/NewAd");
 
-			var ad = Advertising.Find(id);
+			var ad = DbSession.Load<Advertising>(id);
 			if (IsPost) {
 				BindObjectInstance(ad, "ad");
 				if (!HasValidationError(ad)) {
-					ad.Save();
+					DbSession.Save(ad);
 					Redirect("Advertisings", "Index");
 				}
 			}

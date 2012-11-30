@@ -6,7 +6,7 @@ using Castle.ActiveRecord.Linq;
 namespace AdminInterface.Models.Billing
 {
 	[ActiveRecord(Schema = "Billing")]
-	public class Advertising : ActiveRecordLinqBase<Advertising>
+	public class Advertising
 	{
 		public Advertising()
 		{

@@ -29,7 +29,7 @@ namespace AdminInterface.Controllers
 
 			var pager = new Pager((int?)currentPage, 30);
 			if (tab.Equals("unregistredItems", StringComparison.CurrentCultureIgnoreCase))
-				PropertyBag["unaccountedItems"] = Account.GetReadyForAccounting(pager);
+				PropertyBag["unaccountedItems"] = Account.GetReadyForAccounting(pager, DbSession);
 			else if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
 				PropertyBag["accountingHistoryItems"] = filter.Find(pager);
 
@@ -43,7 +43,7 @@ namespace AdminInterface.Controllers
 		[return: JSONReturnBinder]
 		public object Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment, DateTime? freePeriodEnd, string addComment)
 		{
-			var account = Account.TryFind(id);
+			var account = DbSession.Load<Account>(id);
 			account.Comment = addComment;
 			var result = UpdateAccounting(account.Id, accounted, payment, free, freePeriodEnd);
 			if (status != null) {
@@ -107,7 +107,7 @@ namespace AdminInterface.Controllers
 		private object UpdateAccounting(uint accountId, bool? accounted, decimal? payment, bool? isFree, DateTime? freePeriodEnd)
 		{
 			object result = null;
-			var account = Account.Find(accountId);
+			var account = DbSession.Load<Account>(accountId);
 
 			if (freePeriodEnd.HasValue)
 				account.FreePeriodEnd = freePeriodEnd.Value;
@@ -151,7 +151,7 @@ namespace AdminInterface.Controllers
 			if (account.IsChanged(a => a.Payment))
 				this.Mailer().AccountChanged(account).Send();
 
-			account.Update();
+			DbSession.Save(account);
 
 			return result;
 		}
@@ -171,11 +171,11 @@ namespace AdminInterface.Controllers
 
 		public void Edit(uint id)
 		{
-			var account = Account.Find(id);
+			var account = DbSession.Load<Account>(id);
 			if (IsPost) {
 				BindObjectInstance(account, "account");
 				if (IsValid(account)) {
-					account.Save();
+					DbSession.Save(account);
 					Notify("Сохранено");
 					RedirectToReferrer();
 					return;

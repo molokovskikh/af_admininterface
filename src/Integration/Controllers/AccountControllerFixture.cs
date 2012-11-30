@@ -37,7 +37,6 @@ namespace Integration.Controllers
 			Assert.That(user.Enabled, Is.False);
 		}
 
-
 		[Test]
 		public void Update_report_account()
 		{
@@ -47,13 +46,13 @@ namespace Integration.Controllers
 				Payer = payer
 			};
 			var account = new ReportAccount(report);
-			account.Save();
+			session.Save(account);
 			Flush();
 
 			controller.Update(account.Id, true, null, true, 500, null, null);
 			Flush();
 
-			account.Refresh();
+			session.Refresh(account);
 			Assert.That(account.Payment, Is.EqualTo(500));
 			Assert.That(account.BeAccounted, Is.True);
 		}
@@ -62,15 +61,15 @@ namespace Integration.Controllers
 		public void Get_Ready_For_Accounting_if_disabled()
 		{
 			var account = new UserAccount(user) { ReadyForAccounting = true, BeAccounted = false };
-			account.Save();
+			session.Save(account);
 			Flush();
 
-			var acoounts = Account.GetReadyForAccounting(new Pager { PageSize = 1000 }).Select(a => a.ObjectId).ToList();
+			var acoounts = Account.GetReadyForAccounting(new Pager { PageSize = 1000 }, session).Select(a => a.ObjectId).ToList();
 			Assert.IsTrue(acoounts.Contains(account.ObjectId));
 			controller.Update(account.Id, false, null, false, 500, null, null);
 			Flush();
 
-			acoounts = Account.GetReadyForAccounting(new Pager { PageSize = 1000 }).Select(a => a.ObjectId).ToList();
+			acoounts = Account.GetReadyForAccounting(new Pager { PageSize = 1000 }, session).Select(a => a.ObjectId).ToList();
 			Assert.IsFalse(acoounts.Contains(account.ObjectId));
 		}
 
@@ -87,12 +86,12 @@ namespace Integration.Controllers
 			var addressAccount = address.Accounting;
 			addressAccount.IsFree = true;
 
-			session.SaveOrUpdate(client);
+			session.Save(client);
 
 			//анонимные объекты internal для того что бы получить доступ к полям использую exposed object
 			var result = Exposed.From(controller.Update(userAccount.Id, null, false, null, null, null, null));
 
-			addressAccount.Refresh();
+			session.Refresh(addressAccount);
 			Assert.That(addressAccount.IsFree, Is.False);
 			Assert.That(result.message, Is.EqualTo(String.Format("Следующие адреса доставки стали платными: {0}", address.Value)));
 			Assert.That(result.accounts.Length, Is.EqualTo(1));

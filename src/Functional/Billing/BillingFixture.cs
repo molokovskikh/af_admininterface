@@ -752,9 +752,9 @@ namespace Functional.Billing
 			Assert.That(Css(String.Format("#AddressRow{0} input[name=free]", address.Id)).Checked, Is.False);
 			Assert.That(Css(String.Format("#AddressRow{0}", address.Id)).ClassName, Is.Not.StringContaining("free"));
 
-			user.Accounting.Refresh();
+			session.Refresh(user.Accounting);
+			session.Refresh(address.Accounting);
 			Assert.That(user.Accounting.IsFree, Is.False);
-			address.Accounting.Refresh();
 			Assert.That(address.Accounting.IsFree, Is.False);
 		}
 

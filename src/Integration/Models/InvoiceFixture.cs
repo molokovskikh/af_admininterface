@@ -22,11 +22,13 @@ namespace Integration.Models
 		public void Delete_invoice_for_ad()
 		{
 			var ad = new Advertising(payer, 1000);
-			ad.SaveAndFlush();
+			session.Save(ad);
 			ad.Invoice = new Invoice(ad);
 			ad.Invoice.Parts[0].Processed = true;
 			ad.Invoice.CalculateSum();
-			ad.SaveAndFlush();
+			session.Save(ad);
+			session.Flush();
+
 			Assert.That(payer.Balance, Is.EqualTo(-1000));
 			ad.Invoice.DeleteAndFlush();
 			Assert.That(payer.Balance, Is.EqualTo(0));
@@ -37,7 +39,7 @@ namespace Integration.Models
 		{
 			var ad = new Advertising(payer, 1000);
 			payer.Ads.Add(ad);
-			ad.SaveAndFlush();
+			session.Save(ad);
 
 			Reopen();
 			payer = Payer.Find(payer.Id);
@@ -53,8 +55,8 @@ namespace Integration.Models
 			var report = DataMother.Report(payer);
 			report.Payment = 5000;
 			report.Description = "Стат. отчет за {0}";
-			report.Save();
-			payer.Refresh();
+			session.Save(report);
+			session.Refresh(payer);
 
 			var invoiceDate = new DateTime(2011, 09, 11);
 			var invoice = new Invoice(payer, invoiceDate.ToPeriod(), invoiceDate);

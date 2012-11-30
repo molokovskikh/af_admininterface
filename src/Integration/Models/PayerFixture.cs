@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Linq;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
-using AdminInterface.Models.Suppliers;
-using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using Integration.ForTesting;
-using Test.Support.log4net;
-using log4net.Config;
 using NUnit.Framework;
 
 namespace Integration.Models
@@ -22,7 +16,8 @@ namespace Integration.Models
 			var client = DataMother.TestClient();
 			var payer = client.Payers.First();
 			payer.ShortName = String.Format("Тестовый плательщик {0}", payer.Id);
-			payer.UpdateAndFlush();
+			session.Save(payer);
+			session.Flush();
 
 			var payers = Payer.GetLikeAvaliable(session, payer.ShortName);
 			Assert.That(payers.Count(), Is.EqualTo(1));
@@ -50,11 +45,13 @@ namespace Integration.Models
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 
 			payer.BeginBalance = 1000;
-			payer.SaveAndFlush();
+			session.Save(payer);
+			session.Flush();
 			Assert.That(payer.Balance, Is.EqualTo(1000));
 			payer.Balance = 2000;
 			payer.BeginBalance = -500;
-			payer.SaveAndFlush();
+			session.Save(payer);
+			session.Flush();
 			Assert.That(payer.Balance, Is.EqualTo(500));
 		}
 
@@ -64,7 +61,7 @@ namespace Integration.Models
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
 			user.Accounting.Payment = 200;
-			session.SaveOrUpdate(user);
+			session.Save(user);
 			Flush();
 
 			var payer = client.Payers[0];
@@ -86,9 +83,9 @@ namespace Integration.Models
 			var report = DataMother.Report(payer);
 			report.Payment = 1500;
 
-			session.SaveOrUpdate(client);
-			payer.Save();
-			report.Save();
+			session.Save(client);
+			session.Save(payer);
+			session.Save(report);
 
 			payer.Refresh();
 			Assert.That(payer.TotalSum, Is.EqualTo(1500));

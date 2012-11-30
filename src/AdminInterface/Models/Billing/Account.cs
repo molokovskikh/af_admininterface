@@ -11,11 +11,13 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models.Audit;
+using NHibernate;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models.Billing
 {
 	[ActiveRecord(DiscriminatorColumn = "Type", Schema = "Billing", Lazy = true), Auditable]
-	public abstract class Account : ActiveRecordLinqBase<Account>, IAuditable
+	public abstract class Account : IAuditable
 	{
 		protected bool _beAccounted;
 		protected bool _readyForAccounting;
@@ -180,10 +182,10 @@ namespace AdminInterface.Models.Billing
 			return (BeAccounted || ReadyForAccounting) && !IsFree && Payment > 0;
 		}
 
-		public static IEnumerable<Account> GetReadyForAccounting(Pager pager)
+		public static IEnumerable<Account> GetReadyForAccounting(Pager pager, ISession session)
 		{
 			var freeEnd = DateTime.Today.AddDays(10);
-			var readyForAccounting = Queryable.Where(a => a.ReadyForAccounting
+			var readyForAccounting = session.Query<Account>().Where(a => a.ReadyForAccounting
 				&& !a.BeAccounted
 				&& !(a.IsFree && a.FreePeriodEnd != null && a.FreePeriodEnd > freeEnd));
 			var allResult = readyForAccounting.ToList().Where(a => a.Enabled);
