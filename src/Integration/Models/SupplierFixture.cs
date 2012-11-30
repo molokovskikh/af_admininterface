@@ -25,5 +25,20 @@ namespace Integration.Models
 			Reopen();
 			Assert.That(session.Get<Supplier>(supplier.Id), Is.Null);
 		}
+
+		[Test]
+		public void Ignore_user_check_on_supplier_delete()
+		{
+			var user = DataMother.CreateSupplierUser();
+			var supplier = (Supplier)user.RootService;
+			supplier.Disabled = true;
+			Save(supplier);
+			Assert.That(supplier.CanDelete(session), Is.True);
+			supplier.Delete(session);
+			session.Flush();
+
+			Reopen();
+			Assert.That(session.Get<Supplier>(supplier.Id), Is.Null);
+		}
 	}
 }

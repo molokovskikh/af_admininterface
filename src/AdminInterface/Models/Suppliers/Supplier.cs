@@ -350,18 +350,13 @@ namespace AdminInterface.Models.Suppliers
 
 		public virtual bool CanDelete(ISession session)
 		{
-			var synonymCount = Convert.ToUInt32(session.CreateSQLQuery(@"
-select count(*)
-from Customers.Suppliers s
-	join Usersettings.PricesData pd on pd.FirmCode = s.Id
-	join Farm.Synonym s on s.PriceCode = pd.PriceCode
-where s.Id = :supplierId")
-				.SetParameter("supplierId", Id)
-				.UniqueResult());
-
-			return Disabled
-				&& synonymCount <= 200
-				&& Users.All(u => u.CanDelete(session));
+			try {
+				CheckBeforeDelete(session);
+				return true;
+			}
+			catch (EndUserException e) {
+				return false;
+			}
 		}
 
 		public virtual void CheckBeforeDelete(ISession session)
@@ -380,8 +375,6 @@ where s.Id = :supplierId")
 
 			if (synonymCount > 200)
 				throw new EndUserException(String.Format("У поставщика {0} больше 200 синонимов", Name));
-
-			Users.Each(u => u.CheckBeforeDelete(session));
 		}
 
 		public virtual void Delete(ISession session)
