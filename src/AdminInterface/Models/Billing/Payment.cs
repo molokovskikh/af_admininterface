@@ -394,7 +394,7 @@ namespace AdminInterface.Models.Billing
 				//запрос должен быть в другой сесии а то будет stackoverflow
 				Advertising ad;
 				using (new SessionScope())
-					ad = Advertising.Queryable.FirstOrDefault(a => a.Payer == Payer && a.Payment == null);
+					ad = ActiveRecordLinqBase<Advertising>.Queryable.FirstOrDefault(a => a.Payer == Payer && a.Payment == null);
 				if (ad == null) {
 					ad = new Advertising(Payer);
 					ad.Cost = AdSum.Value;

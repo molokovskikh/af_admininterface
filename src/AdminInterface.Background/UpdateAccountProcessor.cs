@@ -29,7 +29,7 @@ namespace AdminInterface.Background
 		private static void Process(uint[] ids, ISession session)
 		{
 			foreach (var id in ids) {
-				var account = Account.TryFind(id);
+				var account = session.Load<Account>(id);
 				if (account.ObjectType == LogObjectType.User) {
 					account = session.Load<UserAccount>(id);
 					var user = ((UserAccount)account).User;
@@ -38,7 +38,7 @@ namespace AdminInterface.Background
 						&& (u.UpdateType == UpdateType.Accumulative || u.UpdateType == UpdateType.Cumulative));
 					if (updateCount >= 10) {
 						account.ReadyForAccounting = true;
-						account.Save();
+						session.Save(account);
 					}
 				}
 				else if (account.ObjectType == LogObjectType.Address) {
@@ -46,7 +46,7 @@ namespace AdminInterface.Background
 					var address = ((AddressAccount)account).Address;
 					if (address.AvaliableForUsers.Any(u => u.Accounting.ReadyForAccounting)) {
 						account.ReadyForAccounting = true;
-						account.Save();
+						session.Save(account);
 					}
 				}
 			}

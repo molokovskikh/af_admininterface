@@ -1,3 +1,4 @@
+using System;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Functional.ForTesting;
@@ -19,7 +20,7 @@ namespace Functional.Billing
 		{
 			payer = DataMother.CreatePayerForBillingDocumentTest();
 			ad = new Advertising(payer);
-			ad.Save();
+			session.Save(ad);
 		}
 
 		[Test]

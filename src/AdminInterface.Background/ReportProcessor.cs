@@ -30,9 +30,9 @@ left join Billing.Accounts a on a.ObjectId = gr.GeneralReportCode and a.Type = 2
 where a.Id is null")
 						.List<object>();
 					foreach (var id in ids) {
-						var report = Report.Find(Convert.ToUInt32(id));
+						var report = s.Load<Report>(Convert.ToUInt32(id));
 						var account = new ReportAccount(report);
-						account.Save();
+						s.Save(account);
 					}
 				});
 				scope.VoteCommit();

@@ -31,13 +31,13 @@ set ReadyForAccounting = 0,
 BeAccounted = 0;")
 				.ExecuteUpdate();
 
-			var accountings = Account.GetReadyForAccounting(new Pager());
+			var accountings = Account.GetReadyForAccounting(new Pager(), session);
 			Assert.That(accountings.Count(), Is.EqualTo(0));
 			client.Users[0].Accounting.ReadyForAccounting = true;
 			session.SaveOrUpdate(client);
 			Flush();
 
-			accountings = Account.GetReadyForAccounting(new Pager());
+			accountings = Account.GetReadyForAccounting(new Pager(), session);
 			Assert.That(accountings.Count(), Is.EqualTo(1), accountings.Implode(a => a.Name));
 		}
 
@@ -66,17 +66,17 @@ BeAccounted = 0;")
 			Assert.That(Ready(), Is.Not.Contains(userAccount.Id));
 
 			userAccount.FreePeriodEnd = DateTime.Today.AddDays(-1);
-			userAccount.Save();
+			session.Save(userAccount);
 			Flush();
 
 			Assert.That(Ready().Any(id => id == userAccount.Id), Is.True, "не нашли аккаунт {0}", userAccount.Id);
 		}
 
-		private static uint[] Ready()
+		private uint[] Ready()
 		{
 			var pager = new Pager();
 			pager.PageSize = 1000;
-			var items = Account.GetReadyForAccounting(pager);
+			var items = Account.GetReadyForAccounting(pager, session);
 			var ready = items.Select(i => i.Id).ToArray();
 			return ready;
 		}
