@@ -778,7 +778,6 @@ namespace Functional.Billing
 
 			Assert.That(Css(String.Format("#UserRow{0} input[name=accounted]", user.Id)).Checked, Is.True);
 
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked = false;
 			browser.TextField("AddCommentField").AppendText("testComment");
 			Click("Продолжить");
