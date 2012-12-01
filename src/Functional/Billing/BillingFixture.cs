@@ -769,6 +769,26 @@ namespace Functional.Billing
 			AssertText("Тестовое сообщение");
 		}
 
+		[Test]
+		public void Accounted_not_selected_if_unchecked_status()
+		{
+			user.Accounting.BeAccounted = true;
+			session.SaveOrUpdate(client);
+			Refresh();
+
+			Assert.That(Css(String.Format("#UserRow{0} input[name=accounted]", user.Id)).Checked, Is.True);
+
+			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
+			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked = false;
+			browser.TextField("AddCommentField").AppendText("testComment");
+			Click("Продолжить");
+			Thread.Sleep(1000);
+
+			Refresh();
+
+			Assert.That(Css(String.Format("#UserRow{0} input[name=accounted]", user.Id)).Checked, Is.False);
+		}
+
 		private void SearchAndSelectAddress(string value)
 		{
 			browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();

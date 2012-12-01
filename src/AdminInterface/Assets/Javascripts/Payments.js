@@ -128,6 +128,11 @@ function checkBoxChanger(url, item) {
 				if (id) {
 					updateChildren(id, item.attr("checked"));
 				}
+				if (item.attr("checked") == false || item.attr("checked") == undefined) {
+					var accounted = $(item).parents("tr").find("input[name=accounted]");
+					accounted.attr("checked", false);
+					accounted.change();
+				}
 			}
 		});
 	});
