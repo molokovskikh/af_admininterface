@@ -1,0 +1,29 @@
+﻿ <% component Bubble, {"bredcrumbs" : [("Поставщик ${supplier.Name}", "${siteroot}/Suppliers/${supplier.Id}")]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	Настройка выборочного блокирования некоторых файлов-вложений к письмам, поступающим в качестве накладных
+<% end %>
+
+<form action="${Siteroot}/Suppliers/SaveExcludeFiles" method="post">
+	<table class="DataTable>
+		<tbody>
+			<% for i, file in enumerate(supplier.ExcludeFiles): %>
+				<tr>
+					<td>
+						${FormHelper.TextFieldValue("files[${i}.Mask]", file.Mask)}
+						${FormHelper.HiddenField("files[${i}.Id]", file.Id)}
+					</td>
+					<td>
+						<a href="javascript:" onclick="DeleteExcludeFile(${file.Id})">Удалить</a>
+					</td>
+				</tr>
+			<%end%>
+		</tbody>
+	</table>
+</form>
+
+<form id="addNewForm" action="${Siteroot}/Suppliers/AddNewExcludeFile" method="post">
+	${FormHelper.HiddenField("supplierId", supplier.Id)}
+	<input name="newWaybillFile"> <br/>
+	<button type="submit">Добавить</button>
+</form>

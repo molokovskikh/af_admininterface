@@ -57,6 +57,7 @@ namespace AddUser
 
 			supplier = Supplier.Find(id);
 			HandlersLink.NavigateUrl = "~/SpecialHandlers/?supplierId=" + supplier.Id;
+			WaybillExcludeFiles.NavigateUrl = "~/Suppliers/WaybillExcludeFiles?supplierId=" + supplier.Id;
 
 			if (!IsPostBack)
 				LoadPageData();

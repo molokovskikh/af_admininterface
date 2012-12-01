@@ -165,6 +165,7 @@
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
+    <Compile Include="Models\WaybillExcludeFile.cs" />
     <Compile Include="Queries\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="Queries\ClientAddressFilter.cs" />
     <Compile Include="Queries\ClientConditionsMonitoring.cs" />
@@ -568,6 +569,7 @@
     <None Include="Views\Orders\Details.brail" />
     <None Include="Views\SubViews\JuridicalOrganizationForm.brail" />
     <None Include="Views\LegalEntity\Add.brail" />
+    <Content Include="Views\Suppliers\WaybillExcludeFiles.brail" />
     <None Include="Views\Templates\UnknownCalls.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>

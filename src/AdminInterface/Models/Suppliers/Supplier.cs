@@ -121,6 +121,9 @@ namespace AdminInterface.Models.Suppliers
 		[HasMany(Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<OrderSendRules> OrderRules { get; set; }
 
+		[HasMany(Lazy = true, Cascade = ManyRelationCascadeEnum.AllDeleteOrphan)]
+		public virtual IList<WaybillExcludeFile> ExcludeFiles { get; set; }
+
 		[HasAndBelongsToMany(typeof(CertificateSource),
 			Lazy = true,
 			ColumnKey = "SupplierId",

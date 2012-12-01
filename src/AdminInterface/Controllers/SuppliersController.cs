@@ -56,6 +56,20 @@ namespace AdminInterface.Controllers
 			}
 		}
 
+		public void WaybillExcludeFiles(uint supplierId)
+		{
+			var supplier = DbSession.Get<Supplier>(supplierId);
+			PropertyBag["supplier"] = supplier;
+		}
+
+		public void AddNewExcludeFile(uint supplierId, string newWaybillFile)
+		{
+			var supplier = DbSession.Get<Supplier>(supplierId);
+			var newFile = new WaybillExcludeFile(newWaybillFile, supplier);
+			DbSession.Save(newFile);
+			RedirectToReferrer();
+		}
+
 		public void ChangePayer(uint supplierId, uint payerId)
 		{
 			var suplier = Supplier.Find(supplierId);
