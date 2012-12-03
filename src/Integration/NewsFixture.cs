@@ -44,7 +44,7 @@ namespace Integration
 			Assert.That(message.Body, Is.StringEnding(String.Format(@"Дата изменения: {1}<br>
 Сотрудник: test<br>
 Хост: localhost<br>
-Для разработчиков: Код {0}<br>
+Код новости: {0}<br>
 Новость: <a href=""/News/{0}"">TestNewHeader</a><br>
 Адресат: {2}<br>
 Дата и время публикации новости: {3}<br>
@@ -63,7 +63,7 @@ namespace Integration
 			Assert.That(message.Body, Is.StringEnding(String.Format(@"Дата изменения: {1}<br>
 Сотрудник: test<br>
 Хост: localhost<br>
-Для разработчиков: Код {0}<br>
+Код новости: {0}<br>
 Новость: <a href=""https://stat.analit.net/adm/News/{0}"">TestNewHeader</a><br>
 
 Скрыта новость: <br/>

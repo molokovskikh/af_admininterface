@@ -245,13 +245,32 @@ namespace AdminInterface.Mailers
 		{
 			var idLabel = BindingHelper.TryGetDescription(NHibernateUtil.GetClass(entity), "Id");
 			if (idLabel == null)
-				idLabel = "Код";
+				idLabel = "Код " + GetEntityName(entity);
 			From = "register@analit.net";
 			PropertyBag["message"] = message;
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["entity"] = entity;
 			PropertyBag["type"] = Inflector.Pluralize(NHibernateUtil.GetClass(entity).Name);
 			PropertyBag["idLabel"] = idLabel;
+		}
+
+
+		private string GetEntityName(object entity)
+		{
+			var type = NHibernateUtil.GetClass(entity);
+			if (type == typeof(Client))
+				return "клиента";
+			if (type == typeof(Supplier))
+				return "поставщика";
+			if (type == typeof(LegalEntity))
+				return "юр. Лица";
+			if (type == typeof(User))
+				return "пользователя";
+			if (type == typeof(Payer))
+				return "плательщика";
+			if (type == typeof(News))
+				return "новости";
+			return "не оптеделено";
 		}
 
 		public MonorailMailer RegisterOrDeleteNews(News news, string to, string messageSubject)
