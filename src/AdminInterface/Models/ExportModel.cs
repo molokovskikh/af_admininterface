@@ -1,17 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Security.AccessControl;
 using System.Web;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models.Telephony;
+using AdminInterface.Queries;
+using Castle.Components.DictionaryAdapter;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
+using ExcelLibrary.BinaryFileFormat;
+using ExcelLibrary.CompoundDocumentFormat;
+using ExcelLibrary.Office.Excel.BinaryFileFormat.Records;
 using ExcelLibrary.SpreadSheet;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.Util;
+using BorderStyle = NPOI.SS.UserModel.BorderStyle;
+using HorizontalAlignment = NPOI.SS.UserModel.HorizontalAlignment;
 
 namespace AdminInterface.Models
 {
@@ -141,6 +154,93 @@ namespace AdminInterface.Models
 			wb.Worksheets.Add(ws);
 			var buffer = new MemoryStream();
 			wb.Save(buffer);
+			return buffer.ToArray();
+		}
+
+		public static byte[] GetFormPosition(FormPositionFilter filter)
+		{
+			var book = new HSSFWorkbook();
+
+			var sheet = book.CreateSheet("Лист1");
+
+			var row = 0;
+			var col = 0;
+			// выбираем данные
+			var report = filter.Find();
+			if(report.Count == 0)
+				return null;
+			var type = report.FirstOrDefault().GetType();
+			// получаем список всех свойств
+			var infos = type.GetProperties();
+			// создаем строку
+			var sheetRow = sheet.CreateRow(row++);
+			// шрифт для заголовков (жирный)
+			var font = book.CreateFont();
+			font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.BOLD;
+			// стиль для заголовков
+			var headerStyle = book.CreateCellStyle();
+			headerStyle.BorderRight = BorderStyle.MEDIUM;
+			headerStyle.BorderLeft = BorderStyle.MEDIUM;
+			headerStyle.BorderBottom = BorderStyle.MEDIUM;
+			headerStyle.BorderTop = BorderStyle.MEDIUM;
+			headerStyle.Alignment = HorizontalAlignment.CENTER;
+			headerStyle.SetFont(font);
+			headerStyle.WrapText = true;
+			// выводим наименование отчета
+			var headerCell = sheetRow.CreateCell(0);
+			headerCell.CellStyle = headerStyle;
+			headerCell.SetCellValue("Отчет о состоянии формализуемых полей в прайс-листах поставщиков");
+			// дата построения отчета
+			sheetRow = sheet.CreateRow(row++);
+			var dateCell = sheetRow.CreateCell(0);
+			dateCell.SetCellValue(String.Format("Дата подготовки отчета: {0}", DateTime.Now));
+			sheetRow = sheet.CreateRow(row++);
+			dateCell = sheetRow.CreateCell(0);
+			dateCell.SetCellValue(String.Format("* В отчет не включены прайс-листы с фиксированной шириной колонки"));
+			// добавляем пустую строку перед таблицей
+			sheet.CreateRow(row++);
+			sheetRow = sheet.CreateRow(row++);
+			// заполняем наименования столбцов таблицы
+			foreach (PropertyInfo prop in infos) {
+				var cell = sheetRow.CreateCell(col++);
+				cell.CellStyle = headerStyle;
+				var value = ((DisplayAttribute)prop.GetCustomAttributes(typeof(DisplayAttribute), false).First()).Name;
+				cell.SetCellValue(value);
+			}
+			// стиль для ячеек с данными
+			var dataStyle = book.CreateCellStyle();
+			dataStyle.BorderRight = BorderStyle.THIN;
+			dataStyle.BorderLeft = BorderStyle.THIN;
+			dataStyle.BorderBottom = BorderStyle.THIN;
+			dataStyle.BorderTop = BorderStyle.THIN;
+			dataStyle.GetFont(book).Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.None;
+
+			dateCell.CellStyle = dataStyle;
+			// выводим данные
+			foreach (var formPositionItem in report) {
+				col = 0;
+				sheetRow = sheet.CreateRow(row++);
+				foreach (PropertyInfo prop in infos) {
+					var cell = sheetRow.CreateCell(col++);
+					cell.CellStyle = dataStyle;
+					var value = prop.GetValue(formPositionItem, null);
+					if(value != null)
+						cell.SetCellValue(value.ToString());
+				}
+			}
+			// устанавливаем ширину столбцов
+			for(var i = col; i >= 0; i--) {
+				sheet.SetColumnWidth(i, 2700);
+			}
+			sheet.SetColumnWidth(1, sheet.GetColumnWidth(1) * 2);
+			sheet.SetColumnWidth(2, sheet.GetColumnWidth(2) * 2);
+			sheet.SetColumnWidth(4, sheet.GetColumnWidth(4) * 2);
+			sheet.SetAutoFilter(new CellRangeAddress(4, row, 4, col - 1));
+			// добавляем автофильтр
+			sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, col - 1));
+
+			var buffer = new MemoryStream();
+			book.Write(buffer);
 			return buffer.ToArray();
 		}
 	}

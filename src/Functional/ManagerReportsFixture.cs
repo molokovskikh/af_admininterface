@@ -10,6 +10,8 @@ using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
+using Test.Support;
+using Test.Support.Suppliers;
 using Test.Support.Web;
 using WatiN.Core;
 using Test.Support.Web;
@@ -131,6 +133,25 @@ namespace Functional
 			foreach (var user in client.Users) {
 				AssertText(string.Format("{0} - ({1})", user.Name, user.Id));
 			}
+		}
+
+		[Test]
+		public void FormPositionFixture()
+		{
+			var supplier = TestSupplier.Create();
+			var price = supplier.Prices[0];
+			var itemFormat = price.Costs[0].PriceItem.Format;
+			itemFormat.PriceFormat = PriceFormatType.NativeDbf;
+			itemFormat.FCode = "F1";
+			session.Save(itemFormat);
+			session.Flush();
+			session.Save(price);
+			Open("ManagerReports");
+			Click("Отчет о состоянии формализуемых полей в прайс-листах поставщиков");
+			AssertText("Отчет о состоянии формализуемых полей в прайс-листах поставщиков");
+			AssertText("Выгрузить в Excel");
+			Click("Показать");
+			AssertText(price.Id.ToString());
 		}
 	}
 }

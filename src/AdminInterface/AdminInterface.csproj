@@ -120,6 +120,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\NHibernate.ByteCode.Castle.dll</HintPath>
     </Reference>
+    <Reference Include="NPOI">
+      <HintPath>..\..\packages\NPOI.1.2.5\lib\net40\NPOI.dll</HintPath>
+    </Reference>
     <Reference Include="RemoteOrderSenderService">
       <HintPath>..\..\lib\RemoteOrderSenderService.dll</HintPath>
     </Reference>
@@ -168,6 +171,7 @@
     <Compile Include="Queries\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="Queries\ClientAddressFilter.cs" />
     <Compile Include="Queries\ClientConditionsMonitoring.cs" />
+    <Compile Include="Queries\FormPositionFilter.cs" />
     <Compile Include="Queries\IFiltrable.cs" />
     <Compile Include="Queries\RegistrationInformation.cs" />
     <Compile Include="Queries\SwitchOffClientsFilter.cs" />
@@ -510,6 +514,7 @@
     <Content Include="Views\ManagerReports\UpdatedAndDidNotDoOrders.brail" />
     <Content Include="Views\ManagerReports\AnalysisOfWorkDrugstores.brail" />
     <Content Include="Views\ManagerReports\SimpleTable.brail" />
+    <Content Include="Views\ManagerReports\FormPosition.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />
