@@ -208,3 +208,11 @@ table thead.CenterHead th
 .DataTable tbody tr td.no-order-style, div.no-order-style {
 	background-color: #9999ff;
 }
+
+.ExcludeFilesForm {
+	width: 750px;
+}
+
+.ExcludeFilesForm input[type="text"] {
+	width: 300px;
+}

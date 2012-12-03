@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Castle.Components.Validator;
 
 namespace AdminInterface.Models
 {
@@ -23,7 +24,7 @@ namespace AdminInterface.Models
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty("Введите маску файла")]
 		public virtual string Mask { get; set; }
 
 		[BelongsTo]

@@ -16,7 +16,9 @@ using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
@@ -66,8 +68,31 @@ namespace AdminInterface.Controllers
 		{
 			var supplier = DbSession.Get<Supplier>(supplierId);
 			var newFile = new WaybillExcludeFile(newWaybillFile, supplier);
-			DbSession.Save(newFile);
+			if (IsValid(newFile)) {
+				DbSession.Save(newFile);
+				Notify("Сохранено");
+			}
 			RedirectToReferrer();
+		}
+
+		public void SaveExcludeFiles([ARDataBind("files", AutoLoadBehavior.NullIfInvalidKey)]WaybillExcludeFile[] files)
+		{
+			foreach (var waybillExcludeFile in files.Where(f => f != null)) {
+				if (IsValid(waybillExcludeFile)) {
+					DbSession.Save(waybillExcludeFile);
+				}
+			}
+			RedirectToReferrer();
+		}
+
+		[return: JSONReturnBinder]
+		public uint DeleteMask(uint maskId)
+		{
+			var mask = DbSession.Get<WaybillExcludeFile>(maskId);
+			var supplierId = mask.Supplier.Id;
+			DbSession.Delete(mask);
+			Notify("Удалено");
+			return supplierId;
 		}
 
 		public void ChangePayer(uint supplierId, uint payerId)

@@ -12,6 +12,7 @@ using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
 using Test.Support;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Suppliers
 {
@@ -182,6 +183,42 @@ Where pc.PriceCode = :PriceId1")
 				.First();
 			//проверяем RequestInterval
 			Assert.That(source.RequestInterval, Is.EqualTo(86400));
+		}
+
+		[Test]
+		public void Waybill_exclude_file_base_test()
+		{
+			Open(supplier);
+			Click("Настройка");
+			Click("Файлы, исключенные из разбора в качестве накладных");
+			Click("Добавить");
+			AssertText("Это поле необходимо заполнить.");
+			browser.TextField("addNewExcludeFileInput").AppendText("1234");
+			Click("Добавить");
+			AssertText("Сохранено");
+		}
+
+		[Test]
+		public void Edit_waybill_exlude_file()
+		{
+			Open("Suppliers/WaybillExcludeFiles?supplierId=" + supplier.Id);
+			browser.TextField("addNewExcludeFileInput").AppendText("1234");
+			Click("Добавить");
+			browser.TextField(Find.ByClass("excludeFileMask")).Clear();
+			browser.TextField(Find.ByClass("excludeFileMask")).AppendText("0000");
+			Click("Сохранить");
+			Refresh();
+			Assert.AreEqual(browser.TextField(Find.ByClass("excludeFileMask")).Text, "0000");
+		}
+
+		[Test]
+		public void Delete_waybill_exclude_file()
+		{
+			Open("Suppliers/WaybillExcludeFiles?supplierId=" + supplier.Id);
+			browser.TextField("addNewExcludeFileInput").AppendText("1234");
+			Click("Добавить");
+			Click("Удалить");
+			AssertText("Вы уверены, что хотите удалить эту маску ?");
 		}
 	}
 }
