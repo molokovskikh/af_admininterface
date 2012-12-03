@@ -187,7 +187,7 @@ namespace Integration.Models
 			Close();
 
 			Assert.That(message, Is.Not.Null);
-			Assert.That(message.Body, Is.StringEnding(String.Format("Код {0}\r\n"
+			Assert.That(message.Body, Is.StringEnding(String.Format("Код пользователя  {0}\r\n"
 				+ "Пользователь {1}\r\n"
 				+ "Клиент {2}\r\n"
 				+ "Изменено 'Регионы работы' Добавлено 'Белгород'\r\n", user.Id, user.Name, client.Name)));
