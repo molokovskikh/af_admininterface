@@ -11,6 +11,7 @@
 	<form id="DeleteUpdateForm" action="${Siteroot}/Suppliers/SaveExcludeFiles" method="post">
 		<table class="DataTable">
 			<tbody>
+			<%if supplier.ExcludeFiles.Count:%>
 				<% for i, file in enumerate(supplier.ExcludeFiles): %>
 					<tr>
 						<td>
@@ -25,6 +26,9 @@
 					<tr>
 						<td colspan=2><button type="submit">Сохранить</button></td>
 					</tr>
+			<%else:%>
+				<tr class="EmptyData"><td>Нет зарегистрированных масок<td></tr>
+			<%end%>
 			</tbody>
 		</table>
 	</form>
