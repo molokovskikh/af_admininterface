@@ -100,7 +100,7 @@ namespace AdminInterface.Queries
 			};
 		}
 
-		private string _queryString = @"drop temporary table IF EXISTS farm.TmpPricesCode;
+		private string _queryString = @"DROP TEMPORARY TABLE IF EXISTS  farm.TmpPricesCode;
 CREATE temporary table farm.TmpPricesCode(
   PriceCode bigint unsigned
   ) engine=MEMORY;
@@ -117,7 +117,7 @@ where pf.format in ('XML', 'Sudakov', 'Формат для Фармаимпе', 
 and pd.Agencyenabled=1
 and s.Disabled=0;
 
-DROP TABLE IF EXISTS `usersettings`.`corefields`;
+DROP TEMPORARY TABLE IF EXISTS `usersettings`.`corefields`;
 CREATE temporary table  `usersettings`.`corefields` (
   `PriceCode` int(11) unsigned NOT NULL,
   `FCode` varchar(20) DEFAULT NULL,
@@ -170,7 +170,7 @@ and pd.Agencyenabled=1
 and s.Disabled=0
 order by ps.PriceCode;
 
-DROP TABLE IF EXISTS `usersettings`.`pricesInfo`;
+DROP TEMPORARY TABLE IF EXISTS `usersettings`.`pricesInfo`;
 CREATE temporary table  `usersettings`.`pricesInfo` (
   `SupplierCode` int(11) unsigned NOT NULL,
   `SupplierName` varchar(255) DEFAULT NULL,
