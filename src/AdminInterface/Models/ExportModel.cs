@@ -235,7 +235,7 @@ namespace AdminInterface.Models
 			sheet.SetColumnWidth(1, sheet.GetColumnWidth(1) * 2);
 			sheet.SetColumnWidth(2, sheet.GetColumnWidth(2) * 2);
 			sheet.SetColumnWidth(4, sheet.GetColumnWidth(4) * 2);
-			sheet.SetAutoFilter(new CellRangeAddress(4, row, 4, col - 1));
+			sheet.SetAutoFilter(new CellRangeAddress(4, row, 0, col - 1));
 			// добавляем автофильтр
 			sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, col - 1));
 
