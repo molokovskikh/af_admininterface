@@ -71,6 +71,11 @@ table.DataTable tbody tr.free, td.free, .free
 	background-color: #b0ffb0;
 }
 
+table.DataTable tbody tr.consolidate-free td.consolidate-free, .consolidate-free
+{
+	background-color: #b0ffb0;
+}
+
 table.DataTable tbody tr.has-no-connected-users, td.has-no-connected-users, .has-no-connected-users
 {
 	background-color: #cece9d;
