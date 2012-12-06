@@ -87,6 +87,7 @@ namespace Integration.Models
 			row["Enabled"] = 1;
 			row["UpCost"] = 0;
 			row["PriceType"] = 0;
+			row["IsLocal"] = 0;
 			table.Rows.Add(row);
 			var message = "";
 			(new managep()).Save(supplier, data, "", ref message);
