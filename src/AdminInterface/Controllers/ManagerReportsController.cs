@@ -11,6 +11,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
+using AdminInterface.Queries;
 using AdminInterface.Security;
 using AdminInterface.Services;
 using Castle.Components.Binder;
@@ -200,6 +201,28 @@ namespace AdminInterface.Controllers
 				.ToList()
 				.Select(c => new { id = c.Id, label = c.Name })
 				.ToList();
+		}
+
+		public void FormPosition()
+		{
+			var filter = BindFilter<FormPositionFilter, BaseItemForTable>();
+			if(filter.Session == null)
+				filter.Session = DbSession;
+			FindFilter(filter);
+		}
+
+		public void FormPositionToExcel([DataBind("filter")] FormPositionFilter filter)
+		{
+			CancelLayout();
+			CancelView();
+			if(filter.Session == null)
+				filter.Session = DbSession;
+			var result = ExportModel.GetFormPosition(filter);
+			Response.Clear();
+			Response.AppendHeader("Content-Disposition",
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Отчет о состоянии формализуемых полей.xls")));
+			Response.ContentType = "application/vnd.ms-excel";
+			Response.OutputStream.Write(result, 0, result.Length);
 		}
 	}
 }

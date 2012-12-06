@@ -9,6 +9,7 @@ using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Suppliers
 {
@@ -179,6 +180,18 @@ namespace Functional.Suppliers
 			Click("Базовый");
 			selectList = browser.SelectLists[0];
 			Assert.That(selectList.SelectedItem, Is.EqualTo("Новая базовая"));
+		}
+
+		[Test]
+		public void IsLocalPriceTest()
+		{
+			Open(supplier);
+			Click("Настройка");
+			AssertText("Локальный");
+			var localBox = browser.CheckBox(Find.ById("MainContentPlaceHolder_PricesGrid_IsLocal_0"));
+			localBox.Checked = true;
+			Click("Применить");
+			Assert.That(browser.CheckBox(Find.ById("MainContentPlaceHolder_PricesGrid_IsLocal_0")).Checked, Is.True);
 		}
 	}
 }
