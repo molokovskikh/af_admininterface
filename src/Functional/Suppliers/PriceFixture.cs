@@ -191,7 +191,6 @@ namespace Functional.Suppliers
 			var localBox = browser.CheckBox(Find.ById("MainContentPlaceHolder_PricesGrid_IsLocal_0"));
 			localBox.Checked = true;
 			Click("Применить");
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			Assert.That(browser.CheckBox(Find.ById("MainContentPlaceHolder_PricesGrid_IsLocal_0")).Checked, Is.True);
 		}
 	}
