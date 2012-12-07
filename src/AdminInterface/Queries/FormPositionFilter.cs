@@ -29,62 +29,83 @@ namespace AdminInterface.Queries
 		public int WaitingDownloadInterval { get; set; }
 		[Display(Name = "Количество ценовых колонок", Order = 3)]
 		public int CostCount { get; set; }
-		[Display(Name = "Код товара", Order = 3)]
+		[Display(Name = "Количество позиций", Order = 3)]
+		public int RowCount { get; set; }
+		[Display(Name = "Количество регионов размещения", Order = 3)]
+		public int RegionsCount { get; set; }
+
+
+		[Display(Name = "Код товара", Order = 3, GroupName = "CenterClass")]
 		public string FCode { get; set; }
-		[Display(Name = "Код производителя", Order = 3)]
+		[Display(Name = "Код производителя", Order = 3, GroupName = "CenterClass")]
 		public string FCodeCr { get; set; }
-		[Display(Name = "Наименование товара", Order = 3)]
+		[Display(Name = "Наименование товара", Order = 3, GroupName = "CenterClass")]
 		public string FName { get; set; }
-		[Display(Name = "Наименование производителя", Order = 3)]
+		[Display(Name = "Наименование производителя", Order = 3, GroupName = "CenterClass")]
 		public string FFirmCr { get; set; }
-		[Display(Name = "Минимальная цена", Order = 3)]
+		[Display(Name = "Минимальная цена", Order = 3, GroupName = "CenterClass")]
 		public string FMinBoundCost { get; set; }
-		[Display(Name = "Единица измерения", Order = 3)]
+		[Display(Name = "Единица измерения", Order = 3, GroupName = "CenterClass")]
 		public string FUnit { get; set; }
-		[Display(Name = "Цеховая упаковка", Order = 3)]
+		[Display(Name = "Цеховая упаковка", Order = 3, GroupName = "CenterClass")]
 		public string FVolume { get; set; }
-		[Display(Name = "Количество", Order = 3)]
+		[Display(Name = "Количество", Order = 3, GroupName = "CenterClass")]
 		public string FQuantity { get; set; }
-		[Display(Name = "Примечание", Order = 3)]
+		[Display(Name = "Примечание", Order = 3, GroupName = "CenterClass")]
 		public string FNote { get; set; }
-		[Display(Name = "Срок годности", Order = 3)]
+		[Display(Name = "Срок годности", Order = 3, GroupName = "CenterClass")]
 		public string FPeriod { get; set; }
-		[Display(Name = "Документ", Order = 3)]
+		[Display(Name = "Документ", Order = 3, GroupName = "CenterClass")]
 		public string FDoc { get; set; }
-		[Display(Name = "Срок", Order = 3)]
+		[Display(Name = "Срок", Order = 3, GroupName = "CenterClass")]
 		public string FJunk { get; set; }
-		[Display(Name = "Ожидается", Order = 3)]
+		[Display(Name = "Ожидается", Order = 3, GroupName = "CenterClass")]
 		public string FAwait { get; set; }
-		[Display(Name = "Жизненно важный", Order = 3)]
+		[Display(Name = "Жизненно важный", Order = 3, GroupName = "CenterClass")]
 		public string FVitallyImportant { get; set; }
-		[Display(Name = "Кратность", Order = 3)]
+		[Display(Name = "Кратность", Order = 3, GroupName = "CenterClass")]
 		public string FRequestRatio { get; set; }
-		[Display(Name = "Реестровая цена", Order = 3)]
+		[Display(Name = "Реестровая цена", Order = 3, GroupName = "CenterClass")]
 		public string FRegistryCost { get; set; }
-		[Display(Name = "Цена максимальная", Order = 3)]
+		[Display(Name = "Цена максимальная", Order = 3, GroupName = "CenterClass")]
 		public string FMaxBoundCost { get; set; }
-		[Display(Name = "Минимальная сумма", Order = 3)]
+		[Display(Name = "Минимальная сумма", Order = 3, GroupName = "CenterClass")]
 		public string FOrderCost { get; set; }
-		[Display(Name = "Минимальное количество", Order = 3)]
+		[Display(Name = "Минимальное количество", Order = 3, GroupName = "CenterClass")]
 		public string FMinOrderCount { get; set; }
-		[Display(Name = "Цена производителя", Order = 3)]
+		[Display(Name = "Цена производителя", Order = 3, GroupName = "CenterClass")]
 		public string FProducerCost { get; set; }
-		[Display(Name = "Ставка НДС", Order = 3)]
+		[Display(Name = "Ставка НДС", Order = 3, GroupName = "CenterClass")]
 		public string FNds { get; set; }
-		[Display(Name = "Код EAN-13 (штрих-код)", Order = 3)]
+		[Display(Name = "Код EAN-13 (штрих-код)", Order = 3, GroupName = "CenterClass")]
 		public string FEAN13 { get; set; }
-		[Display(Name = "Серия", Order = 3)]
+		[Display(Name = "Серия", Order = 3, GroupName = "CenterClass")]
 		public string FSeries { get; set; }
-		[Display(Name = "Код ОКП", Order = 3)]
+		[Display(Name = "Код ОКП", Order = 3, GroupName = "CenterClass")]
 		public string FCodeOKP { get; set; }
 	}
 
 	public class FormPositionFilter : PaginableSortable, IFiltrable<BaseItemForTable>
 	{
+		private IList<BaseItemForTable> ApplySort(IList<FormPositionItem> items)
+		{
+			if(String.IsNullOrEmpty(SortBy)) {
+				return items.Cast<BaseItemForTable>().ToList();
+			}
+			var propertyInfo = typeof(FormPositionItem).GetProperty(SortBy);
+
+			var groupedItems = items.GroupBy(r => r.SupplierCode);
+			if(SortDirection.Contains("asc"))
+				groupedItems = groupedItems.OrderBy(r => r.Min(item => propertyInfo.GetValue(item, null)));
+			else
+				groupedItems = groupedItems.OrderByDescending(r => r.Min(item => propertyInfo.GetValue(item, null)));
+			return groupedItems.SelectMany(r => r.Where(a => true)).Cast<BaseItemForTable>().ToList();
+		}
 		public IList<BaseItemForTable> Find()
 		{
 			var result = Session.CreateSQLQuery(_queryString).ToList<FormPositionItem>();
-			return result.Cast<BaseItemForTable>().ToList();
+			var result1 = ApplySort(result);
+			return result1;
 		}
 
 		public ISession Session { get; set; }
@@ -92,11 +113,14 @@ namespace AdminInterface.Queries
 
 		public FormPositionFilter()
 		{
-			SortBy = "SupplierName";
+			SortBy = "MaxOld";
+			SortDirection = "asc";
 			SortKeyMap = new Dictionary<string, string> {
 				{ "SupplierName", "SupplierName" },
 				{ "Region", "Region" },
-				{ "PriceName", "PriceName" }
+				{ "PriceName", "PriceName" },
+				{ "MaxOld", "MaxOld" },
+				{ "WaitingDownloadInterval", "WaitingDownloadInterval" }
 			};
 		}
 
@@ -179,17 +203,21 @@ CREATE temporary table  `usersettings`.`pricesInfo` (
   `PriceName` varchar(50) DEFAULT NULL,
   `MaxOld` int(11) DEFAULT NULL,
   `WaitingDownloadInterval` int(11) DEFAULT 1,
-  `CostCount` int(11) DEFAULT 0
+  `CostCount` int(11) DEFAULT 0,
+`RowCount` int(11) DEFAULT 0,
+`RegionsCount` int(11) DEFAULT 0
   ) engine=MEMORY;
   insert into `usersettings`.`pricesInfo`
 select distinct s.Id, s.Name, rg.Region, pd.PriceCode, pd.PriceName, f.MaxOld, p.WaitingDownloadInterval,
-sum(if(ps.Enabled = 1 and ps.AgencyEnabled=1, 1, 0)) as CostCount
+sum(if(ps.Enabled = 1 and ps.AgencyEnabled=1, 1, 0)) as CostCount, p.RowCount,
+sum(if(prd.Enabled = 1, 1, 0)) as RegionsCount
 from usersettings.pricesdata pd
 join usersettings.pricescosts ps on ps.pricecode=pd.pricecode
 join usersettings.priceitems p on ps.PriceItemId = p.Id
 join customers.suppliers s on pd.FirmCode=s.id
 join farm.regions rg on s.homeregion = rg.RegionCode
 join farm.formrules f on p.FormRuleId=f.Id
+left join usersettings.pricesregionaldata prd on prd.pricecode = pd.pricecode
 group by s.Id, s.Name, rg.Region, pd.PriceCode, pd.PriceName, f.MaxOld, p.WaitingDownloadInterval;
 
 select distinct pd.*,

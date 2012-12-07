@@ -4,6 +4,7 @@
 	Отчет о состоянии формализуемых полей в прайс-листах поставщиков
 <% end %>
  ${app.JS("ManagerReport.js")}
+ ${app.Asset("ManagerReport.css")}
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.SortBy")}
 ${FormHelper.HiddenField("filter.SortDirection")}
