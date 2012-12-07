@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.ManagerReportsFilters;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 
@@ -87,6 +88,12 @@ namespace AdminInterface.Queries
 
 	public class FormPositionFilter : PaginableSortable, IFiltrable<BaseItemForTable>
 	{
+		[Description("Наименование поставщика: ")]
+		public string SupplierName { get; set; }
+
+		[Description("Регион работы прайса: ")]
+		public Region Region { get; set; }
+
 		private IList<BaseItemForTable> ApplySort(IList<FormPositionItem> items)
 		{
 			if(String.IsNullOrEmpty(SortBy)) {
@@ -96,16 +103,26 @@ namespace AdminInterface.Queries
 
 			var groupedItems = items.GroupBy(r => r.SupplierCode);
 			if(SortDirection.Contains("asc"))
-				groupedItems = groupedItems.OrderBy(r => r.Min(item => propertyInfo.GetValue(item, null)));
+				groupedItems = groupedItems.OrderBy(r => r.Max(item => propertyInfo.GetValue(item, null)));
 			else
-				groupedItems = groupedItems.OrderByDescending(r => r.Min(item => propertyInfo.GetValue(item, null)));
+				groupedItems = groupedItems.OrderByDescending(r => r.Max(item => propertyInfo.GetValue(item, null)));
 			return groupedItems.SelectMany(r => r.Where(a => true)).Cast<BaseItemForTable>().ToList();
 		}
 		public IList<BaseItemForTable> Find()
 		{
-			var result = Session.CreateSQLQuery(_queryString).ToList<FormPositionItem>();
-			var result1 = ApplySort(result);
-			return result1;
+			var regionPriceFilter = "";
+			if(Region != null && Region.Id != 0)
+				regionPriceFilter = String.Format(
+					@"join usersettings.pricesregionaldata prd
+on prd.PriceCode = pd.pricecode and prd.RegionCode = {0} and prd.Enabled = 1",
+					Region.Id);
+			var query = Session.CreateSQLQuery(
+				String.Format(_queryString, SupplierName, regionPriceFilter));
+			var result = query.ToList<FormPositionItem>();
+			var sortResult = ApplySort(result);
+			if(Region != null)
+				Region.Name = Session.Load<Region>(Region.Id).Name;
+			return sortResult;
 		}
 
 		public ISession Session { get; set; }
@@ -113,7 +130,7 @@ namespace AdminInterface.Queries
 
 		public FormPositionFilter()
 		{
-			SortBy = "MaxOld";
+			SortBy = "SupplierName";
 			SortDirection = "asc";
 			SortKeyMap = new Dictionary<string, string> {
 				{ "SupplierName", "SupplierName" },
@@ -210,14 +227,15 @@ CREATE temporary table  `usersettings`.`pricesInfo` (
   insert into `usersettings`.`pricesInfo`
 select distinct s.Id, s.Name, rg.Region, pd.PriceCode, pd.PriceName, f.MaxOld, p.WaitingDownloadInterval,
 sum(if(ps.Enabled = 1 and ps.AgencyEnabled=1, 1, 0)) as CostCount, p.RowCount,
-sum(if(prd.Enabled = 1, 1, 0)) as RegionsCount
+count(distinct prd.RegionCode) as RegionsCount
 from usersettings.pricesdata pd
 join usersettings.pricescosts ps on ps.pricecode=pd.pricecode
 join usersettings.priceitems p on ps.PriceItemId = p.Id
 join customers.suppliers s on pd.FirmCode=s.id
 join farm.regions rg on s.homeregion = rg.RegionCode
 join farm.formrules f on p.FormRuleId=f.Id
-left join usersettings.pricesregionaldata prd on prd.pricecode = pd.pricecode
+left join usersettings.pricesregionaldata prd on prd.pricecode = pd.pricecode and prd.Enabled = 1
+where s.Name like '%{0}%'
 group by s.Id, s.Name, rg.Region, pd.PriceCode, pd.PriceName, f.MaxOld, p.WaitingDownloadInterval;
 
 select distinct pd.*,
@@ -246,7 +264,8 @@ if(cf.FEAN13 is null,null,'*') as FEAN13 ,
 if(cf.FSeries is null,null,'*') as FSeries ,
 if(cf.FCodeOKP is null,null,'*') as FCodeOKP
 from usersettings.corefields cf join usersettings.pricesInfo pd on cf.pricecode=pd.pricecode
-order by pd.SupplierName, pd.Region, pd.PriceName;
+ {1}
+ order by pd.SupplierName, pd.Region, pd.PriceName;
 ";
 	}
 }

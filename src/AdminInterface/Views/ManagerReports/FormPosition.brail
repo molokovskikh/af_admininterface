@@ -8,6 +8,8 @@
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.SortBy")}
 ${FormHelper.HiddenField("filter.SortDirection")}
+${app.FilterFor("filter.SupplierName")}
+${app.FilterFor("filter.Region")}
 ${app.EndFormFor("filter")}
 <div class="filter">
 <table class="CenterBlock">
