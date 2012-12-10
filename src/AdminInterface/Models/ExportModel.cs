@@ -201,7 +201,7 @@ namespace AdminInterface.Models
 			// регион работы прайса
 			sheetRow = sheet.CreateRow(row++);
 			dateCell = sheetRow.CreateCell(0);
-			dateCell.SetCellValue(String.Format("Регион работы прайса: {0}", filter.Region.Name));
+			dateCell.SetCellValue(String.Format("Регион работы прайса: {0}", filter.Region != null ? filter.Region.Name : "Все"));
 			sheetRow = sheet.CreateRow(row++);
 			dateCell = sheetRow.CreateCell(0);
 			dateCell.SetCellValue(String.Format("* В отчет не включены прайс-листы с фиксированной шириной колонки"));
@@ -224,15 +224,28 @@ namespace AdminInterface.Models
 			dataStyle.BorderTop = BorderStyle.THIN;
 			dataStyle.GetFont(book).Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.None;
 
+			// стиль для ячеек с данными, выравненный по центру
+			var centerDataStyle = book.CreateCellStyle();
+			centerDataStyle.BorderRight = BorderStyle.THIN;
+			centerDataStyle.BorderLeft = BorderStyle.THIN;
+			centerDataStyle.BorderBottom = BorderStyle.THIN;
+			centerDataStyle.BorderTop = BorderStyle.THIN;
+			centerDataStyle.Alignment = HorizontalAlignment.CENTER;
+			centerDataStyle.GetFont(book).Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.None;
+
 			dateCell.CellStyle = dataStyle;
 			// выводим данные
 			foreach (var formPositionItem in report) {
 				col = 0;
 				sheetRow = sheet.CreateRow(row++);
 				foreach (PropertyInfo prop in infos) {
-					var cell = sheetRow.CreateCell(col++);
-					cell.CellStyle = dataStyle;
 					var value = prop.GetValue(formPositionItem, null);
+					var cell = sheetRow.CreateCell(col++);
+					if(value != null && value.ToString() == "*") {
+						cell.CellStyle = centerDataStyle;
+					}
+					else
+						cell.CellStyle = dataStyle;
 					if(value != null)
 						cell.SetCellValue(value.ToString());
 				}
