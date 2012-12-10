@@ -167,9 +167,7 @@ namespace AdminInterface.Models
 			var col = 0;
 			// выбираем данные
 			var report = filter.Find();
-			if(report.Count == 0)
-				return null;
-			var type = report.FirstOrDefault().GetType();
+			var type = typeof(FormPositionItem);
 			// получаем список всех свойств
 			var infos = type.GetProperties();
 			// создаем строку
@@ -194,11 +192,20 @@ namespace AdminInterface.Models
 			sheetRow = sheet.CreateRow(row++);
 			var dateCell = sheetRow.CreateCell(0);
 			dateCell.SetCellValue(String.Format("Дата подготовки отчета: {0}", DateTime.Now));
+			// наименование поставщика
+			sheetRow = sheet.CreateRow(row++);
+			dateCell = sheetRow.CreateCell(0);
+			dateCell.SetCellValue(String.Format("Наименование поставщика: {0}", filter.SupplierName));
+			// регион работы прайса
+			sheetRow = sheet.CreateRow(row++);
+			dateCell = sheetRow.CreateCell(0);
+			dateCell.SetCellValue(String.Format("Регион работы прайса: {0}", filter.Region != null ? filter.Region.Name : "Все"));
 			sheetRow = sheet.CreateRow(row++);
 			dateCell = sheetRow.CreateCell(0);
 			dateCell.SetCellValue(String.Format("* В отчет не включены прайс-листы с фиксированной шириной колонки"));
 			// добавляем пустую строку перед таблицей
 			sheet.CreateRow(row++);
+			var tableHeaderRow = row;
 			sheetRow = sheet.CreateRow(row++);
 			// заполняем наименования столбцов таблицы
 			foreach (PropertyInfo prop in infos) {
@@ -215,15 +222,28 @@ namespace AdminInterface.Models
 			dataStyle.BorderTop = BorderStyle.THIN;
 			dataStyle.GetFont(book).Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.None;
 
+			// стиль для ячеек с данными, выравненный по центру
+			var centerDataStyle = book.CreateCellStyle();
+			centerDataStyle.BorderRight = BorderStyle.THIN;
+			centerDataStyle.BorderLeft = BorderStyle.THIN;
+			centerDataStyle.BorderBottom = BorderStyle.THIN;
+			centerDataStyle.BorderTop = BorderStyle.THIN;
+			centerDataStyle.Alignment = HorizontalAlignment.CENTER;
+			centerDataStyle.GetFont(book).Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.None;
+
 			dateCell.CellStyle = dataStyle;
 			// выводим данные
 			foreach (var formPositionItem in report) {
 				col = 0;
 				sheetRow = sheet.CreateRow(row++);
 				foreach (PropertyInfo prop in infos) {
-					var cell = sheetRow.CreateCell(col++);
-					cell.CellStyle = dataStyle;
 					var value = prop.GetValue(formPositionItem, null);
+					var cell = sheetRow.CreateCell(col++);
+					if(value != null && value.ToString() == "*") {
+						cell.CellStyle = centerDataStyle;
+					}
+					else
+						cell.CellStyle = dataStyle;
 					if(value != null)
 						cell.SetCellValue(value.ToString());
 				}
@@ -235,8 +255,10 @@ namespace AdminInterface.Models
 			sheet.SetColumnWidth(1, sheet.GetColumnWidth(1) * 2);
 			sheet.SetColumnWidth(2, sheet.GetColumnWidth(2) * 2);
 			sheet.SetColumnWidth(4, sheet.GetColumnWidth(4) * 2);
-			sheet.SetAutoFilter(new CellRangeAddress(4, row, 0, col - 1));
+
 			// добавляем автофильтр
+			sheet.SetAutoFilter(new CellRangeAddress(tableHeaderRow, row, tableHeaderRow, col - 1));
+
 			sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, col - 1));
 
 			var buffer = new MemoryStream();

@@ -636,6 +636,7 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Views\Accounts\Index.brail" />
     <None Include="Views\Accounts\AccountingHistory.brail" />
@@ -777,7 +778,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>59334</DevelopmentServerPort>
+          <DevelopmentServerPort>63945</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
