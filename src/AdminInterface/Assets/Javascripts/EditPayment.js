@@ -14,7 +14,7 @@
 		$.ui.autocomplete.prototype._renderItem = function (ul, item) {
 			uri = "${siteroot}/Billing/Edit?billingcode=" + item.id;
 			var cls = "";
-			if ($(payment_Recipient_Id).val() == item.recipient)
+			if ($("#payment_Recipient_Id").val() == item.recipient)
 			{
 				cls = "Recipient";
 			}
