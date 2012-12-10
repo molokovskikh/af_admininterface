@@ -28,6 +28,16 @@ namespace Functional
 		}
 
 		[Test]
+		public void SaveSettingsWithNullShowUserTest()
+		{
+			Open(user);
+			Click("Настройка");
+			Click("Добавить");
+			Click("Сохранить");
+			AssertText("Сохранено");
+		}
+
+		[Test]
 		public void ShowUsersTest()
 		{
 			var user1 = new User(client) {
