@@ -167,9 +167,7 @@ namespace AdminInterface.Models
 			var col = 0;
 			// выбираем данные
 			var report = filter.Find();
-			if(report.Count == 0)
-				return null;
-			var type = report.FirstOrDefault().GetType();
+			var type = typeof(FormPositionItem);
 			// получаем список всех свойств
 			var infos = type.GetProperties();
 			// создаем строку
