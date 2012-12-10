@@ -187,7 +187,8 @@ namespace AdminInterface.Controllers
 				.ToList()
 				.Select(p => new {
 					id = p.PayerID,
-					label = String.Format("[{0}]. {1} ИНН {2}", p.Id, p.Name, p.INN)
+					label = String.Format("[{0}]. {1} ИНН {2}", p.Id, p.Name, p.INN),
+					recipient = p.Recipient != null ? p.Recipient.Id : 0
 				});
 		}
 	}

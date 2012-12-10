@@ -448,6 +448,7 @@
     <Content Include="Assets\Javascripts\billing.js" />
     <Content Include="Assets\Javascripts\billing.search.js" />
     <Content Include="Assets\Javascripts\confirmation.coffee" />
+    <Content Include="Assets\Javascripts\EditPayment.js" />
     <Content Include="Assets\Javascripts\input.dependency.coffee" />
     <Content Include="Assets\Javascripts\order.delivery.group.editor.coffee" />
     <Content Include="Assets\Javascripts\payer.send.message.coffee" />

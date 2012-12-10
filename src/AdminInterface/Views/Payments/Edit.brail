@@ -4,31 +4,7 @@
 
 <% component Bubble, {@bredcrumbs :
 	[("Платежи", "${siteroot}/Payments/")]} %>
-
-<script>
-	$(function () {
-
-		$("form").validate();
-
-		$("#payment_Payer_Name").autocomplete({
-			source: "SearchPayer",
-			minLength: 2,
-			select: function (event, ui) {
-				$("#payment_Payer_PayerId").val(ui.item.id)
-			}
-		});
-		//$("#payer").focus();
-
-		$.ui.autocomplete.prototype._renderItem = function (ul, item) {
-			uri = "${siteroot}/Billing/Edit?billingcode=" + item.id;
-			return $("<li></li>")
-				.data("item.autocomplete", item)
-				.append("<a href='" + uri + "'>" + item.label + "</a>")
-				.appendTo(ul);
-		};
-	});
-</script>
-
+	${app.Asset("EditPayment.js")}
 <form class="accountant-friendly" method="post">
 	${FormHelper.HiddenField("payment.Id")}
 	${FormHelper.HiddenField("payment.Payer.PayerId")}
@@ -109,7 +85,7 @@
 				Получатель:
 			</td>
 			<td>
-				<select name="payment.Recipient.Id">
+				<select name="payment.Recipient.Id" id="payment_Recipient_Id">
 					<% for recipient in recipients: %>
 					<option value=${recipient.Id} ${"selected" if payment.Recipient and recipient.Id == payment.Recipient.Id}>
 					${recipient.Name}
