@@ -463,6 +463,7 @@
     <Content Include="Assets\Stylesheets\ClientsShow.css" />
     <Content Include="Assets\Stylesheets\News.css" />
     <Content Include="Assets\Stylesheets\ManagerReport.css" />
+    <Content Include="Assets\Stylesheets\PrintRevisionAct.css" />
     <Content Include="Css\columns.css" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
