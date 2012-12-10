@@ -244,6 +244,7 @@ namespace AdminInterface.Models
 			sheet.SetColumnWidth(1, sheet.GetColumnWidth(1) * 2);
 			sheet.SetColumnWidth(2, sheet.GetColumnWidth(2) * 2);
 			sheet.SetColumnWidth(4, sheet.GetColumnWidth(4) * 2);
+
 			// добавляем автофильтр
 			sheet.SetAutoFilter(new CellRangeAddress(tableHeaderRow, row, tableHeaderRow, col - 1));
 

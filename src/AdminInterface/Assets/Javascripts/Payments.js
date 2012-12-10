@@ -100,9 +100,9 @@ function processResponse(data, element) {
 			row = idElement.parents("tr").first();
 			row.find("input[name=free]").attr("checked", account.free);
 			if (account.free)
-				row.addClass("free");
+				row.addClass("consolidate-free");
 			else
-				row.removeClass("free");
+				row.removeClass("consolidate-free");
 		});
 	}
 	if (data.data) {
@@ -128,6 +128,11 @@ function checkBoxChanger(url, item) {
 				if (id) {
 					updateChildren(id, item.attr("checked"));
 				}
+				if (item.attr("checked") == false || item.attr("checked") == undefined) {
+					var accounted = $(item).parents("tr").find("input[name=accounted]");
+					accounted.attr("checked", false);
+					accounted.change();
+				}
 			}
 		});
 	});
@@ -139,12 +144,12 @@ $(function () {
 	$("input[name=free]").change(function () {
 		var accounted = $(this).parent().parent().children().children('input[name=accounted]');
 		if (this.checked) {
-			$(this).parents("tr").addClass("free");
+			$(this).parents("tr").addClass("consolidate-free");
 			accounted.attr("disabled", true);
 			accounted.removeAttr("checked");
 		}
 		else {
-			$(this).parents("tr").removeClass("free");
+			$(this).parents("tr").removeClass("consolidate-free");
 			accounted.attr("disabled", false);
 		}
 	});

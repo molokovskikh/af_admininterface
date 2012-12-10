@@ -77,7 +77,6 @@ namespace AdminInterface.Models.Billing
 		public virtual int InvoiceGroup { get; set; }
 
 		[
-			Style,
 			Property(Access = PropertyAccess.FieldCamelcaseUnderscore),
 			Description("Обслуживается бесплатно"),
 			Auditable("Бесплатно"),
@@ -94,6 +93,9 @@ namespace AdminInterface.Models.Billing
 				}
 			}
 		}
+
+		[Style]
+		public virtual bool ConsolidateFree { get { return IsFree || Payment == 0; } }
 
 		[
 			Auditable,

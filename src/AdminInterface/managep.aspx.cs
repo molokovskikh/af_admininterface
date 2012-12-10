@@ -57,6 +57,7 @@ namespace AddUser
 
 			supplier = Supplier.Find(id);
 			HandlersLink.NavigateUrl = "~/SpecialHandlers/?supplierId=" + supplier.Id;
+			WaybillExcludeFiles.NavigateUrl = "~/Suppliers/WaybillExcludeFiles?supplierId=" + supplier.Id;
 
 			if (!IsPostBack)
 				LoadPageData();
@@ -96,7 +97,8 @@ SELECT  pd.PriceCode,
 		pd.UpCost,
 		pd.PriceType,
 		pd.CostType,
-		pd.BuyingMatrix
+		pd.BuyingMatrix,
+		pd.IsLocal
 FROM pricesdata pd
 	JOIN usersettings.pricescosts pc on pd.PriceCode = pc.PriceCode and pc.BaseCost = 1
 		JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
@@ -221,6 +223,7 @@ order by r.Region;";
 					row["Enabled"] = false;
 					row["AgencyEnabled"] = false;
 					row["BuyingMatrix"] = false;
+					row["IsLocal"] = false;
 					row["PriceType"] = 0;
 					Data.Tables["Prices"].Rows.Add(row);
 					((GridView)sender).DataBind();
@@ -291,6 +294,7 @@ SET UpCost = ?UpCost,
 	Enabled = ?Enabled,
 	AgencyEnabled = ?AgencyEnabled,
 	BuyingMatrix = ?BuyingMatrix,
+	IsLocal = ?IsLocal,
 	FirmCode = ?ClientCode;
 SET @InsertedPriceCode = Last_Insert_ID();
 
@@ -346,6 +350,7 @@ select @NewPriceCostId;
 			pricesDataAdapter.InsertCommand.Parameters.Add("?BuyingMatrix", MySqlDbType.Bit, 0, "BuyingMatrix");
 			pricesDataAdapter.InsertCommand.Parameters.Add("?PriceCode", MySqlDbType.Int32, 0, "PriceCode");
 			pricesDataAdapter.InsertCommand.Parameters.Add("?CostType", MySqlDbType.Int32, 0, "CostType");
+			pricesDataAdapter.InsertCommand.Parameters.Add("?IsLocal", MySqlDbType.Bit, 0, "IsLocal");
 
 			pricesDataAdapter.UpdateCommand = new MySqlCommand(
 				@"
@@ -357,7 +362,8 @@ SET UpCost = ?UpCost,
 	PriceType = ?PriceType,
 	Enabled = ?Enabled,
 	AgencyEnabled = ?AgencyEnabled,
-	BuyingMatrix = ?BuyingMatrix
+	BuyingMatrix = ?BuyingMatrix,
+	IsLocal = ?IsLocal
 WHERE PriceCode = ?PriceCode;
 
 UPDATE farm.sources fs
@@ -377,6 +383,7 @@ call UpdateCostType(?PriceCode, ?CostType);
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?BuyingMatrix", MySqlDbType.Bit, 0, "BuyingMatrix");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?PriceCode", MySqlDbType.Int32, 0, "PriceCode");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?CostType", MySqlDbType.Int32, 0, "CostType");
+			pricesDataAdapter.UpdateCommand.Parameters.Add("?IsLocal", MySqlDbType.Bit, 0, "IsLocal");
 
 			var regionalSettingsDataAdapter = new MySqlDataAdapter();
 			regionalSettingsDataAdapter.UpdateCommand = new MySqlCommand(
@@ -589,6 +596,10 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 					Data.Tables["Prices"].DefaultView[i]["Enabled"] = ((CheckBox)PricesGrid.Rows[i].FindControl("InWorkCheck")).Checked;
 				if (Convert.ToBoolean(Data.Tables["Prices"].DefaultView[i]["BuyingMatrix"]) != ((CheckBox)PricesGrid.Rows[i].FindControl("BuyingMatrix")).Checked)
 					Data.Tables["Prices"].DefaultView[i]["BuyingMatrix"] = ((CheckBox)PricesGrid.Rows[i].FindControl("BuyingMatrix")).Checked;
+
+				if (Convert.ToBoolean(Data.Tables["Prices"].DefaultView[i]["IsLocal"]) != ((CheckBox)PricesGrid.Rows[i].FindControl("IsLocal")).Checked)
+					Data.Tables["Prices"].DefaultView[i]["IsLocal"] = ((CheckBox)PricesGrid.Rows[i].FindControl("IsLocal")).Checked;
+
 				if (Data.Tables["Prices"].DefaultView[i]["CostType"].ToString() != ((DropDownList)PricesGrid.Rows[i].FindControl("CostType")).SelectedValue) {
 					var value = ((DropDownList)PricesGrid.Rows[i].FindControl("CostType")).SelectedValue;
 					if (value == DBNull.Value.ToString())

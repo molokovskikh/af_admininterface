@@ -168,6 +168,7 @@
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
+    <Compile Include="Models\WaybillExcludeFile.cs" />
     <Compile Include="Queries\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="Queries\ClientAddressFilter.cs" />
     <Compile Include="Queries\ClientConditionsMonitoring.cs" />
@@ -455,6 +456,8 @@
     <Content Include="Assets\Javascripts\registration.js" />
     <Content Include="Assets\Javascripts\request.coffee" />
     <Content Include="Assets\Javascripts\table.editor.js" />
+    <Content Include="Assets\Javascripts\UserCommon.js" />
+    <Content Include="Assets\Javascripts\WaybillExcludeFiles.js" />
     <Content Include="Assets\Stylesheets\billing.css" />
     <Content Include="Assets\Stylesheets\ClientsShow.css" />
     <Content Include="Assets\Stylesheets\News.css" />
@@ -573,6 +576,7 @@
     <None Include="Views\Orders\Details.brail" />
     <None Include="Views\SubViews\JuridicalOrganizationForm.brail" />
     <None Include="Views\LegalEntity\Add.brail" />
+    <Content Include="Views\Suppliers\WaybillExcludeFiles.brail" />
     <None Include="Views\Templates\UnknownCalls.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
@@ -631,6 +635,7 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Views\Accounts\Index.brail" />
     <None Include="Views\Accounts\AccountingHistory.brail" />

@@ -31,6 +31,7 @@
 			<div class="block">
 				<ul class="navigation-menu">
 					<li><asp:HyperLink runat="server" ID="HandlersLink">Настройка форматеров и отправщиков доступных поставщику</asp:HyperLink></li>
+					<li><asp:HyperLink runat="server" ID="WaybillExcludeFiles">Файлы, исключенные из разбора в качестве накладных</asp:HyperLink></li>
 				</ul>
 			</div>
 			<div class="BorderedBlock">
@@ -98,6 +99,11 @@
 							<asp:TemplateField HeaderText="Матрица">
 								<ItemTemplate>
 									<asp:CheckBox ID="BuyingMatrix" runat="server" Checked='<%# Convert.ToBoolean(Eval("BuyingMatrix")) %>' />
+								</ItemTemplate>
+							</asp:TemplateField>
+							<asp:TemplateField HeaderText="Локальный">
+								<ItemTemplate>
+									<asp:CheckBox ID="IsLocal" runat="server" Checked='<%# Convert.ToBoolean(Eval("IsLocal")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
 						</Columns>

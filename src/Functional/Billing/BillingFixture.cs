@@ -736,8 +736,10 @@ namespace Functional.Billing
 		[Test]
 		public void If_free_flag_turnoff_on_user_than_free_flag_should_by_thurnoff_on_all_related_addresses()
 		{
+			user.Accounting.Payment = 100;
 			user.Accounting.IsFree = true;
 			address.Accounting.IsFree = true;
+			address.Accounting.Payment = 100;
 			user.AvaliableAddresses.Add(address);
 			session.SaveOrUpdate(client);
 			Refresh();
@@ -747,10 +749,10 @@ namespace Functional.Billing
 			AssertText(String.Format("Следующие адреса доставки стали платными: {0}", address.Value));
 
 			Assert.That(Css(String.Format("#UserRow{0} input[name=free]", user.Id)).Checked, Is.False);
-			Assert.That(Css(String.Format("#UserRow{0}", user.Id)).ClassName, Is.Not.StringContaining("free"));
+			Assert.That(Css(String.Format("#UserRow{0}", user.Id)).ClassName, Is.Not.StringContaining("consolidate-free"));
 
 			Assert.That(Css(String.Format("#AddressRow{0} input[name=free]", address.Id)).Checked, Is.False);
-			Assert.That(Css(String.Format("#AddressRow{0}", address.Id)).ClassName, Is.Not.StringContaining("free"));
+			Assert.That(Css(String.Format("#AddressRow{0}", address.Id)).ClassName, Is.Not.StringContaining("consolidate-free"));
 
 			session.Refresh(user.Accounting);
 			session.Refresh(address.Accounting);
@@ -767,6 +769,25 @@ namespace Functional.Billing
 			Click("История сообщений");
 			AssertText("История сообщения");
 			AssertText("Тестовое сообщение");
+		}
+
+		[Test]
+		public void Accounted_not_selected_if_unchecked_status()
+		{
+			user.Accounting.BeAccounted = true;
+			session.SaveOrUpdate(client);
+			Refresh();
+
+			Assert.That(Css(String.Format("#UserRow{0} input[name=accounted]", user.Id)).Checked, Is.True);
+
+			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked = false;
+			browser.TextField("AddCommentField").AppendText("testComment");
+			Click("Продолжить");
+			Thread.Sleep(1000);
+
+			Refresh();
+
+			Assert.That(Css(String.Format("#UserRow{0} input[name=accounted]", user.Id)).Checked, Is.False);
 		}
 
 		private void SearchAndSelectAddress(string value)
