@@ -29,3 +29,7 @@
 #ClientConditionsTable tbody .leftText {
 	text-align: left;
 }
+
+.CenterClass{
+	text-align: center;
+}

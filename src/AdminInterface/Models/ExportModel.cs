@@ -194,11 +194,20 @@ namespace AdminInterface.Models
 			sheetRow = sheet.CreateRow(row++);
 			var dateCell = sheetRow.CreateCell(0);
 			dateCell.SetCellValue(String.Format("Дата подготовки отчета: {0}", DateTime.Now));
+			// наименование поставщика
+			sheetRow = sheet.CreateRow(row++);
+			dateCell = sheetRow.CreateCell(0);
+			dateCell.SetCellValue(String.Format("Наименование поставщика: {0}", filter.SupplierName));
+			// регион работы прайса
+			sheetRow = sheet.CreateRow(row++);
+			dateCell = sheetRow.CreateCell(0);
+			dateCell.SetCellValue(String.Format("Регион работы прайса: {0}", filter.Region.Name));
 			sheetRow = sheet.CreateRow(row++);
 			dateCell = sheetRow.CreateCell(0);
 			dateCell.SetCellValue(String.Format("* В отчет не включены прайс-листы с фиксированной шириной колонки"));
 			// добавляем пустую строку перед таблицей
 			sheet.CreateRow(row++);
+			var tableHeaderRow = row;
 			sheetRow = sheet.CreateRow(row++);
 			// заполняем наименования столбцов таблицы
 			foreach (PropertyInfo prop in infos) {
@@ -235,8 +244,10 @@ namespace AdminInterface.Models
 			sheet.SetColumnWidth(1, sheet.GetColumnWidth(1) * 2);
 			sheet.SetColumnWidth(2, sheet.GetColumnWidth(2) * 2);
 			sheet.SetColumnWidth(4, sheet.GetColumnWidth(4) * 2);
-			sheet.SetAutoFilter(new CellRangeAddress(4, row, 0, col - 1));
+
 			// добавляем автофильтр
+			sheet.SetAutoFilter(new CellRangeAddress(tableHeaderRow, row, tableHeaderRow, col - 1));
+
 			sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, col - 1));
 
 			var buffer = new MemoryStream();
