@@ -23,6 +23,18 @@ namespace Functional.Drugstore
 		}
 
 		[Test]
+		public void AddLegalEntityWithEmptyName()
+		{
+			Click("Новое юр. лицо");
+			Click("Создать");
+			AssertText("Заполнение поля обязательно");
+			browser.TextField(Find.ById("JuridicalOrganization_Name")).Value = "Тестовое";
+			browser.TextField(Find.ById("JuridicalOrganization_FullName")).Value = "Тестовое";
+			Click("Создать");
+			AssertText("Юридическое лицо создано");
+		}
+
+		[Test]
 		public void Try_sort_users()
 		{
 			var user = client.AddUser("test user");

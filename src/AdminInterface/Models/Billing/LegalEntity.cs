@@ -2,6 +2,7 @@
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Castle.Components.Validator;
 
 namespace AdminInterface.Models.Billing
 {
@@ -27,10 +28,10 @@ namespace AdminInterface.Models.Billing
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty]
 		public virtual string Name { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty]
 		public virtual string FullName { get; set; }
 
 		[BelongsTo("PayerId")]
