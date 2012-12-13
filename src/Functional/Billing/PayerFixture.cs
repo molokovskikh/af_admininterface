@@ -80,7 +80,6 @@ namespace Functional.Billing
 			AssertText("Да");
 			AssertText("Нет");
 			Click("Да");
-			Console.WriteLine(browser.Text);
 		}
 	}
 }
