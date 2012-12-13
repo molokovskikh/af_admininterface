@@ -67,7 +67,7 @@
 		<br>
 		<label>Сообщение, будет отправлено вместе с актом:</label>
 		<br>
-		<textarea name=message rows=3 cols=60></textarea>
+		<textarea name=message rows=3 cols=60>Предлагаем произвести сверку расчетов за использование ИС АналитФармация (акт сверки вложен). Просим подтвердить, либо сообщить свои данные.</textarea>
 		<br>
 		<input type=submit value="Отправить">
 	</form>
