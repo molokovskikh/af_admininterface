@@ -30,3 +30,8 @@
 {
 	text-decoration: line-through;
 }
+
+.deletePayerDiv {
+	margin: 0px auto;
+	width: 150px;
+}

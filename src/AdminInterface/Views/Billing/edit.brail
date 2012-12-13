@@ -13,9 +13,13 @@ ${app.Asset("billing.css")}
 <div id="ErrorMessageDiv" class="flash err" style="display: none">
 </div>
 
-<% for action in payer.Actions: %>
-	${OutputSubView("/Shared/DisplayTemplates/Action", {@action: action})}
-<% end %>
+<div class="deletePayerDiv">
+	<form id="deletePayerForm" method="post" action="${SiteRoot}/Payers/Delete">
+	<input type="hidden" id="id" name="id" value="${payer.Id}">
+	<input type="button" value="Удалить Плательщика" onclick="DeletePayer('${payer.Name}')">
+</form>
+
+</div>
 
 <div class="tabs">
 	<ul>

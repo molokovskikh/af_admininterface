@@ -8,6 +8,7 @@ using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Billing
 {
@@ -68,6 +69,18 @@ namespace Functional.Billing
 			Css("#invoice_bills[0]_Cost").Value = "500";
 			Css("#invoice_bills[0]_Count").Value = "1";
 			Click("Сохранить");
+		}
+
+		[Test]
+		public void Delete_payer_yes_no_dialog()
+		{
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
+			Open(payer);
+			Click("Удалить Плательщика");
+			AssertText("Да");
+			AssertText("Нет");
+			Click("Да");
+			Console.WriteLine(browser.Text);
 		}
 	}
 }
