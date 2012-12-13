@@ -57,6 +57,16 @@ namespace Integration.Tasks
 		}
 
 		[Test]
+		public void ReadyForAccountingIfProcessWithLittlePage()
+		{
+			MakeUpdates(user, 11);
+			Check(1);
+			var address = user.AvaliableAddresses.First();
+			session.Refresh(address);
+			Assert.That(address.Accounting.ReadyForAccounting, Is.True, "адрес доставки {0}", address.Id);
+		}
+
+		[Test]
 		public void Do_check_for_newly_join_addresses()
 		{
 			var address = user.Client.AddAddress("Тестовый адрес доставки");
@@ -87,6 +97,18 @@ namespace Integration.Tasks
 			HideScope();
 			try {
 				new UpdateAccountProcessor().Process();
+			}
+			finally {
+				ShowScope();
+			}
+		}
+
+		private void Check(int pageSize)
+		{
+			Flush();
+			HideScope();
+			try {
+				new UpdateAccountProcessor().Process(pageSize);
 			}
 			finally {
 				ShowScope();

@@ -26,6 +26,17 @@ namespace AdminInterface.Background
 			}
 		}
 
+		public void Process(int pageSize)
+		{
+			foreach (var ids in Page<Account>(a => !a.ReadyForAccounting, pageSize)) {
+				using (var scope = new TransactionScope(OnDispose.Rollback)) {
+					ArHelper.WithSession(s => { Process(ids, s); });
+
+					scope.VoteCommit();
+				}
+			}
+		}
+
 		private static void Process(uint[] ids, ISession session)
 		{
 			foreach (var id in ids) {
@@ -66,15 +77,19 @@ namespace AdminInterface.Background
 			}
 
 			var pages = total / size + (total % size == 0 ? 0 : 1);
+			uint lastId = 0;
 			for (var page = 0; page <= pages; page++) {
 				uint[] result;
 				using (new SessionScope()) {
 					result = ArHelper.WithSession(s => {
-						return s.QueryOver<T>().Where(expression).Select(Projections.Id()).Skip(page * size).Take(size)
+						return s.QueryOver<T>().Where(expression).And(NHibernate.Criterion.Expression.Gt("Id", lastId))
+							.Select(Projections.Id()).Take(size)
 							.List<uint>()
 							.ToArray();
 					});
 				}
+				if(result.Length > 0)
+					lastId = result.Max();
 				yield return result;
 			}
 		}
