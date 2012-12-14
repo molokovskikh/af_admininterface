@@ -17,7 +17,7 @@ namespace AdminInterface.Controllers
 			}
 
 			if (begin == null)
-				begin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+				begin = new DateTime(DateTime.Now.Year, 1, 1);
 			if (end == null)
 				end = DateTime.Now;
 
