@@ -93,6 +93,31 @@ namespace AdminInterface.Controllers
 			PropertyBag["line"] = line;
 		}
 
+		public void Converted(uint id, uint? userId, uint? clientId)
+		{
+			if(userId != null) {
+				var user = DbSession.Load<User>(userId);
+				if(user.Client != null)
+					clientId = user.Client.Id;
+			}
+			if(clientId != null) {
+				var client = DbSession.Load<Client>(clientId);
+				var line = DbSession.Load<DocumentLine>(id);
+				if(client.Settings.AssortimentPrice != null && line.CatalogProduct != null) {
+					var core = DbSession.Query<Core>()
+						.Where(c => c.Price.Id == client.Settings.AssortimentPrice.Id
+							&& c.ProductId == line.CatalogProduct.Id
+							&& c.CodeFirmCr == line.CatalogProducer.Id)
+						.OrderBy(c => c.Code)
+						.FirstOrDefault();
+					if(core != null)
+						PropertyBag["convertedLine"] = core.Code + " "
+							+ core.ProductSynonym.Synonym + " " + core.CodeCr
+							+ " " + core.ProducerSynonym.Synonym;
+				}
+			}
+		}
+
 		public void Certificate(uint id)
 		{
 			var file = DbSession.Load<CertificateFile>(id);

@@ -3,9 +3,9 @@
 	<td colspan="100">
 		<div id="Certificates${line.Id}">
 			<% if line.CatalogProduct: %>
-				Сопоставлен с "${line.CatalogProduct.Catalog.Name}"<br>
+				Сопоставлен с "${line.CatalogProduct.Catalog.Name}" (ProductID: ${line.CatalogProduct.Id})<br>
 				<%if line.CatalogProducer: %>
-				По производителю с "${line.CatalogProducer.Name}"
+				По производителю с "${line.CatalogProducer.Name}" (ProducerID: ${line.CatalogProducer.Id})
 				<%end%>
 				<% if line.Certificate and line.Certificate.Files: %>
 				<p>
