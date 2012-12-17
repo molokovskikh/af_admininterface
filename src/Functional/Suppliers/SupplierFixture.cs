@@ -218,7 +218,7 @@ Where pc.PriceCode = :PriceId1")
 			browser.TextField("addNewExcludeFileInput").AppendText("1234");
 			Click("Добавить");
 			Click("Удалить");
-			AssertText("Вы уверены, что хотите удалить эту маску ?");
+			AssertText("Вы уверены, что хотите удалить маску \"1234\" ?");
 		}
 	}
 }
