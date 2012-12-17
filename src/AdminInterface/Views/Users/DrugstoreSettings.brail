@@ -1,4 +1,7 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), user.RootService, user]} %>
+﻿${app.Asset("UserCommon.js")}
+${app.Asset("UserScripts.js")}
+
+<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), user.RootService, user]} %>
 
 <% component CaptureFor, {@id : @Title}: %>
 	Настройки пользователя ${user.Login}
@@ -22,7 +25,11 @@
 				<% for version in user.AvalilableAnalitFVersions: %>
 					<option ${"selected" if user.TargetVersion and user.TargetVersion.ToString() == version} value="${version if version != "Любая версия"}">${version}</option>
 				<% end %>
-			</select><br>
+			</select>
+			<%if user.UserUpdateInfo.AFAppVersion != 999 :%>
+			<button type="button" onclick="ResetAFVersion(${user.Id}, '${user.Login}');">Сбросить версию АФ (Сейчас ${user.UserUpdateInfo.AFAppVersion})</button>
+			<%end%>
+			<br>
 
 			${app.Edit("user.SaveAFDataFiles")}<br>
 			${app.Edit("user.UseAdjustmentOrders")}<br>
