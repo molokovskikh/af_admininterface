@@ -18,7 +18,7 @@
 							${FormHelper.HiddenField("files[${i}].Id", file.Id)}
 						</td>
 						<td>
-							<a href="javascript:" onclick="DeleteFileMask(${file.Id})">Удалить</a>
+							<a href="javascript:" onclick="DeleteFileMask(${file.Id}, this)">Удалить</a>
 						</td>
 					</tr>
 				<%end%>
