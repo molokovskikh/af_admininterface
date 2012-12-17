@@ -49,11 +49,20 @@ namespace Integration.Tasks
 		[Test]
 		public void All_addresses_ready_for_accounting_user_ready_for_accounting()
 		{
-			MakeUpdates(user, 10);
+			MakeUpdates(user, 11);
 			Check();
 			var address = user.AvaliableAddresses.First();
-			session.Clear();
-			address = session.Load<Address>(address.Id);
+			session.Refresh(address);
+			Assert.That(address.Accounting.ReadyForAccounting, Is.True, "адрес доставки {0}", address.Id);
+		}
+
+		[Test]
+		public void ReadyForAccountingIfProcessWithLittlePage()
+		{
+			MakeUpdates(user, 11);
+			Check(1);
+			var address = user.AvaliableAddresses.First();
+			session.Refresh(address);
 			Assert.That(address.Accounting.ReadyForAccounting, Is.True, "адрес доставки {0}", address.Id);
 		}
 
@@ -88,6 +97,18 @@ namespace Integration.Tasks
 			HideScope();
 			try {
 				new UpdateAccountProcessor().Process();
+			}
+			finally {
+				ShowScope();
+			}
+		}
+
+		private void Check(int pageSize)
+		{
+			Flush();
+			HideScope();
+			try {
+				new UpdateAccountProcessor().Process(pageSize);
 			}
 			finally {
 				ShowScope();
