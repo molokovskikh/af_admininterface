@@ -3,11 +3,10 @@
 <% component Bubble, {"bredcrumbs" : [("Поставщик ${supplier.Name}", "${siteroot}/Suppliers/${supplier.Id}")]} %>
 
 <% component CaptureFor, {@id : @Title}: %>
-	Настройка выборочного блокирования некоторых файлов-вложений к письмам, поступающим в качестве накладных
+	Файлы, исключенные из разбора в качестве накладных
 <% end %>
 
 <div class="ExcludeFilesForm block">
-	<h3>Маски файлов, для блокирования вложений, поступающих накладных</h3>
 	<form id="DeleteUpdateForm" action="${Siteroot}/Suppliers/SaveExcludeFiles" method="post">
 		<table class="DataTable">
 			<tbody>
@@ -42,3 +41,7 @@
 		<button type="submit">Добавить</button>
 	</form>
 </div>
+
+<p>
+Примечание: Если клиент получает оригинальные файлы накладных, он их получит вне зависимости от установленной маски. Маска действует исключительно для игнорирования файлов при формализации на сервере.
+</p>
