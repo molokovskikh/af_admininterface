@@ -44,6 +44,7 @@ namespace AdminInterface.Controllers
 		public void Add(uint clientId)
 		{
 			PropertyBag["client"] = DbSession.Load<Client>(clientId);
+			PropertyBag["JuridicalOrganization"] = new LegalEntity();
 		}
 	}
 }

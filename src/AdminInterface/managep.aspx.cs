@@ -18,6 +18,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Framework.Scopes;
 using Common.MySql;
+using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
@@ -72,6 +73,8 @@ namespace AddUser
 			ConnectDataSource();
 			DataBind();
 			SetRegions();
+			if (supplier.ExcludeFiles.Count > 0)
+				WaybillExcludeFiles.Text += ": " + supplier.ExcludeFiles.Select(e => e.Mask).Implode();
 		}
 
 		private void ConnectDataSource()

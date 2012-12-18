@@ -384,12 +384,14 @@ namespace AdminInterface.Controllers
 
 		public void AddJuridicalOrganization([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NewRootInstanceIfInvalidKey)] LegalEntity legalEntity, uint payerId)
 		{
-			var payer = Payer.Find(payerId);
-			legalEntity.Payer = payer;
-			legalEntity.CreateAndFlush();
-			Maintainer.LegalEntityCreated(legalEntity);
+			if(IsValid(legalEntity)) {
+				var payer = Payer.Find(payerId);
+				legalEntity.Payer = payer;
+				legalEntity.CreateAndFlush();
+				Maintainer.LegalEntityCreated(legalEntity);
 
-			Notify("Юридическое лицо создано");
+				Notify("Юридическое лицо создано");
+			}
 			RedirectToReferrer();
 		}
 	}

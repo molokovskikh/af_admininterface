@@ -9,8 +9,9 @@ $(function () {
 	$('#AddNewForm').validate();
 });
 
-function DeleteFileMask(itemId) {
-	YesNoDialog('Удалить маску', 'Вы уверены, что хотите удалить эту маску ?', function() {
+function DeleteFileMask(itemId, item) {
+	var mask = $(item).parent().parent().children('td').children('.excludeFileMask:first').val();
+	YesNoDialog('Удалить маску', 'Вы уверены, что хотите удалить маску "' + mask + '" ?', function () {
 		$.post("DeleteMask", { maskId: itemId }, function(data) {
 			window.location = "WaybillExcludeFiles?supplierId=" + data;
 		});

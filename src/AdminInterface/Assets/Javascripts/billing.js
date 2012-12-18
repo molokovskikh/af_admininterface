@@ -69,3 +69,9 @@ function ShowMessage(userId) {
 			}
 		);
 }
+
+function DeletePayer(payerName) {
+	YesNoDialog('Плательщика', 'Вы уверены, что хотите удалить плательщика "' + payerName + '" ?', function () {
+		$("#deletePayerForm").submit();
+	});
+}

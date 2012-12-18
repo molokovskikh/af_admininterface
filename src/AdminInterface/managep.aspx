@@ -103,7 +103,7 @@
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Локальный">
 								<ItemTemplate>
-									<asp:CheckBox ID="IsLocal" runat="server" Checked='<%# Convert.ToBoolean(Eval("IsLocal")) %>' />
+									<asp:CheckBox ID="IsLocal" ToolTip="Заказы, сделанные по прайс-листам, помеченным, как &quot;Локальный&quot; не участвуют в построении отчетов на основе Заказов" runat="server" Checked='<%# Convert.ToBoolean(Eval("IsLocal")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
 						</Columns>
