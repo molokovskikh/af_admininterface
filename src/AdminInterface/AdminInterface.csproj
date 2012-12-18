@@ -511,6 +511,7 @@
     <None Include="Views\BalanceOperations\Show.brail" />
     <Content Include="Views\Billing\AdditionalSupplierInfo.brail" />
     <None Include="Views\LegalEntity\Show.brail" />
+    <Content Include="Views\Logs\Converted.brail" />
     <None Include="Views\Logs\OrdersTable.brail" />
     <None Include="Views\Logs\Statistics.brail" />
     <None Include="Views\Mail\RegisterNews.brail" />

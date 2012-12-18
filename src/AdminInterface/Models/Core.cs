@@ -29,9 +29,6 @@ namespace AdminInterface.Models
 		[Property]
 		public int? ProductId { get; set; }
 
-		[BelongsTo("ProductId")]
-		public Product Product { get; set; }
-
 		[Property]
 		public int? CodeFirmCr { get; set; }
 

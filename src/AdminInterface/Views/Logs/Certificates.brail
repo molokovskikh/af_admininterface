@@ -3,10 +3,23 @@
 	<td colspan="100">
 		<div id="Certificates${line.Id}">
 			<% if line.CatalogProduct: %>
-				Сопоставлен с "${line.CatalogProduct.Catalog.Name}" (ProductID: ${line.CatalogProduct.Id})<br>
+				Сопоставлен с "${line.CatalogProduct.Catalog.Name}${?productProperties}" (ProductID: ${line.CatalogProduct.Id})<br>
 				<%if line.CatalogProducer: %>
 				По производителю с "${line.CatalogProducer.Name}" (ProducerID: ${line.CatalogProducer.Id})
 				<%end%>
+				<% if not filterSupplierId: %>
+				<br/>
+				<br/>
+				<table>
+				<tr>
+				<td>
+				<a href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${line.Id}, 'Converted?id=${line.Id}&clientId=${clientId}', 'Converted');">
+										Сконвертировать по ассортиментному ПЛ
+									</a>
+				</td>
+				</tr>
+				</table>
+				<% end %>
 				<% if line.Certificate and line.Certificate.Files: %>
 				<p>
 					<strong>Сертификаты:</strong><br>

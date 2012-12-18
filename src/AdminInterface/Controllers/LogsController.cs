@@ -76,46 +76,59 @@ namespace AdminInterface.Controllers
 			PropertyBag["detailDocumentLogs"] = detailDocumentLogs;
 		}
 
-		public void ShowDocumentDetails(uint documentLogId)
+		public void ShowDocumentDetails(uint documentLogId, uint? supplierId)
 		{
 			CancelLayout();
 
 			var documentLog = DbSession.Load<DocumentReceiveLog>(documentLogId);
 			PropertyBag["documentLogId"] = documentLogId;
 			PropertyBag["documentLog"] = documentLog;
+			PropertyBag["filterSupplierId"] = supplierId;
 		}
 
-		public void Certificates(uint id)
+		public void Certificates(uint id, uint? clientId, uint? filterSupplierId)
 		{
 			CancelLayout();
 
 			var line = DbSession.Load<DocumentLine>(id);
+			var query = DbSession.CreateSQLQuery(String.Format(@"select value from catalogs.propertyvalues pv
+join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId = {0}", line.CatalogProduct.Id));
+			var properties = String.Join(", ", query.List<string>());
+			if(!String.IsNullOrEmpty(properties)) {
+				PropertyBag["productProperties"] = ", " + properties;
+			}
 			PropertyBag["line"] = line;
+			PropertyBag["clientId"] = clientId;
+			PropertyBag["filterSupplierId"] = filterSupplierId;
 		}
 
-		public void Converted(uint id, uint? userId, uint? clientId)
+		public void Converted(uint id, uint? clientId)
 		{
-			if(userId != null) {
-				var user = DbSession.Load<User>(userId);
-				if(user.Client != null)
-					clientId = user.Client.Id;
-			}
-			if(clientId != null) {
+			CancelLayout();
+			var convertedLine = "Позиция отсутствует в ассортиментном ПЛ";
+
+			if (clientId != null) {
 				var client = DbSession.Load<Client>(clientId);
 				var line = DbSession.Load<DocumentLine>(id);
-				if(client.Settings.AssortimentPrice != null && line.CatalogProduct != null) {
+				if (client.Settings.AssortimentPrice != null && line.CatalogProduct != null) {
 					var core = DbSession.Query<Core>()
 						.Where(c => c.Price.Id == client.Settings.AssortimentPrice.Id
 							&& c.ProductId == line.CatalogProduct.Id
 							&& c.CodeFirmCr == line.CatalogProducer.Id)
 						.OrderBy(c => c.Code)
 						.FirstOrDefault();
-					if(core != null)
-						PropertyBag["convertedLine"] = core.Code + " "
-							+ core.ProductSynonym.Synonym + " " + core.CodeCr
-							+ " " + core.ProducerSynonym.Synonym;
+					if (core != null) {
+						convertedLine = core.Code + " ";
+						if (core.ProductSynonym != null)
+							convertedLine += core.ProductSynonym.Synonym;
+						convertedLine += "<br>" + core.CodeCr + " ";
+						if (core.ProducerSynonym != null)
+							convertedLine += core.ProducerSynonym.Synonym;
+					}
 				}
 			}
+			PropertyBag["convertedLine"] = convertedLine;
+			PropertyBag["lineId"] = id;
 		}
 
 		public void Certificate(uint id)
