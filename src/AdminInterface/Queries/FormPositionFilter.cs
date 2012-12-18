@@ -24,9 +24,9 @@ namespace AdminInterface.Queries
 		public uint PriceCode { get; set; }
 		[Display(Name = "Наименование прайс-листа", Order = 3)]
 		public string PriceName { get; set; }
-		[Display(Name = "Установленная старость прайс-листа", Order = 3)]
+		[Display(Name = "Установленная старость прайс-листа, дней", Order = 3)]
 		public int MaxOld { get; set; }
-		[Display(Name = "Установленное ожидание прайс-листа", Order = 3)]
+		[Display(Name = "Установленное ожидание прайс-листа, часов", Order = 3)]
 		public int WaitingDownloadInterval { get; set; }
 		[Display(Name = "Количество ценовых колонок", Order = 3)]
 		public int CostCount { get; set; }
@@ -114,7 +114,8 @@ namespace AdminInterface.Queries
 			if(Region != null && Region.Id != 0)
 				regionPriceFilter = String.Format(
 					@"join usersettings.pricesregionaldata prd
-on prd.PriceCode = pd.pricecode and prd.RegionCode = {0} and prd.Enabled = 1",
+on prd.PriceCode = pd.pricecode and prd.RegionCode = {0} and prd.Enabled = 1
+join customers.suppliers s on pd.SupplierCode = s.Id and s.RegionMask & prd.RegionCode > 0",
 					Region.Id);
 			var query = Session.CreateSQLQuery(
 				String.Format(_queryString, SupplierName, regionPriceFilter));
@@ -234,7 +235,7 @@ join usersettings.priceitems p on ps.PriceItemId = p.Id
 join customers.suppliers s on pd.FirmCode=s.id
 join farm.regions rg on s.homeregion = rg.RegionCode
 join farm.formrules f on p.FormRuleId=f.Id
-left join usersettings.pricesregionaldata prd on prd.pricecode = pd.pricecode and prd.Enabled = 1
+left join usersettings.pricesregionaldata prd on prd.pricecode = pd.pricecode and prd.Enabled = 1 and s.RegionMask & prd.RegionCode > 0
 where s.Name like '%{0}%'
 group by s.Id, s.Name, rg.Region, pd.PriceCode, pd.PriceName, f.MaxOld, p.WaitingDownloadInterval;
 
