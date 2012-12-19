@@ -39,10 +39,13 @@ namespace Integration.Models
 			Assert.That(message, Is.Not.Null);
 			Assert.That(message.Body, Is.StringStarting(String.Format(@"{0}: <br/>
 Документ №{1}, дата: {2}<br/>
+Период: {5}<br/>
+Сумма: {6}<br/>
 Организация: {3}<br/>
 Контрагент от Аналит: {4}<br/>
 Пользователь: test<br/>
-Дата и время удаления:", "Удален акт", act.Id, act.ActDate.ToString("dd.MM.yyyy"), act.Customer, act.Recipient.Name)));
+Дата и время удаления:", "Удален акт", act.Id, act.ActDate.ToString("dd.MM.yyyy"),
+				act.Customer, act.Recipient.Name, new Period(2012, Interval.January), 100)));
 		}
 		private Act PrepareAct()
 		{
@@ -52,7 +55,9 @@ namespace Integration.Models
 				Recipient = new Recipient {
 					Name = "Тестовый получатель"
 				},
-				Customer = "Организация"
+				Customer = "Организация",
+				Period = new Period(2012, Interval.January),
+				Sum = 100
 			};
 		}
 		[Test]
@@ -65,10 +70,13 @@ namespace Integration.Models
 			Assert.That(message, Is.Not.Null);
 			Assert.That(message.Body, Is.StringStarting(String.Format(@"{0}: <br/>
 Документ №{1}, дата: {2}<br/>
+Период: {5}<br/>
+Сумма: {6}<br/>
 Организация: {3}<br/>
 Контрагент от Аналит: {4}<br/>
 Пользователь: test<br/>
-Дата и время изменения:", "Изменен акт", act.Id, act.ActDate.ToString("dd.MM.yyyy"), act.Customer, act.Recipient.Name)));
+Дата и время изменения:", "Изменен акт", act.Id, act.ActDate.ToString("dd.MM.yyyy"),
+				act.Customer, act.Recipient.Name, new Period(2012, Interval.January), 100)));
 		}
 	}
 }
