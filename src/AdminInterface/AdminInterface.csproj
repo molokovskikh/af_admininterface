@@ -168,6 +168,9 @@
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
+    <Compile Include="Models\Core.cs" />
+    <Compile Include="Models\ProducerSynonym.cs" />
+    <Compile Include="Models\ProductSynonym.cs" />
     <Compile Include="Models\WaybillExcludeFile.cs" />
     <Compile Include="Queries\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="Queries\ClientAddressFilter.cs" />
@@ -509,8 +512,10 @@
     <None Include="Views\BalanceOperations\Show.brail" />
     <Content Include="Views\Billing\AdditionalSupplierInfo.brail" />
     <None Include="Views\LegalEntity\Show.brail" />
+    <Content Include="Views\Logs\Converted.brail" />
     <None Include="Views\Logs\OrdersTable.brail" />
     <None Include="Views\Logs\Statistics.brail" />
+    <Content Include="Views\Mail\ModifyAct.brail" />
     <None Include="Views\Mail\RegisterNews.brail" />
     <Content Include="Views\ManagerReports\ClientAddressesMonitor.brail" />
     <None Include="Views\ManagerReports\ClientConditionsMonitoring.brail" />
@@ -780,7 +785,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>63945</DevelopmentServerPort>
+          <DevelopmentServerPort>58801</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

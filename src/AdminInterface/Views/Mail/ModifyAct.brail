@@ -1,0 +1,8 @@
+﻿${messageSubject}: <br/>
+Документ №${act.Id}, дата: ${act.ActDate.ToString("dd.MM.yyyy")}<br/>
+Период: ${act.Period}<br/>
+Сумма: ${act.Sum}<br/>
+Организация: ${act.Customer}<br/>
+Контрагент от Аналит: ${act.Recipient.Name}<br/>
+Пользователь: ${admin.Name}<br/>
+${dateTime}

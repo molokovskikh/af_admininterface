@@ -1,0 +1,7 @@
+﻿<tr class=details>
+	<td colspan="100">
+		<div id="Converted${lineId}">
+		${convertedLine}
+		</div>
+	</td>
+</tr>
