@@ -321,7 +321,7 @@ and tI.priceid = i.priceid
 and tI.regionid =  i.RegionId) as BasePersent,
 
 (select
-	concat(cast(count(IF(II.AvailableForClient > 0, 1, NULL)) as char(255)), '/', cast(count(*) as char(255))) as CountAvailableForClient
+	concat(cast(count(distinct IF(II.AvailableForClient > 0, II.PriceId, NULL)) as char(255)), '/', cast(count(distinct II.PriceId) as char(255))) as CountAvailableForClient
 from Usersettings.PricesData pd
 	join Usersettings.PricesData pdj on pd.FirmCode = pdj.FirmCode and pdj.Enabled = 1
 	join usersettings.pricesRegionaldata rd on rd.PriceCode = pdj.PriceCode and (rd.RegionCode & :Region) > 0
