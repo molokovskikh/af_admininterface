@@ -187,5 +187,15 @@ namespace Integration.Controllers
 			var clientObj = controller.SearchForShowUser("ForShowUserFind");
 			Assert.AreEqual(clientObj.Count(), 2);
 		}
+
+		[Test]
+		public void Reset_af_version_test()
+		{
+			var client = DataMother.CreateClientAndUsers();
+			var user = client.Users[0];
+			controller.ResetAFVersion(user.Id);
+			Flush();
+			Assert.AreEqual(session.Get<User>(user.Id).UserUpdateInfo.AFAppVersion, 999);
+		}
 	}
 }

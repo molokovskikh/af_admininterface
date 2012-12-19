@@ -797,5 +797,13 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 			browser.Button(Find.ByValue("Принять")).Click();
 			Assert.That(browser.ContainsText("Поле содержит запрещенные символы(<, >)."), Is.True);
 		}
+
+		[Test]
+		public void Reset_af_version_test()
+		{
+			Open(user, "Settings");
+			Click(string.Format("Сбросить версию АФ (Сейчас {0})", user.UserUpdateInfo.AFAppVersion));
+			AssertText("Вы уверены, что хотите произвести сброс параметра, отвечающего за версию АФ");
+		}
 	}
 }

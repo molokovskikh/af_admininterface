@@ -395,6 +395,22 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
+		public uint ResetAFVersion(uint userId)
+		{
+			CancelView();
+			var user = DbSession.Load<User>(userId);
+			if (user.Client != null) {
+				user.UserUpdateInfo.AFAppVersion = 999;
+				DbSession.Save(user);
+				Notify("Версия АФ сброшена");
+			}
+			else {
+				Error("Нельзя сбросить версию АФ для пользователя поставщика");
+			}
+			return userId;
+		}
+
+		[AccessibleThrough(Verb.Post)]
 		public void SaveSettings([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom, user.ShowUsers")] User user)
 		{
 			user.ShowUsers = user.ShowUsers.Where(u => u != null).ToList();
