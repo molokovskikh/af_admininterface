@@ -56,6 +56,7 @@ namespace Functional.Drugstore
 			Click("История документов");
 			OpenedWindow("История документов");
 			AssertText(document.Id.ToString());
+			AssertText("Пользователь получивший документ");
 			AssertText("тестовый адрес");
 		}
 
@@ -69,6 +70,24 @@ namespace Functional.Drugstore
 
 			session.Refresh(sendLog);
 			Assert.That(sendLog.Committed, Is.False);
+		}
+
+		[Test]
+		public void ShowDocumentForMultiUserClient()
+		{
+			var newUser = client.AddUser("Новый тестовый пользователь");
+			Save(client);
+
+			var newSendLog = new DocumentSendLog(newUser, document);
+			Save(newSendLog);
+			Reopen();
+			Open("Logs/Documents?filter.Client.Id={0}", client.Id);
+			AssertText("Статистика");
+			Assert.That(browser.Text, Is.Not.StringContaining("Пользователь получивший документ"));
+			Click("...");
+			browser.WaitUntilContainsText("Пользователь получивший документ", 1);
+			AssertText("Пользователь получивший документ");
+			AssertText(user.Login);
 		}
 
 		[Test]
@@ -99,6 +118,7 @@ namespace Functional.Drugstore
 
 			Click("SpecialFileNameForThisReport");
 			Click("123");
+			browser.WaitUntilContainsText("Сопоставлен с", 1);
 			AssertText("Сопоставлен с \"testCatName testForm\"");
 			AssertText("По производителю с \"testProducer\"");
 		}

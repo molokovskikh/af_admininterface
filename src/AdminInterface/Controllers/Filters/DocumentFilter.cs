@@ -28,6 +28,14 @@ namespace AdminInterface.Controllers.Filters
 		[Description("Только неразобранные накладные: ")]
 		public bool OnlyNoParsed { get; set; }
 
+		private bool _statMode = false;
+
+		public bool StatMode
+		{
+			get { return _statMode; }
+			set { _statMode = value; }
+		}
+
 		public User User { get; set; }
 		public Client Client { get; set; }
 		public Supplier Supplier { get; set; }
@@ -86,7 +94,7 @@ namespace AdminInterface.Controllers.Filters
 			else {
 				criteria.CreateAlias("FromSupplier", "fs", JoinType.InnerJoin);
 			}
-			if(!OnlyNoParsed || User != null) {
+			if((!OnlyNoParsed || User != null) && !StatMode) {
 				criteria.CreateAlias("SendLogs", "sl", JoinType.LeftOuterJoin);
 				criteria.CreateAlias("sl.ForUser", "u", JoinType.LeftOuterJoin);
 				criteria.CreateAlias("sl.SendedInUpdate", "su", JoinType.LeftOuterJoin);
@@ -108,7 +116,7 @@ namespace AdminInterface.Controllers.Filters
 				.Add(Projections.Property("fc.Name").As("Client"))
 				.Add(Projections.Property("fc.Id").As("ClientId"))
 				.Add(Projections.Property("a.Value").As("Address"));
-			if(!OnlyNoParsed) {
+			if(!OnlyNoParsed && !StatMode) {
 				projection.Add(Projections.Property("u.Login").As("Login"))
 					.Add(Projections.Property("u.Id").As("LoginId"));
 				projection.Add(Projections.Property("su.RequestTime").As("RequestTime"))

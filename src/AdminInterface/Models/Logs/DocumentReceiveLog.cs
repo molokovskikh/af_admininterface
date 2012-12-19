@@ -54,6 +54,18 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public virtual bool DocumentDelivered { get; set; }
+
+		private bool DocumentProcessedSuccessfully()
+		{
+			return (Id <= 15374942) || FileDelivered || DocumentDelivered;
+		}
+
+		public virtual DateTime? GetDisplayRequestTime()
+		{
+			if (DocumentProcessedSuccessfully() && SendedInUpdate != null)
+				return SendedInUpdate.RequestTime;
+			return null;
+		}
 	}
 
 	[ActiveRecord("Document_logs", Schema = "Logs", Lazy = true)]

@@ -1,0 +1,24 @@
+﻿<tr class=details>
+	<td colspan="5">
+		<div id="StatDetails${documentLogId}">
+			<table class="DataTable">
+				<% if items.Count != 0: %>
+					<thead>
+						<th>Пользователь получивший документ</th>
+						<th>Файл доставлен</th>
+						<th>Документ доставлен</th>
+						<th>Дата отправки</th>
+					</thead>
+					<% for i, item in enumerate(items): %>
+						<tr>
+							<td>${app.LinkTo(item.ForUser.Login, @Users, item.ForUser.Id.ToString())}</td>
+							<td>${ViewHelper.ToHumanReadable(item.FileDelivered)}</td>
+							<td>${ViewHelper.ToHumanReadable(item.DocumentDelivered)}</td>
+							<td>${item.GetDisplayRequestTime()}</td>
+						</tr>
+					<% end %>
+				<% end %>
+			</table>
+		</div>
+	</td>
+</tr>
