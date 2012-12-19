@@ -273,6 +273,23 @@ namespace AdminInterface.Mailers
 			return "не оптеделено";
 		}
 
+		public MonorailMailer DeleteOrEditAct(Act act, string to, string messageSubject, bool isDelete)
+		{
+			From = "billing@analit.net";
+			To = to;
+			IsBodyHtml = true;
+			Template = "ModifyAct";
+			Subject = messageSubject;
+			PropertyBag["admin"] = SecurityContext.Administrator;
+			PropertyBag["act"] = act;
+			if(isDelete)
+				PropertyBag["dateTime"] = String.Format("Дата и время удаления: {0}", DateTime.Now);
+			else
+				PropertyBag["dateTime"] = String.Format("Дата и время изменения: {0}", DateTime.Now);
+			PropertyBag["messageSubject"] = messageSubject;
+			return this;
+		}
+
 		public MonorailMailer RegisterOrDeleteNews(News news, string to, string messageSubject)
 		{
 			To = to;

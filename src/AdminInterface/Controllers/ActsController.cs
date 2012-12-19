@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AdminInterface.Controllers.Filters;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
@@ -56,8 +57,10 @@ namespace AdminInterface.Controllers
 		public void Process([ARDataBind("acts", AutoLoadBehavior.Always)] Act[] acts)
 		{
 			if (Form["delete"] != null) {
-				foreach (var act in acts)
+				foreach (var act in acts) {
 					act.Delete();
+					new MonorailMailer().DeleteOrEditAct(act, "billing@analit.net", "Удален акт", true).Send();
+				}
 
 				Flash["message"] = "Удалено";
 				RedirectToReferrer();
@@ -86,6 +89,7 @@ namespace AdminInterface.Controllers
 				if (!HasValidationError(act)) {
 					act.CalculateSum();
 					act.Save();
+					new MonorailMailer().DeleteOrEditAct(act, "billing@analit.net", "Изменен акт", false).Send();
 					Flash["Message"] = "Сохранено";
 					RedirectUsingRoute("Acts", "Edit", new { act.Id });
 				}

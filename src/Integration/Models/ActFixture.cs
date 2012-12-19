@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using AdminInterface.Controllers;
 using AdminInterface.Models.Billing;
 using Common.Tools;
@@ -26,6 +27,48 @@ namespace Integration.Models
 
 			acts = Act.Build(new List<Invoice> { invoice }, DateTime.Now);
 			Assert.That(acts.Count(), Is.EqualTo(0));
+		}
+
+		[Test]
+		public void NotifyAboutDeleteAct()
+		{
+			var act = PrepareAct();
+			MailMessage message = null;
+			var mailer = ForTest.TestMailer(m => message = m);
+			mailer.DeleteOrEditAct(act, "testmail@test.te", "Удален акт", true).Send();
+			Assert.That(message, Is.Not.Null);
+			Assert.That(message.Body, Is.StringStarting(String.Format(@"{0}: <br/>
+Документ №{1}, дата: {2}<br/>
+Организация: {3}<br/>
+Контрагент от Аналит: {4}<br/>
+Пользователь: test<br/>
+Дата и время удаления:", "Удален акт", act.Id, act.ActDate.ToString("dd.MM.yyyy"), act.Customer, act.Recipient.Name)));
+		}
+		private Act PrepareAct()
+		{
+			ForTest.InitializeMailer();
+			return new Act {
+				ActDate = new DateTime(2012, 11, 13),
+				Recipient = new Recipient {
+					Name = "Тестовый получатель"
+				},
+				Customer = "Организация"
+			};
+		}
+		[Test]
+		public void NotifyAboutEditAct()
+		{
+			var act = PrepareAct();
+			MailMessage message = null;
+			var mailer = ForTest.TestMailer(m => message = m);
+			mailer.DeleteOrEditAct(act, "testmail@test.te", "Изменен акт", false).Send();
+			Assert.That(message, Is.Not.Null);
+			Assert.That(message.Body, Is.StringStarting(String.Format(@"{0}: <br/>
+Документ №{1}, дата: {2}<br/>
+Организация: {3}<br/>
+Контрагент от Аналит: {4}<br/>
+Пользователь: test<br/>
+Дата и время изменения:", "Изменен акт", act.Id, act.ActDate.ToString("dd.MM.yyyy"), act.Customer, act.Recipient.Name)));
 		}
 	}
 }
