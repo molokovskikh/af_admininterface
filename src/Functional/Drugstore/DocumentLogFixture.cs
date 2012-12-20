@@ -76,11 +76,10 @@ namespace Functional.Drugstore
 		public void ShowDocumentForMultiUserClient()
 		{
 			var newUser = client.AddUser("Новый тестовый пользователь");
-			Save(client);
+			Save(newUser);
 
 			var newSendLog = new DocumentSendLog(newUser, document);
 			Save(newSendLog);
-			Reopen();
 			Open("Logs/Documents?filter.Client.Id={0}", client.Id);
 			AssertText("Статистика");
 			Assert.That(browser.Text, Is.Not.StringContaining("Пользователь получивший документ"));
