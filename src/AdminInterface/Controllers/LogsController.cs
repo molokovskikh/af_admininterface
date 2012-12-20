@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
@@ -28,9 +29,15 @@ namespace AdminInterface.Controllers
 			SetBinder(new ARDataBinder());
 		}
 
-		public void Resend(uint[] ids)
+		public void Resend(uint[] ids, bool? statMode)
 		{
-			var logs = DbSession.Query<DocumentSendLog>().Where(d => ids.Contains(d.Id));
+			List<DocumentSendLog> logs;
+			if(statMode.HasValue && statMode.Value)
+				logs = DbSession.Query<DocumentReceiveLog>()
+					.Where(l => ids.Contains(l.Id))
+					.SelectMany(l => l.SendLogs).ToList();
+			else
+				logs = DbSession.Query<DocumentSendLog>().Where(d => ids.Contains(d.Id)).ToList();
 			foreach (var log in logs) {
 				log.SendedInUpdate = null;
 				log.Committed = false;
@@ -42,6 +49,12 @@ namespace AdminInterface.Controllers
 
 		public void Documents([ARDataBind("filter", AutoLoadBehavior.NullIfInvalidKey)] DocumentFilter filter)
 		{
+			if(filter.Client != null) {
+				var clientUsers = DbSession.Load<Client>(filter.Client.Id).Users;
+				if(clientUsers != null) {
+					filter.StatMode = clientUsers.Count > 1;
+				}
+			}
 			PropertyBag["filter"] = filter;
 			PropertyBag["logEntities"] = filter.Find();
 		}
@@ -52,6 +65,13 @@ namespace AdminInterface.Controllers
 
 			var file = log.GetRemoteFileName(Config);
 			this.RenderFile(file, log.FileName);
+		}
+
+		public void ShowStatDetails(uint documentLogId)
+		{
+			CancelLayout();
+			PropertyBag["documentLogId"] = documentLogId;
+			PropertyBag["items"] = DbSession.Load<DocumentReceiveLog>(documentLogId).SendLogs;
 		}
 
 		public void ShowUpdateDetails(uint updateLogEntityId)

@@ -26,7 +26,7 @@ ${app.EndFormFor("filter")}
 	Всего документов ${filter.RowsCount}
 </div>
 
-<form method=post action="${siteroot}/Logs/Resend">
+<form method=post action="${siteroot}/Logs/Resend?statMode=${filter.StatMode}">
 
 	<% if not filter.OnlyNoParsed: %>
 	<input type=submit value="Повторить">
@@ -52,21 +52,32 @@ ${app.EndFormFor("filter")}
 					<th>На адрес</th>
 					<th>Название файла</th>
 					<th>Размер</th>
-					<% if not filter.OnlyNoParsed: %>
-					<th>Пользователь получивший документ</th>
-					<th>Файл доставлен</th>
-					<th>Документ доставлен</th>
-					<th>Дата отправки</th>
+					<% if filter.StatMode:%>
+						<th>Комментарий</th>
+						<th>Статистика</th>
+					<% else: %>
+						<% if not filter.OnlyNoParsed: %>
+						<th>Пользователь получивший документ</th>
+						<th>Файл доставлен</th>
+						<th>Документ доставлен</th>
+						<th>Дата отправки</th>
+						<% end %>
+						<th>Комментарий</th>
 					<% end %>
-					<th>Комментарий</th>
 				</tr>
 			</thead>
 		<% for i, log in enumerate(logEntities): %>
 			<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${log.Id}">
-				<% if not filter.OnlyNoParsed: %>
-				<td>
-					<input type=checkbox name="ids[${i}]" value="${log.DeliveredId}" >
-				</td>
+				<% if filter.StatMode: %>
+					<td>
+						<input type=checkbox name="ids[${i}]" value="${log.Id}" >
+					</td>
+				<% else: %>
+					<% if not filter.OnlyNoParsed: %>
+					<td>
+						<input type=checkbox name="ids[${i}]" value="${log.DeliveredId}" >
+					</td>
+					<% end %>
 				<% end %>
 				<td>${log.Id}</td>
 				<td>${log.LogTime}</td>
@@ -98,23 +109,30 @@ ${app.EndFormFor("filter")}
 				<td>
 					${ViewHelper.ConvertToUserFriendlySize(log.DocumentSize) if log.DocumentSize}
 				</td>
-				<% if not filter.OnlyNoParsed: %>
-				<td>${app.LinkTo(log.Login, @Users, log.LoginId)}</td>
-				<td>
+				<% if filter.StatMode:%>
+					<td>
+						<pre>!{log.Addition}</pre>
+					</td>
+					<td>
+						<a id="ShowStatDetails${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, 'ShowStatDetails?documentLogId=${log.Id}', 'StatDetails');">
+							...
+						</a>
+					</td>
+				<% else: %>
 					<% if not filter.OnlyNoParsed: %>
-						${ViewHelper.ToHumanReadable(log.FileDelivered)}
+						<td>${app.LinkTo(log.Login, @Users, log.LoginId)}</td>
+						<td>
+							${ViewHelper.ToHumanReadable(log.FileDelivered)}
+						</td>
+						<td>
+							${ViewHelper.ToHumanReadable(log.DocumentDelivered)}
+						</td>
+						<td>${log.GetDisplayRequestTime()}</td>
 					<% end %>
-				</td>
-				<td>
-					<% if not filter.OnlyNoParsed: %>
-						${ViewHelper.ToHumanReadable(log.DocumentDelivered)}
-					<% end %>
-				</td>
-				<td>${log.GetDisplayRequestTime()}</td>
+					<td>
+						<pre>!{log.Addition}</pre>
+					</td>
 				<% end %>
-				<td>
-					<pre>!{log.Addition}</pre>
-				</td>
 			</tr>
 
 		<% end %>
