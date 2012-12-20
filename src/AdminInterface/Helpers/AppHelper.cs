@@ -102,5 +102,12 @@ namespace AdminInterface.Helpers
 			}
 			return string.Empty;
 		}
+
+		public string EditSelect(string name, object options = null)
+		{
+			var htmlOptions = GetSelectOptions(options);
+			var selectName = name + IdSufix;
+			return EmptyableSelect(selectName, "", htmlOptions, options as IDictionary, "");
+		}
 	}
 }

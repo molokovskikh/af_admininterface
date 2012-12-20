@@ -83,6 +83,7 @@ namespace AdminInterface.Controllers
 				payers = ((Client)service).Payers;
 			else
 				payers = new List<Payer> { Supplier.Find(service.Id).Payer };
+
 			PropertyBag["Payers"] = payers;
 			PropertyBag["maxRegion"] = UInt64.MaxValue;
 			PropertyBag["UserRegistration"] = true;

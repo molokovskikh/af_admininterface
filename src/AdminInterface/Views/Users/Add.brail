@@ -29,7 +29,7 @@
 			${app.GetValidationError("user.Name")}<br>
 
 			${app.Label("user.Payer")}<br>
-			${app.Edit("user.Payer", Payers)}<br>
+				${app.EditSelect("user.Payer", Payers)}<br>
 			<% if not IsDefined(@registerSupplierUser) :%>
 			${app.Edit("user.SubmitOrders")}<br>
 			${app.Edit("user.IgnoreCheckMinOrder")}<br>
