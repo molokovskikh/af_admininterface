@@ -103,11 +103,15 @@ namespace AdminInterface.Helpers
 			return string.Empty;
 		}
 
-		public string EditSelect(string name, object options = null)
+		public string EditSelect(string name, object options = null, object attributes = null)
 		{
 			var htmlOptions = GetSelectOptions(options);
 			var selectName = name + IdSufix;
-			return EmptyableSelect(selectName, "", htmlOptions, options as IDictionary, "");
+			var value = (dynamic)ObtainValue(name);
+			if(value is Payer)
+				return EmptyableSelect(selectName, ((Payer)value).Id.ToString(), htmlOptions, attributes as IDictionary, "");
+
+			return EmptyableSelect(selectName, value, htmlOptions, attributes as IDictionary, "");
 		}
 	}
 }

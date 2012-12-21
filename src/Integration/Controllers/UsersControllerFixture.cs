@@ -117,6 +117,52 @@ namespace Integration.Controllers
 			Assert.That(user.Payer, Is.EqualTo(payer));
 		}
 
+		[Test]
+		public void NotRegisterUserAndAddressWithOtherPayer()
+		{
+			client = DataMother.CreateTestClientWithUser();
+			var payer = new Payer("Тестовый плательщик");
+			payer.Save();
+			client.Payers.Add(payer);
+			session.SaveOrUpdate(client);
+
+			var legalEntity = client.Orgs().First();
+			Request.Params.Add("user.Payer.Id", payer.Id.ToString());
+			Request.Params.Add("address.LegalEntity.Id", legalEntity.Id.ToString());
+			Request.Params.Add("address.Value", "новый адрес");
+			controller.Add(new Contact[0], new[] {
+				new RegionSettings {
+					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
+				},
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+			Assert.That(controller.Flash["Message"].ToString(),
+				Is.StringContaining("Ошибка регистрации: попытка зарегистрировать пользователя и адрес в различных Плательщиках"));
+		}
+
+		[Test]
+		public void RegisterUserAndAddressWithSamePayerForMultipayerClient()
+		{
+			client = DataMother.CreateTestClientWithUser();
+			var payer = new Payer("Тестовый плательщик");
+			payer.Save();
+			client.Payers.Add(payer);
+			session.SaveOrUpdate(client);
+
+			var legalEntity = client.Orgs().First(entity => entity.Payer.Id == payer.Id);
+			Request.Params.Add("user.Payer.Id", payer.Id.ToString());
+			Request.Params.Add("address.LegalEntity.Id", legalEntity.Id.ToString());
+			Request.Params.Add("address.Value", "новый адрес");
+			controller.Add(new Contact[0], new[] {
+				new RegionSettings {
+					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
+				},
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+			Assert.That(controller.Flash["Message"].ToString(),
+				Is.Not.StringContaining("Ошибка регистрации: попытка зарегистрировать пользователя и адрес в различных Плательщиках"));
+			var user = Registred();
+			Assert.That(user.Payer, Is.EqualTo(payer));
+		}
+
 		private void Prepare()
 		{
 			Request.Params.Add("user.Name", "Тестовый пользователь");

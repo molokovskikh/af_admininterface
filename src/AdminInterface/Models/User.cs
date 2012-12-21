@@ -11,6 +11,7 @@ using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.Models.Validators;
 using AdminInterface.Queries;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;

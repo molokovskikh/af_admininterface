@@ -29,7 +29,13 @@
 			${app.GetValidationError("user.Name")}<br>
 
 			${app.Label("user.Payer")}<br>
-				${app.EditSelect("user.Payer", Payers)}<br>
+				<% if onePayer: %>
+					${app.Edit("user.Payer.ShortName", {@readonly: @readonly})}<br>
+					${FormHelper.HiddenField("user.Payer.Id")}
+				<% else: %>
+					${app.EditSelect("user.Payer", Payers)}<br>
+					${app.GetValidationError("user.Payer")}<br>
+				<% end %>
 			<% if not IsDefined(@registerSupplierUser) :%>
 			${app.Edit("user.SubmitOrders")}<br>
 			${app.Edit("user.IgnoreCheckMinOrder")}<br>
@@ -71,7 +77,14 @@
 				<tr><td colspan=2><% OutputSubView("/SubViews/MemoAboutWritingAddresses") %></td></tr>
 				<tr>
 					<td wisth="20%">Юридическое лицо</td>
+					<% if Organizations.Length > 1: %>
 					<td>${FormHelper.Select("address.LegalEntity.Id", Organizations, {"value" : "Id", "text" : "Name"})}</td>
+					<% else: %>
+						<td>
+							${app.Edit("address.LegalEntity.Name", {@readonly: @readonly})}<br>
+							${FormHelper.HiddenField("address.LegalEntity.Id")}
+						</td>
+					<% end %>
 				<tr/>
 			</table>
 		</div>

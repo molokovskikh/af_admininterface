@@ -14,6 +14,7 @@ using System.IO;
 using AdminInterface;
 using Common.Web.Ui.Models;
 using System.Threading;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Drugstore
 {
@@ -576,6 +577,25 @@ namespace Functional.Drugstore
 		private void FillRequiredFields()
 		{
 			Css("#user_Name").TypeText("Коометарий Тестовый пользователь");
+		}
+
+		[Test]
+		public void RegisterUserForMultiPayerClient()
+		{
+			var payer = new Payer("Тестовый плательщик");
+			payer.Save();
+			client.Payers.Add(payer);
+			session.SaveOrUpdate(client);
+			Open(client);
+			browser.Link(Find.ByText("Новый пользователь")).Click();
+			FillRequiredFields();
+			Click("Создать");
+			AssertText("Ошибка регистрации: необходимо выбрать Плательщика");
+			browser.Css("#user_Payer_Id").Select("Тестовый плательщик");
+			Click("Создать");
+			AssertText("Регистрационная карта");
+			session.Refresh(client);
+			Assert.That(client.Users.Count, Is.EqualTo(2));
 		}
 
 		[Test]
