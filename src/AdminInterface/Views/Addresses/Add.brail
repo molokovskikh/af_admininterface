@@ -19,7 +19,12 @@
 
 		<div class="block">
 			<h3>Юридическое лицо</h3>
-			${app.Edit("address.LegalEntity", client.Orgs())}
+			<% if Organisations.Length > 1:%>
+				${app.Edit("address.LegalEntity", client.Orgs())}
+			<% else: %>
+				${app.Edit("address.LegalEntity.Name", {@readonly: @readonly})}
+				${FormHelper.HiddenField("address.LegalEntity.Id")}
+			<% end %>
 		</div>
 
 		<div class="block">

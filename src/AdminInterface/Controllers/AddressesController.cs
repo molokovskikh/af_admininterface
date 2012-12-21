@@ -1,4 +1,5 @@
-﻿using AdminInterface.Mailers;
+﻿using System.Linq;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.MonoRailExtentions;
@@ -28,7 +29,14 @@ namespace AdminInterface.Controllers
 		public void Add(uint clientId)
 		{
 			var client = Client.FindAndCheck<Client>(clientId);
-			PropertyBag["address"] = new Address(client);
+			var organisations = client.Orgs().ToArray();
+			if(organisations.Length == 1) {
+				PropertyBag["address"] = new Address(client) { LegalEntity = organisations.First() };
+			}
+			else {
+				PropertyBag["address"] = new Address(client);
+			}
+			PropertyBag["Organisations"] = organisations;
 			PropertyBag["client"] = client;
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
@@ -45,7 +53,16 @@ namespace AdminInterface.Controllers
 			var address = new Address(client);
 			RecreateOnlyIfNullBinder.Prepare(this);
 			BindObjectInstance(address, "address", AutoLoadBehavior.NewRootInstanceIfInvalidKey);
-
+			if(client.Payers.Count > 1 && address.AvaliableForUsers != null && address.AvaliableForUsers.Count > 0) {
+				address.AvaliableForUsers.Each(u => DbSession.Refresh(u));
+				if(address.AvaliableForUsers.All(u => u.Payer.Id != address.LegalEntity.Payer.Id)) {
+					Add(client.Id);
+					PropertyBag["client"] = client;
+					PropertyBag["address"] = address;
+					Error("Ошибка регистрации: попытка зарегистрировать пользователя и адрес в различных Плательщиках");
+					return;
+				}
+			}
 			client.AddAddress(address);
 			address.UpdateContacts(contacts);
 			DbSession.Save(address);

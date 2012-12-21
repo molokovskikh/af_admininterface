@@ -62,7 +62,11 @@ namespace AdminInterface.Controllers
 			PropertyBag["client"] = service;
 			if (service.IsClient()) {
 				PropertyBag["drugstore"] = ((Client)service).Settings;
-				PropertyBag["Organizations"] = ((Client)service).Orgs().ToArray();
+				var organizations = ((Client)service).Orgs().ToArray();
+				if (organizations.Length == 1) {
+					PropertyBag["address"] = new Address { LegalEntity = organizations.First() };
+				}
+				PropertyBag["Organizations"] = organizations;
 				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.Base);
 			}
 			else {
@@ -83,6 +87,14 @@ namespace AdminInterface.Controllers
 				payers = ((Client)service).Payers;
 			else
 				payers = new List<Payer> { Supplier.Find(service.Id).Payer };
+
+			if(payers.Count == 1) {
+				user.Payer = payers.First();
+				PropertyBag["onePayer"] = true;
+			}
+			else {
+				PropertyBag["onePayer"] = false;
+			}
 			PropertyBag["Payers"] = payers;
 			PropertyBag["maxRegion"] = UInt64.MaxValue;
 			PropertyBag["UserRegistration"] = true;
@@ -107,9 +119,16 @@ namespace AdminInterface.Controllers
 			var user = new User(service);
 			BindObjectInstance(user, "user");
 
+
 			if (!IsValid(user)) {
 				Add(service.Id);
 				PropertyBag["user"] = user;
+				return;
+			}
+			if(user.Payer == null || user.Payer.Id == 0) {
+				Add(service.Id);
+				PropertyBag["user"] = user;
+				Error("Ошибка регистрации: необходимо выбрать Плательщика");
 				return;
 			}
 
@@ -117,10 +136,25 @@ namespace AdminInterface.Controllers
 			SetBinder(new ARDataBinder());
 			BindObjectInstance(address, "address", AutoLoadBehavior.NewInstanceIfInvalidKey);
 
-			service.AddUser(user);
 
 			if (String.IsNullOrEmpty(address.Value))
 				address = null;
+			if (service.IsClient()
+				&& ((Client)service).Payers.Count > 1) {
+				if (user.AvaliableAddresses.Any()) {
+					user.AvaliableAddresses.Each(a => DbSession.Refresh(a));
+				}
+				if ((user.AvaliableAddresses.Any() && user.AvaliableAddresses.Select(s => s.LegalEntity).All(l => l.Payer.Id != user.Payer.Id))
+					|| (address != null && address.LegalEntity.Payer.Id != user.Payer.Id)) {
+					Add(service.Id);
+					PropertyBag["user"] = user;
+					PropertyBag["address"] = address;
+					Error("Ошибка регистрации: попытка зарегистрировать пользователя и адрес в различных Плательщиках");
+					return;
+				}
+			}
+
+			service.AddUser(user);
 
 			user.Payer = Payer.Find(user.Payer.Id);
 			user.Setup();
