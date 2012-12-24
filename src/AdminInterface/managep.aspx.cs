@@ -500,8 +500,8 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 						var rule = new OrderSendRules();
 						rule.Supplier = supplier;
 						BindRule(rule, row);
-						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["FormaterId"]), "Специальный формат");
-						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["SenderId"]), "Специальная доставка");
+						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["FormaterId"]), "Специальный формат", HandlerTypes.Formatter);
+						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["SenderId"]), "Специальная доставка", HandlerTypes.Sender);
 						supplier.OrderRules.Add(rule);
 						break;
 					}
@@ -518,8 +518,8 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 						if (rule == null)
 							continue;
 						BindRule(rule, row);
-						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["FormaterId"]), "Специальный формат");
-						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["SenderId"]), "Специальная доставка");
+						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["FormaterId"]), "Специальный формат", HandlerTypes.Formatter);
+						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["SenderId"]), "Специальная доставка", HandlerTypes.Sender);
 						break;
 					}
 				}
@@ -546,12 +546,12 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 			return supplier.OrderRules.FirstOrDefault(r => r.Id == id);
 		}
 
-		public void CreateNewSpecialOrders(Supplier supplier, uint formaterId, string specialName)
+		public void CreateNewSpecialOrders(Supplier supplier, uint formaterId, string specialName, HandlerTypes handlerType)
 		{
 			var orderHandler = DbSession.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId);
 			if(DbSession.Query<SpecialHandler>()
 				.FirstOrDefault(t => t.Supplier.Id == supplier.Id && t.Handler.Id == formaterId) == null
-				&& !OrderHandler.DefaultHandlerByType[HandlerTypes.Formatter].Contains(orderHandler.ClassName)) {
+				&& !OrderHandler.DefaultHandlerByType[handlerType].Contains(orderHandler.ClassName)) {
 				var handler = new SpecialHandler {
 					Supplier = supplier,
 					Handler = DbSession.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId)
