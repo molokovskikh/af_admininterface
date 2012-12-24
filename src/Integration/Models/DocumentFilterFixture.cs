@@ -187,5 +187,16 @@ namespace Integration.Models
 			// не должны получить сохраненный выше документ из-за установленного IsFake
 			Assert.That(documents.Count, Is.EqualTo(0));
 		}
+
+
+		[Test, Description("проверяет работу фильтра для отчета о неформализованных накладных")]
+		public void OnlyNoParsedReport()
+		{
+			var filter = new DocumentFilter();
+			var documents = filter.FindStat();
+			var resultDoc = documents.FirstOrDefault(d => d.SupplierId == _supplier.Id);
+			Assert.That(resultDoc.DocumentsCount, Is.EqualTo(1));
+			Assert.That(resultDoc.DocumentToClientsCount, Is.EqualTo(String.Format("{0}: {1}; ", _client.Name, 1)));
+		}
 	}
 }
