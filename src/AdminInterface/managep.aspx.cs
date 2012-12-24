@@ -500,7 +500,8 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 						var rule = new OrderSendRules();
 						rule.Supplier = supplier;
 						BindRule(rule, row);
-						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["FormaterId"]));
+						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["FormaterId"]), "Специальный формат");
+						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["SenderId"]), "Специальная доставка");
 						supplier.OrderRules.Add(rule);
 						break;
 					}
@@ -517,7 +518,8 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 						if (rule == null)
 							continue;
 						BindRule(rule, row);
-						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["FormaterId"]));
+						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["FormaterId"]), "Специальный формат");
+						CreateNewSpecialOrders(supplier, Convert.ToUInt32(row["SenderId"]), "Специальная доставка");
 						break;
 					}
 				}
@@ -544,7 +546,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 			return supplier.OrderRules.FirstOrDefault(r => r.Id == id);
 		}
 
-		public void CreateNewSpecialOrders(Supplier supplier, uint formaterId)
+		public void CreateNewSpecialOrders(Supplier supplier, uint formaterId, string specialName)
 		{
 			var orderHandler = DbSession.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId);
 			if(DbSession.Query<SpecialHandler>()
@@ -555,7 +557,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 					Handler = DbSession.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId)
 				};
 				// задаем имя по умолчанию
-				var handlerName = "Специальный формат";
+				var handlerName = specialName;
 				// проверяем свободно ли имя и если нет, то ищем свободное
 				if(DbSession.Query<SpecialHandler>()
 					.Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName) != 0) {
