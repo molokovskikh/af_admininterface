@@ -325,7 +325,7 @@ LOWER(s.Name) like '{0}' ",
 					break;
 				}
 				case SearchUserBy.AddressMail:
-					filter = AddFilterCriteria(filter, String.Format(" (concat(a.Id, '@waybills.analit.net') like '{0}' or concat(a.Id, '@refused.analit.net') like '{0}') ", sqlSearchText));
+					filter = AddFilterCriteria(filter, String.Format(" (concat(a.Id, '@waybills.analit.net') = '{0}' or concat(a.Id, '@refused.analit.net') = '{0}') ", sqlSearchText.Replace("%", string.Empty)));
 					break;
 			}
 			return filter;

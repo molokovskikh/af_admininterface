@@ -67,8 +67,15 @@ namespace Integration.Models
 			Flush();
 
 			filter.SearchBy = SearchUserBy.AddressMail;
-			filter.SearchText = String.Format("{0}@waybills.analit.net", address.Id);
+			var addr = address.Id.ToString();
+			filter.SearchText = String.Format("{0}@waybills.analit.net", addr.Substring(0, addr.Length - 1));
 			var result = filter.Find();
+
+			Assert.That(result.Count, Is.EqualTo(0), result.Implode());
+
+			filter.SearchBy = SearchUserBy.AddressMail;
+			filter.SearchText = String.Format("{0}@waybills.analit.net", address.Id);
+			result = filter.Find();
 
 			Assert.That(result.Count, Is.EqualTo(1), result.Implode());
 			Assert.That(result[0].UserId, Is.EqualTo(user.Id));
