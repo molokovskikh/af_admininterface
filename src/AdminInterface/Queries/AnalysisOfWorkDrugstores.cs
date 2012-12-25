@@ -27,7 +27,12 @@ namespace AdminInterface.ManagerReportsFilters
 		[Display(Name = "Код", Order = 0)]
 		public string Id
 		{
-			get { return Link(_id, ReportType.GetDescription(), new System.Tuple<string, object>("Id", _id)); }
+			get
+			{
+				if (ForExport)
+					return _id;
+				return Link(_id, ReportType.GetDescription(), new System.Tuple<string, object>("Id", _id));
+			}
 			set { _id = value; }
 		}
 
@@ -37,7 +42,12 @@ namespace AdminInterface.ManagerReportsFilters
 		[Display(Name = "Наименование", Order = 1)]
 		public string Name
 		{
-			get { return Link(_name, ReportType.GetDescription(), new System.Tuple<string, object>("Id", _id)); }
+			get
+			{
+				if (ForExport)
+					return _name;
+				return Link(_name, ReportType.GetDescription(), new System.Tuple<string, object>("Id", _id));
+			}
 			set { _name = value; }
 		}
 
@@ -48,6 +58,8 @@ namespace AdminInterface.ManagerReportsFilters
 		{
 			get
 			{
+				if (ForExport)
+					return _userCount;
 				if (!ForSubQuery)
 					return string.Format("<a href=\"javascript:\" id=\"{1}\" onclick=\"GetAnalysInfo({1}, this, 'User')\">{0}</a>", _userCount, _id);
 				else {
@@ -99,6 +111,7 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public bool ForSubQuery;
 		public AnalysisReportType ReportType;
+		public bool ForExport;
 	}
 
 	public enum AnalysisReportType
@@ -117,6 +130,11 @@ namespace AdminInterface.ManagerReportsFilters
 		public AnalysisReportType Type { get; set; }
 		public bool ForSubQuery { get; set; }
 
+
+		public IList<BaseItemForTable> Find()
+		{
+			return Find(false);
+		}
 
 		public ISession Session { get; set; }
 		public bool LoadDefault { get; set; }
@@ -368,11 +386,16 @@ LastWeekZak INT) engine=MEMORY;";
 			query.ExecuteUpdate();
 		}
 
-		public IList<BaseItemForTable> Find()
+		public IList<BaseItemForTable> Find(bool forExport)
 		{
 			PrepareAggregatesData();
 
 			RowsCount = Convert.ToInt32(Session.CreateSQLQuery("select count(*) from Customers.updates;").UniqueResult());
+
+			var limitPart = string.Empty;
+
+			if (!forExport)
+				limitPart = string.Format("limit {0}, {1}", CurrentPage * PageSize, PageSize);
 
 			var result = Session.CreateSQLQuery(string.Format(@"
 SELECT
@@ -388,8 +411,7 @@ SELECT
 	LastWeekZak,
 	IF (CurWeekZak - LastWeekZak < 0 , ( IF (CurWeekZak <> 0, ROUND((LastWeekZak-CurWeekZak)*100/LastWeekZak), 100 ) ) ,0) ProblemZak
 FROM Customers.updates up
-ORDER BY {2} {3}
-limit {0}, {1}", CurrentPage * PageSize, PageSize, SortBy, SortDirection))
+ORDER BY {0} {1} {2}", SortBy, SortDirection, limitPart))
 				.ToList<AnalysisOfWorkFiled>();
 
 			foreach (var analysisOfWorkFiled in result) {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,6 +23,8 @@ using ExcelLibrary.CompoundDocumentFormat;
 using ExcelLibrary.Office.Excel.BinaryFileFormat.Records;
 using ExcelLibrary.SpreadSheet;
 using NPOI.HSSF.UserModel;
+using NPOI.HSSF.Util;
+using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using BorderStyle = NPOI.SS.UserModel.BorderStyle;
 using HorizontalAlignment = NPOI.SS.UserModel.HorizontalAlignment;
@@ -39,6 +42,15 @@ namespace AdminInterface.Models
 			return ArHelper.WithSession(
 				s => criteria.GetExecutableCriteria(s).ToList<RegistrationInformation>())
 				.ToList();
+		}
+
+		private static IEnumerable<SwitchOffCounts> GetExcelSwitchOffClients(SwitchOffClientsFilter filter)
+		{
+			var criteria = filter.GetCriteria();
+
+			filter.ApplySort(criteria);
+
+			return ArHelper.WithSession(s => filter.Find(s, true)).ToList();
 		}
 
 		private static void FormatUserAndAdresses(Worksheet ws, UserFinderFilter filter)
@@ -61,6 +73,79 @@ namespace AdminInterface.Models
 			ws.Cells.ColumnWidth[5] = 8000;
 			if (filter.ShowUserNames())
 				ws.Cells.ColumnWidth[6] = 15000;
+
+			ws.Cells.Rows[headerRow].Height = 514;
+		}
+
+		private static void FormatSwitchOffClients(Worksheet ws, SwitchOffClientsFilter filter)
+		{
+			int headerRow = 3;
+			ExcelHelper.WriteHeader1(ws, headerRow, 0, "Код клиента", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 1, "Наименование клиента", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 2, "Регион", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 3, "Дата отключения", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 4, "Комментарий оператора", true, true);
+
+			ws.Cells.ColumnWidth[0] = 4000;
+			ws.Cells.ColumnWidth[1] = 12000;
+			ws.Cells.ColumnWidth[2] = 6000;
+			ws.Cells.ColumnWidth[3] = 5000;
+			ws.Cells.ColumnWidth[4] = 20000;
+
+			ws.Cells.Rows[headerRow].Height = 514;
+		}
+
+		private static void FormatWhoWasNotUpdated(Worksheet ws, int headerRow = 4)
+		{
+			ExcelHelper.WriteHeader1(ws, headerRow, 0, "Код клиента", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 1, "Наименование клиента", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 2, "Код пользователя", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 3, "Комментарий пользователя", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 4, "Регион", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 5, "Регистратор", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 6, "Дата обновления", true, true);
+
+			ws.Cells.ColumnWidth[0] = 4000;
+			ws.Cells.ColumnWidth[1] = 12000;
+			ws.Cells.ColumnWidth[2] = 4000;
+			ws.Cells.ColumnWidth[3] = 12000;
+			ws.Cells.ColumnWidth[4] = 6000;
+			ws.Cells.ColumnWidth[5] = 8000;
+			ws.Cells.ColumnWidth[6] = 6000;
+
+			ws.Cells.Rows[headerRow].Height = 514;
+		}
+
+		private static void UpdatedAndDidNotDoOrders(Worksheet ws)
+		{
+			int headerRow = 5;
+			FormatWhoWasNotUpdated(ws, 5);
+			ExcelHelper.WriteHeader1(ws, headerRow, 7, "Дата последнего заказа", true, true);
+			ws.Cells.ColumnWidth[7] = 6000;
+		}
+
+		private static void AnalysisOfWorkDrugstoresFormat(Worksheet ws)
+		{
+			int headerRow = 5;
+			ExcelHelper.WriteHeader1(ws, headerRow, 0, "Код", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 1, "Наименование", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 2, "Количество пользователей", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 3, "Количество адресов доставки", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 4, "Регион", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 5, "Обновления (Новый/Старый)", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 6, "Падение обновлений", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 7, "Заказы (Новый/Старый)", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 8, "Падение заказов", true, true);
+
+			ws.Cells.ColumnWidth[0] = 4000;
+			ws.Cells.ColumnWidth[1] = 6000;
+			ws.Cells.ColumnWidth[2] = 4000;
+			ws.Cells.ColumnWidth[3] = 4000;
+			ws.Cells.ColumnWidth[4] = 6000;
+			ws.Cells.ColumnWidth[5] = 6000;
+			ws.Cells.ColumnWidth[6] = 4000;
+			ws.Cells.ColumnWidth[7] = 10000;
+			ws.Cells.ColumnWidth[8] = 4000;
 
 			ws.Cells.Rows[headerRow].Height = 514;
 		}
@@ -123,6 +208,235 @@ namespace AdminInterface.Models
 			return ms.ToArray();
 		}
 
+		public static byte[] ExcelSwitchOffClients(SwitchOffClientsFilter filter)
+		{
+			var wb = new Workbook();
+			var ws = new Worksheet("Список отключенных клиентов");
+
+			int row = 4;
+			int colShift = 0;
+
+			ws.Merge(0, 0, 0, 6);
+
+			ExcelHelper.WriteHeader1(ws, 0, 0, "Список отключенных клиентов", false, true);
+
+			ws.Merge(1, 1, 1, 2);
+			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
+			string regionName;
+			if (filter.Region == null)
+				regionName = "Все";
+			else {
+				regionName = filter.Region.Name;
+			}
+			ExcelHelper.Write(ws, 1, 1, regionName, false);
+
+			ws.Merge(2, 1, 2, 2);
+			ExcelHelper.Write(ws, 2, 0, "Период:", false);
+			if (filter.Period.Begin != filter.Period.End)
+				ExcelHelper.Write(ws, 2, 1,
+					"С " + filter.Period.Begin.ToString("dd.MM.yyyy") + " по " + filter.Period.End.ToString("dd.MM.yyyy"), false);
+			else
+				ExcelHelper.Write(ws, 2, 1, "За " + filter.Period.Begin.ToString("dd.MM.yyyy"), false);
+
+			var reportData = GetExcelSwitchOffClients(filter);
+
+			foreach (var item in reportData) {
+				ExcelHelper.Write(ws, row, colShift + 0, item.ClientId, true);
+				ExcelHelper.Write(ws, row, colShift + 1, item.ClientName, true);
+				ExcelHelper.Write(ws, row, colShift + 2, item.RegionName, true);
+				ExcelHelper.Write(ws, row, colShift + 3, item.LogTime, true);
+				ExcelHelper.Write(ws, row, colShift + 4, item.Comment, true);
+				row++;
+			}
+
+			FormatSwitchOffClients(ws, filter);
+
+			wb.Worksheets.Add(ws);
+			var ms = new MemoryStream();
+			wb.Save(ms);
+
+			return ms.ToArray();
+		}
+
+		public static byte[] ExcelUpdatedAndDidNotDoOrders(UpdatedAndDidNotDoOrdersFilter filter)
+		{
+			var wb = new Workbook();
+			var ws = new Worksheet("Кто обновлялся и не делал заказы");
+
+			int row = 6;
+			int colShift = 0;
+
+			ws.Merge(0, 0, 0, 6);
+
+			ExcelHelper.WriteHeader1(ws, 0, 0, "Кто обновлялся и не делал заказы", false, true);
+
+			ws.Merge(1, 1, 1, 2);
+			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
+			string regionName;
+			if (filter.Region == null)
+				regionName = "Все";
+			else {
+				regionName = filter.Region.Name;
+			}
+			ExcelHelper.Write(ws, 1, 1, regionName, false);
+
+			ws.Merge(2, 1, 2, 2);
+			ExcelHelper.Write(ws, 2, 0, "Период:", false);
+			if (filter.UpdatePeriod.Begin != filter.UpdatePeriod.End)
+				ExcelHelper.Write(ws, 2, 1, "С " + filter.UpdatePeriod.Begin.ToString("dd.MM.yyyy") + " по " + filter.UpdatePeriod.End.ToString("dd.MM.yyyy"), false);
+			else
+				ExcelHelper.Write(ws, 2, 1, "За " + filter.UpdatePeriod.Begin.ToString("dd.MM.yyyy"), false);
+
+			ws.Merge(3, 0, 3, 3);
+			ExcelHelper.Write(ws, 3, 0, "Не делались заказы с: " + filter.OrderDate.ToString("dd.MM.yyyy"), false);
+			//ExcelHelper.Write(ws, 3, 1, , false);
+
+			var reportData = ArHelper.WithSession(s => {
+				filter.Session = s;
+				var result = filter.Find(true);
+				foreach (var updatedAndDidNotDoOrdersField in result) {
+					updatedAndDidNotDoOrdersField.ForExport = true;
+				}
+				return result;
+			});
+
+			foreach (var item in reportData) {
+				ExcelHelper.Write(ws, row, colShift + 0, item.ClientId, true);
+				ExcelHelper.Write(ws, row, colShift + 1, item.ClientName, true);
+				ExcelHelper.Write(ws, row, colShift + 2, item.UserId, true);
+				ExcelHelper.Write(ws, row, colShift + 3, item.UserName, true);
+				ExcelHelper.Write(ws, row, colShift + 4, item.RegionName, true);
+				ExcelHelper.Write(ws, row, colShift + 5, item.Registrant, true);
+				ExcelHelper.Write(ws, row, colShift + 6, item.UpdateDate, true);
+				ExcelHelper.Write(ws, row, colShift + 7, item.LastOrderDate, true);
+				row++;
+			}
+
+			UpdatedAndDidNotDoOrders(ws);
+
+			wb.Worksheets.Add(ws);
+			var ms = new MemoryStream();
+			wb.Save(ms);
+
+			return ms.ToArray();
+		}
+
+
+		public static byte[] ExcelAnalysisOfWorkDrugstores(AnalysisOfWorkDrugstoresFilter filter)
+		{
+			var wb = new Workbook();
+			var ws = new Worksheet("Сравнительный анализ работы аптек");
+
+			int row = 6;
+			int colShift = 0;
+
+			ws.Merge(0, 0, 0, 6);
+
+			ExcelHelper.WriteHeader1(ws, 0, 0, "Сравнительный анализ работы аптек", false, true);
+
+			ws.Merge(1, 1, 1, 2);
+			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
+			string regionName;
+			if (filter.Region == null)
+				regionName = "Все";
+			else {
+				regionName = filter.Region.Name;
+			}
+			ExcelHelper.Write(ws, 1, 1, regionName, false);
+
+			ws.Merge(2, 1, 2, 2);
+			ExcelHelper.Write(ws, 2, 0, "Старый период:", false);
+			if (filter.FistPeriod.Begin != filter.FistPeriod.End)
+				ExcelHelper.Write(ws, 2, 1, "С " + filter.FistPeriod.Begin.ToString("dd.MM.yyyy") + " по " + filter.FistPeriod.End.ToString("dd.MM.yyyy"), false);
+			else
+				ExcelHelper.Write(ws, 2, 1, "За " + filter.FistPeriod.Begin.ToString("dd.MM.yyyy"), false);
+
+			ws.Merge(3, 1, 3, 2);
+			ExcelHelper.Write(ws, 3, 0, "Новый период:", false);
+			if (filter.LastPeriod.Begin != filter.LastPeriod.End)
+				ExcelHelper.Write(ws, 3, 1, "С " + filter.LastPeriod.Begin.ToString("dd.MM.yyyy") + " по " + filter.LastPeriod.End.ToString("dd.MM.yyyy"), false);
+			else
+				ExcelHelper.Write(ws, 3, 1, "За " + filter.LastPeriod.Begin.ToString("dd.MM.yyyy"), false);
+
+			var reportData = ArHelper.WithSession(s => {
+				filter.Session = s;
+				var result = filter.Find(true);
+				foreach (var updatedAndDidNotDoOrdersField in result) {
+					((AnalysisOfWorkFiled)updatedAndDidNotDoOrdersField).ForExport = true;
+				}
+				return result;
+			});
+
+			foreach (AnalysisOfWorkFiled item in reportData) {
+				ExcelHelper.Write(ws, row, colShift + 0, item.Id, true);
+				ExcelHelper.Write(ws, row, colShift + 1, item.Name, true);
+				ExcelHelper.Write(ws, row, colShift + 2, item.UserCount, true);
+				ExcelHelper.Write(ws, row, colShift + 3, item.AddressCount, true);
+				ExcelHelper.Write(ws, row, colShift + 4, item.RegionName, true);
+				ExcelHelper.Write(ws, row, colShift + 5, item.Obn, true);
+				ExcelHelper.Write(ws, row, colShift + 6, item.ProblemObn, true);
+				ExcelHelper.Write(ws, row, colShift + 7, item.Zak, true);
+				ExcelHelper.Write(ws, row, colShift + 8, item.ProblemZak, true);
+				row++;
+			}
+
+			AnalysisOfWorkDrugstoresFormat(ws);
+
+			wb.Worksheets.Add(ws);
+			var ms = new MemoryStream();
+			wb.Save(ms);
+
+			return ms.ToArray();
+		}
+
+		public static byte[] ExcelWhoWasNotUpdated(WhoWasNotUpdatedFilter filter)
+		{
+			var wb = new Workbook();
+			var ws = new Worksheet("Кто не обновлялся с опред. даты");
+
+			int row = 4;
+			int colShift = 0;
+
+			ws.Merge(0, 0, 0, 6);
+
+			ExcelHelper.WriteHeader1(ws, 0, 0, "Кто не обновлялся с опред. даты", false, true);
+
+			ws.Merge(1, 1, 1, 2);
+			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
+			string regionName;
+			if (filter.Region == null)
+				regionName = "Все";
+			else {
+				regionName = filter.Region.Name;
+			}
+			ExcelHelper.Write(ws, 1, 1, regionName, false);
+
+			ws.Merge(2, 1, 2, 2);
+			ExcelHelper.Write(ws, 2, 0, "Нет обновлений с:", false);
+			ExcelHelper.Write(ws, 2, 1, filter.BeginDate.ToString("dd.MM.yyyy"), false);
+
+			var reportData = ArHelper.WithSession(s => filter.SqlQuery2(s, true)).ToList();
+
+			foreach (var item in reportData) {
+				ExcelHelper.Write(ws, row, colShift + 0, item.ClientId, true);
+				ExcelHelper.Write(ws, row, colShift + 1, item.ClientName, true);
+				ExcelHelper.Write(ws, row, colShift + 2, item.UserId, true);
+				ExcelHelper.Write(ws, row, colShift + 3, item.UserName, true);
+				ExcelHelper.Write(ws, row, colShift + 4, item.RegionName, true);
+				ExcelHelper.Write(ws, row, colShift + 5, item.Registrant, true);
+				ExcelHelper.Write(ws, row, colShift + 6, item.UpdateDate, true);
+				row++;
+			}
+
+			FormatWhoWasNotUpdated(ws);
+
+			wb.Worksheets.Add(ws);
+			var ms = new MemoryStream();
+			wb.Save(ms);
+
+			return ms.ToArray();
+		}
+
 		public static byte[] GetCallsHistory(CallRecordFilter filter)
 		{
 			var wb = new Workbook();
@@ -172,18 +486,7 @@ namespace AdminInterface.Models
 			var infos = type.GetProperties();
 			// создаем строку
 			var sheetRow = sheet.CreateRow(row++);
-			// шрифт для заголовков (жирный)
-			var font = book.CreateFont();
-			font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.BOLD;
-			// стиль для заголовков
-			var headerStyle = book.CreateCellStyle();
-			headerStyle.BorderRight = BorderStyle.MEDIUM;
-			headerStyle.BorderLeft = BorderStyle.MEDIUM;
-			headerStyle.BorderBottom = BorderStyle.MEDIUM;
-			headerStyle.BorderTop = BorderStyle.MEDIUM;
-			headerStyle.Alignment = HorizontalAlignment.CENTER;
-			headerStyle.SetFont(font);
-			headerStyle.WrapText = true;
+			var headerStyle = NPOIExcelHelper.GetHeaderStype(book);
 			// выводим наименование отчета
 			var headerCell = sheetRow.CreateCell(0);
 			headerCell.CellStyle = headerStyle;
@@ -215,21 +518,10 @@ namespace AdminInterface.Models
 				cell.SetCellValue(value);
 			}
 			// стиль для ячеек с данными
-			var dataStyle = book.CreateCellStyle();
-			dataStyle.BorderRight = BorderStyle.THIN;
-			dataStyle.BorderLeft = BorderStyle.THIN;
-			dataStyle.BorderBottom = BorderStyle.THIN;
-			dataStyle.BorderTop = BorderStyle.THIN;
-			dataStyle.GetFont(book).Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.None;
+			var dataStyle = NPOIExcelHelper.GetDataStyle(book);
 
 			// стиль для ячеек с данными, выравненный по центру
-			var centerDataStyle = book.CreateCellStyle();
-			centerDataStyle.BorderRight = BorderStyle.THIN;
-			centerDataStyle.BorderLeft = BorderStyle.THIN;
-			centerDataStyle.BorderBottom = BorderStyle.THIN;
-			centerDataStyle.BorderTop = BorderStyle.THIN;
-			centerDataStyle.Alignment = HorizontalAlignment.CENTER;
-			centerDataStyle.GetFont(book).Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.None;
+			var centerDataStyle = NPOIExcelHelper.GetCenterDataStyle(book);
 
 			dateCell.CellStyle = dataStyle;
 			// выводим данные
@@ -260,6 +552,181 @@ namespace AdminInterface.Models
 			sheet.SetAutoFilter(new CellRangeAddress(tableHeaderRow, row, tableHeaderRow, col - 1));
 
 			sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, col - 1));
+
+			var buffer = new MemoryStream();
+			book.Write(buffer);
+			return buffer.ToArray();
+		}
+
+
+		public static byte[] GetClientConditionsMonitoring(ClientConditionsMonitoringFilter filter)
+		{
+			var book = new HSSFWorkbook();
+
+			var sheet = book.CreateSheet("Мониторинг выставления условий клиенту");
+
+			var row = 0;
+			var col = 0;
+			// выбираем данные
+			var report = filter.Find();
+			// создаем строку
+			var sheetRow = sheet.CreateRow(row++);
+			var headerStyle = NPOIExcelHelper.GetHeaderStype(book);
+			// выводим наименование отчета
+			var headerCell = sheetRow.CreateCell(0);
+			headerCell.CellStyle = headerStyle;
+			headerCell.SetCellValue("Мониторинг выставления условий клиенту");
+			// дата построения отчета
+			sheetRow = sheet.CreateRow(row++);
+			var dateCell = sheetRow.CreateCell(0);
+			dateCell.SetCellValue(String.Format("Дата подготовки отчета: {0}", DateTime.Now));
+			// наименование аптеки
+			sheetRow = sheet.CreateRow(row++);
+			dateCell = sheetRow.CreateCell(0);
+			dateCell.SetCellValue(String.Format("Наименование аптеки: {0}", filter.ClientName));
+
+			// добавляем пустую строку перед таблицей
+			sheet.CreateRow(row++);
+			sheetRow = sheet.CreateRow(row++);
+			// заполняем наименования столбцов таблицы
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, "Код поставщика", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 1, "Наименование поставщика", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 2, "Регион", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 3, "Прайс лист", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 4, "Тип", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 5, "Ценовая колонка", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 6, "В работе", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 7, "Подключен к прайсам", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 8, "Наценка", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 9, "Код клиента", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 10, "Код доставки", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 11, "Код оплаты", headerStyle);
+			// стиль для ячеек с данными
+			var dataStyle = NPOIExcelHelper.GetDataStyle(book);
+
+			// стиль для ячеек с данными, выравненный по центру
+			var centerDataStyle = NPOIExcelHelper.GetCenterDataStyle(book);
+
+			ICellStyle LIGHT_ORANGE_STYLE;
+			ICellStyle LIGHT_YELLOW_STYLE;
+			ICellStyle LIGHT_BLUE_STYLE;
+			ICellStyle PINK_STYLE;
+			ICellStyle LIGHT_GREEN_STYLE;
+			ICellStyle LAVENDER_STYLE;
+
+			dateCell.CellStyle = dataStyle;
+			// выводим данные
+			foreach (var monitoringItem in report) {
+				sheetRow = sheet.CreateRow(row++);
+
+				NPOIExcelHelper.FillNewCell(sheetRow, 0, monitoringItem.SupplierCode.ToString(), centerDataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 1, monitoringItem.SupplierName, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 2, monitoringItem.RegionName, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 3, monitoringItem.PriceName, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 4, monitoringItem.PriceType, dataStyle);
+
+				if (monitoringItem.CostCollumn) {
+					LIGHT_ORANGE_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_ORANGE.index);
+					NPOIExcelHelper.FillNewCell(sheetRow, 5, monitoringItem.CostName, LIGHT_ORANGE_STYLE);
+				}
+				else {
+					NPOIExcelHelper.FillNewCell(sheetRow, 5, monitoringItem.CostName, centerDataStyle);
+				}
+
+				NPOIExcelHelper.FillNewCell(sheetRow, 6, !monitoringItem.AvailableForClient ? "Нет" : string.Empty, centerDataStyle);
+
+				if (monitoringItem.NoPriceConnected) {
+					LIGHT_YELLOW_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_YELLOW.index);
+					NPOIExcelHelper.FillNewCell(sheetRow, 7, monitoringItem.CountAvailableForClient, LIGHT_YELLOW_STYLE);
+				}
+				else {
+					NPOIExcelHelper.FillNewCell(sheetRow, 7, monitoringItem.CountAvailableForClient, centerDataStyle);
+				}
+
+				if (monitoringItem.PriceMarkupStyle) {
+					LIGHT_BLUE_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_BLUE.index);
+					NPOIExcelHelper.FillNewCell(sheetRow, 8, monitoringItem.PriceMarkup > 0 ? monitoringItem.PriceMarkup.ToString() : string.Empty, LIGHT_BLUE_STYLE);
+				}
+				else {
+					NPOIExcelHelper.FillNewCell(sheetRow, 8, monitoringItem.PriceMarkup > 0 ? monitoringItem.PriceMarkup.ToString() : string.Empty, centerDataStyle);
+				}
+
+				if (monitoringItem.ClientCodeStyle) {
+					PINK_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.PINK.index);
+					NPOIExcelHelper.FillNewCell(sheetRow, 9, monitoringItem.SupplierClientId, PINK_STYLE);
+				}
+				else {
+					NPOIExcelHelper.FillNewCell(sheetRow, 9, monitoringItem.SupplierClientId, centerDataStyle);
+				}
+
+				if (monitoringItem.DeliveryStyle) {
+					LIGHT_GREEN_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_GREEN.index);
+					NPOIExcelHelper.FillNewCell(sheetRow, 10, monitoringItem.DeliveryStyle ? monitoringItem.SupplierDeliveryAdresses.Replace("</br>", Environment.NewLine) : string.Empty, LIGHT_GREEN_STYLE);
+				}
+				else {
+					NPOIExcelHelper.FillNewCell(sheetRow, 10, monitoringItem.DeliveryStyle ? monitoringItem.SupplierDeliveryAdresses.Replace("</br>", Environment.NewLine) : string.Empty, centerDataStyle);
+				}
+
+				if (!string.IsNullOrEmpty(monitoringItem.SupplierDeliveryAdresses)) {
+					var rows = monitoringItem.SupplierDeliveryAdresses.Split(new[] { "</br>" }, StringSplitOptions.RemoveEmptyEntries);
+					sheetRow.Height = (short)(sheetRow.Height * rows.Count());
+				}
+
+				if (monitoringItem.PaymentCodeStyle) {
+					LAVENDER_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LAVENDER.index);
+					NPOIExcelHelper.FillNewCell(sheetRow, 11, monitoringItem.SupplierPaymentId, LAVENDER_STYLE);
+				}
+				else {
+					NPOIExcelHelper.FillNewCell(sheetRow, 11, monitoringItem.SupplierPaymentId, centerDataStyle);
+				}
+			}
+			// устанавливаем ширину столбцов
+			for(var i = col; i >= 0; i--) {
+				sheet.SetColumnWidth(i, 3500);
+			}
+			sheet.SetColumnWidth(0, sheet.GetColumnWidth(1) * 4);
+			sheet.SetColumnWidth(1, sheet.GetColumnWidth(2) * 4);
+			sheet.SetColumnWidth(3, sheet.GetColumnWidth(3) * 2);
+			sheet.SetColumnWidth(5, sheet.GetColumnWidth(5) * 4);
+			sheet.SetColumnWidth(9, sheet.GetColumnWidth(9) * 2);
+			sheet.SetColumnWidth(10, sheet.GetColumnWidth(10) * 6);
+			sheet.SetColumnWidth(11, sheet.GetColumnWidth(11) * 4);
+
+
+			sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, 11));
+			var dataRowCount = row;
+
+			for (int i = 1; i < 7; i++) {
+				sheet.AddMergedRegion(new CellRangeAddress(dataRowCount + i, dataRowCount + i, 1, 11));
+			}
+
+			dataStyle = book.CreateCellStyle();
+			dataStyle.GetFont(book).Boldweight = (short)FontBoldWeight.None;
+
+			sheet.CreateRow(row++);
+			sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_ORANGE.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Если у поставщика менее 30% клиентов подключены к базовой ценовой колонке и данной аптеке назначена базовая", dataStyle);
+			sheetRow = sheet.CreateRow(row++);
+
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_YELLOW.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Не подключен ни к одному из проайсов", dataStyle);
+			sheetRow = sheet.CreateRow(row++);
+
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_BLUE.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Более половины аптек, подключенных к прайсу имеют наценку, отличную от Нуля, а для рассматриваемой аптеки наценка 0", dataStyle);
+			sheetRow = sheet.CreateRow(row++);
+
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.PINK.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Более половины аптек, подключенных к прайсу имеют код клиента, а для рассматриваемой аптеки этот код не прописан", dataStyle);
+			sheetRow = sheet.CreateRow(row++);
+
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_GREEN.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Более половины аптек, подключенных к прайсу имеют коды адресов доставки, а для рассматриваемой аптеки этот код не прописан, либо для рассмастриваемой аптеки прописаны не все коды адресов доставки", dataStyle);
+			sheetRow = sheet.CreateRow(row++);
+
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LAVENDER.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Более половины аптек, подключенных к прайсу имеют код оплаты, а для рассматриваемой аптеки этот код не прописан", dataStyle);
 
 			var buffer = new MemoryStream();
 			book.Write(buffer);
