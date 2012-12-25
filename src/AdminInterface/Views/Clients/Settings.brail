@@ -161,7 +161,6 @@
 						${app.Edit("drugstore.SendWaybillsFromClient")}<br>
 						${app.Edit("drugstore.ShowAdvertising")}<br>
 						${app.Edit("drugstore.SendRetailMarkup")}<br>
-						${app.Edit("drugstore.ParseWaybills")}<br>
 						${app.Edit("drugstore.EnableImpersonalPrice")}<br>
 						${app.Edit("drugstore.ShowCertificatesWithoutRefSupplier")}<br>
 
