@@ -216,3 +216,7 @@ table thead.CenterHead th
 .ExcludeFilesForm input[type="text"] {
 	width: 300px;
 }
+
+.ExcelLink {
+	text-align: right;
+}

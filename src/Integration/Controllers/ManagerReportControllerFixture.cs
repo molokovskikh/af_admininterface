@@ -48,5 +48,61 @@ namespace Integration.Controllers
 			Assert.That(ws.Cells.GetRow(3).GetCell(5).Value, Is.EqualTo("Дата регистрации"));
 			Assert.That(ws.Cells.GetRow(3).GetCell(6).Value, Is.EqualTo("С этим адресом зарегистрированы пользователи, код пользователя (комментарий к пользователю)"));
 		}
+
+		[Test]
+		public void ExportSwitchOffClientsTest()
+		{
+			var filter = new SwitchOffClientsFilter();
+			var buf = ExportModel.ExcelSwitchOffClients(filter);
+			var stream = new MemoryStream(buf);
+			var wb = Workbook.Load(stream);
+			var ws = wb.Worksheets.First();
+			Assert.That(ws.Name, Is.StringContaining("Список отключенных клиентов"));
+		}
+
+		[Test]
+		public void ExportWhoWasNotUpdatedFilterTest()
+		{
+			var filter = new WhoWasNotUpdatedFilter();
+			var buf = ExportModel.ExcelWhoWasNotUpdated(filter);
+			var stream = new MemoryStream(buf);
+			var wb = Workbook.Load(stream);
+			var ws = wb.Worksheets.First();
+			Assert.That(ws.Name, Is.StringContaining("Кто не обновлялся с опред. даты"));
+		}
+
+		[Test]
+		public void ExportUpdatedAndDidNotDoOrdersFilterTest()
+		{
+			var filter = new UpdatedAndDidNotDoOrdersFilter();
+			var buf = ExportModel.ExcelUpdatedAndDidNotDoOrders(filter);
+			var stream = new MemoryStream(buf);
+			var wb = Workbook.Load(stream);
+			var ws = wb.Worksheets.First();
+			Assert.That(ws.Name, Is.StringContaining("Кто обновлялся и не делал заказы"));
+		}
+
+		[Test]
+		public void ExportAnalysisOfWorkDrugstoresTest()
+		{
+			var filter = new AnalysisOfWorkDrugstoresFilter();
+			var buf = ExportModel.ExcelAnalysisOfWorkDrugstores(filter);
+			var stream = new MemoryStream(buf);
+			var wb = Workbook.Load(stream);
+			var ws = wb.Worksheets.First();
+			Assert.That(ws.Name, Is.StringContaining("Сравнительный анализ работы аптек"));
+		}
+
+		[Test]
+		public void ExportClientConditionsMonitoringTest()
+		{
+			var filter = new ClientConditionsMonitoringFilter();
+			filter.Session = session;
+			var buf = ExportModel.GetClientConditionsMonitoring(filter);
+			var stream = new MemoryStream(buf);
+			var wb = Workbook.Load(stream);
+			var ws = wb.Worksheets.First();
+			Assert.That(ws.Name, Is.StringContaining("Мониторинг выставления условий"));
+		}
 	}
 }

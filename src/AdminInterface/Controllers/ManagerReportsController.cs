@@ -86,6 +86,47 @@ namespace AdminInterface.Controllers
 			PropertyBag["Clients"] = filter.Find(DbSession);
 		}
 
+		public void ExcelSwitchOffClients()
+		{
+			var filter = new SwitchOffClientsFilter();
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			this.RenderFile("Список_отключенных_клиентов.xls", ExportModel.ExcelSwitchOffClients(filter));
+		}
+
+		public void ExcelWhoWasNotUpdated()
+		{
+			var filter = new WhoWasNotUpdatedFilter();
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			this.RenderFile("Кто_не_обновлялся_с_опред._даты.xls", ExportModel.ExcelWhoWasNotUpdated(filter));
+		}
+
+		public void ExcelUpdatedAndDidNotDoOrders()
+		{
+			var filter = new UpdatedAndDidNotDoOrdersFilter();
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			this.RenderFile("Кто_обновлялся_и_не_делал_заказы.xls", ExportModel.ExcelUpdatedAndDidNotDoOrders(filter));
+		}
+
+		public void ExcelAnalysisOfWorkDrugstores()
+		{
+			var filter = new AnalysisOfWorkDrugstoresFilter();
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			this.RenderFile("Сравнительный_анализ_работы_аптек.xls", ExportModel.ExcelAnalysisOfWorkDrugstores(filter));
+		}
+
+		public void ExcelClientConditionsMonitoring()
+		{
+			var filter = new ClientConditionsMonitoringFilter();
+			filter.Session = DbSession;
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			this.RenderFile("Мониторинг_выставления_условий_клиенту.xls", ExportModel.GetClientConditionsMonitoring(filter));
+		}
+
 		public void WhoWasNotUpdated()
 		{
 			var filter = new WhoWasNotUpdatedFilter();

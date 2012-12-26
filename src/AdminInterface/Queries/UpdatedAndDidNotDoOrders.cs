@@ -19,7 +19,12 @@ namespace AdminInterface.ManagerReportsFilters
 		[Display(Name = "Код клиента", Order = 0)]
 		public string ClientId
 		{
-			get { return Link(_clientId, "Clients", new Tuple<string, object>("Id", _clientId)); }
+			get
+			{
+				if (ForExport)
+					return _clientId;
+				return Link(_clientId, "Clients", new Tuple<string, object>("Id", _clientId));
+			}
 			set { _clientId = value; }
 		}
 
@@ -28,7 +33,12 @@ namespace AdminInterface.ManagerReportsFilters
 		[Display(Name = "Наименование клиента", Order = 1)]
 		public string ClientName
 		{
-			get { return Link(_clientName, "Clients", new Tuple<string, object>("Id", _clientId)); }
+			get
+			{
+				if (ForExport)
+					return _clientName;
+				return Link(_clientName, "Clients", new Tuple<string, object>("Id", _clientId));
+			}
 			set { _clientName = value; }
 		}
 
@@ -42,7 +52,12 @@ namespace AdminInterface.ManagerReportsFilters
 		[Display(Name = "Комментарий пользователя", Order = 3)]
 		public string UserName
 		{
-			get { return Link(_userName, "Users", new Tuple<string, object>("Id", UserId)); }
+			get
+			{
+				if (ForExport)
+					return _userName;
+				return Link(_userName, "Users", new Tuple<string, object>("Id", UserId));
+			}
 			set { _userName = value; }
 		}
 
@@ -52,6 +67,8 @@ namespace AdminInterface.ManagerReportsFilters
 		public string Registrant { get; set; }
 		[Display(Name = "Дата последнего заказа", Order = 7)]
 		public string LastOrderDate { get; set; }
+
+		public bool ForExport;
 
 		[Style]
 		public virtual bool IsOldUserUpdate
@@ -66,6 +83,11 @@ namespace AdminInterface.ManagerReportsFilters
 		[Description("Не делались заказы с")]
 		public DateTime OrderDate { get; set; }
 		public DatePeriod UpdatePeriod { get; set; }
+
+		public IList<UpdatedAndDidNotDoOrdersField> Find()
+		{
+			return Find(false);
+		}
 
 		public ISession Session { get; set; }
 		public bool LoadDefault { get; set; }
@@ -86,7 +108,8 @@ namespace AdminInterface.ManagerReportsFilters
 		}
 
 		//Здесь join Customers.UserAddresses ua on ua.UserId = u.Id, чтобы отсеять пользователей, у которых нет адресов доставки.
-		public IList<UpdatedAndDidNotDoOrdersField> Find()
+
+		public IList<UpdatedAndDidNotDoOrdersField> Find(bool forExport)
 		{
 			var regionMask = SecurityContext.Administrator.RegionMask;
 			if (Region != null)
@@ -129,6 +152,8 @@ order by {0} {1}
 				.ToList<UpdatedAndDidNotDoOrdersField>();
 
 			RowsCount = result.Count;
+			if (forExport)
+				return result.ToList();
 			return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
 		}
 	}

@@ -41,7 +41,7 @@ namespace AdminInterface.ManagerReportsFilters
 			Period = new DatePeriod(DateTime.Now.AddMonths(-1), DateTime.Now);
 		}
 
-		protected DetachedCriteria GetCriteria()
+		public DetachedCriteria GetCriteria()
 		{
 			var regionMask = SecurityContext.Administrator.RegionMask;
 			if (Region != null)
@@ -63,10 +63,15 @@ namespace AdminInterface.ManagerReportsFilters
 			return criteria;
 		}
 
-		public IList<SwitchOffCounts> Find(ISession session)
+		public IList<SwitchOffCounts> Find(ISession session, bool forExcel = false)
 		{
 			var criteria = GetCriteria();
-			var result = AcceptPaginator<SwitchOffCounts>(criteria, session);
+			IList<SwitchOffCounts> result = null;
+			if (forExcel)
+				result = criteria.GetExecutableCriteria(session).ToList<SwitchOffCounts>();
+			else {
+				result = AcceptPaginator<SwitchOffCounts>(criteria, session);
+			}
 
 			var logsRecord = result.Select(r =>
 				session.Query<PayerAuditRecord>().Where(p =>

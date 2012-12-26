@@ -36,7 +36,7 @@ namespace AdminInterface.ManagerReportsFilters
 			SortBy = "ClientName";
 		}
 
-		public IList<WhoWasNotUpdatedField> SqlQuery2(ISession session)
+		public IList<WhoWasNotUpdatedField> SqlQuery2(ISession session, bool forExcel = false)
 		{
 			var regionMask = SecurityContext.Administrator.RegionMask;
 			if (Region != null)
@@ -159,7 +159,13 @@ order by {0} {1}
 				.ToList<WhoWasNotUpdatedField>();
 
 			RowsCount = result.Count;
-			return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
+
+			if (forExcel) {
+				return result.ToList();
+			}
+			else {
+				return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
+			}
 		}
 	}
 }
