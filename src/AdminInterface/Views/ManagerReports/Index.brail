@@ -14,5 +14,6 @@
 		<li>${app.LinkTo("Неразобранные накладные", "Logs", "Documents", {"filter.OnlyNoParsed": @true})}</li>
 		<li>${app.LinkTo("Мониторинг выставления условий клиенту", @ManagerReports, @ClientConditionsMonitoring)}</li>
 		<li>${app.LinkTo("Отчет о состоянии формализуемых полей в прайс-листах поставщиков", @ManagerReports, @FormPosition)}</li>
+		<li>${app.LinkTo("Отчет о состоянии неформализованных накладных по поставщикам", @ManagerReports, @NotParcedWaybills)}</li>
 	</ul>
 </div>

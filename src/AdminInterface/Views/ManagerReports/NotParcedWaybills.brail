@@ -1,7 +1,7 @@
 ﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
-	Клиенты и адреса в регионе, по которым не принимаются накладные
+	Отчет о состоянии неформализованных накладных по поставщикам
 <% end %>
  ${app.JS("ManagerReport.js")}
 ${app.BeginFormFor("filter")}

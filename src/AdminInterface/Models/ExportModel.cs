@@ -175,7 +175,7 @@ namespace AdminInterface.Models
 			return style;
 		}
 
-		private static ICellStyle GetDataStyle(HSSFWorkbook book, bool isCenter = false)
+		private static ICellStyle GetDataStyle(HSSFWorkbook book, bool isCenter = false, bool isWrap = true)
 		{
 			var style = book.CreateCellStyle();
 			style.BorderRight = BorderStyle.THIN;
@@ -183,7 +183,8 @@ namespace AdminInterface.Models
 			style.BorderBottom = BorderStyle.THIN;
 			style.BorderTop = BorderStyle.THIN;
 			style.GetFont(book).Boldweight = (short)FontBoldWeight.None;
-			style.WrapText = true;
+			if(isWrap)
+				style.WrapText = true;
 			if(isCenter)
 				style.Alignment = HorizontalAlignment.CENTER;
 			return style;
@@ -208,14 +209,7 @@ namespace AdminInterface.Models
 			var font = book.CreateFont();
 			font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.BOLD;
 			// стиль для заголовков
-			var headerStyle = book.CreateCellStyle();
-			headerStyle.BorderRight = BorderStyle.MEDIUM;
-			headerStyle.BorderLeft = BorderStyle.MEDIUM;
-			headerStyle.BorderBottom = BorderStyle.MEDIUM;
-			headerStyle.BorderTop = BorderStyle.MEDIUM;
-			headerStyle.Alignment = HorizontalAlignment.CENTER;
-			headerStyle.SetFont(font);
-			headerStyle.WrapText = true;
+			var headerStyle = GetHeaderStyle(book);
 			// выводим наименование отчета
 			var headerCell = sheetRow.CreateCell(0);
 			headerCell.CellStyle = headerStyle;
@@ -247,21 +241,10 @@ namespace AdminInterface.Models
 				cell.SetCellValue(value);
 			}
 			// стиль для ячеек с данными
-			var dataStyle = book.CreateCellStyle();
-			dataStyle.BorderRight = BorderStyle.THIN;
-			dataStyle.BorderLeft = BorderStyle.THIN;
-			dataStyle.BorderBottom = BorderStyle.THIN;
-			dataStyle.BorderTop = BorderStyle.THIN;
-			dataStyle.GetFont(book).Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.None;
+			var dataStyle = GetDataStyle(book, isWrap: false);
 
 			// стиль для ячеек с данными, выравненный по центру
-			var centerDataStyle = book.CreateCellStyle();
-			centerDataStyle.BorderRight = BorderStyle.THIN;
-			centerDataStyle.BorderLeft = BorderStyle.THIN;
-			centerDataStyle.BorderBottom = BorderStyle.THIN;
-			centerDataStyle.BorderTop = BorderStyle.THIN;
-			centerDataStyle.Alignment = HorizontalAlignment.CENTER;
-			centerDataStyle.GetFont(book).Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.None;
+			var centerDataStyle = GetDataStyle(book, true, false);
 
 			dateCell.CellStyle = dataStyle;
 			// выводим данные
@@ -325,8 +308,8 @@ namespace AdminInterface.Models
 			sheetRow = sheet.CreateRow(row++);
 			dateCell = sheetRow.CreateCell(0);
 			dateCell.SetCellValue(String.Format("Период: с {0} по {1}",
-				filter.Period.Begin.ToString("hh.MM.yyyy"),
-				filter.Period.End.ToString("hh.MM.yyyy")));
+				filter.Period.Begin.ToString("dd.MM.yyyy"),
+				filter.Period.End.ToString("dd.MM.yyyy")));
 			// добавляем пустую строку перед таблицей
 			sheet.CreateRow(row++);
 			var tableHeaderRow = row;

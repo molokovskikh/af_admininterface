@@ -243,7 +243,7 @@ namespace AdminInterface.Controllers
 			var result = ExportModel.GetNotParcedWaybills(filter);
 			Response.Clear();
 			Response.AppendHeader("Content-Disposition",
-				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Отчет о состоянии формализуемых полей.xls")));
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Отчет о состоянии неформализованных накладных.xls")));
 			Response.ContentType = "application/vnd.ms-excel";
 			Response.OutputStream.Write(result, 0, result.Length);
 		}
