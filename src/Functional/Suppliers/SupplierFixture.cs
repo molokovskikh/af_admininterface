@@ -220,5 +220,18 @@ Where pc.PriceCode = :PriceId1")
 			Click("Удалить");
 			AssertText("Вы уверены, что хотите удалить маску \"1234\" ?");
 		}
+
+		[Test]
+		public void SetAllWorkRegionTest()
+		{
+			Open(user);
+			browser.TextField(Find.ByName("user.Name")).Value = "Тестовый";
+			browser.CheckBox(Find.ByName("WorkRegions[1]")).Checked = true;
+			Click("Сохранить");
+			AssertText("$$$Изменено 'Регионы работы' Удалено 'Все регионы' Добавлено 'Воронеж'");
+			browser.CheckBox(Find.ByName("WorkRegions[0]")).Checked = true;
+			Click("Сохранить");
+			AssertText("$$$Изменено 'Регионы работы' Удалено 'Воронеж' Добавлено 'Все регионы'");
+		}
 	}
 }
