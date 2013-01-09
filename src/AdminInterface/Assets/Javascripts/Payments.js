@@ -198,4 +198,10 @@ $(function () {
 			triggers.addClass("HideVisible");
 		}
 	});
+
+	$("form#MessagesForm").validate({
+		rules: {
+			"messageText": { "required": true, "validateForbiddenSymbols": true }
+		}
+	});
 });
