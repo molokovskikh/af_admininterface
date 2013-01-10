@@ -38,7 +38,7 @@ freePeriodEnd = (url, next, cancel) ->
 	showForm(url, next, cancel, form)
 
 addComment = (url, next, cancel) ->
-	form = $("<form><div><label>Введите причину отключения</label><input id='AddCommentField' name='AddComment' class='required' ></div></form>")
+	form = $("<form onsubmit='return false;'><div><label>Введите причину отключения</label><input id='AddCommentField' name='AddComment' class='required' ></div></form>")
 	showForm(url, next, cancel, form)
 
 requests["FreePeriodEnd"] = freePeriodEnd

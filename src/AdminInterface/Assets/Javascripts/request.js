@@ -50,8 +50,8 @@
     return showForm(url, next, cancel, form);
   };
   addComment = function(url, next, cancel) {
-    var form;
-    form = $("<form><div><label>Введите причину отключения</label><input id='AddCommentField' name='AddComment' class='required' ></div></form>");
+	var form;
+	form = $("<form onsubmit='return false;'><div><label>Введите причину отключения</label><input id='AddCommentField' name='AddComment' class='required' ></div></form>");
     return showForm(url, next, cancel, form);
   };
   requests["FreePeriodEnd"] = freePeriodEnd;
