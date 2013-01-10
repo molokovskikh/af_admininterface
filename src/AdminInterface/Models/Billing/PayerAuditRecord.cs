@@ -79,7 +79,9 @@ namespace AdminInterface.Models.Billing
 			set
 			{
 				_message = value;
-				if (_message != null && _message.Substring(0, 3).Contains("$$$"))
+				if (_message != null
+					&& _message.Length > 3
+					&& _message.Substring(0, 3).Contains("$$$"))
 					_message = _message.Remove(0, 3);
 			}
 		}

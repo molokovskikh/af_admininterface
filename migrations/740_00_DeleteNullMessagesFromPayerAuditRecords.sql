@@ -1,0 +1,1 @@
+﻿delete FROM billing.payerauditrecords where message is null;
