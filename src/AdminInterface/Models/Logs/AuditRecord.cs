@@ -85,13 +85,6 @@ namespace AdminInterface.Models.Logs
 				Type = LogObjectType.Address;
 				Name = address.Value;
 			}
-			else if (entity is SmartOrderRules) {
-				var client = ((SmartOrderRules)entity).Settings.Client;
-				ObjectId = client.Id;
-				Service = client;
-				Type = LogObjectType.Client;
-				Name = client.Name;
-			}
 			else {
 				throw new Exception(String.Format("Не знаю как делать сообщения для {0}", entity));
 			}
@@ -146,6 +139,8 @@ namespace AdminInterface.Models.Logs
 		{
 			get
 			{
+				if(String.IsNullOrEmpty(Message))
+					return "";
 				if (IsHtml)
 					return Message;
 				return AppealHelper.TnasformRedmineToLink(ViewHelper.FormatMessage(Message));
@@ -181,6 +176,8 @@ namespace AdminInterface.Models.Logs
 		{
 			get
 			{
+				if(String.IsNullOrEmpty(Message))
+					return false;
 				return Message.Contains("$$$Клиент включен")
 					|| Message.Contains("$$$Клиент отключен")
 					|| Message.Contains("$$$Изменено 'Включен'");

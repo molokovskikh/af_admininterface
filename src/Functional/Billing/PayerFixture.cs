@@ -81,5 +81,17 @@ namespace Functional.Billing
 			AssertText("Нет");
 			Click("Да");
 		}
+
+		[Test]
+		public void NotSendEmptyMessageTest()
+		{
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
+			Open(payer);
+			browser.Button(Find.ByValue("Принять")).Click();
+			AssertText("Это поле необходимо заполнить.");
+			browser.TextField(Find.ByName("messageText")).TypeText("Тестовое сообщение");
+			browser.Button(Find.ByValue("Принять")).Click();
+			AssertText("Тестовое сообщение");
+		}
 	}
 }
