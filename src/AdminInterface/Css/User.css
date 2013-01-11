@@ -220,3 +220,8 @@ table thead.CenterHead th
 .ExcelLink {
 	text-align: right;
 }
+
+.subHeadTable {
+	font-weight: bold;
+	text-align: center;
+}
