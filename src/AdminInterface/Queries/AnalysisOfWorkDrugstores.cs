@@ -139,7 +139,49 @@ namespace AdminInterface.ManagerReportsFilters
 		public ISession Session { get; set; }
 		public bool LoadDefault { get; set; }
 
-		public string ClientTypeSqlPart = @"insert into Customers.Updates
+		public string ClientTypeSqlPart = @"
+
+DROP TEMPORARY TABLE IF EXISTS orders.OrdersSumFirst;
+
+CREATE TEMPORARY TABLE orders.OrdersSumFirst (
+ClientId INT unsigned,
+ClientSum decimal(14,2)) engine=MEMORY;
+
+insert into orders.OrdersSumFirst
+SELECT
+	oh1.clientcode,
+	ROUND(sum(cost*quantity),2)
+FROM
+	orders.ordershead oh1,
+	orders.orderslist ol1
+WHERE
+	writetime BETWEEN :FistPeriodStart AND :FistPeriodEnd
+	AND ol1.orderid = oh1.rowid
+	AND oh1.RegionCode = :regionCode
+ group by oh1.clientcode;
+
+
+DROP TEMPORARY TABLE IF EXISTS orders.OrdersSumLast;
+
+CREATE TEMPORARY TABLE orders.OrdersSumLast (
+ClientId INT unsigned,
+ClientSum decimal(14,2)) engine=MEMORY;
+
+insert into orders.OrdersSumLast
+SELECT
+	oh1.clientcode,
+	ROUND(sum(cost*quantity),2)
+FROM
+	orders.ordershead oh1,
+	orders.orderslist ol1
+WHERE
+	writetime BETWEEN :LastPeriodStart AND :LastPeriodEnd
+	AND ol1.orderid = oh1.rowid
+	AND oh1.RegionCode = :regionCode
+ group by oh1.clientcode;
+
+
+insert into Customers.Updates
 SELECT cd.id,
 cd.name,
 reg.Region as RegionName,
@@ -161,31 +203,20 @@ reg.Region as RegionName,
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
 ) LastWeekObn,
-(SELECT ROUND(sum(cost*quantity), 2)
-	FROM orders.ordershead oh1,
-	orders.orderslist ol1
-	WHERE writetime BETWEEN :FistPeriodStart AND :FistPeriodEnd
-	AND ol1.orderid = oh1.rowid
-	AND oh1.clientcode = cd.id
-	AND oh1.RegionCode = :regionCode
-) CurWeekZak,
-(SELECT ROUND(sum(cost*quantity), 2)
-	FROM orders.ordershead oh2,
-	orders.orderslist ol2
-	WHERE writetime BETWEEN :LastPeriodStart AND :LastPeriodEnd
-	AND ol2.orderid = oh2.rowid
-	AND oh2.clientcode = cd.id
-	AND oh2.RegionCode = :regionCode
-) LastWeekZak
+osf.ClientSum as CurWeekZak,
+osl.ClientSum as LastWeekZak
+
 FROM customers.Clients Cd
-left join usersettings.RetClientsSet Rcs on rcs.clientcode = cd.id
-left join farm.Regions reg on reg.RegionCode = Cd.regioncode
+	join orders.OrdersSumFirst osf on osf.ClientId = cd.Id
+	join orders.OrdersSumLast osl on osl.ClientId = cd.Id
+	left join usersettings.RetClientsSet Rcs on rcs.clientcode = cd.id
+	left join farm.Regions reg on reg.RegionCode = Cd.regioncode
 WHERE
-cd.regioncode & :regionCode > 0
-{0}
-And cd.Status = 1
-AND rcs.serviceclient = 0
-AND rcs.invisibleonfirm = 0;";
+	cd.regioncode & :regionCode > 0
+	{0}
+	And cd.Status = 1
+	AND rcs.serviceclient = 0
+	AND rcs.invisibleonfirm = 0;";
 
 		public string UserTypeSqlPart = @"insert into Customers.Updates
 SELECT u.id,
