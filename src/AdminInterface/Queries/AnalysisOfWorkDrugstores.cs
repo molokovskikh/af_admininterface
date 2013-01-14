@@ -207,8 +207,8 @@ osf.ClientSum as CurWeekZak,
 osl.ClientSum as LastWeekZak
 
 FROM customers.Clients Cd
-	join orders.OrdersSumFirst osf on osf.ClientId = cd.Id
-	join orders.OrdersSumLast osl on osl.ClientId = cd.Id
+	left join orders.OrdersSumFirst osf on osf.ClientId = cd.Id
+	left join orders.OrdersSumLast osl on osl.ClientId = cd.Id
 	left join usersettings.RetClientsSet Rcs on rcs.clientcode = cd.id
 	left join farm.Regions reg on reg.RegionCode = Cd.regioncode
 WHERE
