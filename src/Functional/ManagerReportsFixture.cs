@@ -127,7 +127,7 @@ namespace Functional
 		[Test]
 		public void AnalisOfWorkTest()
 		{
-			var client = session.Query<Client>().First();
+			var client = DataMother.CreateTestClientWithAddressAndUser();
 			var user = client.Users.First();
 			var address = client.Addresses.First();
 			user.AvaliableAddresses.Add(address);

@@ -255,5 +255,43 @@ WHERE AddressId = :AddressId
 				.SetParameter("ClientId", clientId)
 				.UniqueResult()));
 		}
+
+		[Test]
+		public void AddMaxOrdersSumTest()
+		{
+			var address = client.AddAddress("Тестовый адрес");
+			address.MaxDailyOrdersSum = 0;
+			session.Save(address);
+			Open(address);
+			AssertText("Проверять максимальный дневной заказ");
+			AssertText("Максимальная сумма заказа за 1 день, руб.:");
+			Assert.That(browser.CheckBox("address_CheckDailyOrdersSum").Checked, Is.False);
+			browser.CheckBox("address_CheckDailyOrdersSum").Checked = true;
+			browser.TextField("address_MaxDailyOrdersSum").Value = "100";
+			Click("Сохранить");
+			AssertText("Сохранено");
+			Open(address);
+			Assert.That(browser.CheckBox("address_CheckDailyOrdersSum").Checked, Is.True);
+			Assert.That(browser.TextField("address_MaxDailyOrdersSum").Value, Is.EqualTo("100"));
+		}
+
+		[Test]
+		public void CreateAddressWithMaxOrdersSum()
+		{
+			browser.Link(Find.ByText("Новый адрес доставки")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Новый адрес доставки"));
+			browser.CheckBox("address_CheckDailyOrdersSum").Checked = true;
+			browser.TextField("address_MaxDailyOrdersSum").Value = "100";
+			browser.TextField(Find.ByName("address.Value")).TypeText("тестовый адрес");
+			browser.Button(Find.ByValue("Создать")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
+
+			session.Refresh(client);
+			Assert.That(client.Addresses.Count, Is.EqualTo(1), "не создали адресс доставки");
+			var address = client.Addresses.First();
+			Assert.That(address.Value, Is.EqualTo("тестовый адрес"));
+			Assert.That(address.MaxDailyOrdersSum, Is.EqualTo(100));
+			Assert.That(address.CheckDailyOrdersSum, Is.True);
+		}
 	}
 }
