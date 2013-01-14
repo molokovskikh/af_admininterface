@@ -59,6 +59,12 @@ namespace AdminInterface.Models
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
+		[Property, Description("Проверять максимальный дневной заказ")]
+		public virtual bool CheckDailyOrdersSum { get; set; }
+
+		[Property, Description("Максимальная сумма заказа за 1 день, руб.:"), ValidateInteger]
+		public virtual int MaxDailyOrdersSum { get; set; }
+
 		[Property("Address"), Description("Адрес"), Auditable, ValidateNonEmpty]
 		public virtual string Value { get; set; }
 
