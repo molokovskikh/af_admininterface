@@ -172,8 +172,10 @@ namespace AdminInterface.Controllers
 		public void SendMessage(uint BillingCode, string messageText)
 		{
 			var payer = DbSession.Get<Payer>(BillingCode);
-			var message = new PayerAuditRecord(payer, messageText);
-			DbSession.Save(message);
+			if (!String.IsNullOrEmpty(messageText)) {
+				var message = new PayerAuditRecord(payer, messageText);
+				DbSession.Save(message);
+			}
 			RedirectToReferrer();
 		}
 

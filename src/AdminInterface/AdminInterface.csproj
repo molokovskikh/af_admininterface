@@ -168,6 +168,7 @@
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
+    <Compile Include="Helpers\NPOIExcelHelper.cs" />
     <Compile Include="Models\Core.cs" />
     <Compile Include="Models\ProducerSynonym.cs" />
     <Compile Include="Models\ProductSynonym.cs" />
@@ -530,6 +531,7 @@
     <Content Include="Views\ManagerReports\SimpleTable.brail" />
     <Content Include="Views\ManagerReports\FormPosition.brail" />
     <Content Include="Views\ManagerReports\NotParcedWaybills.brail" />
+    <Content Include="Views\Monitoring\InboundPriceItemsList.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />
@@ -789,7 +791,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>58801</DevelopmentServerPort>
+          <DevelopmentServerPort>60927</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

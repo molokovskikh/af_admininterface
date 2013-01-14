@@ -48,7 +48,6 @@ namespace AdminInterface.Models
 
 		public DrugstoreSettings()
 		{
-			ParseWaybills = true;
 			ShowAdvertising = true;
 			EnableSmartOrder = true;
 		}
@@ -128,9 +127,6 @@ namespace AdminInterface.Models
 
 		[Property, Description("Передавать розничную цену (работа по договору комиссии)"), Auditable]
 		public virtual bool SendRetailMarkup { get; set; }
-
-		[Property, Description("Разбирать накладные"), Auditable]
-		public virtual bool ParseWaybills { get; set; }
 
 		[Property, Description("Проверять максимальный недельный заказ"), Auditable]
 		public virtual bool CheckWeeklyOrdersSum { get; set; }

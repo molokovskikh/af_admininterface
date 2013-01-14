@@ -268,6 +268,20 @@ namespace Functional.Billing
 		}
 
 		[Test]
+		public void NotSubmitInCommentDialogTest()
+		{
+			var clientStatus = browser.Css(String.Format("#ClientStatus{0}", client.Id));
+			Assert.IsTrue(clientStatus.Checked);
+			clientStatus.Click();
+			((TextField)browser.Css(".ui-dialog-content #AddCommentField")).TypeText("TestComment");
+			browser.Eval("$('input#AddCommentField').trigger($.Event( 'keydown', {which:$.ui.keyCode.ENTER, keyCode:$.ui.keyCode.ENTER}));");
+			Click("Продолжить");
+			Assert.IsFalse(clientStatus.Checked);
+			browser.Refresh();
+			AssertText("TestComment");
+		}
+
+		[Test]
 		public void Change_client_status()
 		{
 			Assert.That(browser.Text, Is.StringContaining("Плательщик"));

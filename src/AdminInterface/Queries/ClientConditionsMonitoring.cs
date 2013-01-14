@@ -210,6 +210,11 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public IList<MonitoringItem> Find()
 		{
+			return Find(false);
+		}
+
+		public IList<MonitoringItem> Find(bool forExport)
+		{
 			var regionMask = SecurityContext.Administrator.RegionMask;
 
 			var client = Session.Get<Client>(ClientId);
@@ -411,7 +416,10 @@ order by {0} {1}", SortKeyMap[SortBy], SortDirection))
 			if (SortBy == "ItemsCount")
 				result = result.GroupBy(g => g.SupplierCode).OrderByDescending(g => g.Max(i => i.ItemsCount)).SelectMany(i => i).ToList();
 
-			return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
+			if (forExport)
+				return result.ToList();
+			else
+				return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
 		}
 	}
 }

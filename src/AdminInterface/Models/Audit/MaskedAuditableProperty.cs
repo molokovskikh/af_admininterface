@@ -26,6 +26,7 @@ namespace AdminInterface.Models.Audit
 			ulong oldRegionValue = 0;
 			if (oldValue != null)
 				oldRegionValue = (ulong)oldValue;
+			ulong maxRegion = UInt64.MaxValue;
 
 			var current = ToRegionList(newRegionValue);
 			var old = ToRegionList(oldRegionValue);
@@ -36,10 +37,20 @@ namespace AdminInterface.Models.Audit
 			Message = String.Format("$$$Изменено '{0}'", Name);
 
 			if (removed.Length > 0)
-				Message += " Удалено " + ToString(removed);
+				if(oldRegionValue == maxRegion)
+					Message += " Удалено 'Все регионы'";
+				else
+					Message += " Удалено " + ToString(removed);
+			else if(newRegionValue == maxRegion)
+				Message += " Удалено " + ToString(old);
 
 			if (added.Length > 0)
-				Message += " Добавлено " + ToString(added);
+				if(newRegionValue == maxRegion)
+					Message += " Добавлено 'Все регионы'";
+				else
+					Message += " Добавлено " + ToString(added);
+			else if(oldRegionValue == maxRegion)
+				Message += " Добавлено " + ToString(current);
 
 			var notifyAdded = ToStringForNotify(added);
 			var notifyRemoved = ToStringForNotify(removed);

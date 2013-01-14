@@ -6,6 +6,7 @@ using AdminInterface.Extentions;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -50,7 +51,9 @@ namespace AdminInterface.Controllers
 			var statuses = new StatusServices();
 #if !DEBUG
 			RemoteServiceHelper.RemotingCall(s => {
-				PropertyBag["FormalizationQueue"] = s.InboundFiles().Length.ToString();
+				var itemList = s.GetPriceItemList();
+				var downloadedCount = itemList.Count(i => i.Downloaded);
+				PropertyBag["FormalizationQueue"] = string.Format("{0}({1}/{2})", itemList.Length, downloadedCount, itemList.Length - downloadedCount);
 			});
 
 
@@ -61,6 +64,7 @@ namespace AdminInterface.Controllers
 			statuses.OrderProcStatus = "";
 			statuses.PriceProcessorMasterStatus = "";
 			PropertyBag["StatusServices"] = statuses;
+			PropertyBag["FormalizationQueue"] = "0(0/0)";
 #endif
 
 			foreach (var pair in data.ToKeyValuePairs()) {
