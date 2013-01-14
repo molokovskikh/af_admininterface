@@ -49,5 +49,17 @@ namespace Functional
 			AssertText("Обновляющиеся клиенты");
 			AssertText("FileHandler");
 		}
+
+		[Test]
+		public void Show_monitoring_priceList_page()
+		{
+			Open();
+			Click("0(0/0)");
+			AssertText("Очередь обработки прайс листов");
+			AssertText("Загруженные");
+			AssertText("Перепроведенные");
+			AssertText("AAA");
+			AssertText("789");
+		}
 	}
 }

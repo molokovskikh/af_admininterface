@@ -530,6 +530,7 @@
     <Content Include="Views\ManagerReports\AnalysisOfWorkDrugstores.brail" />
     <Content Include="Views\ManagerReports\SimpleTable.brail" />
     <Content Include="Views\ManagerReports\FormPosition.brail" />
+    <Content Include="Views\Monitoring\InboundPriceItemsList.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />

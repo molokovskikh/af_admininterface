@@ -1,0 +1,64 @@
+﻿${app.Asset("UserScripts.js")}
+
+<script type="text/javascript">
+	$(function () {
+		AjaxLoader();
+	});
+</script>
+
+<% component CaptureFor, {"id" : "Title"}: %>
+	Очередь обработки прайс листов
+<% end %>
+
+<table class="DataTable">
+<% if Items.Count: %>
+	<thead>
+		<tr>
+			<th>${app.Sortable("Код поставщика", "SupplierCode")}</th>
+			<th>${app.Sortable("Поставщик", "SupplierName")}</th>
+			<th>${app.Sortable("Код прайса", "PriceCode")}</th>
+			<th>${app.Sortable("Прайс", "PriceName")}</th>
+			<th>${app.Sortable("Формат плайса", "Extension")}</th>
+			<th>${app.Sortable("Время получения/перепроведения прайса", "PticeTime")}</th>
+		</tr>
+	</thead>
+<%firstPosition = Items[0].Downloaded%>
+<tr class="${ViewHelper.GetRowStyle(1)}">
+	<td colspan=8 class="subHeadTable">
+		<%if firstPosition: %>
+			Загруженные
+		<%else:%>
+			Перепроведенные
+		<%end%>
+	</td>
+</tr>
+<% for i, item in enumerate(Items): %>
+	<%if (firstPosition != item.Downloaded):%>
+	<tr class="${ViewHelper.GetRowStyle(1)}">
+		<td colspan=8 class="subHeadTable">
+		<%if item.Downloaded: %>
+			Загруженные
+		<%else:%>
+			Перепроведенные
+		<%end%>
+		</td>
+	</tr>
+	<%firstPosition = item.Downloaded%>
+	<%end%>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>${app.LinkTo(item.Supplier, item.SupplierCode, "")}</td>
+		<td>${app.LinkTo(item.Supplier)}</td>
+		<td>${item.PriceCode}</td>
+		<td>${item.PriceName}</td>
+		<td>${item.Extension}</td>
+		<td>${item.PriceTime}</td>
+		<td><a href="#" onclick="DeleteItemInInboundList(${item.Hash}, '${item.PriceName}')">Удалить</a></td>
+		<td>${app.LinkTo("Вверх", @Monitoring, @TopInInboundList, { @hashCode : item.Hash})}</td>
+	</tr>
+<% end %>
+<% else: %>
+	<tr>
+		<td class="EmptyData">В данный момент прас листы не формализуются</td>
+	</tr>
+<% end %>
+</table>
