@@ -232,7 +232,7 @@
 				<tr>
 					<td class="statistic-label" colspan=2>Очередь формализации:</td>
 					<td class="statistic-value" colspan=2>
-						${?FormalizationQueue}
+						${app.LinkTo(?FormalizationQueue, @Monitoring, @InboundPriceItemsList)}
 					</td>
 				</tr>
 				<tr>
