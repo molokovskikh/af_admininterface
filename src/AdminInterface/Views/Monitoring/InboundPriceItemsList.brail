@@ -6,6 +6,8 @@
 	});
 </script>
 
+<% component Bubble, {"bredcrumbs" : []} %>
+
 <% component CaptureFor, {"id" : "Title"}: %>
 	Очередь обработки прайс листов
 <% end %>
