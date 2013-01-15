@@ -136,6 +136,7 @@ namespace Functional
 			Click("Сравнительный анализ работы аптек");
 			Click("Показать");
 			Click("Код");
+			Click("Код");
 			browser.Link(client.Id.ToString()).Click();
 			AssertText(string.Format("Клиент: {0}", client.Name));
 			AssertText(user.Id.ToString());
