@@ -116,6 +116,7 @@ namespace Functional
 			session.Save(address);
 			Open("ManagerReports");
 			Click("Сравнительный анализ работы аптек");
+			browser.SelectList("filter_Region_Id").SelectByValue(client.HomeRegion.Id.ToString());
 			Click("Показать");
 			Click("Код");
 			browser.Link(client.Id.ToString()).Click();
