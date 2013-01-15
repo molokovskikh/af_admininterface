@@ -33,7 +33,6 @@ namespace Functional
 			Open("main/Settings");
 			AssertText("Настройки по умолчанию");
 			Click("Режим работы техподдержки");
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			browser.TextField("defaults_TechOperatingModeBegin").Value = "70.30";
 			browser.TextField("defaults_TechOperatingModeEnd").Value = "19.80";
 			Click("Сохранить");
