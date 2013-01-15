@@ -108,10 +108,12 @@ namespace Functional
 		public void AnalisOfWorkTest()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
+			session.Save(client);
 			var user = client.Users.First();
 			var address = client.Addresses.First();
 			user.AvaliableAddresses.Add(address);
 			session.Save(user);
+			session.Save(address);
 			Open("ManagerReports");
 			Click("Сравнительный анализ работы аптек");
 			Click("Показать");
