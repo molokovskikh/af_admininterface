@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -119,6 +120,7 @@ namespace Functional
 			browser.SelectList("filter_Region_Id").SelectByValue(client.HomeRegion.Id.ToString());
 			Click("Показать");
 			Click("Код");
+			File.WriteAllText("TestAnalisOfWorkTest.txt", browser.Text, Encoding.UTF8);
 			browser.Link(client.Id.ToString()).Click();
 			AssertText(string.Format("Клиент: {0}", client.Name));
 			AssertText(user.Id.ToString());
