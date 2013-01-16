@@ -179,6 +179,7 @@
     <Compile Include="NotificationServiceFixture.cs" />
     <Compile Include="PaymentFilterFixture.cs" />
     <Compile Include="PrinterFixture.cs" />
+    <Compile Include="Queries\ParsedWaybillsFilterFixture.cs" />
     <Compile Include="Queries\ResetReclameDateFixture.cs" />
     <Compile Include="Queries\UpdateOrdersFixture.cs" />
     <Compile Include="RegionalBaseCostsFixture.cs" />
