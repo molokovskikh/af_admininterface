@@ -72,7 +72,7 @@ SELECT  oh.rowid as Id,
 		(select oi.ResultCode from Logs.Orders oi where oi.RowId = max(o.RowId)) as ResultCode,
 		(select oi.TransportType from Logs.Orders oi where oi.RowId = max(o.RowId)) as TransportType,
 		oh.ClientOrderId,
-		reg.Region
+		reg.Region,
 		oh.Submited,
 		oh.Deleted
 FROM orders.ordershead oh

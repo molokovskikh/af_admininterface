@@ -74,7 +74,7 @@ insert into Logs.Orders(OrderId, TransportType, ResultCode) values(:orderId, 1, 
 			Flush();
 			var orders = new OrderFilter { User = _user }.Find();
 			Assert.That(orders.Count, Is.EqualTo(1));
-			Assert.That(orders.First().GetResult(), Is.EqualTo("Удален"));
+			Assert.That(orders.First().GetResult(), Is.EqualTo("РЈРґР°Р»РµРЅ"));
 		}
 
 		[Test]
@@ -85,7 +85,7 @@ insert into Logs.Orders(OrderId, TransportType, ResultCode) values(:orderId, 1, 
 			Flush();
 			var orders = new OrderFilter { User = _user }.Find();
 			Assert.That(orders.Count, Is.EqualTo(1));
-			Assert.That(orders.First().GetResult(), Is.EqualTo("Не подтвержден"));
+			Assert.That(orders.First().GetResult(), Is.EqualTo("РќРµ РїРѕРґС‚РІРµСЂР¶РґРµРЅ"));
 		}
 	}
 }
