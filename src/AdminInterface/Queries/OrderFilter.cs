@@ -73,6 +73,8 @@ SELECT  oh.rowid as Id,
 		(select oi.TransportType from Logs.Orders oi where oi.RowId = max(o.RowId)) as TransportType,
 		oh.ClientOrderId,
 		reg.Region
+		oh.Submited,
+		oh.Deleted
 FROM orders.ordershead oh
 	join usersettings.pricesdata pd on pd.pricecode = oh.pricecode
 	join Customers.Suppliers as s on s.Id = pd.firmcode

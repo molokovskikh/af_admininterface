@@ -1,4 +1,4 @@
-using System.Linq;
+п»їusing System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Queries;
@@ -12,6 +12,25 @@ namespace Integration.Models
 	[TestFixture]
 	public class OrderFilterFixture : Test.Support.IntegrationFixture
 	{
+		private User _user;
+		private ClientOrder _order;
+		[SetUp]
+		public void SetUp()
+		{
+			var supplier = DataMother.CreateSupplier();
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			_user = client.Users[0];
+			_user.AvaliableAddresses.Add(client.Addresses[0]);
+
+			_order = new ClientOrder(_user, supplier.Prices[0]);
+
+			var product = new Product(session.Load<Catalog>(DataMother.CreateCatelogProduct()));
+			var line = new OrderLine(_order, product, 100, 1);
+
+			Save(supplier, _order, product, line);
+			Flush();
+		}
+
 		[Test]
 		public void Find_not_sended_orders()
 		{
@@ -36,27 +55,37 @@ namespace Integration.Models
 		[Test]
 		public void Select_result_for_max_id()
 		{
-			var supplier = DataMother.CreateSupplier();
-			var client = DataMother.CreateTestClientWithAddressAndUser();
-			var user = client.Users[0];
-			user.AvaliableAddresses.Add(client.Addresses[0]);
-
-			var order = new ClientOrder(user, supplier.Prices[0]);
-
-			var product = new Product(session.Load<Catalog>(DataMother.CreateCatelogProduct()));
-			var line = new OrderLine(order, product, 100, 1);
-
-			Save(supplier, order, product, line);
-			Flush();
 			session.CreateSQLQuery(@"
 insert into Logs.Orders(OrderId, TransportType, ResultCode) values(:orderId, 0, 5);
 insert into Logs.Orders(OrderId, TransportType, ResultCode) values(:orderId, 1, 24989)")
-				.SetParameter("orderId", order.Id)
+				.SetParameter("orderId", _order.Id)
 				.ExecuteUpdate();
 
-			var orders = new OrderFilter { User = user }.Find();
+			var orders = new OrderFilter { User = _user }.Find();
 			Assert.That(orders.Count, Is.EqualTo(1));
 			Assert.That(orders[0].GetResult(), Is.EqualTo("24989"));
+		}
+
+		[Test]
+		public void GetStatusForDeletedOrder()
+		{
+			_order.Deleted = true;
+			Save(_order);
+			Flush();
+			var orders = new OrderFilter { User = _user }.Find();
+			Assert.That(orders.Count, Is.EqualTo(1));
+			Assert.That(orders.First().GetResult(), Is.EqualTo("Удален"));
+		}
+
+		[Test]
+		public void GetStatusForNotSubmitedOrder()
+		{
+			_order.Submited = false;
+			Save(_order);
+			Flush();
+			var orders = new OrderFilter { User = _user }.Find();
+			Assert.That(orders.Count, Is.EqualTo(1));
+			Assert.That(orders.First().GetResult(), Is.EqualTo("Не подтвержден"));
 		}
 	}
 }
