@@ -21,6 +21,7 @@ ${app.EndFormFor("filter")}
 				<th>Дата отправки</th>
 				<th>Поставщик</th>
 				<th>Email отправителя</th>
+				<th>Email получателя</th>
 				<th>Получатель</th>
 				<th>Пользователь</th>
 				<th>Дата отправки</th>
@@ -35,6 +36,7 @@ ${app.EndFormFor("filter")}
 			<td>${mail.LogTime}</td>
 			<td>${app.LinkTo(mail.Supplier)}</td>
 			<td>!{mail.SupplierEmail}</td>
+			<td>!{log.Recipient.Email}</td>
 			<td>${log.Recipient}</td>
 			<td>${app.LinkTo(log.User)}</td>
 			<td>${?log.Update.RequestTime}</td>

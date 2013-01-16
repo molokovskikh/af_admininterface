@@ -26,7 +26,7 @@ namespace AdminInterface.Controllers
 
 		public MailFilter()
 		{
-			Period = new DatePeriod(DateTime.Today.AddDays(-14), DateTime.Today);
+			Period = new DatePeriod(DateTime.Today.AddDays(-1), DateTime.Today);
 		}
 
 		public IList<MailSendLog> Find()

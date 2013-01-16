@@ -52,6 +52,7 @@ ${app.EndFormFor("filter")}
 					<th>На адрес</th>
 					<th>Название файла</th>
 					<th>Размер</th>
+					<th>Парсер</th>
 					<% if filter.StatMode:%>
 						<th>Комментарий</th>
 						<th>Статистика</th>
@@ -109,6 +110,7 @@ ${app.EndFormFor("filter")}
 				<td>
 					${ViewHelper.ConvertToUserFriendlySize(log.DocumentSize) if log.DocumentSize}
 				</td>
+				<td><pre>${log.Parser}</pre></td>
 				<% if filter.StatMode:%>
 					<td>
 						<pre>!{log.Addition}</pre>
