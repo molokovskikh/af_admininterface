@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -118,6 +119,7 @@ namespace Functional
 			Click("Сравнительный анализ работы аптек");
 			browser.SelectList("filter_Region_Id").SelectByValue(client.HomeRegion.Id.ToString());
 			Click("Показать");
+			Click("Код");
 			Click("Код");
 			browser.Link(client.Id.ToString()).Click();
 			AssertText(string.Format("Клиент: {0}", client.Name));
