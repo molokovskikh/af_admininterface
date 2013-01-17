@@ -226,7 +226,7 @@
 						Прайсы:
 					</td>
 					<td class="statistic-header header-description" colspan=2>
-						X(Y/Z), где: X - всего, Y - загруженные , Z - перепроводимые
+						в скобках указано количество уникальных поставщиков
 					</td>
 				</tr>
 				<tr>
