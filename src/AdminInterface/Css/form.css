@@ -151,3 +151,7 @@ form.vertical label {
 .width100px {
 	width: 100px !important;
 }
+
+.width50px {
+	width: 50px;
+}

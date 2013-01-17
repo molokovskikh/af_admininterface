@@ -1,15 +1,6 @@
 ﻿${app.Asset("tinymce/tiny_mce.js")}
 ${app.Asset("News.css")}
-
-<script type="text/javascript">
-	tinyMCE.init({
-		theme: "advanced",
-		mode: "textareas",
-		height: "500",
-		width: "600",
-		editor_selector: "tinymceAddressesHelpText"
-	});
-</script>
+${app.Asset("MainSettings.js")}
 
 <% def WriteLabelAndEditTemplate(templateLabel as string, subjectField as string, subjectValue as string, bodyField as string, bodyValue as string) as string: %>
 	<fieldset class="tabFieldset">
@@ -45,7 +36,49 @@ ${app.Asset("News.css")}
 		<li>
 			<a id="supportTexts" href="#">Справочная информация</a>
 		</li>
+		<li>
+			<a id="techOperatingSettings" href="#">Режим работы техподдержки</a>
+		</li>
 	</ul>
+</div>
+
+<div id="techOperatingSettings-tab" class="tab">
+	<fieldset class="tabFieldset">
+		<legend>Московское время работы техподдержки</legend>
+		<table>
+			<tr>
+				<td>
+					${app.GetLabel("defaults.TechOperatingModeBegin")}
+				</td>
+				<td>
+					${app.Edit("defaults.TechOperatingModeBegin", {@class: @width50px})}
+				</td>
+			</tr>
+			<tr>
+				<td colspan=2>
+					${app.GetValidationError(Defaults, "TechOperatingModeBegin")}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					${app.GetLabel("defaults.TechOperatingModeEnd")}
+				</td>
+				<td>
+					${app.Edit("defaults.TechOperatingModeEnd", {@class: @width50px})}
+				</td>
+			</tr>
+			<tr>
+				<td colspan=2>
+					${app.GetValidationError(Defaults, "TechOperatingModeEnd")}
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	<fieldset class="tabFieldset">
+		<legend>Шаблон режима работы техподдержки</legend>
+		${FormHelper.TextArea("Defaults.TechOperatingModeTemplate", {@class: @tinymce})}
+		${app.GetValidationError(Defaults, "TechOperatingModeTemplate")}
+	</fieldset>
 </div>
 
 <div id="supportTexts-tab" class="tab">
