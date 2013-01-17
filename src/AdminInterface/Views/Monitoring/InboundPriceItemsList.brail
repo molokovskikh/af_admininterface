@@ -54,8 +54,16 @@
 		<td>${item.PriceName}</td>
 		<td>${item.Extension}</td>
 		<td>${item.PriceTime}</td>
-		<td><a href="#" onclick="DeleteItemInInboundList(${item.Hash}, '${item.PriceName}')">Удалить</a></td>
-		<td>${app.LinkTo("Вверх", @Monitoring, @TopInInboundList, { @hashCode : item.Hash})}</td>
+		<td>
+			<%if not item.FormalizedNow: %>
+			<a href="#" onclick="DeleteItemInInboundList(${item.Hash}, '${item.PriceName}')">Удалить</a>
+			<%end%>
+		</td>
+		<td>
+			<%if not item.FormalizedNow:%>
+			${app.LinkTo("Вверх", @Monitoring, @TopInInboundList, { @hashCode : item.Hash})}
+			<%end%>
+		</td>
 	</tr>
 <% end %>
 <% else: %>
