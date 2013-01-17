@@ -30,7 +30,7 @@
 		<%if firstPosition: %>
 			Загруженные
 		<%else:%>
-			Перепроведенные
+			Перепроведимые
 		<%end%>
 	</td>
 </tr>
@@ -41,13 +41,13 @@
 		<%if item.Downloaded: %>
 			Загруженные
 		<%else:%>
-			Перепроведенные
+			Перепроведимые
 		<%end%>
 		</td>
 	</tr>
 	<%firstPosition = item.Downloaded%>
 	<%end%>
-	<tr class="${ViewHelper.GetRowStyle(i)}">
+	<tr class="${ViewHelper.GetRowStyle(i)} ${"FormalizedNow" if item.FormalizedNow }">
 		<td>${app.LinkTo(item.Supplier, item.SupplierCode, "")}</td>
 		<td>${app.LinkTo(item.Supplier)}</td>
 		<td>${item.PriceCode}</td>
@@ -64,3 +64,15 @@
 	</tr>
 <% end %>
 </table>
+<br/>
+
+<table>
+<tbody>
+	<tr>
+	<td>
+		<div class="LegendMarker FormalizedNow">
+		</div>
+	</td>
+	<td> - формализуется сейчас </td>
+	</tr>
+</tbody></table>

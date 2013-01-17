@@ -20,21 +20,8 @@ function AjaxLoader() {
 
 	$('#loadingDiv')
 		.append('<p id="loadingText"></p>')
-		.css('background', 'url(/Images/ajax-loader.gif) no-repeat 50% 10%')
-		.css('padding-top', '60px')
-		.css('background-color', '#F5F5F5')
-		.css('border', '2px solid #AAA')
-		.css('height', '100px')
-		.css('width', '230px')
 		.center()
 		.hide();
-
-	$('#loadingText')
-		.css('text-align', 'center')
-		.css('padding-left', '15px')
-		.css('padding-right', '15px')
-		.css('font', '16px bolder')
-		.css('font-family', 'Segoe UI, Tahoma, Arial');
 }
 
 
