@@ -25,7 +25,7 @@ namespace AdminInterface.Models
 		[Description("Белый список")] WhiteList = 0,
 	}
 
-	public enum BuyingMatrixAction
+	public enum MatrixAction
 	{
 		[Description("Запретить заказ")] Block = 0,
 		[Description("Выводить предупреждения")] Warning = 1,
@@ -50,6 +50,7 @@ namespace AdminInterface.Models
 		{
 			ShowAdvertising = true;
 			EnableSmartOrder = true;
+			OfferMatrixAction = MatrixAction.Warning;
 		}
 
 		public DrugstoreSettings(Client client)
@@ -153,15 +154,21 @@ namespace AdminInterface.Models
 			}
 		}
 
+		[Description("Подключить матрицу закупок")]
 		public virtual bool EnableBuyingMatrix
 		{
 			get { return BuyingMatrixPrice != null; }
 			set
 			{
-				if (!value)
+				if (!value) {
 					BuyingMatrixPrice = null;
+					BuyingMatrix = null;
+				}
 			}
 		}
+
+		[BelongsTo]
+		public virtual Matrix BuyingMatrix { get; set; }
 
 		[BelongsTo("BuyingMatrixPriceId"), Description("Ассортиментный прайс для матрицы закупок"), Auditable, SetForceReplication]
 		public virtual Price BuyingMatrixPrice { get; set; }
@@ -170,7 +177,7 @@ namespace AdminInterface.Models
 		public virtual BuyingMatrixType BuyingMatrixType { get; set; }
 
 		[Property, Description("Действие матрицы"), Auditable, SetForceReplication]
-		public virtual BuyingMatrixAction WarningOnBuyingMatrix { get; set; }
+		public virtual MatrixAction BuyingMatrixAction { get; set; }
 
 		[Property, Description("Конвертировать накладные"), Auditable]
 		public virtual bool IsConvertFormat { get; set; }
@@ -193,24 +200,33 @@ namespace AdminInterface.Models
 		[BelongsTo("SmartOrderRuleId", Cascade = CascadeEnum.SaveUpdate)]
 		public virtual SmartOrderRules SmartOrderRules { get; set; }
 
-		[BelongsTo("OfferMatrixPriceId"), Description("Матрица предложений"), Auditable]
-		public virtual Price OfferMatrixPrice { get; set; }
-
-		[Property, Description("Тип матрицы предложений"), Auditable]
-		public virtual BuyingMatrixType OfferMatrixType { get; set; }
-
 		[Property(NotNull = true)]
 		public virtual string BasecostPassword { get; set; }
 
+		[Description("Подключить матрицу предложений")]
 		public virtual bool EnableOfferMatrix
 		{
 			get { return OfferMatrixPrice != null; }
 			set
 			{
-				if (!value)
+				if (!value) {
 					OfferMatrixPrice = null;
+					OfferMatrix = null;
+				}
 			}
 		}
+
+		[BelongsTo("OfferMatrixPriceId"), Description("Матрица предложений"), Auditable]
+		public virtual Price OfferMatrixPrice { get; set; }
+
+		[BelongsTo]
+		public virtual Matrix OfferMatrix { get; set; }
+
+		[Property, Description("Тип матрицы предложений"), Auditable]
+		public virtual BuyingMatrixType OfferMatrixType { get; set; }
+
+		[Property]
+		public virtual MatrixAction OfferMatrixAction { get; set; }
 
 		[HasAndBelongsToMany(
 			Table = "OfferMatrixSuppliers",
@@ -231,6 +247,22 @@ namespace AdminInterface.Models
 
 		[Property, Description("Отправлять копию заказа на zakaz_copy@analit.net"), Auditable]
 		public virtual bool DebugOrders { get; set; }
+
+		public virtual void BeforeSave()
+		{
+			if (OfferMatrixPrice != null) {
+				OfferMatrix = OfferMatrixPrice.Matrix;
+				if (OfferMatrix == null)
+					OfferMatrixPrice = null;
+			}
+
+			if (BuyingMatrixPrice != null) {
+				BuyingMatrix = BuyingMatrixPrice.Matrix;
+				if (BuyingMatrix == null) {
+					BuyingMatrixPrice = null;
+				}
+			}
+		}
 
 		public virtual void CheckDefaults()
 		{

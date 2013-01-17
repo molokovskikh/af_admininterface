@@ -12,6 +12,7 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;
 using System.Linq;
+using NHibernate;
 using Test.Support.log4net;
 using DocumentType = AdminInterface.Models.Logs.DocumentType;
 
@@ -19,6 +20,13 @@ namespace Integration.ForTesting
 {
 	public class DataMother
 	{
+		private ISession session;
+
+		public DataMother(ISession session)
+		{
+			this.session = session;
+		}
+
 		public static Client TestClient(Action<Client> action = null)
 		{
 			var payer = CreatePayer();
@@ -333,6 +341,19 @@ insert into Catalogs.Catalog(NameId, FormId) values (@NameId, @FormId);
 select last_insert_id();")
 					.UniqueResult());
 			});
+		}
+
+		public Supplier CreateMatrix()
+		{
+			var supplier = CreateSupplier(s => {
+				s.Name = "Фармаимпекс";
+				s.FullName = "Фармаимпекс";
+				var price = s.AddPrice("Матрица", PriceType.Assortment);
+				price.Matrix = new Matrix();
+			});
+			session.Save(supplier);
+			session.Flush();
+			return supplier;
 		}
 	}
 }

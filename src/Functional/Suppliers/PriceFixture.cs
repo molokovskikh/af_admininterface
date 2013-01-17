@@ -1,8 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Models;
+using Functional.Drugstore;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate;
 using NHibernate.Linq;
@@ -14,7 +17,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional.Suppliers
 {
 	[TestFixture]
-	public class PriceFixture : WatinFixture2
+	public class PriceFixture : FunctionalFixture
 	{
 		private User user;
 		private Supplier supplier;
@@ -192,6 +195,29 @@ namespace Functional.Suppliers
 			localBox.Checked = true;
 			Click("Применить");
 			Assert.That(browser.CheckBox(Find.ById("MainContentPlaceHolder_PricesGrid_IsLocal_0")).Checked, Is.True);
+		}
+
+		[Test]
+		public void Set_price_as_join_matrix()
+		{
+			var matrixSupplier = dataMother.CreateMatrix();
+			var matrixPrice = matrixSupplier.Prices[1];
+
+			var price = supplier.Prices.First();
+			Open(price, "Edit");
+			Css("#price_IsMatrix").Click();
+
+			Search(matrixSupplier.Name, "Объединить с матрицей прайс листа");
+			var select = SearchRoot("Объединить с матрицей прайс листа").Css("select");
+			select.SelectByValue(matrixPrice.Id.ToString());
+			browser.Eval("$('select').change()");
+			Assert.That(select.SelectedItem, Is.EqualTo(matrixPrice.ToString()));
+			Click("Сохранить");
+			AssertText("Сохранено");
+			AssertText(matrixPrice.ToString());
+
+			session.Refresh(price);
+			Assert.That(price.Matrix.Id, Is.EqualTo(matrixPrice.Matrix.Id));
 		}
 	}
 }

@@ -1,5 +1,4 @@
-﻿${app.Asset("search.editor.js")}
-<script type="text/javascript">
+﻿<script type="text/javascript">
 	$(function () {
 		$("#excludes").data("template", function () {
 			return $("<tr>")

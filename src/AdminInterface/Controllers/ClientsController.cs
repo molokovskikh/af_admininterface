@@ -298,22 +298,15 @@ where Phone like :phone")
 
 			if (drugstore.EnableSmartOrder) {
 				if (drugstore.SmartOrderRules == null && smartOrderRules == null) {
-					var smartOrder = SmartOrderRules.TestSmartOrder();
-					drugstore.SmartOrderRules = smartOrder;
+					drugstore.SmartOrderRules = SmartOrderRules.TestSmartOrder();
 				}
 				else {
 					drugstore.SmartOrderRules = smartOrderRules;
-					var parseAlgorithm = drugstore.SmartOrderRules.ParseAlgorithm;
-					uint algorithmId;
-					if (UInt32.TryParse(parseAlgorithm, out algorithmId)) {
-						var algorithm = DbSession.Load<ParseAlgorithm>(algorithmId);
-						if (algorithm != null)
-							drugstore.SmartOrderRules.ParseAlgorithm = algorithm.Name;
-					}
 				}
 			}
-			DbSession.SaveOrUpdate(client);
-			DbSession.SaveOrUpdate(drugstore);
+			drugstore.BeforeSave();
+			DbSession.Save(client);
+			DbSession.Save(drugstore);
 			DbSession.Flush();
 			if (oldMaskRegion != client.MaskRegion)
 				client.MaintainIntersection();
@@ -372,7 +365,21 @@ where Phone like :phone")
 				.OrderBy(p => p.Supplier.Name)
 				.Take(50)
 				.ToArray()
-				.Select(p => new { id = p.Id, name = String.Format("{0} - {1}", p.Supplier.Name, p.Name) })
+				.Select(p => new { id = p.Id, name = p.ToString() })
+				.ToArray();
+		}
+
+		[return: JSONReturnBinder]
+		public object[] SearchMatrix(string text)
+		{
+			uint id;
+			UInt32.TryParse(text, out id);
+			return DbSession.Query<Price>()
+				.Where(p => (p.Supplier.Name.Contains(text) || p.Supplier.Id == id) && p.Matrix != null)
+				.OrderBy(p => p.Supplier.Name)
+				.Take(50)
+				.ToArray()
+				.Select(p => new { id = p.Id, name = p.ToString() })
 				.ToArray();
 		}
 
@@ -408,7 +415,7 @@ where Phone like :phone")
 				Restrictions.On<ParseAlgorithm>(l => l.Name).IsLike(text, MatchMode.Anywhere))
 				.Take(50)
 				.List().OrderBy(l => l.Name)
-				.Select(p => new { id = p.Id, name = p.Name })
+				.Select(p => new { id = p.Name, name = p.Name })
 				.ToArray();
 		}
 

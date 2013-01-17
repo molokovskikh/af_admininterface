@@ -29,7 +29,7 @@ namespace Integration.Models
 
 			client.Settings.BuyingMatrixPrice = price;
 			client.Settings.BuyingMatrixType = BuyingMatrixType.BlackList;
-			client.Settings.WarningOnBuyingMatrix = BuyingMatrixAction.Block;
+			client.Settings.BuyingMatrixAction = MatrixAction.Block;
 			session.SaveOrUpdate(client.Settings);
 			Flush();
 

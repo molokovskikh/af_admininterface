@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Castle.ActiveRecord.Framework.Internal;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 
@@ -88,6 +91,51 @@ namespace AdminInterface.Helpers
 		public override bool HaveEditPermission(PropertyInfo propertyInfo)
 		{
 			return Permission.CheckPermissionByAttribute(SecurityContext.Administrator, propertyInfo);
+		}
+
+		public string SearchEdit(string target, IDictionary attributes)
+		{
+			string dependOn = "";
+			if (attributes != null && attributes.Contains("data-depend-on")) {
+				dependOn = "data-depend-on=\"" + attributes["data-depend-on"] + "\"";
+			}
+			var result = new StringBuilder();
+			var label = GetLabel(target);
+			if (!String.IsNullOrEmpty(label)) {
+				attributes = attributes ?? new Dictionary<string, string>();
+				if (!attributes.Contains("data-search-title"))
+					attributes.Add("data-search-title", label);
+			}
+
+			var property = FindProperty(target);
+			var hiddenTarget = target;
+			if (property != null) {
+				var primaryKey = GetPrimaryKey(property.PropertyType);
+				if (primaryKey != null) {
+					hiddenTarget = target + "." + primaryKey.Property.Name;
+				}
+			}
+			var hidden = helper.HiddenField(hiddenTarget, attributes);
+
+			result.Append(hidden);
+			var value = ObtainValue(target);
+			if (value != null) {
+				var labelTag = Label(target, ": ");
+				result.AppendFormat("<div class=\"value\" {2}>{0} {1}</div>", labelTag, SafeHtmlEncode(value.ToString()), dependOn);
+			}
+			return result.ToString();
+		}
+
+		private static PrimaryKeyModel GetPrimaryKey(Type type)
+		{
+			var model = ActiveRecordModel.GetModel(type);
+			if (model == null)
+				return null;
+			var primaryKey = model.PrimaryKey;
+			if (primaryKey == null) {
+				return GetPrimaryKey(model.Type.BaseType);
+			}
+			return primaryKey;
 		}
 
 		public string ExportLink(string name, string action, object filter, IDictionary querystring)

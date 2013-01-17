@@ -1,0 +1,11 @@
+﻿div.search span.message
+{
+	display:block;
+	clear:both;
+	font-style:italic;
+}
+
+div.search span.message.error
+{
+	color:Red;
+}

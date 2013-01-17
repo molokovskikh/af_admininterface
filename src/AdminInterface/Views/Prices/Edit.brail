@@ -7,6 +7,12 @@
 	Редактирование прайса !{price.Name}
 <% end %>
 
+<script>
+	$(function () {
+		activateSearch();
+	});
+</script>
+
 ${FormHelper.FormTag("", {@class: @vertical})}
 <div>
 	${app.Label("price.Name")}
@@ -20,6 +26,17 @@ ${FormHelper.FormTag("", {@class: @vertical})}
 <div>
 	${app.Edit("price.IsRejectCancellations")}
 	${app.GetValidationError("price.IsRejectCancellations")}
+</div>
+<div>
+	${app.Edit("price.IsMatrix", {@class: @activate})}
+	<div>
+		${app.SearchEdit("price.JoinWithPriceInMatrix", {"data-search-editor": @searchMatrix, "data-depend-on": "price_IsMatrix"})}
+		${app.GetValidationError("price.JoinWithPriceInMatrix")}
+	</div>
+	<div>
+		${app.SearchEdit("price.CodeOkpFilterPrice", {"data-search-editor": @assortmentPrice, "data-depend-on": "price_IsMatrix"})}
+		${app.GetValidationError("price.CodeOkpFilterPrice")}
+	</div>
 </div>
 <div>
 	${FormHelper.Submit("Сохранить")}

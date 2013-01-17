@@ -4,7 +4,9 @@ using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Tools;
 using Common.Web.Ui.Models;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
@@ -16,7 +18,7 @@ using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 namespace Functional.Drugstore
 {
 	[TestFixture]
-	public class SettingsFixture : WatinFixture2
+	public class SettingsFixture : FunctionalFixture
 	{
 		private Client client;
 		private DrugstoreSettings settings;
@@ -36,13 +38,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Set_buying_matrix_configuration()
 		{
-			var supplier = DataMother.CreateSupplier(s => {
-				s.Name = "Фармаимпекс";
-				s.FullName = "Фармаимпекс";
-				s.AddPrice("Матрица", PriceType.Assortment);
-			});
-			Save(supplier);
-			Flush();
+			dataMother.CreateMatrix();
 
 			Css("#drugstore_EnableBuyingMatrix").Click();
 
@@ -50,7 +46,7 @@ namespace Functional.Drugstore
 
 			Assert.That(Css("div.search select").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
-			Assert.That(browser.SelectList(Find.ByName("drugstore.WarningOnBuyingMatrix")).SelectedItem, Is.EqualTo("Запретить заказ"));
+			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixAction")).SelectedItem, Is.EqualTo("Запретить заказ"));
 
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
@@ -58,25 +54,19 @@ namespace Functional.Drugstore
 
 			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
-			Assert.That(browser.SelectList(Find.ByName("drugstore.WarningOnBuyingMatrix")).SelectedItem, Is.EqualTo("Запретить заказ"));
+			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixAction")).SelectedItem, Is.EqualTo("Запретить заказ"));
 
 			session.Refresh(client);
 
 			Assert.That(client.Settings.BuyingMatrixPrice.Name, Is.EqualTo("Матрица"));
 			Assert.That(client.Settings.BuyingMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
-			Assert.That(client.Settings.WarningOnBuyingMatrix, Is.EqualTo(BuyingMatrixAction.Block));
+			Assert.That(client.Settings.BuyingMatrixAction, Is.EqualTo(MatrixAction.Block));
 		}
 
 		[Test]
 		public void Set_offers_matrix()
 		{
-			var supplier = DataMother.CreateSupplier(s => {
-				s.Name = "Фармаимпекс";
-				s.FullName = "Фармаимпекс";
-				s.AddPrice("Матрица", PriceType.Assortment);
-			});
-			Save(supplier);
-			Flush();
+			dataMother.CreateMatrix();
 
 			Css("#drugstore_EnableOfferMatrix").Click();
 
@@ -102,14 +92,9 @@ namespace Functional.Drugstore
 		[Test]
 		public void Add_offer_matrix_exclude()
 		{
-			var supplier = DataMother.CreateSupplier(s => {
-				s.Name = "Фармаимпекс";
-				s.FullName = "Фармаимпекс";
-				s.AddPrice("Матрица", PriceType.Assortment);
-			});
-			Save(supplier);
+			var supplier = dataMother.CreateMatrix();
+
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
-			Flush();
 
 			Css("#drugstore_EnableOfferMatrix").Click();
 
@@ -125,9 +110,9 @@ namespace Functional.Drugstore
 			Thread.Sleep(1000);
 			Assert.That(excludes.Css("div.search select").SelectedItem, Is.StringEnding("Фармаимпекс"));
 
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			browser.Click("Настройка");
+			Click("Настройка");
 
 			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.OfferMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
@@ -137,6 +122,7 @@ namespace Functional.Drugstore
 			session.Refresh(client);
 
 			Assert.That(client.Settings.OfferMatrixPrice.Name, Is.EqualTo("Матрица"));
+			Assert.That(client.Settings.OfferMatrix, Is.Not.Null);
 			Assert.That(client.Settings.OfferMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
 			Assert.That(client.Settings.OfferMatrixExcludes.Count, Is.EqualTo(1));
 			Assert.That(client.Settings.OfferMatrixExcludes[0].Name, Is.EqualTo(supplier.Name));
@@ -562,25 +548,6 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 		{
 			Click("Сбросить дату рекламы");
 			AssertText("Сброшена");
-		}
-
-		private void Search(string term, string title = null)
-		{
-			if (String.IsNullOrEmpty(title)) {
-				Css(".term").TypeText(term);
-				Css(".search[type=button]").Click();
-			}
-			else {
-				var searchRoot = SearchRoot(title);
-				searchRoot.Css(".term").TypeText(term);
-				searchRoot.Css(".search[type=button]").Click();
-			}
-			Thread.Sleep(1000);
-		}
-
-		private Element SearchRoot(string title)
-		{
-			return browser.Element(Find.ByText(title).And(Find.ByClass("search-title"))).Parent;
 		}
 
 		private SelectList GetHomeRegionSelect(Browser browser)

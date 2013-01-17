@@ -1,32 +1,12 @@
-﻿${app.Asset("search.editor.js")}
-
-<% component Bubble, {@bredcrumbs : [("Поиск пользователей", "${siteroot}/users/search"), client]} %>
+﻿<% component Bubble, {@bredcrumbs : [("Поиск пользователей", "${siteroot}/users/search"), client]} %>
 
 <% component CaptureFor, {@id : @Title}: %>
 	Конфигурация клиента ${client.Name}
 <% end %>
 
-<style>
-	div.search span.message
-	{
-		display:block;
-		clear:both;
-		font-style:italic;
-	}
-	
-	div.search span.message.error
-	{
-		color:Red;
-	}
-</style>
-
 <script>
 	$(function () {
-		window.searchEditors = {};
-		window.searchEditors["assortmentPrice"] = {
-			title: "Выберите ассортиментный прайс лист",
-			url: "/clients/SearchAssortmentPrices"
-		};
+		activateSearch();
 
 		window.searchEditors["parser"] = {
 			title: "Выберите парсер",
@@ -40,52 +20,7 @@
 					.append(searchTemplate("Выберете поставщика", "/clients/${client.Id}/SearchSuppliers"))
 					.append("<input type=hidden name=drugstore.OfferMatrixExcludes[0].Id>"));
 		});
-
-		$("input[type=checkbox].activate").click(function() {
-			var root = $($(this).parents("td").get(0)).siblings("td");
-			if (this.checked)
-				search(root);
-			else
-				cancel(root);
-		});
-
-		<% if (not drugstore.SmartOrderRules) and (drugstore.EnableSmartOrder): %>
-			var rootSmartOrder = $('#EnableSmartOrderFirstRow').children('td');
-			search(rootSmartOrder);
-		<% end %>
-
-		$("#drugstore_NoiseCosts").change(function () {
-			$("#drugstore_NoiseCostExceptSupplier_Id").val("");
-		});
 	});
-
-	function cancel(root)
-	{
-		var activate = $(root.parents("tr").get(0)).find("input[type=checkbox].activate").get(0);
-		activate.checked = false;
-		cancelRoot(root);
-	}
-
-	function cancelRoot(root) {
-		root.find(".search").remove();
-		root.find(".value").remove();
-		root.find(".settings").css("display", "none");
-		root.find("input[type=hidden]").val("");
-	}
-
-	function search(root) {
-		root.find(".value").remove();
-		root.find(".settings").css("display", "none");
-		root.find("input[type=hidden][data-search-url]")
-			.add(root.find("input[type=hidden][data-search-editor]"))
-			.each(function () {
-				var element = $(this);
-				var editor = window.searchEditors[element.attr("data-search-editor")] || {};
-				var title = element.attr("data-search-title") || editor.title;
-				var url = element.attr("data-search-url") || editor.url;
-				root.prepend(searchTemplate(title, url, element));
-			});
-	}
 
 	function NotifySuppliers() {
 		$('#NotifySuppliers').submit();
@@ -111,34 +46,29 @@
 			<div class="block" id="commonSettings">
 				<h3>Общая настройка</h3>
 				<table border="0" style="width: 100%; height: 100%;">
-					<tr>
+				<tr>
 					<td style="width: 50%;">
 						${app.Edit("drugstore.NoiseCosts", {@class: @activate})}
 					</td>
 					<td>
-						${FormHelper.HiddenField("drugstore.NoiseCostExceptSupplier.Id",
+						${app.SearchEdit("drugstore.NoiseCostExceptSupplier",
 							{"data-search-title":"Кроме",
-								"data-search-url": "/clients/${client.Id}/SearchSuppliers"})}
-						<div class=value>
-							<% if drugstore.NoiseCosts and drugstore.NoiseCostExceptSupplier: %>
-								Кроме: ${drugstore.NoiseCostExceptSupplier.Name}
-							<% end %>
-						</div>
+								"data-search-url": "/clients/${client.Id}/SearchSuppliers",
+								"data-depend-on": "drugstore_NoiseCosts"})}
+						${app.GetValidationError("drugstore.NoiseCostExceptSupplier")}
 					</td>
-					</tr>
+				</tr>
 				<tr>
 					<td>
 						${app.Edit("drugstore.IsConvertFormat", {@class: @activate})}
 					</td>
 					<td>
-						${FormHelper.HiddenField("drugstore.AssortimentPrice.Id", 
-							{"data-search-editor": "assortmentPrice"})}
-						<div class=value>
-							<% if drugstore.IsConvertFormat and drugstore.AssortimentPrice: %>
-								Ассортиментный прайс: ${drugstore.AssortimentPrice.Supplier.Name} - ${drugstore.AssortimentPrice.Name}
-							<% end %>
-						</div>
-						<div class="settings" ${"style='display:none'" if not drugstore.IsConvertFormat}>
+						${app.SearchEdit("drugstore.AssortimentPrice",
+							{"data-search-editor": "assortmentPrice",
+								"data-depend-on": "drugstore_IsConvertFormat"})}
+						${app.GetValidationError("drugstore.AssortimentPrice")}
+
+						<div class="settings" data-depend-on="drugstore_IsConvertFormat">
 							${app.Label("drugstore.WaybillConvertFormat")}
 							${app.Edit("drugstore.WaybillConvertFormat")}
 						</div>
@@ -172,75 +102,69 @@
 				</tr>
 				<tr>
 					<td>
-						${FormHelper.CheckboxField("drugstore.EnableSmartOrder", {@class : @activate})}
-						<label>Автозаказ</label>
+						${app.Edit("drugstore.EnableSmartOrder", {@class : @activate})}
 					</td>
 					<td>
-						${FormHelper.HiddenField("drugstore.SmartOrderRules.AssortimentPriceCode.Id",
-							{"data-search-editor": "assortmentPrice"})}
-
-						${FormHelper.HiddenField("drugstore.SmartOrderRules.ParseAlgorithm",
-							{"data-search-editor": "parser"})}
-						<%if drugstore.SmartOrderRules: %>
-							<div class=value>
-								Ассортиментный прайс лист: ${drugstore.SmartOrderRules.GetAssortimentPriceName()} <br />
-								Парсер: ${drugstore.SmartOrderRules.ParseAlgorithm}
-							</div>
-						<%end %>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						${FormHelper.CheckboxField("drugstore.EnableBuyingMatrix", {@class : @activate})}
-						<label>Подключить матрицу закупок</label>
-					</td>
-					<td>
-						${FormHelper.HiddenField("drugstore.BuyingMatrixPrice.Id",
-							{"data-search-editor": "assortmentPrice"})}
-						<% if drugstore.BuyingMatrixPrice: %>
-							<div class=value>
-								${drugstore.BuyingMatrixPrice.Supplier.Name} - ${drugstore.BuyingMatrixPrice.Name}
-							</div>
-						<% end %>
-						<div class=settings ${"style='display:none'" if not drugstore.BuyingMatrixPrice}>
-							${app.Edit("drugstore.BuyingMatrixType")}
-							${app.Edit("drugstore.WarningOnBuyingMatrix")}
+						<div>
+							${app.SearchEdit("drugstore.SmartOrderRules.AssortimentPriceCode", {"data-search-editor": @assortmentPrice,
+								"data-depend-on": "drugstore_EnableSmartOrder",
+								"data-search-title": "Выберите ассортиментный прайс лист"})}
+							${app.GetValidationError("drugstore.SmartOrderRules.AssortimentPriceCode")}
+						</div>
+						<div>
+							${app.SearchEdit("drugstore.SmartOrderRules.ParseAlgorithm", {"data-search-editor": @parser,
+								"data-depend-on": "drugstore_EnableSmartOrder",
+								"data-search-title": "Выберите парсер"})}
+							${app.GetValidationError("drugstore.SmartOrderRules.ParseAlgorithm")}
 						</div>
 					</td>
 				</tr>
 				<tr>
 					<td>
-						${FormHelper.CheckboxField("drugstore.EnableOfferMatrix", {@class : @activate})}
-						<label>Подключить матрицу предложений</label>
+						${app.Edit("drugstore.EnableBuyingMatrix", {@class : @activate})}
 					</td>
 					<td>
-						${FormHelper.HiddenField("drugstore.OfferMatrixPrice.Id",
-							{"data-search-editor": "assortmentPrice"})}
-						<% if drugstore.OfferMatrixPrice: %>
-							<div class=value>
-								${drugstore.OfferMatrixPrice.Supplier.Name} - ${drugstore.OfferMatrixPrice.Name}
+						<div>
+							${app.SearchEdit("drugstore.BuyingMatrixPrice", {"data-search-editor": @searchMatrix, "data-depend-on": "drugstore_EnableBuyingMatrix"})}
+							${app.GetValidationError("drugstore.BuyingMatrixPrice")}
+						</div>
+						<div class=settings data-depend-on="drugstore_EnableBuyingMatrix">
+							${app.Edit("drugstore.BuyingMatrixType")}
+							${app.Edit("drugstore.BuyingMatrixAction")}
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						${app.Edit("drugstore.EnableOfferMatrix", {@class : @activate})}
+					</td>
+					<td>
+						<div>
+							${app.SearchEdit("drugstore.OfferMatrixPrice", {"data-search-editor": @searchMatrix, "data-depend-on": "drugstore_EnableOfferMatrix"})}
+							${app.GetValidationError("drugstore.OfferMatrixPrice")}
+						</div>
+						<div class=settings data-depend-on="drugstore_EnableOfferMatrix">
+							${app.Edit("drugstore.OfferMatrixType")}
+							<div>
+								<h4 style="border:none; color:Black;">Поставщики исключения</h4>
+								<table id=excludes class=editable>
+									<tr>
+										<td><input type=button class=add value=Добавить></td>
+										<th></th>
+									</tr>
+									<% for i, supplier in enumerate(drugstore.OfferMatrixExcludes): %>
+									<tr>
+										<td>
+											<input type=button value=Удалить class=delete>
+										</td>
+										<td>
+											${FormHelper.HiddenField("drugstore.OfferMatrixExcludes[${i}].Id")}
+											${supplier.Name}
+										</td>
+									</tr>
+									<% end %>
+								</table>
 							</div>
-						<% end %>
-						<div class=settings ${"style='display:none'" if not drugstore.OfferMatrixPrice}>
-							${app.Edit("drugstore.OfferMatrixType")}<br><br>
-							<h4 style="border:none; color:Black;">Поставщики исключения</h4>
-							<table id=excludes class=editable>
-								<tr>
-									<td><input type=button class=add value=Добавить></td>
-									<th></th>
-								</tr>
-								<% for i, supplier in enumerate(drugstore.OfferMatrixExcludes): %>
-								<tr>
-									<td>
-										<input type=button value=Удалить class=delete>
-									</td>
-									<td>
-										${FormHelper.HiddenField("drugstore.OfferMatrixExcludes[${i}].Id")}
-										${supplier.Name}
-									</td>
-								</tr>
-								<% end %>
-							</table>
 						</div>
 					</td>
 				</tr>

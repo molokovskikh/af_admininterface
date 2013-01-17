@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.Serialization;
 using AdminInterface.Models.Listeners;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Common.Web.Ui.Models;
+using NHibernate;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models.Suppliers
 {
@@ -16,6 +19,14 @@ namespace AdminInterface.Models.Suppliers
 		Assortment,
 		Vip
 	}
+
+	[ActiveRecord(Schema = "Farm")]
+	public class Matrix
+	{
+		[PrimaryKey]
+		public virtual uint Id { get; set; }
+	}
+
 
 	[ActiveRecord("PricesData", Schema = "Usersettings", Lazy = true)]
 	public class Price
@@ -44,6 +55,9 @@ namespace AdminInterface.Models.Suppliers
 		[Property, SetForceReplication]
 		public virtual bool Enabled { get; set; }
 
+		[Description("Матрица закупок")]
+		public virtual bool IsMatrix { get; set; }
+
 		[Property]
 		public virtual decimal UpCost { get; set; }
 
@@ -52,6 +66,15 @@ namespace AdminInterface.Models.Suppliers
 
 		[Property, Description("Прайс содержит разбраковку")]
 		public virtual bool IsRejectCancellations { get; set; }
+
+		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
+		public virtual Matrix Matrix { get; set; }
+
+		[Description("Объединить с матрицей прайс листа")]
+		public virtual Price JoinWithPriceInMatrix { get; set; }
+
+		[BelongsTo, Description("Фильтровать по коду ОКП с помощью прайс-листа")]
+		public virtual Price CodeOkpFilterPrice { get; set; }
 
 		[BelongsTo("FirmCode")]
 		public virtual Supplier Supplier { get; set; }
@@ -84,6 +107,29 @@ namespace AdminInterface.Models.Suppliers
 			if (Supplier == null)
 				return Name;
 			return String.Format("{0} - {1}", Supplier.Name, Name);
+		}
+
+		public virtual void PrepareEdit(ISession dbSession)
+		{
+			IsMatrix = Matrix != null;
+			if (Matrix != null)
+				JoinWithPriceInMatrix = dbSession.Query<Price>().FirstOrDefault(p => p.Matrix == Matrix && p != this);
+		}
+
+		public virtual void PrepareSave()
+		{
+			if (IsMatrix) {
+				if (JoinWithPriceInMatrix != null)
+					Matrix = JoinWithPriceInMatrix.Matrix;
+
+				if (Matrix == null)
+					Matrix = new Matrix();
+			}
+			else {
+				Matrix = null;
+				JoinWithPriceInMatrix = null;
+				CodeOkpFilterPrice = null;
+			}
 		}
 	}
 
