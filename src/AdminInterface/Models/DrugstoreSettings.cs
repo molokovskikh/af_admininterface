@@ -29,6 +29,7 @@ namespace AdminInterface.Models
 	{
 		[Description("Запретить заказ")] Block = 0,
 		[Description("Выводить предупреждения")] Warning = 1,
+		[Description("Удалить предложение")] Delete = 2,
 	}
 
 	public enum WaybillConvertFormat
@@ -50,7 +51,6 @@ namespace AdminInterface.Models
 		{
 			ShowAdvertising = true;
 			EnableSmartOrder = true;
-			OfferMatrixAction = MatrixAction.Warning;
 		}
 
 		public DrugstoreSettings(Client client)
