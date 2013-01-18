@@ -71,6 +71,15 @@ namespace AdminInterface.Models
 		[Property, ValidateNonEmpty]
 		public string AddressesHelpText { get; set; }
 
+		[Property, ValidateNonEmpty]
+		public string TechOperatingModeTemplate { get; set; }
+
+		[Property, Description("Начало рабочего дня:"), ValidateRegExp("^([0-1]?[0-9]|[2][0-3])(.([0-5][0-9]))$", "Некорректное время начала рабочего дня, время должно содержать часы (0-24) и минуты (00-59), разделенные точкой")]
+		public string TechOperatingModeBegin { get; set; }
+
+		[Property, Description("Окончание рабочего дня:"), ValidateRegExp("^([0-1]?[0-9]|[2][0-3])(.([0-5][0-9]))$", "Некорректное время окончания рабочего дня, время должно содержать часы (0-24) и минуты (00-59), разделенные точкой")]
+		public string TechOperatingModeEnd { get; set; }
+
 		public IEnumerable<string> GetPhones()
 		{
 			return Phones.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);

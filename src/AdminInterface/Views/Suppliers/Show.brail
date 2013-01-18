@@ -1,10 +1,8 @@
-﻿ <% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search")]} %>
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search")]} %>
 
 <% component CaptureFor, {@id : @Title}: %>
 	Поставщик ${supplier.Name}, Код ${supplier.Id}
 <% end %>
-
-${app.Asset("search.editor.js")}
 
 <script type="text/javascript">
 	$(function () {

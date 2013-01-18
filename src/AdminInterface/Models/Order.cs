@@ -51,6 +51,9 @@ namespace AdminInterface.Models
 		public virtual bool Submited { get; set; }
 
 		[Property]
+		public virtual bool Deleted { get; set; }
+
+		[Property]
 		public virtual DateTime WriteTime { get; set; }
 
 		public IList<OrderLineView> Lines(ISession session)

@@ -156,6 +156,7 @@ namespace AdminInterface.Controllers.Filters
 				.Add(Projections.Property("d.ProviderDocumentId").As("ProviderDocumentId"))
 				.Add(Projections.Property("d.DocumentDate").As("DocumentDate"))
 				.Add(Projections.Property("d.WriteTime").As("DocumentWriteTime"))
+				.Add(Projections.Property("d.Parser").As("Parser"))
 				.Add(Projections.Property("fs.Name").As("Supplier"))
 				.Add(Projections.Property("fs.Id").As("SupplierId"))
 				.Add(Projections.Property("fc.Name").As("Client"))
@@ -201,6 +202,7 @@ namespace AdminInterface.Controllers.Filters
 		public DateTime? DocumentWriteTime { get; set; }
 
 		public string Supplier { get; set; }
+		public string Parser { get; set; }
 		public string SupplierId { get; set; }
 		public string Client { get; set; }
 		public string ClientId { get; set; }

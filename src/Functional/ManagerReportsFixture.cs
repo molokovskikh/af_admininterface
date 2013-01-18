@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -136,12 +137,15 @@ namespace Functional
 		public void AnalisOfWorkTest()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
+			session.Save(client);
 			var user = client.Users.First();
 			var address = client.Addresses.First();
 			user.AvaliableAddresses.Add(address);
 			session.Save(user);
+			session.Save(address);
 			Open("ManagerReports");
 			Click("Сравнительный анализ работы аптек");
+			browser.SelectList("filter_Region_Id").SelectByValue(client.HomeRegion.Id.ToString());
 			Click("Показать");
 			Click("Код");
 			Click("Код");

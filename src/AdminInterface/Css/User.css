@@ -225,3 +225,28 @@ table thead.CenterHead th
 	font-weight: bold;
 	text-align: center;
 }
+
+.DataTable tbody tr.FormalizedNow {
+	background-color: #d4f79f;
+}
+
+.FormalizedNow {
+	background-color: #d4f79f;
+}
+
+#loadingDiv {
+	background: url(/Images/ajax-loader.gif) no-repeat 50% 10%;
+	padding-top: 60px;
+	background-color: #F5F5F5;
+	border: 2px solid #AAA;
+	height: 100px;
+	width: 230px;
+}
+
+#loadingText {
+	text-align: center;
+	padding-left: 15px;
+	padding-right: 15px;
+	font: 16px bolder;
+	font-family: Segoe UI, Tahoma, Arial;
+}

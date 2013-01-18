@@ -18,7 +18,7 @@ namespace AdminInterface.Controllers
 {
 	public class InboundPriceItems
 	{
-		public InboundPriceItems(bool down, Price price, string filePath, DateTime priceTime, int hash)
+		public InboundPriceItems(bool down, Price price, string filePath, DateTime priceTime, int hash, bool formalizedNow)
 		{
 			Downloaded = down;
 			if (price != null) {
@@ -28,9 +28,10 @@ namespace AdminInterface.Controllers
 				PriceCode = price.Id;
 				PriceName = price.Name;
 			}
-			Extension = Path.GetExtension(Path.GetFileName(filePath));
+			Extension = Path.GetExtension(Path.GetFileName(filePath)).Replace(".", string.Empty);
 			PriceTime = priceTime;
 			Hash = hash;
+			FormalizedNow = formalizedNow;
 		}
 
 		public bool Downloaded { get; set; }
@@ -42,6 +43,7 @@ namespace AdminInterface.Controllers
 		public string Extension { get; set; }
 		public DateTime PriceTime { get; set; }
 		public int Hash { get; set; }
+		public bool FormalizedNow { get; set; }
 	}
 
 	[
@@ -91,13 +93,13 @@ namespace AdminInterface.Controllers
 			items = new[] {
 				new WcfPriceProcessItem(0, false, "jjj.AAA", 0, null, DateTime.Now.AddMinutes(50), 0),
 				new WcfPriceProcessItem(0, true, "jjj.123", 0, null, DateTime.Now.AddMinutes(10), 0),
-				new WcfPriceProcessItem(0, false, "jjj.BBB", 0, null, DateTime.Now.AddMinutes(100), 0),
+				new WcfPriceProcessItem(0, false, "jjj.BBB", 0, null, DateTime.Now.AddMinutes(100), 0) { FormalizedNow = true },
 				new WcfPriceProcessItem(0, true, "jjj.789", 0, null, DateTime.Now.AddMinutes(500), 0)
 			};
 #endif
 			var result = items.Select(i => {
 				var price = DbSession.Get<Price>((uint)i.PriceCode);
-				return new InboundPriceItems(i.Downloaded, price, i.FilePath, i.CreateTime, i.HashCode);
+				return new InboundPriceItems(i.Downloaded, price, i.FilePath, i.CreateTime, i.HashCode, i.FormalizedNow);
 			}).ToList();
 
 			var sortable = new Sortable();

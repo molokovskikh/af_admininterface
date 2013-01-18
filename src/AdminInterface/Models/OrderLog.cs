@@ -34,8 +34,16 @@ namespace AdminInterface.Models
 
 		public string Region { get; set; }
 
+		public bool Submited { get; set; }
+
+		public bool Deleted { get; set; }
+
 		public string GetResult()
 		{
+			if(Deleted)
+				return "Удален";
+			if(!Submited)
+				return "Не подтвержден";
 			if (TransportType == null || ResultCode == 0)
 				return "Не отправлен";
 

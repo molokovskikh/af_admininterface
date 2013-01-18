@@ -53,7 +53,7 @@ namespace AdminInterface.Controllers
 			RemoteServiceHelper.RemotingCall(s => {
 				var itemList = s.GetPriceItemList();
 				var downloadedCount = itemList.Count(i => i.Downloaded);
-				PropertyBag["FormalizationQueue"] = string.Format("{0}({1}/{2})", itemList.Length, downloadedCount, itemList.Length - downloadedCount);
+				PropertyBag["FormalizationQueue"] = string.Format("Всего: {0}, загруженные: {1}, перепроводимые: {2}", itemList.Length, downloadedCount, itemList.Length - downloadedCount);
 			});
 
 
@@ -64,7 +64,7 @@ namespace AdminInterface.Controllers
 			statuses.OrderProcStatus = "";
 			statuses.PriceProcessorMasterStatus = "";
 			PropertyBag["StatusServices"] = statuses;
-			PropertyBag["FormalizationQueue"] = "0(0/0)";
+			PropertyBag["FormalizationQueue"] = "Всего: 0, загруженные: 0, перепроводимые: 0";
 #endif
 
 			foreach (var pair in data.ToKeyValuePairs()) {

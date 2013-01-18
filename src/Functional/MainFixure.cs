@@ -5,6 +5,7 @@ using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 
 namespace Functional
 {
@@ -24,6 +25,23 @@ namespace Functional
 			Assert.That(browser.Text, Is.StringContaining("Настройки по умолчанию"));
 			Assert.That(browser.Text, Is.StringContaining("Общие настройки"));
 			Assert.That(browser.Text, Is.StringContaining("Настройки мини-почты"));
+		}
+
+		[Test(Description = "Проверяет корректность сохранения режима работы техподдержки")]
+		public void TechOperatingModeSettingsTest()
+		{
+			Open("main/Settings");
+			AssertText("Настройки по умолчанию");
+			Click("Режим работы техподдержки");
+			browser.TextField("defaults_TechOperatingModeBegin").Value = "70.30";
+			browser.TextField("defaults_TechOperatingModeEnd").Value = "19.80";
+			Click("Сохранить");
+			AssertText("Некорректное время начала рабочего дня");
+			AssertText("Некорректное время окончания рабочего дня");
+			browser.TextField("defaults_TechOperatingModeBegin").Value = "8.00";
+			browser.TextField("defaults_TechOperatingModeEnd").Value = "20.30";
+			Click("Сохранить");
+			AssertText("Сохранено");
 		}
 
 		[Test]
@@ -54,10 +72,10 @@ namespace Functional
 		public void Show_monitoring_priceList_page()
 		{
 			Open();
-			Click("0(0/0)");
+			Click("Всего: 0, загруженные: 0, перепроводимые: 0");
 			AssertText("Очередь обработки прайс листов");
 			AssertText("Загруженные");
-			AssertText("Перепроведенные");
+			AssertText("Перепроводимые");
 			AssertText("AAA");
 			AssertText("789");
 		}

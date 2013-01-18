@@ -131,10 +131,13 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 				var client = DbSession.Load<Client>(clientId);
 				var line = DbSession.Load<DocumentLine>(id);
 				if (client.Settings.AssortimentPrice != null && line.CatalogProduct != null) {
+					uint? producerId = null;
+					if(line.CatalogProducer != null)
+						producerId = line.CatalogProducer.Id;
 					var core = DbSession.Query<Core>()
 						.Where(c => c.Price.Id == client.Settings.AssortimentPrice.Id
 							&& c.ProductId == line.CatalogProduct.Id
-							&& c.CodeFirmCr == line.CatalogProducer.Id)
+							&& c.CodeFirmCr == producerId)
 						.OrderBy(c => c.Code)
 						.FirstOrDefault();
 					if (core != null) {

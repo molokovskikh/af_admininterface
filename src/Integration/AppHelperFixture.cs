@@ -5,12 +5,15 @@ using System.IO;
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.Framework.Descriptors;
 using Castle.MonoRail.Framework.Helpers;
 using Castle.MonoRail.Framework.Routing;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.Test;
 using Integration.ForTesting;
@@ -259,6 +262,43 @@ namespace Integration
 		{
 			var link = helper.LinkTo(new Address { Enabled = true, Value = "Test" }, "Test", "Index", new Dictionary<string, object> { { "tab", "1" } });
 			Assert.That(link, Is.EqualTo("<a class=\"has-no-connected-users\"  href=\"/Addresses/0/Index?tab=1\">Test</a>"));
+		}
+
+		[Test]
+		public void Not_empty_search_editor()
+		{
+			var supplier = new Supplier(new Region("Тестовый регион"), new Payer("Плательшик") {
+				PayerID = 1
+			});
+			propertyBag["supplier"] = supplier;
+			var html = helper.SearchEdit("supplier.Payer", null);
+			Assert.That(html, Is.EqualTo("<input type=\"hidden\" id=\"supplier_Payer_PayerID\" name=\"supplier.Payer.PayerID\" value=\"1\" />"
+				+ "<div class=\"value\" > Плательшик</div>"));
+		}
+
+		[Test]
+		public void Empty_search_editor()
+		{
+			var supplier = new Supplier();
+			propertyBag["supplier"] = supplier;
+			var html = helper.SearchEdit("supplier.HomeRegion", null);
+			Assert.That(html, Is.EqualTo("<input type=\"hidden\" id=\"supplier_HomeRegion_Id\"" +
+				" name=\"supplier.HomeRegion.Id\" value=\"\"" +
+				" data-search-title=\"Домашний регион\" />"));
+		}
+
+		[Test]
+		public void Search_editor_with_inheritance()
+		{
+			var supplier = new Supplier();
+			var price = new Price {
+				Supplier = supplier
+			};
+			propertyBag["price"] = price;
+			var html = helper.SearchEdit("price.Supplier", null);
+			Assert.That(html, Is.EqualTo("<input type=\"hidden\" id=\"price_Supplier_Id\"" +
+				" name=\"price.Supplier.Id\" value=\"0\" />" +
+				"<div class=\"value\" > </div>"));
 		}
 	}
 }

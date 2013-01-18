@@ -100,6 +100,9 @@ namespace AdminInterface.Models.Documents
 		[BelongsTo("AddressId")]
 		public virtual Address Address { get; set; }
 
+		[Property]
+		public virtual string Email { get; set; }
+
 		public override string ToString()
 		{
 			if (Region != null)

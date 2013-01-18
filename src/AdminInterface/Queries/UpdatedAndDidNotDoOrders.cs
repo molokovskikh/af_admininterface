@@ -142,7 +142,7 @@ where
 	and rcs.ServiceClient = 0
 	and ap.PermissionId = 1
 group by u.id
-having max(oh.`WriteTime`) < :orderDate
+having max(oh.`WriteTime`) < :orderDate or max(oh.`WriteTime`) is null
 order by {0} {1}
 ;", SortBy, SortDirection))
 				.SetParameter("orderDate", OrderDate)
