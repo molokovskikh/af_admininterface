@@ -59,7 +59,7 @@ namespace Functional.Drugstore
 			session.Refresh(client);
 
 			Assert.That(client.Settings.BuyingMatrixPrice.Name, Is.EqualTo("Матрица"));
-			Assert.That(client.Settings.BuyingMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
+			Assert.That(client.Settings.BuyingMatrixType, Is.EqualTo(MatrixType.WhiteList));
 			Assert.That(client.Settings.BuyingMatrixAction, Is.EqualTo(MatrixAction.Block));
 		}
 
@@ -86,7 +86,7 @@ namespace Functional.Drugstore
 			session.Refresh(client);
 
 			Assert.That(client.Settings.OfferMatrixPrice.Name, Is.EqualTo("Матрица"));
-			Assert.That(client.Settings.OfferMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
+			Assert.That(client.Settings.OfferMatrixType, Is.EqualTo(MatrixType.WhiteList));
 		}
 
 		[Test]
@@ -123,7 +123,7 @@ namespace Functional.Drugstore
 
 			Assert.That(client.Settings.OfferMatrixPrice.Name, Is.EqualTo("Матрица"));
 			Assert.That(client.Settings.OfferMatrix, Is.Not.Null);
-			Assert.That(client.Settings.OfferMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
+			Assert.That(client.Settings.OfferMatrixType, Is.EqualTo(MatrixType.WhiteList));
 			Assert.That(client.Settings.OfferMatrixExcludes.Count, Is.EqualTo(1));
 			Assert.That(client.Settings.OfferMatrixExcludes[0].Name, Is.EqualTo(supplier.Name));
 		}
