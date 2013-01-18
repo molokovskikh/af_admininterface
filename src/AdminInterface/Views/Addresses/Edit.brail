@@ -47,6 +47,14 @@
 			<% OutputSubView("/SubViews/ContactInfo") %>
 		</div>
 
+		<div class="block">
+			<h3>Настройка ограничения суммы заказов за 1 день</h3>
+			${app.Edit("address.CheckDailyOrdersSum")}<br/>
+			${app.Label("address.MaxDailyOrdersSum")}
+			${app.Edit("address.MaxDailyOrdersSum", {@class: @width100px})}
+		</div>
+
+
 		<% OutputSubView("/Templates/Users") %>
 
 		<div class=save>
