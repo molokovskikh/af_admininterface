@@ -107,6 +107,14 @@ namespace Functional
 		}
 
 		[Test]
+		public void ParsedWaybillsReportTest()
+		{
+			Open("ManagerReports");
+			Click("Отчет о состоянии формализованных накладных по поставщикам");
+			AssertText("Отчет о состоянии формализованных накладных");
+		}
+
+		[Test]
 		public void ClientAddressMonitorTest()
 		{
 			Open("ManagerReports");

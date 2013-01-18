@@ -15,5 +15,6 @@
 		<li>${app.LinkTo("Мониторинг выставления условий клиенту", @ManagerReports, @ClientConditionsMonitoring)}</li>
 		<li>${app.LinkTo("Отчет о состоянии формализуемых полей в прайс-листах поставщиков", @ManagerReports, @FormPosition)}</li>
 		<li>${app.LinkTo("Отчет о состоянии неформализованных накладных по поставщикам", @ManagerReports, @NotParcedWaybills)}</li>
+		<li>${app.LinkTo("Отчет о состоянии формализованных накладных по поставщикам", @ManagerReports, @ParsedWaybills)}</li>
 	</ul>
 </div>

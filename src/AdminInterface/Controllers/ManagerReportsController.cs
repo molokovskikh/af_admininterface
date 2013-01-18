@@ -288,5 +288,27 @@ namespace AdminInterface.Controllers
 			Response.ContentType = "application/vnd.ms-excel";
 			Response.OutputStream.Write(result, 0, result.Length);
 		}
+
+		public void ParsedWaybills()
+		{
+			var filter = BindFilter<ParsedWaybillsFilter, BaseItemForTable>();
+			if(filter.Session == null)
+				filter.Session = DbSession;
+			FindFilter(filter);
+		}
+
+		public void ParsedWaybillsToExcel([DataBind("filter")] ParsedWaybillsFilter filter)
+		{
+			CancelLayout();
+			CancelView();
+			if(filter.Session == null)
+				filter.Session = DbSession;
+			var result = ExportModel.GetParcedWaybills(filter);
+			Response.Clear();
+			Response.AppendHeader("Content-Disposition",
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Отчет о состоянии формализованных накладных.xls")));
+			Response.ContentType = "application/vnd.ms-excel";
+			Response.OutputStream.Write(result, 0, result.Length);
+		}
 	}
 }

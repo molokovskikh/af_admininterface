@@ -863,5 +863,64 @@ namespace AdminInterface.Models
 			}
 			return row;
 		}
+
+		public static byte[] GetParcedWaybills(ParsedWaybillsFilter filter)
+		{
+			var book = new HSSFWorkbook();
+
+			var sheet = book.CreateSheet("Лист1");
+
+			var row = 0;
+
+			// создаем строку
+			var sheetRow = sheet.CreateRow(row++);
+
+			// стиль для заголовков
+			var headerStyle = GetHeaderStyle(book);
+
+			// выводим наименование отчета
+			var headerCell = sheetRow.CreateCell(0);
+			headerCell.CellStyle = headerStyle;
+			headerCell.SetCellValue("Отчет о состоянии формализованных накладных");
+			// дата построения отчета
+			sheetRow = sheet.CreateRow(row++);
+			var dateCell = sheetRow.CreateCell(0);
+			dateCell.SetCellValue(String.Format("Дата подготовки отчета: {0}", DateTime.Now));
+			// период построения отчета
+			sheetRow = sheet.CreateRow(row++);
+			dateCell = sheetRow.CreateCell(0);
+			dateCell.SetCellValue(String.Format("Период: с {0} по {1}",
+				filter.Period.Begin.ToString("dd.MM.yyyy"),
+				filter.Period.End.ToString("dd.MM.yyyy")));
+			// клиент
+			sheetRow = sheet.CreateRow(row++);
+			dateCell = sheetRow.CreateCell(0);
+			dateCell.SetCellValue(String.Format("Клиент: {0}",
+				filter.ClientName));
+			// добавляем пустую строку перед таблицей
+			sheet.CreateRow(row++);
+			var tableHeaderRow = row;
+			var type = typeof(ParsedWaybillsItem);
+			// формируем заголовки таблицы
+			row = CreateTableHeader(sheet, type, headerStyle, row);
+			var dataStyle = GetDataStyle(book);
+			var centerDataStyle = GetDataStyle(book, true);
+			// формируем данные таблицы
+			row = CreateTableData(sheet, type, dataStyle, centerDataStyle, row, filter.Find);
+
+			// устанавливаем ширину столбцов
+			for (int i = 0; i < type.GetProperties().Length; i++) {
+				sheet.SetColumnWidth(i, (sheet.GetColumnWidth(i) * 3) / 2);
+			}
+
+			// добавляем автофильтр
+			sheet.SetAutoFilter(new CellRangeAddress(tableHeaderRow, row, 0, type.GetProperties().Length - 1));
+
+			sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, 6));
+
+			var buffer = new MemoryStream();
+			book.Write(buffer);
+			return buffer.ToArray();
+		}
 	}
 }
