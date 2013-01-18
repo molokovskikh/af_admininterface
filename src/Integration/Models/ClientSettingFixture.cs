@@ -28,7 +28,7 @@ namespace Integration.Models
 				.ExecuteUpdate();
 
 			client.Settings.BuyingMatrixPrice = price;
-			client.Settings.BuyingMatrixType = BuyingMatrixType.BlackList;
+			client.Settings.BuyingMatrixType = MatrixType.BlackList;
 			client.Settings.BuyingMatrixAction = MatrixAction.Block;
 			session.SaveOrUpdate(client.Settings);
 			Flush();

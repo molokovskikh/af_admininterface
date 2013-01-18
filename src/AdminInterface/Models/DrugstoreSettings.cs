@@ -19,7 +19,7 @@ namespace AdminInterface.Models
 		[Description("Скрытый")] Hidden = 2
 	}
 
-	public enum BuyingMatrixType
+	public enum MatrixType
 	{
 		[Description("Черный список")] BlackList = 1,
 		[Description("Белый список")] WhiteList = 0,
@@ -174,7 +174,7 @@ namespace AdminInterface.Models
 		public virtual Price BuyingMatrixPrice { get; set; }
 
 		[Property, Description("Тип матрицы"), Auditable, SetForceReplication]
-		public virtual BuyingMatrixType BuyingMatrixType { get; set; }
+		public virtual MatrixType BuyingMatrixType { get; set; }
 
 		[Property, Description("Действие матрицы"), Auditable, SetForceReplication]
 		public virtual MatrixAction BuyingMatrixAction { get; set; }
@@ -223,7 +223,7 @@ namespace AdminInterface.Models
 		public virtual Matrix OfferMatrix { get; set; }
 
 		[Property, Description("Тип матрицы предложений"), Auditable]
-		public virtual BuyingMatrixType OfferMatrixType { get; set; }
+		public virtual MatrixType OfferMatrixType { get; set; }
 
 		[Property]
 		public virtual MatrixAction OfferMatrixAction { get; set; }
