@@ -56,7 +56,6 @@ namespace Functional
 			browser.Link(Find.ByText("Регионы")).Click();
 			AssertText("Регионы");
 			Click("Воронеж");
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			var field = browser.TextField(Find.ByValue("111,00"));
 			var id = field.Id;
 			field.Value = "112";
