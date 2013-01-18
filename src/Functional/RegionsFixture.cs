@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AdminInterface.Models;
+using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
@@ -35,6 +37,36 @@ namespace Functional
 			AssertText("Сохранено");
 			browser.Link(Find.ByText("Регионы")).Click();
 			AssertText("123-1233210");
+		}
+
+		[Test]
+		public void SaveMarkupTest()
+		{
+			var markup = new Markup() {
+				Begin = 150,
+				End = 170,
+				RegionId = 1,
+				Type = 0,
+				Value = 111
+			};
+			session.Save(markup);
+			session.Flush();
+			Open("Main/Index");
+
+			browser.Link(Find.ByText("Регионы")).Click();
+			AssertText("Регионы");
+			Click("Воронеж");
+			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
+			var field = browser.TextField(Find.ByValue("111,00"));
+			var id = field.Id;
+			field.Value = "112";
+			Click("Сохранить");
+			AssertText("Сохранено");
+			session.Clear();
+			field = browser.TextField(id);
+			var savedMarkup = session.Query<Markup>().FirstOrDefault(m => m.Id == markup.Id);
+			Assert.That(savedMarkup.Value, Is.EqualTo(112));
+			Assert.That(field.Value, Is.EqualTo("112,00"));
 		}
 	}
 }
