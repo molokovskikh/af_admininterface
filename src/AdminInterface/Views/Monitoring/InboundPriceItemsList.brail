@@ -30,7 +30,7 @@
 		<%if firstPosition: %>
 			Загруженные
 		<%else:%>
-			Перепроведенные
+			Перепроводимые
 		<%end%>
 	</td>
 </tr>
@@ -41,21 +41,29 @@
 		<%if item.Downloaded: %>
 			Загруженные
 		<%else:%>
-			Перепроведенные
+			Перепроводимые
 		<%end%>
 		</td>
 	</tr>
 	<%firstPosition = item.Downloaded%>
 	<%end%>
-	<tr class="${ViewHelper.GetRowStyle(i)}">
+	<tr class="${ViewHelper.GetRowStyle(i)} ${"FormalizedNow" if item.FormalizedNow }">
 		<td>${app.LinkTo(item.Supplier, item.SupplierCode, "")}</td>
 		<td>${app.LinkTo(item.Supplier)}</td>
 		<td>${item.PriceCode}</td>
 		<td>${item.PriceName}</td>
 		<td>${item.Extension}</td>
 		<td>${item.PriceTime}</td>
-		<td><a href="#" onclick="DeleteItemInInboundList(${item.Hash}, '${item.PriceName}')">Удалить</a></td>
-		<td>${app.LinkTo("Вверх", @Monitoring, @TopInInboundList, { @hashCode : item.Hash})}</td>
+		<td>
+			<%if not item.FormalizedNow: %>
+			<a href="#" onclick="DeleteItemInInboundList(${item.Hash}, '${item.PriceName}')">Удалить</a>
+			<%end%>
+		</td>
+		<td>
+			<%if not item.FormalizedNow:%>
+			${app.LinkTo("Вверх", @Monitoring, @TopInInboundList, { @hashCode : item.Hash})}
+			<%end%>
+		</td>
 	</tr>
 <% end %>
 <% else: %>
@@ -64,3 +72,15 @@
 	</tr>
 <% end %>
 </table>
+<br/>
+
+<table>
+<tbody>
+	<tr>
+	<td>
+		<div class="LegendMarker FormalizedNow">
+		</div>
+	</td>
+	<td> - формализуется сейчас </td>
+	</tr>
+</tbody></table>
