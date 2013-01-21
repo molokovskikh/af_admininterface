@@ -145,6 +145,7 @@
 						</div>
 						<div class=settings data-depend-on="drugstore_EnableOfferMatrix">
 							${app.Edit("drugstore.OfferMatrixType")}
+							${app.Edit("drugstore.OfferMatrixAction")}
 							<div>
 								<h4 style="border:none; color:Black;">Поставщики исключения</h4>
 								<table id=excludes class=editable>
