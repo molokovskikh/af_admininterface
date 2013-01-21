@@ -179,6 +179,7 @@
     <Compile Include="Queries\ClientConditionsMonitoring.cs" />
     <Compile Include="Queries\FormPositionFilter.cs" />
     <Compile Include="Queries\IFiltrable.cs" />
+    <Compile Include="Queries\ParsedWaybillsFilter.cs" />
     <Compile Include="Queries\RegistrationInformation.cs" />
     <Compile Include="Queries\SwitchOffClientsFilter.cs" />
     <Compile Include="Queries\UpdatedAndDidNotDoOrders.cs" />
@@ -534,6 +535,7 @@
     <Content Include="Views\ManagerReports\SimpleTable.brail" />
     <Content Include="Views\ManagerReports\FormPosition.brail" />
     <Content Include="Views\Monitoring\InboundPriceItemsList.brail" />
+    <Content Include="Views\ManagerReports\ParsedWaybills.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />

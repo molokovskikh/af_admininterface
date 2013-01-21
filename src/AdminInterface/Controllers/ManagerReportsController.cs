@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Web;
+using AdminInterface.Controllers.Filters;
 using AdminInterface.Helpers;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
@@ -262,6 +263,50 @@ namespace AdminInterface.Controllers
 			Response.Clear();
 			Response.AppendHeader("Content-Disposition",
 				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Отчет о состоянии формализуемых полей.xls")));
+			Response.ContentType = "application/vnd.ms-excel";
+			Response.OutputStream.Write(result, 0, result.Length);
+		}
+
+		public void NotParcedWaybills()
+		{
+			var filter = new DocumentFilter();
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
+			var documents = filter.FindStat();
+			PropertyBag["filter"] = filter;
+			PropertyBag["documents"] = documents;
+		}
+
+		public void NotParcedWaybillsToExcel([DataBind("filter")] DocumentFilter filter)
+		{
+			CancelLayout();
+			CancelView();
+			var result = ExportModel.GetNotParcedWaybills(filter);
+			Response.Clear();
+			Response.AppendHeader("Content-Disposition",
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Отчет о состоянии неформализованных накладных.xls")));
+			Response.ContentType = "application/vnd.ms-excel";
+			Response.OutputStream.Write(result, 0, result.Length);
+		}
+
+		public void ParsedWaybills()
+		{
+			var filter = BindFilter<ParsedWaybillsFilter, BaseItemForTable>();
+			if(filter.Session == null)
+				filter.Session = DbSession;
+			FindFilter(filter);
+		}
+
+		public void ParsedWaybillsToExcel([DataBind("filter")] ParsedWaybillsFilter filter)
+		{
+			CancelLayout();
+			CancelView();
+			if(filter.Session == null)
+				filter.Session = DbSession;
+			var result = ExportModel.GetParcedWaybills(filter);
+			Response.Clear();
+			Response.AppendHeader("Content-Disposition",
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Отчет о состоянии формализованных накладных.xls")));
 			Response.ContentType = "application/vnd.ms-excel";
 			Response.OutputStream.Write(result, 0, result.Length);
 		}

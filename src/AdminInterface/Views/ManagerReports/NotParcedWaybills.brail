@@ -1,0 +1,56 @@
+﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+
+ <% component CaptureFor, {@id : @Title}: %>
+	Отчет о состоянии неформализованных накладных по поставщикам
+<% end %>
+ ${app.JS("ManagerReport.js")}
+${app.BeginFormFor("filter")}
+${FormHelper.HiddenField("filter.SortBy")}
+${FormHelper.HiddenField("filter.SortDirection")}
+<table class="CenterBlock">
+<tbody>
+	${app.FilterFor("filter.Period")}
+	<tr>
+		${app.EndFormFor("filter")}
+	</tr>
+</tbody>
+</table>
+
+<div class="filter">
+	<table class="CenterBlock">
+		<tr>
+			<td>
+				${app.ExportLink("Выгрузить в Excel", @NotParcedWaybillsToExcel, filter)}
+			</td>
+		</tr>
+	</table>
+</div>
+
+<% if IsDefined("documents"): %>
+	<table class="DataTable">
+		<%if documents.Count > 0: %>
+			<thead>
+				<tr>
+					<th>${app.Sortable("Код поставщика", "SupplierId")}</th>
+					<th>${app.Sortable("Наименование поставщика", "Supplier")}</th>
+					<th>${app.Sortable("Регион", "RegionName")}</th>
+					<th>${app.Sortable("Кол-во нераспознанных накладных", "DocumentsCount")}</th>
+					<th>Кол-во нераспознанных накладных отправленных клиентам</th>
+				</tr>
+			</thead>
+		<%end %>
+		<tbody>
+		<%if documents.Count > 0: %>
+			<%for i, item in enumerate(documents): %>
+				<tr>
+					<td>${item.SupplierId}</td>
+					<td>${item.Supplier}</td>
+					<td>${item.RegionName}</td>
+					<td>${item.DocumentsCount}</td>
+					<td>${item.DocumentToClientsCount}</td>
+				</tr>
+			<% end %>
+		<% end %>
+		</tbody>
+	</table>
+<% end %>

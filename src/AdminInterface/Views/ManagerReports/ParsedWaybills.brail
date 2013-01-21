@@ -1,0 +1,31 @@
+﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+
+ <% component CaptureFor, {@id : @Title}: %>
+	Отчет о состоянии формализованных накладных
+<% end %>
+ ${app.JS("ManagerReport.js")}
+ ${app.Asset("ManagerReport.css")}
+${app.BeginFormFor("filter")}
+${app.FilterFor("filter.Period")}
+<tr>
+		<td class="filter-label">Клиент</td>
+		<td colspan=2>
+			${app.Edit("filter.ClientName")}
+			${FormHelper.HiddenField("filter.ClientId")}
+		</td>
+	</tr>
+${FormHelper.HiddenField("filter.SortBy")}
+${FormHelper.HiddenField("filter.SortDirection")}
+${app.EndFormFor("filter")}
+<div class="filter">
+<table class="CenterBlock">
+<tr>
+<td>
+${app.ExportLink("Выгрузить в Excel", @ParsedWaybillsToExcel, filter)}
+</td>
+</tr>
+</table>
+</div>
+<div id="ParsedWaybillsTable">
+${tableHelper.ViewResult(Items, filter, app)}
+</div>
