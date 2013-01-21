@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
@@ -54,6 +56,49 @@ namespace AdminInterface.Controllers.Filters
 				RowsCount = countQuery.GetExecutableCriteria(s).UniqueResult<int>();
 				return criteria.GetExecutableCriteria(s).ToList<DocumentLog>();
 			});
+		}
+
+		public IList<NotParcedStat> FindStat()
+		{
+			SortKeyMap = new Dictionary<string, string> {
+				{ "Supplier", "Supplier" },
+				{ "SupplierId", "SupplierId" },
+				{ "RegionName", "RegionName" },
+				{ "DocumentsCount", "DocumentsCount" }
+			};
+			OnlyNoParsed = true;
+			var criteria = GetCriteriaForView(Period.Begin, Period.End);
+			criteria.Add(Expression.IsNull("d.Id"));
+			criteria.Add(Expression.Eq("DocumentType", DocumentType.Waybill));
+
+			var documents = ArHelper.WithSession(s => criteria.GetExecutableCriteria(s).ToList<DocumentLog>());
+
+			//var documents = AcceptPaginator(criteria);
+
+			var groupedDocs = documents.GroupBy(d => d.SupplierId);
+			var documentStats = new List<NotParcedStat>();
+			foreach (var groupedDoc in groupedDocs) {
+				var stat = new NotParcedStat {
+					SupplierId = int.Parse(groupedDoc.Key),
+					Supplier = groupedDoc.First().Supplier,
+					RegionName = groupedDoc.First().RegionName,
+					DocumentsCount = groupedDoc.Count()
+				};
+				foreach (var clientGroup in groupedDoc.GroupBy(s => s.ClientId)) {
+					stat.DocumentToClientsCount += String.Format("{0}: {1}; ", clientGroup.First().Client, clientGroup.Count());
+				}
+				documentStats.Add(stat);
+			}
+			if(!String.IsNullOrEmpty(SortBy)) {
+				var propertyInfo = typeof(NotParcedStat).GetProperty(SortBy);
+				if(SortDirection.Contains("asc"))
+					documentStats = documentStats.OrderBy(d => propertyInfo.GetValue(d, null)).ToList();
+				else
+					documentStats = documentStats.OrderByDescending(d => propertyInfo.GetValue(d, null)).ToList();
+			}
+			else
+				documentStats = documentStats.OrderBy(d => d.Supplier).ThenBy(d => d.RegionName).ToList();
+			return documentStats;
 		}
 
 		public IList<DocumentLog> Find()
@@ -116,7 +161,8 @@ namespace AdminInterface.Controllers.Filters
 				.Add(Projections.Property("fs.Id").As("SupplierId"))
 				.Add(Projections.Property("fc.Name").As("Client"))
 				.Add(Projections.Property("fc.Id").As("ClientId"))
-				.Add(Projections.Property("a.Value").As("Address"));
+				.Add(Projections.Property("a.Value").As("Address"))
+				.Add(Projections.Property("fs.HomeRegion").As("RegionName"));
 			if(!OnlyNoParsed && !StatMode) {
 				projection.Add(Projections.Property("u.Login").As("Login"))
 					.Add(Projections.Property("u.Id").As("LoginId"));
@@ -167,6 +213,7 @@ namespace AdminInterface.Controllers.Filters
 		public uint DeliveredId { get; set; }
 		public bool? FileDelivered { get; set; }
 		public bool? DocumentDelivered { get; set; }
+		public string RegionName { get; set; }
 
 		public bool DocumentProcessedSuccessfully()
 		{
@@ -180,5 +227,19 @@ namespace AdminInterface.Controllers.Filters
 
 			return null;
 		}
+	}
+
+	public class NotParcedStat
+	{
+		[Display(Name = "Наименование поставщика", Order = 1)]
+		public string Supplier { get; set; }
+		[Display(Name = "Код поставщика", Order = 0)]
+		public int SupplierId { get; set; }
+		[Display(Name = "Регион", Order = 2)]
+		public string RegionName { get; set; }
+		[Display(Name = "Кол-во нераспознанных накладных", Order = 3)]
+		public int DocumentsCount { get; set; }
+		[Display(Name = "Кол-во нераспознанных накладных отправленных клиентам", Order = 4)]
+		public string DocumentToClientsCount { get; set; }
 	}
 }

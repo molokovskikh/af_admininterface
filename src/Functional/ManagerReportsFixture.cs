@@ -88,6 +88,34 @@ namespace Functional
 		}
 
 		[Test]
+		public void NoParsedWaybillsReport()
+		{
+			var supplier = DataMother.CreateSupplier();
+			Save(supplier);
+			var client = DataMother.CreateClientAndUsers();
+			Save(client);
+			var documentLog = new AdminInterface.Models.Logs.DocumentReceiveLog(supplier);
+			documentLog.ForClient = client;
+			documentLog.LogTime = DateTime.Now;
+			Save(documentLog);
+
+			Open("ManagerReports");
+			Click("Отчет о состоянии неформализованных накладных по поставщикам");
+			AssertText("Отчет о состоянии неформализованных накладных по поставщикам");
+			AssertText("Кол-во нераспознанных накладных");
+			AssertText(supplier.Id.ToString());
+			AssertText(supplier.Name);
+		}
+
+		[Test]
+		public void ParsedWaybillsReportTest()
+		{
+			Open("ManagerReports");
+			Click("Отчет о состоянии формализованных накладных по поставщикам");
+			AssertText("Отчет о состоянии формализованных накладных");
+		}
+
+		[Test]
 		public void ClientAddressMonitorTest()
 		{
 			Open("ManagerReports");
