@@ -225,7 +225,7 @@ namespace AdminInterface.Models
 		[Property, Description("Тип матрицы предложений"), Auditable]
 		public virtual MatrixType OfferMatrixType { get; set; }
 
-		[Property("Действие матрицы предложений"), Auditable]
+		[Property, Description("Действие матрицы предложений"), Auditable]
 		public virtual MatrixAction OfferMatrixAction { get; set; }
 
 		[HasAndBelongsToMany(
