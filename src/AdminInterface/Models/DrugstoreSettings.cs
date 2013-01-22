@@ -154,7 +154,7 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[Description("Подключить матрицу закупок")]
+		[Description("Подключить матрицу предложений")]
 		public virtual bool EnableBuyingMatrix
 		{
 			get { return BuyingMatrixPrice != null; }
@@ -170,13 +170,13 @@ namespace AdminInterface.Models
 		[BelongsTo]
 		public virtual Matrix BuyingMatrix { get; set; }
 
-		[BelongsTo("BuyingMatrixPriceId"), Description("Ассортиментный прайс для матрицы закупок"), Auditable, SetForceReplication]
+		[BelongsTo("BuyingMatrixPriceId"), Description("Ассортиментный прайс для матрицы предложений"), Auditable, SetForceReplication]
 		public virtual Price BuyingMatrixPrice { get; set; }
 
-		[Property, Description("Тип матрицы"), Auditable, SetForceReplication]
+		[Property, Description("Тип матрицы предложений"), Auditable, SetForceReplication]
 		public virtual MatrixType BuyingMatrixType { get; set; }
 
-		[Property, Description("Действие матрицы"), Auditable, SetForceReplication]
+		[Property, Description("Действие матрицы предложений"), Auditable, SetForceReplication]
 		public virtual MatrixAction BuyingMatrixAction { get; set; }
 
 		[Property, Description("Конвертировать накладные"), Auditable]
@@ -203,7 +203,7 @@ namespace AdminInterface.Models
 		[Property(NotNull = true)]
 		public virtual string BasecostPassword { get; set; }
 
-		[Description("Подключить матрицу предложений")]
+		[Description("Подключить матрицу закупок")]
 		public virtual bool EnableOfferMatrix
 		{
 			get { return OfferMatrixPrice != null; }
@@ -216,16 +216,16 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[BelongsTo("OfferMatrixPriceId"), Description("Матрица предложений"), Auditable]
+		[BelongsTo("OfferMatrixPriceId"), Description("Ассортиментный прайс для матрицы закупок"), Auditable]
 		public virtual Price OfferMatrixPrice { get; set; }
 
 		[BelongsTo]
 		public virtual Matrix OfferMatrix { get; set; }
 
-		[Property, Description("Тип матрицы предложений"), Auditable]
+		[Property, Description("Тип матрицы закупок"), Auditable]
 		public virtual MatrixType OfferMatrixType { get; set; }
 
-		[Property, Description("Действие матрицы предложений"), Auditable]
+		[Property, Description("Действие матрицы закупок"), Auditable]
 		public virtual MatrixAction OfferMatrixAction { get; set; }
 
 		[HasAndBelongsToMany(
