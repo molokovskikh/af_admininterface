@@ -67,10 +67,8 @@ namespace Functional.Suppliers
 			Flush();
 			Open(supplier);
 			Click("Настройка");
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			browser.CheckBox("MainContentPlaceHolder_WorkRegionList_0").Checked = true;
 			Click("Применить");
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			session.Clear();
 			var savedPrice = session.Load<Price>(price.Id);
 			Assert.That(savedPrice.RegionalData.Count(d => d.Cost.Id == regionalData.Cost.Id), Is.EqualTo(2));
@@ -162,7 +160,6 @@ namespace Functional.Suppliers
 			Click("Применить");
 			AssertText("Сохранено");
 			Click("Настройка поставщика");
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			Click("Базовый");
 			selectList = browser.SelectLists[0];
 			Assert.That(selectList.SelectedItem, Is.EqualTo("Новая базовая"));
