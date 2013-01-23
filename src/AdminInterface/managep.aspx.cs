@@ -322,11 +322,13 @@ INTO    pricesregionaldata
 		(
 				regioncode,
 				pricecode,
-				enabled
+				enabled,
+				basecost
 		)
 SELECT  r.RegionCode,
 		p.PriceCode,
-		if(p.pricetype<>1, 1, 0)
+		if(p.pricetype<>1, 1, 0),
+		@NewPriceCostId
 FROM    pricesdata p,
 		Customers.Suppliers s,
 		farm.regions r
