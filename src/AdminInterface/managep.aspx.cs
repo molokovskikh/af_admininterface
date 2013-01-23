@@ -712,11 +712,13 @@ INTO    pricesregionaldata
 		(
 				regioncode,
 				pricecode,
-				enabled
+				enabled,
+				basecost
 		)
 SELECT  r.RegionCode,
 		p.PriceCode,
-		if(p.pricetype<>1, 1, 0)
+		if(p.pricetype<>1, 1, 0),
+		(select prd.basecost from usersettings.pricesregionaldata prd where prd.pricecode = p.pricecode limit 1)
 FROM pricesdata p, Customers.Suppliers s, farm.regions r
 WHERE s.Id = ?ClientCode
 		AND p.FirmCode = s.Id

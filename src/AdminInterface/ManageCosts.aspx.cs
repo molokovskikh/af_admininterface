@@ -56,12 +56,7 @@ namespace AddUser
 					dataSet.Tables["PriceRegionSettings"].Rows[i]["MinReq"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("MinReqText")).Text;
 
 					if (dataSet.Tables["PriceRegionSettings"].Rows[i]["BaseCost"].ToString() != ((DropDownList)PriceRegionSettings.Rows[i].FindControl("RegionalBaseCost")).SelectedValue) {
-						if (!string.IsNullOrEmpty(dataSet.Tables["PriceRegionSettings"].Rows[i]["BaseCost"].ToString())
-							|| ((DropDownList)PriceRegionSettings.Rows[i].FindControl("RegionalBaseCost")).SelectedValue != DefaultSelect.ToString())
-							dataSet.Tables["PriceRegionSettings"].Rows[i]["BaseCost"] = ((DropDownList)PriceRegionSettings.Rows[i].FindControl("RegionalBaseCost")).SelectedValue;
-						if(!string.IsNullOrEmpty(dataSet.Tables["PriceRegionSettings"].Rows[i]["BaseCost"].ToString())
-							&& ((DropDownList)PriceRegionSettings.Rows[i].FindControl("RegionalBaseCost")).SelectedValue == DefaultSelect.ToString())
-							dataSet.Tables["PriceRegionSettings"].Rows[i]["BaseCost"] = DBNull.Value;
+						dataSet.Tables["PriceRegionSettings"].Rows[i]["BaseCost"] = ((DropDownList)PriceRegionSettings.Rows[i].FindControl("RegionalBaseCost")).SelectedValue;
 					}
 				}
 				var adapter = new MySqlDataAdapter("", c);
