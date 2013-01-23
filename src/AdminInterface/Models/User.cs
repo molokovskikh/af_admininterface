@@ -266,6 +266,9 @@ namespace AdminInterface.Models
 		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
 		public virtual Service RootService { get; set; }
 
+		//public virtual RegionSettings[] RegionSettings { get; set; }
+		public virtual IList<int> RegionSettings { get; set; }
+
 		public virtual List<string> AvalilableAnalitFVersions
 		{
 			get
@@ -436,7 +439,9 @@ namespace AdminInterface.Models
 
 		public virtual void Setup()
 		{
-			Login = GetTempLogin();
+			var needChangeLogin = string.IsNullOrEmpty(Login);
+			if (needChangeLogin)
+				Login = GetTempLogin();
 			Enabled = true;
 			if (Logs == null)
 				Logs = new AuthorizationLogEntity(this);
@@ -447,7 +452,8 @@ namespace AdminInterface.Models
 			TargetVersion = defaults.AnalitFVersion;
 			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;
 			ActiveRecordMediator.Save(this);
-			Login = Id.ToString();
+			if (needChangeLogin)
+				Login = Id.ToString();
 			ActiveRecordMediator.Save(this);
 
 			if (Client != null)
@@ -713,7 +719,9 @@ WHERE
 
 			new AuditRecord("Сообщение в биллинг: " + billingMessage, this).Save();
 
-			billingMessage = String.Format("О регистрации Пользователя {0} ( {1} ) для клиента {2} ( {3} ): {4}", Name, Id, Client.Name, Client.Id, billingMessage);
+			var objName = Client != null ? "клиента" : "поставщика";
+
+			billingMessage = String.Format("О регистрации Пользователя {0} ( {1} ) для {5} {2} ( {3} ): {4}", Name, Id, RootService.Name, RootService.Id, billingMessage, objName);
 			Payer.AddComment(billingMessage);
 		}
 

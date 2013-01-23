@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Web.Script.Serialization;
 using AddUser;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
@@ -20,6 +22,7 @@ using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -32,6 +35,8 @@ using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -45,6 +50,16 @@ namespace AdminInterface.Controllers
 		public void Show(uint id)
 		{
 			RedirectUsingRoute("Edit", new { id });
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void Add()
+		{
+			var encode = Encoding.GetEncoding("utf-8");
+			var responseStream = new StreamReader(Request.InputStream, encode);
+			var jsonText = responseStream.ReadLine();
+			var deserializedObj = JsonConvert.DeserializeObject<User>(jsonText);
+			Add(new Contact[0], null, new Person[0], "Пользователь создан из интерфейса поставщика", true, deserializedObj.RootService.Id, string.Empty, jsonText);
 		}
 
 		[AccessibleThrough(Verb.Get)]
@@ -101,6 +116,57 @@ namespace AdminInterface.Controllers
 			PropertyBag["defaultSettings"] = Defaults;
 		}
 
+		private NameValueCollection GetCollectionFromJson(string text, string objName)
+		{
+			var result = new NameValueCollection();
+			JObject jsonObject = null;
+			if (text.Contains("{"))
+				jsonObject = JObject.Parse(text);
+			else {
+				result.Add(objName, text);
+				return result;
+			}
+			foreach (var obj in jsonObject) {
+				if (obj.Value.Type == JTokenType.Array && obj.Value.HasValues) {
+					var arrayValues = (JArray)obj.Value;
+					var count = 0;
+					foreach (var arrayValue in arrayValues) {
+						result.Add(GetCollectionFromJson(arrayValue.ToString(), string.Format("{0}.{1}[{2}]", objName, obj.Key, count)));
+						count++;
+					}
+					continue;
+				}
+				if (obj.Value.Type == JTokenType.Object) {
+					result.Add(GetCollectionFromJson(obj.Value.ToString(), objName + "." + obj.Key));
+					continue;
+				}
+				var value = obj.Value.ToString();
+				if (obj.Value.Type == JTokenType.String) {
+					value = value.Substring(1, value.Length - 2);
+				}
+				if (obj.Value.Type == JTokenType.Null)
+					value = string.Empty;
+				result.Add(objName + "." + obj.Key, value);
+			}
+			return result;
+		}
+
+		private void BindObjectInstanceForUser(User instance, string prefix, string jsonSource)
+		{
+			var treeRoot = new CompositeNode("root");
+			if (jsonSource != null) {
+				var builder = new TreeBuilder();
+				var collection = GetCollectionFromJson(jsonSource, "User");
+				treeRoot = builder.BuildSourceNode(collection);
+			}
+			else {
+				treeRoot = Request.ObtainParamsNode(ParamStore.Form);
+			}
+			Binder.BindObjectInstance(instance, prefix, treeRoot);
+			boundInstances[instance] = Binder.ErrorList;
+			PopulateValidatorErrorSummary(instance, Binder.GetValidationSummary(instance));
+		}
+
 		[AccessibleThrough(Verb.Post)]
 		public void Add(
 			[DataBind("contacts")] Contact[] contacts,
@@ -109,7 +175,8 @@ namespace AdminInterface.Controllers
 			string comment,
 			bool sendClientCard,
 			uint clientId,
-			string mails)
+			string mails,
+			string jsonSource)
 		{
 			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
 			DbSession.Get<Client>(clientId);
@@ -117,7 +184,7 @@ namespace AdminInterface.Controllers
 
 			var service = Service.FindAndCheck<Service>(clientId);
 			var user = new User(service);
-			BindObjectInstance(user, "user");
+			BindObjectInstanceForUser(user, "user", jsonSource);
 
 
 			if (!IsValid(user)) {
@@ -125,6 +192,7 @@ namespace AdminInterface.Controllers
 				PropertyBag["user"] = user;
 				return;
 			}
+
 			if(user.Payer == null || user.Payer.Id == 0) {
 				Add(service.Id);
 				PropertyBag["user"] = user;
@@ -159,8 +227,14 @@ namespace AdminInterface.Controllers
 			user.Payer = Payer.Find(user.Payer.Id);
 			user.Setup();
 			var password = user.CreateInAd();
-			user.WorkRegionMask = regionSettings.GetBrowseMask();
-			user.OrderRegionMask = regionSettings.GetOrderMask();
+			if (string.IsNullOrEmpty(jsonSource)) {
+				user.WorkRegionMask = regionSettings.GetBrowseMask();
+				user.OrderRegionMask = regionSettings.GetOrderMask();
+			}
+			else {
+				user.WorkRegionMask = BitConverter.ToUInt64(user.RegionSettings.Select(r => Convert.ToByte(r)).ToArray(), 0);
+				mails = user.GetAddressForSendingClientCard();
+			}
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 			DbSession.Save(passwordChangeLog);
 			user.UpdateContacts(contacts);

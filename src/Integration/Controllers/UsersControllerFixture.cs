@@ -73,7 +73,7 @@ namespace Integration.Controllers
 			Prepare();
 			Request.Params.Add("user.Payer.Id", client.Payers.First().Id.ToString());
 
-			controller.Add(clientContacts, regionSettings, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");
+			controller.Add(clientContacts, regionSettings, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut", null);
 			Flush();
 
 			var user = Registred();
@@ -93,7 +93,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
 
 			var user = Registred();
 			var messages = AuditRecord.Queryable.Where(l => l.ObjectId == user.Id);
@@ -113,7 +113,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
 
 			var user = Registred();
 			Assert.That(user.Payer, Is.EqualTo(payer));
@@ -136,7 +136,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
 			Assert.That(controller.Flash["Message"].ToString(),
 				Is.StringContaining("Ошибка регистрации: попытка зарегистрировать пользователя и адрес в различных Плательщиках"));
 		}
@@ -158,7 +158,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
 
 			var user = Registred();
 			Assert.That(user.Payer, Is.EqualTo(payer));
