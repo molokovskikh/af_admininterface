@@ -145,8 +145,12 @@ namespace Functional.Suppliers
 		{
 			supplier.Prices[0].Costs.Add(new Cost {
 				Name = "Новая базовая",
-				Price = supplier.Prices[0]
+				Price = supplier.Prices[0],
+				PriceItem = supplier.Prices[0].Costs[0].PriceItem
 			});
+			supplier.Prices[0].Costs[1].CostFormRule = new CostFormRule {
+				Cost = supplier.Prices[0].Costs[1], FieldName = ""
+			};
 			supplier.Prices[0].CostType = 0;
 			Save(supplier);
 			Flush();
@@ -158,6 +162,7 @@ namespace Functional.Suppliers
 			Click("Применить");
 			AssertText("Сохранено");
 			Click("Настройка поставщика");
+			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			Click("Базовый");
 			selectList = browser.SelectLists[0];
 			Assert.That(selectList.SelectedItem, Is.EqualTo("Новая базовая"));

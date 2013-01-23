@@ -49,7 +49,6 @@ namespace AddUser
 				}
 
 				var price = DbSession.Query<Price>().FirstOrDefault(p => p.Id == priceId);
-				var DefaultSelect = price.Costs.FirstOrDefault(d => d.BaseCost).Id;
 				for (var i = 0; i < PriceRegionSettings.Rows.Count; i++) {
 					dataSet.Tables["PriceRegionSettings"].Rows[i]["Enabled"] = ((CheckBox)PriceRegionSettings.Rows[i].FindControl("EnableCheck")).Checked;
 					dataSet.Tables["PriceRegionSettings"].Rows[i]["UpCost"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("UpCostText")).Text;
@@ -249,15 +248,14 @@ WHERE PriceCode = ?PriceCode
 
 			With.Transaction((c, t) => {
 				var selectCurrentCost = @"
-select pd.CostType, f.Id as RuleId, s.Id as SourceId, pi.Id as ItemId, prd.RegionCode as Region, ifnull(prd.BaseCost, base.CostCode) as CostCode
+select pd.CostType, f.Id as RuleId, s.Id as SourceId, pi.Id as ItemId, prd.RegionCode as Region, prd.BaseCost as CostCode
 from usersettings.PricesCosts pc
 	join usersettings.PricesData pd on pd.PriceCode = pc.PriceCode
-	join usersettings.pricescosts base on base.PriceCode = pc.PriceCode
 		join usersettings.PriceItems pi on pi.Id = pc.PriceItemId
 			join Farm.FormRules f on f.Id = pi.FormRuleId
 			join Farm.sources s on s.Id = pi.SourceId
 join usersettings.pricesregionaldata prd on prd.pricecode=pd.pricecode and prd.Enabled=1
-where pc.CostCode = ?CostCode and base.BaseCost = 1;";
+where pc.CostCode = ?CostCode;";
 
 				var command = new MySqlCommand(selectCurrentCost, c, t);
 				command.Parameters.AddWithValue("?CostCode", costId);

@@ -25,6 +25,7 @@
 						<Columns>
 							<asp:TemplateColumn>
 								<ItemTemplate>
+									<asp:HiddenField ID="CostCode" runat="server" Value='<%# Eval("CostCode") %>' />
 									<asp:Label runat="server" CssClass="ValidationErrorMessage" Visible='<%# ShowWarning(Convert.ToUInt32(Eval("CostCode"))) %>'>
 										Внимание! Ценовая колонка настроена.<br>
 									</asp:Label>

@@ -145,6 +145,7 @@ namespace AdminInterface.Models.Suppliers
 			Price = price;
 			Region = region;
 			Enabled = true;
+			Cost = price.Costs[0];
 		}
 
 		[PrimaryKey("RowId")]

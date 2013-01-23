@@ -103,7 +103,7 @@ SELECT  pd.PriceCode,
 		pd.BuyingMatrix,
 		pd.IsLocal
 FROM pricesdata pd
-	JOIN usersettings.pricescosts pc on pd.PriceCode = pc.PriceCode and pc.BaseCost = 1
+	JOIN usersettings.pricescosts pc on pd.PriceCode = pc.PriceCode and (pc.BaseCost = 1 or exists(select * from userSettings.pricesregionaldata prd where prd.PriceCode = pd.PriceCode and prd.BaseCost=pc.CostCode))
 		JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
 WHERE pd.firmcode = ?supplierId
 GROUP BY pd.PriceCode;
