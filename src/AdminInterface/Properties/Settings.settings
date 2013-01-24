@@ -1,24 +1,30 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AdminInterface.Properties" GeneratedClassName="Settings">
-	<Profiles />
-	<Settings>
-		<Setting Name="RegistrationCardEmailBodyForDrugstore" Type="System.String" Scope="Application">
-			<Value Profile="(Default)">Направляем Вам регистрационную карту Аптеки с учетными данными (имя и пароль) для работы в системе АналитФармация – в приложении.
+  <Profiles />
+  <Settings>
+    <Setting Name="UserPreparedDataFormatString" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">U:\wwwroot\ios\Results\{0}.zip</Value>
+    </Setting>
+    <Setting Name="WCFServiceUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">net.tcp://localhost:900/RemotePriceProcessorService</Value>
+    </Setting>
+    <Setting Name="RegistrationCardEmailBodyForDrugstore" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Направляем Вам регистрационную карту Аптеки с учетными данными (имя и пароль) для работы в системе АналитФармация – в приложении.
 
 Направляем Вам материалы для самостоятельной установки (переустановки) копии программы АналитФармация (если Вы хотите сделать это самостоятельно)
-Последний релиз программы доступен по адресу www.analit.net в разделе"Загрузить программу"
-Вы получите саморазворачивающийся архив.
-Запустите его на исполнение.  После распаковки на выбранном Вами диске появится папка AnalitFNew.  Из нее запустите файл analitf.exe
-Далее програма запросит вписать учетные данные  (имя и пароль) - возьмите их из регистрационной карты для каждого из пользователей - в приложении.
-Там же во вкладке "Соединение" настройте соединение с Интернет, если Вы соединяетесь через модем по телефонной линии, то посавьте галочку
-"Устанавливать удаленное соединение" и чуть ниже выберите используемое соединение.  Если работаете через Прокси-сервер, войдите в соответствующую вкладку и пропишите необходимые настройки.
+Последний релиз программы доступен по адресу www.analit.net в разделе"ПРОГРАММА"
+Выберите файлы для загрузки. Вы получите саморазворачивающийся архив.
+Запустите его на исполнение.  После распаковки на выбранном Вами диске появится папка AnalitF. Из нее запустите файл analitf.exe
+Далее програма запросит вписать учетные данные (имя и пароль) - возьмите их из регистрационной карты для каждого из пользователей - в приложении.
+Там же, во вкладке "Соединение", настройте соединение с Интернет, если Вы соединяетесь через модем по телефонной линии, то поставьте галочку
+"Устанавливать удаленное соединение" и чуть ниже выберите используемое соединение. Если работаете через Прокси-сервер, войдите в соответствующую вкладку и пропишите необходимые настройки.
 
 Успехов в работе.  Пожалуйста, сохраните регистрационную карту
 
 При необходимости, готовы перезвонить и дать все необходимые консультации</Value>
-		</Setting>
-		<Setting Name="RegistrationCardEmailBodyForSupplier" Type="System.String" Scope="Application">
-			<Value Profile="(Default)">
+    </Setting>
+    <Setting Name="RegistrationCardEmailBodyForSupplier" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">
 Направляем Вам регистрационную карту Поставщика с учетными данными (имя и пароль) для доступа к управлению Вашей информацией в системе электронного заказа АналитФармация. Регистрационная карта - в приложении.
 
 Для доступа к интерфейсу управления на www.analit.net войдите в раздел “Пользователям”, введите имя и пароль из рег.карты.
@@ -36,17 +42,13 @@
 Надеемся, что работа с остальными разделами (опциями) нашей системы не составит для Вас труда.
 Готовы ответить на любые Ваши вопросы, как по работе в представленном выше интерфейсе, так и по любым аспектам нашего IT-взаимодействия.
 ВНИМАНИЕ! Информацию, указанную в регистрационной карте, необходимо хранить, т.к. она является ключом доступа к интерфейсу управления настройками клиентов.
-Просьба подтвердить получение.
-			</Value>
-		</Setting>
-		<Setting Name="ClientInterfaceUrl" Type="System.String" Scope="Application">
-			<Value Profile="(Default)">http://localhost:50645/ci/auth/logon.aspx</Value>
-		</Setting>
-		<Setting Name="UserPreparedDataFormatString" Type="System.String" Scope="Application">
-			<Value Profile="(Default)">U:\wwwroot\ios\Results\{0}.zip</Value>
-		</Setting>
-		<Setting Name="WCFServiceUrl" Type="System.String" Scope="Application">
-			<Value Profile="(Default)">net.tcp://localhost:900/RemotePriceProcessorService</Value>
-		</Setting>
-	</Settings>
+Просьба подтвердить получение.</Value>
+    </Setting>
+    <Setting Name="ClientInterfaceUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:58379/ci/</Value>
+    </Setting>
+    <Setting Name="WCFOrderSenderServiceUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">net.tcp://localhost:901/RemoteOrderSenderService</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

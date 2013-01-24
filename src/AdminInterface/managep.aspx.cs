@@ -103,7 +103,7 @@ SELECT  pd.PriceCode,
 		pd.BuyingMatrix,
 		pd.IsLocal
 FROM pricesdata pd
-	JOIN usersettings.pricescosts pc on pd.PriceCode = pc.PriceCode and pc.BaseCost = 1
+	JOIN usersettings.pricescosts pc on pd.PriceCode = pc.PriceCode and (pc.BaseCost = 1 or exists(select * from userSettings.pricesregionaldata prd where prd.PriceCode = pd.PriceCode and prd.BaseCost=pc.CostCode))
 		JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
 WHERE pd.firmcode = ?supplierId
 GROUP BY pd.PriceCode;
@@ -322,11 +322,13 @@ INTO    pricesregionaldata
 		(
 				regioncode,
 				pricecode,
-				enabled
+				enabled,
+				basecost
 		)
 SELECT  r.RegionCode,
 		p.PriceCode,
-		if(p.pricetype<>1, 1, 0)
+		if(p.pricetype<>1, 1, 0),
+		@NewPriceCostId
 FROM    pricesdata p,
 		Customers.Suppliers s,
 		farm.regions r
@@ -710,11 +712,13 @@ INTO    pricesregionaldata
 		(
 				regioncode,
 				pricecode,
-				enabled
+				enabled,
+				basecost
 		)
 SELECT  r.RegionCode,
 		p.PriceCode,
-		if(p.pricetype<>1, 1, 0)
+		if(p.pricetype<>1, 1, 0),
+		(select prd.basecost from usersettings.pricesregionaldata prd where prd.pricecode = p.pricecode limit 1)
 FROM pricesdata p, Customers.Suppliers s, farm.regions r
 WHERE s.Id = ?ClientCode
 		AND p.FirmCode = s.Id

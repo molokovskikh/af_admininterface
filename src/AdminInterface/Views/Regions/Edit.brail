@@ -127,6 +127,73 @@ ${FormHelper.FormTag("", {})}
 				${app.GetValidationError(region, "TechContact")}
 			</td>
 		</tr>
+
+		<tr>
+			<table class="DataTable width380px">
+			<br/>Предельно разрешенные наценки Поставщика на ЖНВЛП<br/> в соотв. с региональным законодательством:<br/>
+				<tr>
+					<th>
+						Мин. цена
+					</th>
+					<th>
+						Макс. цена
+					</th>
+					<th>
+						Наценка
+					</th>
+				</tr>
+				<% for i, markup in enumerate(SuppliersMarkup): %>
+					<tr>
+						<td>
+							${FormHelper.HiddenField("SuppliersMarkup[${i}].Id")}
+							${FormHelper.HiddenField("SuppliersMarkup[${i}].RegionId")}
+							${FormHelper.HiddenField("SuppliersMarkup[${i}].Type")}
+							${markup.Begin}
+						</td>
+						<td>
+							${markup.End}
+						</td>
+						<td>
+							${app.Edit("SuppliersMarkup[${i}].Value", {@class: @width100px})}
+						</td>
+					</tr>
+				<% end %>
+			</table>
+		</tr>
+
+		<tr>
+			<table class="DataTable width380px">
+			<br/>Предельно разрешенные наценки Аптеки на ЖНВЛП<br/> в соотв. с региональным законодательством:<br/>
+				<tr>
+					<th>
+						Мин. цена
+					</th>
+					<th>
+						Макс. цена
+					</th>
+					<th>
+						Наценка
+					</th>
+				</tr>
+				<% for i, markup in enumerate(DrugstoreMarkup): %>
+					<tr>
+						<td>
+							${FormHelper.HiddenField("DrugstoreMarkup[${i}].Id")}
+							${FormHelper.HiddenField("DrugstoreMarkup[${i}].RegionId")}
+							${FormHelper.HiddenField("DrugstoreMarkup[${i}].Type")}
+							${markup.Begin}
+						</td>
+						<td>
+							${markup.End}
+						</td>
+						<td>
+							${app.Edit("DrugstoreMarkup[${i}].Value", {@class: @width100px})}
+						</td>
+					</tr>
+				<% end %>
+			</table>
+		</tr>
+
 		<tr>
 			<td colspan="2">
 			<div  class="hintInfoBlockRegion">
