@@ -413,19 +413,9 @@ namespace AdminInterface.Models
 			return log.IsChangedByOneSelf();
 		}
 
-		public static string GeneratePassword()
-		{
-			var availableChars = "23456789qwertyupasdfghjkzxcvbnmQWERTYUPASDFGHJKLZXCVBNM";
-			var password = String.Empty;
-			var random = new Random();
-			while (password.Length < 8)
-				password += availableChars[random.Next(0, availableChars.Length - 1)];
-			return password;
-		}
-
 		public virtual string CreateInAd()
 		{
-			var password = GeneratePassword();
+			var password = UserCommon.GeneratePassword();
 			ADHelper.CreateUserInAD(Login,
 				password,
 				RootService.Id);

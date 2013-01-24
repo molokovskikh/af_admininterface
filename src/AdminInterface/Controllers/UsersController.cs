@@ -391,7 +391,7 @@ namespace AdminInterface.Controllers
 			var user = DbSession.Load<User>(userId);
 			user.CheckLogin();
 			var administrator = Admin;
-			var password = User.GeneratePassword();
+			var password = UserCommon.GeneratePassword();
 
 			ADHelper.ChangePassword(user.Login, password);
 			if (changeLogin)

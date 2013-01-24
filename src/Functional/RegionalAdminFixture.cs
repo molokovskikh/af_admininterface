@@ -23,7 +23,7 @@ namespace Functional
 
 			browser.Link(Find.ByText("Региональные администраторы")).Click();
 			browser.Button(Find.ByValue("Создать")).Click();
-			var id = User.GeneratePassword();
+			var id = UserCommon.GeneratePassword();
 			var login = String.Format("admin{0}", id);
 			var managerName = String.Format("adminName{0}", id);
 			browser.TextField(Find.ByName("administrator.UserName")).TypeText(login);
@@ -55,7 +55,7 @@ namespace Functional
 
 			browser.Link(Find.ByText("Региональные администраторы")).Click();
 			browser.Button(Find.ByValue("Создать")).Click();
-			var id = User.GeneratePassword();
+			var id = UserCommon.GeneratePassword();
 			var login = String.Format("admin{0}", id);
 			var managerName = String.Format("adminName{0}", id);
 			ClickSaveAndCheckRequired(browser);
