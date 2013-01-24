@@ -25,12 +25,13 @@
 						<Columns>
 							<asp:TemplateColumn>
 								<ItemTemplate>
+									<asp:HiddenField ID="CostCode" runat="server" Value='<%# Eval("CostCode") %>' />
 									<asp:Label runat="server" CssClass="ValidationErrorMessage" Visible='<%# ShowWarning(Convert.ToUInt32(Eval("CostCode"))) %>'>
 										Внимание! Ценовая колонка настроена.<br>
 									</asp:Label>
 									<asp:Button ID="DeletButton" CommandArgument='<%# Bind("CostCode") %>' runat="server"
 												CausesValidation="False" CommandName="Delete" Text='<%# DeleteLabel(Convert.ToUInt32(Eval("CostCode"))) %>'
-												Visible='<%# CanDelete(Eval("BaseCost")) && CanDelete(Eval("RegionBaseCode")) %>'/>
+												Visible='<%# CanDelete(Eval("RegionBaseCode")) %>'/>
 								</ItemTemplate>
 								<ItemStyle HorizontalAlign="Left" />
 							</asp:TemplateColumn>
@@ -58,13 +59,6 @@
 								<ItemTemplate>
 									<asp:CheckBox ID="Pub" runat="server" Checked='<%# Convert.ToBoolean(Eval("AgencyEnabled")) %>'>
 									</asp:CheckBox>
-								</ItemTemplate>
-							</asp:TemplateColumn>
-							<asp:TemplateColumn SortExpression="BaseCost" HeaderText="Базовая&lt;br&gt;цена">
-								<HeaderStyle Width="80px"></HeaderStyle>
-								<ItemTemplate>
-									<asp:HiddenField ID="CostCode" runat="server" Value='<%# Eval("CostCode") %>' />
-									<input value='<%# DataBinder.Eval(Container, "DataItem.CostCode") %>' type="radio" <%# IsChecked(Convert.ToBoolean(DataBinder.Eval(Container, "DataItem.BaseCost"))) %> name="uid" />
 								</ItemTemplate>
 							</asp:TemplateColumn>
 							<asp:BoundColumn DataField="CostID" SortExpression="CostID" HeaderText="Идентификатор">

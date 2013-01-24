@@ -55,6 +55,25 @@ namespace Functional.Suppliers
 			Assert.That(price.Costs.Count, Is.EqualTo(1));
 		}
 
+		[Test(Description = "Тестирует назначение базовой ценовой колонки по-умолчанию для региональной настройки")]
+		public void AddPriceRegionalDataWithBaseCost()
+		{
+			var price = supplier.Prices[0];
+			price.Costs[0].Name = "Базовая";
+			price.CostType = 0;
+			var regionalData = price.RegionalData.First();
+			regionalData.Cost = price.Costs[0];
+			Save(regionalData);
+			Flush();
+			Open(supplier);
+			Click("Настройка");
+			browser.CheckBox("MainContentPlaceHolder_WorkRegionList_0").Checked = true;
+			Click("Применить");
+			session.Clear();
+			var savedPrice = session.Load<Price>(price.Id);
+			Assert.That(savedPrice.RegionalData.Count(d => d.Cost.Id == regionalData.Cost.Id), Is.EqualTo(2));
+		}
+
 		[Test]
 		public void Delete_cost_column_and_set_regional_base_cost()
 		{
@@ -124,8 +143,12 @@ namespace Functional.Suppliers
 		{
 			supplier.Prices[0].Costs.Add(new Cost {
 				Name = "Новая базовая",
-				Price = supplier.Prices[0]
+				Price = supplier.Prices[0],
+				PriceItem = supplier.Prices[0].Costs[0].PriceItem
 			});
+			supplier.Prices[0].Costs[1].CostFormRule = new CostFormRule {
+				Cost = supplier.Prices[0].Costs[1], FieldName = ""
+			};
 			supplier.Prices[0].CostType = 0;
 			Save(supplier);
 			Flush();
