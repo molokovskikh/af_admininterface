@@ -11,20 +11,15 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 <tbody>
 	${app.FilterFor("filter.Period")}
 	<tr>
+		<td>
+			${app.ExportLink("Выгрузить в Excel", @NotParcedWaybillsToExcel, filter)}
+		</td>
+	</tr>
+	<tr>
 		${app.EndFormFor("filter")}
 	</tr>
 </tbody>
 </table>
-
-<div class="filter">
-	<table class="CenterBlock">
-		<tr>
-			<td>
-				${app.ExportLink("Выгрузить в Excel", @NotParcedWaybillsToExcel, filter)}
-			</td>
-		</tr>
-	</table>
-</div>
 
 <% if IsDefined("documents"): %>
 	<table class="DataTable">

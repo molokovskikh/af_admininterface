@@ -59,6 +59,18 @@ namespace AdminInterface.Controllers
 			PropertyBag["logEntities"] = filter.Find();
 		}
 
+		public void DocumentsToExcel([DataBind("filter")] DocumentFilter filter)
+		{
+			CancelLayout();
+			CancelView();
+			var result = ExportModel.DocumentsLog(filter);
+			Response.Clear();
+			Response.AppendHeader("Content-Disposition",
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Неразобранные накладные.xls")));
+			Response.ContentType = "application/vnd.ms-excel";
+			Response.OutputStream.Write(result, 0, result.Length);
+		}
+
 		public void Download(uint id)
 		{
 			var log = DbSession.Load<DocumentReceiveLog>(id);

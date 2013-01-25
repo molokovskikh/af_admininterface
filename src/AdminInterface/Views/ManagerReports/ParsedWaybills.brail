@@ -14,18 +14,14 @@ ${app.FilterFor("filter.Period")}
 			${FormHelper.HiddenField("filter.ClientId")}
 		</td>
 	</tr>
-${FormHelper.HiddenField("filter.SortBy")}
-${FormHelper.HiddenField("filter.SortDirection")}
-${app.EndFormFor("filter")}
-<div class="filter">
-<table class="CenterBlock">
-<tr>
+	<tr>
 <td>
 ${app.ExportLink("Выгрузить в Excel", @ParsedWaybillsToExcel, filter)}
 </td>
 </tr>
-</table>
-</div>
+${FormHelper.HiddenField("filter.SortBy")}
+${FormHelper.HiddenField("filter.SortDirection")}
+${app.EndFormFor("filter")}
 <div id="ParsedWaybillsTable">
 ${tableHelper.ViewResult(Items, filter, app)}
 </div>

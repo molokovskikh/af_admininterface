@@ -11,7 +11,7 @@ namespace AdminInterface.Helpers
 	public class NPOIExcelHelper
 	{
 		// стиль для заголовков
-		public static ICellStyle GetHeaderStype(HSSFWorkbook book)
+		public static ICellStyle GetHeaderStype(HSSFWorkbook book, bool wrapText = true)
 		{
 			// шрифт для заголовков (жирный)
 			var font = book.CreateFont();
@@ -24,7 +24,7 @@ namespace AdminInterface.Helpers
 			headerStyle.BorderTop = BorderStyle.MEDIUM;
 			headerStyle.Alignment = HorizontalAlignment.CENTER;
 			headerStyle.SetFont(font);
-			headerStyle.WrapText = true;
+			headerStyle.WrapText = wrapText;
 			return headerStyle;
 		}
 

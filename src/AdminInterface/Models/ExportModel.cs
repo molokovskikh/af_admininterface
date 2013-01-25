@@ -496,9 +496,9 @@ namespace AdminInterface.Models
 			style.BorderBottom = BorderStyle.THIN;
 			style.BorderTop = BorderStyle.THIN;
 			style.GetFont(book).Boldweight = (short)FontBoldWeight.None;
-			if(isWrap)
+			if (isWrap)
 				style.WrapText = true;
-			if(isCenter)
+			if (isCenter)
 				style.Alignment = HorizontalAlignment.CENTER;
 			return style;
 		}
@@ -563,17 +563,17 @@ namespace AdminInterface.Models
 				foreach (PropertyInfo prop in infos) {
 					var value = prop.GetValue(formPositionItem, null);
 					var cell = sheetRow.CreateCell(col++);
-					if(value != null && value.ToString() == "*") {
+					if (value != null && value.ToString() == "*") {
 						cell.CellStyle = centerDataStyle;
 					}
 					else
 						cell.CellStyle = dataStyle;
-					if(value != null)
+					if (value != null)
 						cell.SetCellValue(value.ToString());
 				}
 			}
 			// устанавливаем ширину столбцов
-			for(var i = col; i >= 0; i--) {
+			for (var i = col; i >= 0; i--) {
 				sheet.SetColumnWidth(i, 2700);
 			}
 			sheet.SetColumnWidth(1, sheet.GetColumnWidth(1) * 2);
@@ -712,7 +712,7 @@ namespace AdminInterface.Models
 				}
 			}
 			// устанавливаем ширину столбцов
-			for(var i = col; i >= 0; i--) {
+			for (var i = col; i >= 0; i--) {
 				sheet.SetColumnWidth(i, 3500);
 			}
 			sheet.SetColumnWidth(0, sheet.GetColumnWidth(1) * 4);
@@ -768,7 +768,7 @@ namespace AdminInterface.Models
 		{
 			var book = new HSSFWorkbook();
 
-			var sheet = book.CreateSheet("Лист1");
+			var sheet = book.CreateSheet("Отчет о состоянии неформализованных накладных");
 
 			var row = 0;
 			var col = 0;
@@ -834,12 +834,12 @@ namespace AdminInterface.Models
 				foreach (PropertyInfo prop in infos) {
 					var value = prop.GetValue(formPositionItem, null);
 					var cell = sheetRow.CreateCell(col++);
-					if(value != null && value.ToString() == "*") {
+					if (value != null && value.ToString() == "*") {
 						cell.CellStyle = centerDataStyle;
 					}
 					else
 						cell.CellStyle = dataStyle;
-					if(value != null)
+					if (value != null)
 						cell.SetCellValue(value.ToString());
 				}
 			}
@@ -868,7 +868,7 @@ namespace AdminInterface.Models
 		{
 			var book = new HSSFWorkbook();
 
-			var sheet = book.CreateSheet("Лист1");
+			var sheet = book.CreateSheet("Отчет о состоянии формализованных накладных");
 
 			var row = 0;
 
@@ -917,6 +917,140 @@ namespace AdminInterface.Models
 			sheet.SetAutoFilter(new CellRangeAddress(tableHeaderRow, row, 0, type.GetProperties().Length - 1));
 
 			sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, 6));
+
+			var buffer = new MemoryStream();
+			book.Write(buffer);
+			return buffer.ToArray();
+		}
+
+		public static byte[] GetClientAddressesMonitor(ClientAddressFilter filter)
+		{
+			var book = new HSSFWorkbook();
+
+			var sheet = book.CreateSheet("Клиенты и адреса в регионе, по которым не принимаются накладные");
+
+			var row = 0;
+			var headerStyle = NPOIExcelHelper.GetHeaderStype(book);
+			var dataStyle = NPOIExcelHelper.GetDataStyle(book);
+			var sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, "Клиенты и адреса в регионе, по которым не принимаются накладные", headerStyle);
+			sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, String.Format("Период: с {0} по {1}",
+				filter.Period.Begin.ToString("dd.MM.yyyy"),
+				filter.Period.End.ToString("dd.MM.yyyy")),
+				book.CreateCellStyle());
+			sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, String.Format("Дата подготовки отчета: {0}", DateTime.Now), book.CreateCellStyle());
+			sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, String.Format("Регион: {0}", filter.Region == null ? "Все" : filter.Region.Name), book.CreateCellStyle());
+			sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, String.Format("Клиент: {0}", filter.ClientText), book.CreateCellStyle());
+			sheet.CreateRow(row++);
+			var tableHeaderRow = row;
+			sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, "Код клиента", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 1, "Наименование клиента", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 2, "Регион", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 3, "Код адреса", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 4, "Адрес", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 5, "Код поставщика", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 6, "Наименование поставщика", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 7, "Количество непринятых накладных", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 8, "Причина", headerStyle);
+
+			var items = filter.Find(true);
+			foreach (var item in items) {
+				sheetRow = sheet.CreateRow(row++);
+				NPOIExcelHelper.FillNewCell(sheetRow, 0, item.ClientId.ToString(), dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 1, item.ClientName, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 2, item.RegionName, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 3, item.AddressId.ToString(), dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 4, item.AddressName, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 5, item.SupplierId.ToString(), dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 6, item.SupplierName, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 7, item.Count.ToString(), dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 8, item.RejectReasonName, dataStyle);
+			}
+
+			// добавляем автофильтр
+			sheet.SetAutoFilter(new CellRangeAddress(tableHeaderRow, row, 0, 8));
+
+			sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, 8));
+
+			// устанавливаем ширину столбцов
+			for (int i = 0; i < 9; i++) {
+				sheet.SetColumnWidth(i, sheet.GetColumnWidth(i) * 2);
+			}
+
+			sheet.SetColumnWidth(4, sheet.GetColumnWidth(4) * 3);
+			sheet.SetColumnWidth(8, sheet.GetColumnWidth(8) * 3);
+
+			var buffer = new MemoryStream();
+			book.Write(buffer);
+			return buffer.ToArray();
+		}
+
+		public static byte[] DocumentsLog(DocumentFilter filter)
+		{
+			var book = new HSSFWorkbook();
+			var sheet = book.CreateSheet("Неразобранные накладные");
+			var row = 0;
+			var headerStyle = NPOIExcelHelper.GetHeaderStype(book);
+			var dataStyle = NPOIExcelHelper.GetDataStyle(book);
+			var sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, "Неразобранные накладные", headerStyle);
+			sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, String.Format("Период: с {0} по {1}",
+				filter.Period.Begin.ToString("dd.MM.yyyy"),
+				filter.Period.End.ToString("dd.MM.yyyy")),
+				book.CreateCellStyle());
+			sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, String.Format("Дата подготовки отчета: {0}", DateTime.Now), book.CreateCellStyle());
+			sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, String.Format("Регион: {0}", filter.Region == null ? "Все" : filter.Region.Name), book.CreateCellStyle());
+			sheet.CreateRow(row++);
+			var tableHeaderRow = row;
+			sheetRow = sheet.CreateRow(row++);
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, "Номер документа", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 1, "Дата получения", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 2, "Тип документа", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 3, "От поставщика", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 4, "Клиенту", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 5, "На адрес", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 6, "Название файла", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 7, "Размер", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 8, "Парсер", headerStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 9, "Комментарий", headerStyle);
+
+			var items = filter.Find(true);
+			foreach (var item in items) {
+				sheetRow = sheet.CreateRow(row++);
+				NPOIExcelHelper.FillNewCell(sheetRow, 0, item.Id.ToString(), dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 1, item.LogTime.ToString(), dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 2, item.DocumentType.GetDescription(), dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 3, item.Supplier, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 4, item.Client, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 5, item.Address, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 6, item.FileName, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 7,
+					item.DocumentSize == null ? ""
+						: ViewHelper.ConvertToUserFriendlySize(item.DocumentSize.Value),
+					dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 8, item.Parser, dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 9, item.Addition, dataStyle);
+			}
+
+			// добавляем автофильтр
+			sheet.SetAutoFilter(new CellRangeAddress(tableHeaderRow, row, 0, 9));
+
+			sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, 9));
+
+			// устанавливаем ширину столбцов
+			for (int i = 0; i < 10; i++) {
+				sheet.SetColumnWidth(i, sheet.GetColumnWidth(i) * 2);
+			}
+
+			sheet.SetColumnWidth(5, sheet.GetColumnWidth(5) * 2);
 
 			var buffer = new MemoryStream();
 			book.Write(buffer);
