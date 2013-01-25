@@ -268,7 +268,6 @@
     <Compile Include="Controllers\UserSearchController.cs" />
     <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TelephonyController.cs" />
-    <Compile Include="Components\Legend.cs" />
     <Compile Include="Controllers\ClientsController.cs" />
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
