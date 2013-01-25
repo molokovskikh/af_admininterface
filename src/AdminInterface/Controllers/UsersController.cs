@@ -160,7 +160,7 @@ namespace AdminInterface.Controllers
 				treeRoot = builder.BuildSourceNode(collection);
 			}
 			else {
-				treeRoot = Request.ObtainParamsNode(ParamStore.Form);
+				treeRoot = Request.ObtainParamsNode(ParamStore.Params);
 			}
 			Binder.BindObjectInstance(instance, prefix, treeRoot);
 			boundInstances[instance] = Binder.ErrorList;
@@ -185,7 +185,6 @@ namespace AdminInterface.Controllers
 			var service = Service.FindAndCheck<Service>(clientId);
 			var user = new User(service);
 			BindObjectInstanceForUser(user, "user", jsonSource);
-
 
 			if (!IsValid(user)) {
 				Add(service.Id);
@@ -225,7 +224,7 @@ namespace AdminInterface.Controllers
 			service.AddUser(user);
 
 			user.Payer = Payer.Find(user.Payer.Id);
-			user.Setup();
+			user.Setup(string.IsNullOrEmpty(jsonSource));
 			var password = user.CreateInAd();
 			if (string.IsNullOrEmpty(jsonSource)) {
 				user.WorkRegionMask = regionSettings.GetBrowseMask();

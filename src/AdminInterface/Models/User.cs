@@ -427,10 +427,9 @@ namespace AdminInterface.Models
 			return Guid.NewGuid().ToString();
 		}
 
-		public virtual void Setup()
+		public virtual void Setup(bool generateTempLogin = true)
 		{
-			var needChangeLogin = string.IsNullOrEmpty(Login);
-			if (needChangeLogin)
+			if (generateTempLogin)
 				Login = GetTempLogin();
 			Enabled = true;
 			if (Logs == null)
@@ -442,7 +441,7 @@ namespace AdminInterface.Models
 			TargetVersion = defaults.AnalitFVersion;
 			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;
 			ActiveRecordMediator.Save(this);
-			if (needChangeLogin)
+			if (generateTempLogin)
 				Login = Id.ToString();
 			ActiveRecordMediator.Save(this);
 
