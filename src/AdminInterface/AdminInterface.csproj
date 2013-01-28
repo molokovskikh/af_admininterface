@@ -173,6 +173,7 @@
     <Compile Include="Models\Markup.cs" />
     <Compile Include="Models\ProducerSynonym.cs" />
     <Compile Include="Models\ProductSynonym.cs" />
+    <Compile Include="Models\Validators\PayerNotNullValidator.cs" />
     <Compile Include="Models\WaybillExcludeFile.cs" />
     <Compile Include="Queries\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="Queries\ClientAddressFilter.cs" />

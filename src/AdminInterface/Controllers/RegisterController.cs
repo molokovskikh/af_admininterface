@@ -246,8 +246,10 @@ namespace AdminInterface.Controllers
 			var forValidation = new List<object> {
 				client
 			};
-			if (!options.RegisterEmpty)
+			if (!options.RegisterEmpty) {
 				forValidation.Add(user);
+				client.AddUser(user);
+			}
 
 			if (!IsValid(forValidation) || equalClientInRegion) {
 				RegisterClient();
@@ -271,9 +273,6 @@ namespace AdminInterface.Controllers
 				address.Value = address.Value.Replace("№", "N").Trim();
 				client.AddAddress(address);
 			}
-
-			if (user != null)
-				client.AddUser(user);
 
 			CreateDrugstore(client, options, supplier);
 			AddContacts(client.ContactGroupOwner, clientContacts);
