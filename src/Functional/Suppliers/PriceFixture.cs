@@ -33,6 +33,24 @@ namespace Functional.Suppliers
 		}
 
 		[Test]
+		public void CreateCostColumnTest()
+		{
+			var price = supplier.Prices[0];
+			price.Costs[0].Name = "Базовая";
+			price.CostType = 0;
+			session.Save(price);
+			Flush();
+			Open(supplier);
+			Click("Настройка");
+			Click("Базовый");
+			AssertText("Настройка ценовых колонок");
+			Click("Новая ценовая колонка");
+			Click("Применить");
+			var costs = session.Query<Cost>().Where(c => c.Price.Id == supplier.Prices[0].Id);
+			Assert.That(costs.Count(), Is.GreaterThan(1));
+		}
+
+		[Test]
 		public void Delete_cost_column()
 		{
 			var price = supplier.Prices[0];
