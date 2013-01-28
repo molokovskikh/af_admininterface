@@ -116,7 +116,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["defaultSettings"] = Defaults;
 		}
 
-		private NameValueCollection GetCollectionFromJson(string text, string objName)
+		public NameValueCollection GetCollectionFromJson(string text, string objName)
 		{
 			var result = new NameValueCollection();
 			JObject jsonObject = null;
@@ -151,7 +151,7 @@ namespace AdminInterface.Controllers
 			return result;
 		}
 
-		private void BindObjectInstanceForUser(User instance, string prefix, string jsonSource)
+		public void BindObjectInstanceForUser(User instance, string prefix, string jsonSource)
 		{
 			var treeRoot = new CompositeNode("root");
 			if (jsonSource != null) {
