@@ -272,8 +272,7 @@ namespace Integration.Controllers
 			var supplier = DataMother.CreateSupplier();
 			session.Save(supplier);
 
-			//var supplierPosition = json.IndexOf("\"Id\":5");
-			var thisJson = json.Replace("\"Id\":5", string.Format("\"Id\":{0}", supplier.Id)).Replace("testLoginRegister", tempLogin);
+			var thisJson = json.Replace("\"Id\":5", string.Format("\"Id\":{0}", supplier.Id)).Replace("\"PayerID\":5", string.Format("\"PayerID\":{0}", supplier.Payer.Id)).Replace("testLoginRegister", tempLogin);
 
 			Prepare();
 			controller.Add(new Contact[0], new RegionSettings[0], new Person[0], "тестовое сообщение для биллинга", true, supplier.Id, null, thisJson);
