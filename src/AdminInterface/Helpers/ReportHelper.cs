@@ -92,8 +92,10 @@ namespace AdminInterface.Helpers
 					From = new MailAddress("tech@analit.net"),
 					Subject = "Регистрационная карта для работы в системе АналитФармация",
 					Body = defaults.AppendFooter(body),
-					Attachments = { new Attachment(stream, "Регистрационная карта.jpg"), new Attachment(Path.Combine(Global.Config.DocsPath, "Инструкция по установке.doc")) },
+					Attachments = { new Attachment(stream, "Регистрационная карта.jpg") },
 				}) {
+					if (user.RootService.IsClient())
+						message.Attachments.Add(new Attachment(Path.Combine(Global.Config.DocsPath, "Инструкция по установке.doc")));
 					foreach (var mail in mails)
 						EmailHelper.BuildAttachementFromString(mail, message);
 
