@@ -18,7 +18,13 @@ ${FormHelper.HiddenField("filter.User.Id")}
 ${FormHelper.HiddenField("filter.OnlyNoParsed")}
 ${app.FilterFor("filter.Period")}
 <% if filter.OnlyNoParsed: %>
+${FormHelper.HiddenField("filter.RowsCount")}
 ${app.FilterFor("filter.Region")}
+<tr>
+<td>
+${app.ExportLink("Выгрузить в Excel", @DocumentsToExcel, filter)}
+</td>
+</tr>
 <% end %>
 ${app.EndFormFor("filter")}
 

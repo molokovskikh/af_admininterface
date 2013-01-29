@@ -59,6 +59,8 @@ namespace AdminInterface.ManagerReportsFilters
 		[Description("Клиент")]
 		public string ClientText { get; set; }
 
+		public ISession Session { get; set; }
+
 		public ClientAddressFilter()
 		{
 			SortKeyMap = new Dictionary<string, string> {
@@ -107,10 +109,14 @@ namespace AdminInterface.ManagerReportsFilters
 			return criteria;
 		}
 
-		public IList<RejectCounts> Find(ISession session)
+		public IList<RejectCounts> Find(bool forExport = false)
 		{
 			var criteria = GetCriteria();
-			var result = AcceptPaginator<RejectCounts>(criteria, session);
+			if(forExport) {
+				ApplySort(criteria);
+				return criteria.GetExecutableCriteria(Session).ToList<RejectCounts>();
+			}
+			var result = AcceptPaginator<RejectCounts>(criteria, Session);
 
 			return result;
 		}

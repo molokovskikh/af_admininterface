@@ -208,7 +208,7 @@ namespace AdminInterface.Models
 		 Description("Наследовать настройки прайс листов"), Auditable, SetForceReplication]
 		public virtual User InheritPricesFrom { get; set; }
 
-		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke), Description("Плательщик"), Auditable]
+		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke), Description("Плательщик"), Auditable, PayerNotNullValidator("Заполнение поля обязательно")]
 		public virtual Payer Payer { get; set; }
 
 		//не работает какая то фигня в хибере

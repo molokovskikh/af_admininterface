@@ -590,7 +590,7 @@ namespace Functional.Drugstore
 			browser.Link(Find.ByText("Новый пользователь")).Click();
 			FillRequiredFields();
 			Click("Создать");
-			AssertText("Ошибка регистрации: необходимо выбрать Плательщика");
+			AssertText("Заполнение поля обязательно");
 			browser.Css("#user_Payer_Id").Select("Тестовый плательщик");
 			Click("Создать");
 			AssertText("Регистрационная карта");
