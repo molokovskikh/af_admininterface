@@ -265,7 +265,7 @@ namespace Integration.Controllers
 			Assert.IsNull(user.InheritPricesFrom);
 		}
 
-		[Test]
+		[Test, Ignore("Чтобы выяснить с этим ли тестом связана поломка")]
 		public void Add_from_json()
 		{
 			var tempLogin = Guid.NewGuid().ToString().Replace("-", string.Empty).Substring(0, 20);
