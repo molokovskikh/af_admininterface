@@ -192,8 +192,6 @@ namespace Integration.Controllers
 			session.Save(user);
 			var oldMask = user.OrderRegionMask;
 			controller.Update(user,
-				new ulong[1],
-				new ulong[1],
 				new Contact[1] {
 					new Contact {
 						ContactText = "123"

@@ -89,7 +89,9 @@ ${app.Asset("UserScripts.js")}
 				<% end %>
 			</div>
 		</div>
-		
+
+		<% OutputSubView("/SubViews/UserRegions") %>
+
 		<div class=save>
 			<input type=submit value="Сохранить">
 		</div>

@@ -236,22 +236,10 @@ namespace AdminInterface.Controllers
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user);
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
-			PropertyBag["maxRegion"] = UInt64.MaxValue;
 
 			PropertyBag["filter"] = filter;
 			PropertyBag["messages"] = user.GetAuditRecord(DbSession, filter);
 
-			if (user.Client != null) {
-				var setting = user.Client.Settings;
-				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask);
-				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion);
-			}
-			if (user.SupplierUser()) {
-				var supplier = Supplier.Find(user.RootService.Id);
-				if (supplier != null) {
-					PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(supplier.RegionMask);
-				}
-			}
 			if (user.ContactGroup != null && user.ContactGroup.Contacts != null)
 				PropertyBag["ContactGroup"] = user.ContactGroup;
 
@@ -266,8 +254,6 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void Update(
 			[ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AvaliableAddresses")] User user,
-			[DataBind("WorkRegions")] ulong[] workRegions,
-			[DataBind("OrderRegions")] ulong[] orderRegions,
 			[DataBind("contacts")] Contact[] contacts,
 			[DataBind("deletedContacts")] Contact[] deletedContacts,
 			[DataBind("persons")] Person[] persons,
@@ -279,9 +265,6 @@ namespace AdminInterface.Controllers
 				return;
 			}
 
-			user.WorkRegionMask = workRegions.Aggregate(0UL, (v, a) => a + v);
-			if(user.Client != null)
-				user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
 			user.UpdateContacts(contacts, deletedContacts);
 			user.UpdatePersons(persons, deletedPersons);
 			DbSession.Save(user);
@@ -410,11 +393,19 @@ namespace AdminInterface.Controllers
 		{
 			var user = DbSession.Load<User>(id);
 			PropertyBag["user"] = user;
+			PropertyBag["maxRegion"] = UInt64.MaxValue;
 			if (user.Client == null) {
+				var supplier = Supplier.Find(user.RootService.Id);
+				if (supplier != null) {
+					PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(supplier.RegionMask);
+				}
 				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.SupplierInterface);
 				RenderView("SupplierSettings");
 			}
 			else {
+				var setting = user.Client.Settings;
+				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask);
+				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion);
 				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.Base);
 				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel);
 				PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint);
@@ -439,8 +430,15 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void SaveSettings([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom, user.ShowUsers")] User user)
+		public void SaveSettings(
+			[ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom, user.ShowUsers")] User user,
+			[DataBind("WorkRegions")] ulong[] workRegions,
+			[DataBind("OrderRegions")] ulong[] orderRegions)
 		{
+			user.WorkRegionMask = workRegions.Aggregate(0UL, (v, a) => a + v);
+			if(user.Client != null)
+				user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
+
 			user.ShowUsers = user.ShowUsers.Where(u => u != null).ToList();
 			DbSession.Save(user);
 			Notify("Сохранено");
