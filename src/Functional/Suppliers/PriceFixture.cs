@@ -46,8 +46,9 @@ namespace Functional.Suppliers
 			AssertText("Настройка ценовых колонок");
 			Click("Новая ценовая колонка");
 			Click("Применить");
-			var costs = session.Query<Cost>().Where(c => c.Price.Id == supplier.Prices[0].Id);
+			var costs = session.Query<Cost>().Where(c => c.Price.Id == supplier.Prices[0].Id).ToList();
 			Assert.That(costs.Count(), Is.GreaterThan(1));
+			Assert.That(costs[0].PriceItem.Id, Is.EqualTo(costs[1].PriceItem.Id));
 		}
 
 		[Test]
