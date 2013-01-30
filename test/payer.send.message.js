@@ -5,7 +5,7 @@
       view = new PayerSendMessage();
       flag = $("#userMessage_SendToMinimail");
       equal(flag.attr("disabled"), "disabled");
-      $("#messageReceiverComboBox option:last").attr("selected", "selected");
+      $("#messageReceiverComboBox option:last").prop("selected", "selected");
       $("#messageReceiverComboBox").change();
       return equal(flag.attr("disabled"), null);
     });
