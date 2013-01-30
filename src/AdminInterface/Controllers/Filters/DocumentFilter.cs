@@ -42,10 +42,10 @@ namespace AdminInterface.Controllers.Filters
 		public Client Client { get; set; }
 		public Supplier Supplier { get; set; }
 
-		private IList<DocumentLog> AcceptPaginator(DetachedCriteria criteria)
+		private IList<DocumentLog> AcceptPaginator(DetachedCriteria criteria, bool forExport = false)
 		{
 			var countQuery = CriteriaTransformer.TransformToRowCount(criteria);
-			if(OnlyNoParsed) {
+			if(OnlyNoParsed && !forExport) {
 				if (CurrentPage > 0)
 					criteria.SetFirstResult(CurrentPage * PageSize);
 
@@ -101,7 +101,7 @@ namespace AdminInterface.Controllers.Filters
 			return documentStats;
 		}
 
-		public IList<DocumentLog> Find()
+		public IList<DocumentLog> Find(bool forExport = false)
 		{
 			var criteria = GetCriteriaForView(Period.Begin, Period.End);
 			if (User != null)
@@ -118,7 +118,7 @@ namespace AdminInterface.Controllers.Filters
 				criteria.Add(Expression.Eq("DocumentType", DocumentType.Waybill));
 			}
 
-			return AcceptPaginator(criteria);
+			return AcceptPaginator(criteria, forExport);
 		}
 
 		private DetachedCriteria GetCriteriaForView(DateTime begin, DateTime end)

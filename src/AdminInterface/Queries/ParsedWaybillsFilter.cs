@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using AdminInterface.ManagerReportsFilters;
+using AdminInterface.Models;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
@@ -49,6 +50,12 @@ namespace AdminInterface.Queries
 
 		public IList<BaseItemForTable> Find()
 		{
+			if(ClientId != null) {
+				var client = Session.Load<Client>(ClientId);
+				if(String.IsNullOrEmpty(ClientName) || !client.Name.Contains(ClientName)) {
+					ClientId = null;
+				}
+			}
 			var query = Session.CreateSQLQuery(String.Format(@"select dh.firmcode as SupplierCode,
 sp.Name as SupplierName,
 r.Region as HomeRegion,

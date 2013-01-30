@@ -125,12 +125,6 @@ namespace AdminInterface.Controllers
 				PropertyBag["user"] = user;
 				return;
 			}
-			if(user.Payer == null || user.Payer.Id == 0) {
-				Add(service.Id);
-				PropertyBag["user"] = user;
-				Error("Ошибка регистрации: необходимо выбрать Плательщика");
-				return;
-			}
 
 			var address = new Address();
 			SetBinder(new ARDataBinder());

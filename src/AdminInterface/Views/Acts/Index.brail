@@ -97,7 +97,7 @@
 						<td>${app.LinkTo(act, "Редактировать", @Edit)}</td>
 						<td>${app.LinkTo(act, act.Id, @Print)}</td>
 						<td>${act.Payer.Id}</td>
-						<td>${act.Recipient.Name}</td>
+						<td><% if act.Recipient != null: %>${act.Recipient.Name}<% end %></td>
 						<td>${app.LinkTo(act.Payer)}</td>
 						<td style="text-align:right;">${act.Sum.ToString("C")}</td>
 						<td>${BindingHelper.GetDescription(act.Period)}</td>

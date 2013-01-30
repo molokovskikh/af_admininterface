@@ -173,6 +173,7 @@
     <Compile Include="Models\Markup.cs" />
     <Compile Include="Models\ProducerSynonym.cs" />
     <Compile Include="Models\ProductSynonym.cs" />
+    <Compile Include="Models\Validators\PayerNotNullValidator.cs" />
     <Compile Include="Models\WaybillExcludeFile.cs" />
     <Compile Include="Queries\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="Queries\ClientAddressFilter.cs" />
@@ -536,6 +537,7 @@
     <Content Include="Views\ManagerReports\FormPosition.brail" />
     <Content Include="Views\Monitoring\InboundPriceItemsList.brail" />
     <Content Include="Views\ManagerReports\ParsedWaybills.brail" />
+    <Content Include="Views\ManagerReports\NotParcedWaybills.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />

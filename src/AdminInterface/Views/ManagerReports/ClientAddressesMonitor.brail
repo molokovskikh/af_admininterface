@@ -21,6 +21,11 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		</td>
 	</tr>
 	<tr>
+		<td>
+			${app.ExportLink("Выгрузить в Excel", @ClientAddressesMonitorToExcel, filter)}
+		</td>
+	</tr>
+	<tr>
 		${app.EndFormFor("filter")}
 	</tr>
 </tbody>

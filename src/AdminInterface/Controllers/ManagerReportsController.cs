@@ -74,8 +74,24 @@ namespace AdminInterface.Controllers
 			var filter = new ClientAddressFilter();
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
-			PropertyBag["Clients"] = filter.Find(DbSession);
+			if(filter.Session == null)
+				filter.Session = DbSession;
+			PropertyBag["Clients"] = filter.Find();
 			PropertyBag["filter"] = filter;
+		}
+
+		public void ClientAddressesMonitorToExcel([DataBind("filter")] ClientAddressFilter filter)
+		{
+			CancelLayout();
+			CancelView();
+			if(filter.Session == null)
+				filter.Session = DbSession;
+			var result = ExportModel.GetClientAddressesMonitor(filter);
+			Response.Clear();
+			Response.AppendHeader("Content-Disposition",
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Клиенты и адреса в регионе, по которым не принимаются накладные.xls")));
+			Response.ContentType = "application/vnd.ms-excel";
+			Response.OutputStream.Write(result, 0, result.Length);
 		}
 
 		public void SwitchOffClients()
@@ -295,6 +311,8 @@ namespace AdminInterface.Controllers
 			if(filter.Session == null)
 				filter.Session = DbSession;
 			FindFilter(filter);
+			if(!String.IsNullOrEmpty(filter.ClientName) && filter.ClientId == null)
+				Flash["Message"] = "Поиск выполнен без учета клиента! Для включения клиента в поиск необходимо выбрать полное наименование клиента из выпадающего списка, появляющегося при вводе части наименования клиента в поле 'Клиент' ";
 		}
 
 		public void ParsedWaybillsToExcel([DataBind("filter")] ParsedWaybillsFilter filter)
