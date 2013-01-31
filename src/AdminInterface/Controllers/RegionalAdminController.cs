@@ -12,6 +12,7 @@ using Castle.MonoRail.Framework;
 using AdminInterface.Models.Security;
 using AdminInterface.Helpers;
 using Castle.ActiveRecord;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using System.Collections;
 using Common.Web.Ui.Models;
@@ -155,7 +156,7 @@ namespace AdminInterface.Controllers
 			if (isExist)
 				return false;
 
-			var password = User.GeneratePassword();
+			var password = UserCommon.GeneratePassword();
 			var isLoginCreated = Storage.CreateAdmin(administrator.UserName, administrator.ManagerName, password);
 
 			if (!isLoginCreated)

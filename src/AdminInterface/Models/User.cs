@@ -266,6 +266,9 @@ namespace AdminInterface.Models
 		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
 		public virtual Service RootService { get; set; }
 
+		//public virtual RegionSettings[] RegionSettings { get; set; }
+		public virtual IList<int> RegionSettings { get; set; }
+
 		public virtual List<string> AvalilableAnalitFVersions
 		{
 			get
@@ -410,19 +413,9 @@ namespace AdminInterface.Models
 			return log.IsChangedByOneSelf();
 		}
 
-		public static string GeneratePassword()
-		{
-			var availableChars = "23456789qwertyupasdfghjkzxcvbnmQWERTYUPASDFGHJKLZXCVBNM";
-			var password = String.Empty;
-			var random = new Random();
-			while (password.Length < 8)
-				password += availableChars[random.Next(0, availableChars.Length - 1)];
-			return password;
-		}
-
 		public virtual string CreateInAd()
 		{
-			var password = GeneratePassword();
+			var password = UserCommon.GeneratePassword();
 			ADHelper.CreateUserInAD(Login,
 				password,
 				RootService.Id);
@@ -434,9 +427,10 @@ namespace AdminInterface.Models
 			return Guid.NewGuid().ToString();
 		}
 
-		public virtual void Setup()
+		public virtual void Setup(bool generateTempLogin = true)
 		{
-			Login = GetTempLogin();
+			if (generateTempLogin)
+				Login = GetTempLogin();
 			Enabled = true;
 			if (Logs == null)
 				Logs = new AuthorizationLogEntity(this);
@@ -447,7 +441,8 @@ namespace AdminInterface.Models
 			TargetVersion = defaults.AnalitFVersion;
 			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;
 			ActiveRecordMediator.Save(this);
-			Login = Id.ToString();
+			if (generateTempLogin)
+				Login = Id.ToString();
 			ActiveRecordMediator.Save(this);
 
 			if (Client != null)
@@ -713,7 +708,9 @@ WHERE
 
 			new AuditRecord("Сообщение в биллинг: " + billingMessage, this).Save();
 
-			billingMessage = String.Format("О регистрации Пользователя {0} ( {1} ) для клиента {2} ( {3} ): {4}", Name, Id, Client.Name, Client.Id, billingMessage);
+			var objName = Client != null ? "клиента" : "поставщика";
+
+			billingMessage = String.Format("О регистрации Пользователя {0} ( {1} ) для {5} {2} ( {3} ): {4}", Name, Id, RootService.Name, RootService.Id, billingMessage, objName);
 			Payer.AddComment(billingMessage);
 		}
 

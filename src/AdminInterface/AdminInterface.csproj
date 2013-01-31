@@ -112,6 +112,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=3.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NHibernate">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\NHibernate.dll</HintPath>
@@ -235,7 +239,6 @@
     <Compile Include="Models\Suppliers\SpecialHandler.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
     <Compile Include="Models\Validators\ExtensionListValidator.cs" />
-    <Compile Include="MonoRailExtentions\RecreateOnlyIfNullBinder.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
     <Compile Include="Helpers\Pager.cs" />
     <Compile Include="Models\Billing\Period.cs" />
@@ -266,7 +269,6 @@
     <Compile Include="Controllers\UserSearchController.cs" />
     <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TelephonyController.cs" />
-    <Compile Include="Components\Legend.cs" />
     <Compile Include="Controllers\ClientsController.cs" />
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
@@ -317,7 +319,6 @@
     <Compile Include="Models\Logs\AuthorizationLogEntity.cs" />
     <Compile Include="Models\Billing\Payer.cs" />
     <Compile Include="Models\PaymentOptions.cs" />
-    <Compile Include="Models\Region.cs" />
     <Compile Include="Models\Security\UserPermission.cs" />
     <Compile Include="Models\SmartOrderRules.cs" />
     <Compile Include="Models\Suppliers\Service.cs" />
@@ -612,7 +613,6 @@
     <None Include="Views\Templates\DocumentPayerSelector.brail" />
     <None Include="Views\Templates\Messages.brail" />
     <None Include="Views\Templates\Nomenclatures.brail" />
-    <None Include="Views\Templates\Region.brail" />
     <None Include="Views\Templates\Settings.brail" />
     <None Include="Views\Templates\Users.brail" />
     <None Include="Views\Users\ShowUsers.brail" />
@@ -703,7 +703,6 @@
     <None Include="Views\UserSearch\Search.brail" />
     <None Include="Views\SubViews\ContactInfo.brail" />
     <None Include="Views\SubViews\PaginatorSubView.brail" />
-    <None Include="Views\SubViews\Regions.brail" />
     <None Include="Views\SubViews\SelectDateInterval.brail" />
     <None Include="Views\Users\DrugstoreSettings.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />

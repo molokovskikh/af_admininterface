@@ -27,6 +27,8 @@ namespace Integration.Controllers
 		private Client client;
 		private DateTime begin;
 
+		private string json = "{\"Id\":0,\"Login\":\"testLoginRegister\",\"Enabled\":true,\"Name\":\"testComment\",\"SubmitOrders\":false,\"Auditor\":false,\"WorkRegionMask\":0,\"AuthorizationDate\":null,\"Client\":null,\"RootService\":{\"Name\":\"Протек-15\",\"Id\":5},\"SendWaybills\":false,\"SendRejects\":true,\"ShowSupplierCost\":true,\"InheritPricesFrom\":null,\"Payer\":{\"PayerID\":5,\"Name\":null,\"Reports\":null,\"Contacts\":null,\"ContactGroupOwner\":null},\"AvaliableAddresses\":[],\"ImpersonableUsers\":null,\"AssignedPermissions\":[{\"Id\":27,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":29,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":31,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":33,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":35,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":37,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":39,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":41,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":43,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":45,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":47,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false}],\"RegionSettings\":[1,8,0,0,0,0,0,0],\"IsInheritPrices\":false,\"NameOrLogin\":\"testComment\",\"CanViewClientInterface\":true}";
+
 		[SetUp]
 		public void Setup()
 		{
@@ -73,7 +75,7 @@ namespace Integration.Controllers
 			Prepare();
 			Request.Params.Add("user.Payer.Id", client.Payers.First().Id.ToString());
 
-			controller.Add(clientContacts, regionSettings, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");
+			controller.Add(clientContacts, regionSettings, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut", null);
 			Flush();
 
 			var user = Registred();
@@ -93,7 +95,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
 
 			var user = Registred();
 			var messages = AuditRecord.Queryable.Where(l => l.ObjectId == user.Id);
@@ -113,7 +115,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
 
 			var user = Registred();
 			Assert.That(user.Payer, Is.EqualTo(payer));
@@ -136,7 +138,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
 			Assert.That(controller.Flash["Message"].ToString(),
 				Is.StringContaining("Ошибка регистрации: попытка зарегистрировать пользователя и адрес в различных Плательщиках"));
 		}
@@ -158,7 +160,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
 
 			var user = Registred();
 			Assert.That(user.Payer, Is.EqualTo(payer));
@@ -243,6 +245,42 @@ namespace Integration.Controllers
 			controller.ResetAFVersion(user.Id);
 			Flush();
 			Assert.AreEqual(session.Get<User>(user.Id).UserUpdateInfo.AFAppVersion, 999);
+		}
+
+		[Test]
+		public void CollectionFromJSonText()
+		{
+			var user = new User();
+			controller.BindObjectInstanceForUser(user, "User", json);
+
+			var regionMask = BitConverter.ToUInt64(user.RegionSettings.Select(r => Convert.ToByte(r)).ToArray(), 0);
+
+			Assert.AreEqual(regionMask, 2049);
+			Assert.AreEqual(user.Login, "testLoginRegister");
+			Assert.AreEqual(user.Name, "testComment");
+			Assert.AreEqual(user.AssignedPermissions.Count, 11);
+			Assert.AreEqual(user.AssignedPermissions[0].Id, 27);
+			Assert.AreEqual(user.RootService.Id, 5);
+			Assert.AreEqual(user.RootService.Name, "Протек-15");
+			Assert.IsNull(user.InheritPricesFrom);
+		}
+
+		[Test, Ignore("Чтобы выяснить с этим ли тестом связана поломка")]
+		public void Add_from_json()
+		{
+			var tempLogin = Guid.NewGuid().ToString().Replace("-", string.Empty).Substring(0, 20);
+			var supplier = DataMother.CreateSupplier();
+			session.Save(supplier);
+
+			var thisJson = json.Replace("\"Id\":5", string.Format("\"Id\":{0}", supplier.Id)).Replace("\"PayerID\":5", string.Format("\"PayerID\":{0}", supplier.Payer.Id)).Replace("testLoginRegister", tempLogin);
+
+			Prepare();
+			controller.Add(new Contact[0], new RegionSettings[0], new Person[0], "тестовое сообщение для биллинга", true, supplier.Id, null, thisJson);
+
+			var user = Registred();
+
+			Assert.AreEqual(user.Login, tempLogin);
+			Assert.AreEqual(user.Name, "testComment");
 		}
 	}
 }
