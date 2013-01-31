@@ -597,6 +597,7 @@
     <None Include="Views\Orders\Details.brail" />
     <None Include="Views\SubViews\JuridicalOrganizationForm.brail" />
     <None Include="Views\LegalEntity\Add.brail" />
+    <None Include="Views\SubViews\UserRegions.brail" />
     <Content Include="Views\Suppliers\WaybillExcludeFiles.brail" />
     <None Include="Views\Templates\UnknownCalls.brail" />
     <Content Include="Web.Config">
