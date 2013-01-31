@@ -9,6 +9,7 @@ using WatiN.Core;
 using Test.Support.Web;
 using Common.Web.Ui.Helpers;
 using Common.Tools;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Drugstore
 {
@@ -330,6 +331,25 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Users[0].Login);
 			browser.Button(Find.ByValue("Найти")).Click();
 			CheckThatIsUserPage(browser);
+		}
+
+		[Test]
+		public void FirstTableIndicateTest()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var user2 = client.AddUser("testUser");
+			var user = client.Users[0];
+			user.SubmitOrders = true;
+			user.IgnoreCheckMinOrder = true;
+			user.AllowDownloadUnconfirmedOrders = true;
+			session.Save(user);
+			session.Save(user2);
+			Open();
+			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Name);
+			browser.Button(Find.ByValue("Найти")).Click();
+			var tr = browser.Table(Find.ByClass("DataTable")).TableRows[1];
+			Assert.That(tr.ClassName, Is.StringContaining("first-table"));
+			Assert.That(tr.ClassName, Is.StringContaining("allow-download-unconfirmed-orders"));
 		}
 	}
 }

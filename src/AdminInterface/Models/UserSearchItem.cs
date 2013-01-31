@@ -31,6 +31,13 @@ namespace AdminInterface.Models
 		[Style]
 		public bool UpdateIsUncommited { get; set; }
 
+		[Style]
+		public bool AllowDownloadUnconfirmedOrders { get; set; }
+
+		public bool SubmitOrders { get; set; }
+
+		public bool IgnoreCheckMinOrder { get; set; }
+
 		public bool ServiceDisabled { get; set; }
 
 		public bool UserEnabled { get; set; }
@@ -43,6 +50,12 @@ namespace AdminInterface.Models
 		public bool NotExistsUser
 		{
 			get { return !IsLoginExists; }
+		}
+
+		[Style]
+		public bool FirstTable
+		{
+			get { return SubmitOrders && IgnoreCheckMinOrder; }
 		}
 
 		[Style]

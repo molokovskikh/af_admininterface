@@ -154,10 +154,10 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[Property, Description("Подтверждать отправку заказов"), Auditable]
+		[Property, Description("Подтверждать отправку заказов"), Auditable, Style]
 		public virtual bool SubmitOrders { get; set; }
 
-		[Property, Description("Игнорировать проверку минимальной суммы заказа у Поставщика"), Auditable]
+		[Property, Description("Игнорировать проверку минимальной суммы заказа у Поставщика"), Auditable, Style]
 		public virtual bool IgnoreCheckMinOrder { get; set; }
 
 		[Property, Description("Передавать файлы-НАКЛАДНЫЕ на сторону аптеки"), Auditable]
@@ -175,7 +175,7 @@ namespace AdminInterface.Models
 		[Property, Description("Сохранять подготовленные данные")]
 		public virtual bool SaveAFDataFiles { get; set; }
 
-		[Property, Description("Загружать неподтвержденные заказы"), Auditable]
+		[Property, Description("Загружать неподтвержденные заказы"), Auditable, Style]
 		public virtual bool AllowDownloadUnconfirmedOrders { get; set; }
 
 		[Property, Description("Отображать реальную цену поставщика"), Auditable]

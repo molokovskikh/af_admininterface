@@ -3,7 +3,9 @@
 		"Пользователь отключен биллингом" : "disabled",
 		"Пользователь заблокирован" : "locked",
 		"Пользователь не существует" : "not-exists-user",
-		"Пользователь самостоятельно изменял пароль" : "change-password-by-one-self"}
+		"Пользователь самостоятельно изменял пароль" : "change-password-by-one-self",
+		"Пользователь загрузки заказов" : "allow-download-unconfirmed-orders",
+		"Пользователь первый стол" : "first-table"}
 
 	if ?showAddressLegend:
 		items.Add("Адрес не имеет подключенных пользователей", "has-no-connected-users")

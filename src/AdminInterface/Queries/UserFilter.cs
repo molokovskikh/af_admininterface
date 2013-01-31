@@ -124,7 +124,10 @@ s.Disabled as ServiceDisabled,
 
 p.JuridicalName as JuridicalName,
 r.Region as RegionName,
-r.RegionCode as RegionCode
+r.RegionCode as RegionCode,
+u.AllowDownloadUnconfirmedOrders as AllowDownloadUnconfirmedOrders,
+u.SubmitOrders as SubmitOrders,
+u.IgnoreCheckMinOrder as IgnoreCheckMinOrder
 FROM
 Customers.Users u
 join usersettings.UserUpdateInfo uui ON uui.UserId = u.Id
