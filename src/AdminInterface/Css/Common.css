@@ -164,7 +164,7 @@ table.DataTable tr.update-is-uncommited td.update-date
 
 .DataTable #SearchResults tr.allow-download-unconfirmed-orders td.login, #users td.allow-download-unconfirmed-orders, .allow-download-unconfirmed-orders
 {
-	background-color: #8fc484;
+	background-color: #77ac6c;
 }
 
 .DataTable #SearchResults tr.first-table td.user-name, #users td.first-table, .first-table
