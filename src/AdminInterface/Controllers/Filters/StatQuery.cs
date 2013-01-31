@@ -28,13 +28,13 @@ SELECT count(dlogs.RowId) as CountDownloadedWaybills,
 	count(distinct dlogs.FirmCode) as CountDownloadedWaybilsBySupplier
 FROM logs.document_logs dlogs
 join usersettings.retclientsset rcs on rcs.ClientCode = dlogs.ClientCode
-WHERE (dlogs.LogTime >= ?StartDateParam AND dlogs.LogTime <= ?EndDateParam) AND dlogs.DocumentType = 1 and rcs.ParseWaybills = 1;
+WHERE (dlogs.LogTime >= ?StartDateParam AND dlogs.LogTime <= ?EndDateParam) AND dlogs.DocumentType = 1;
 
 SELECT count(distinct dsl.UserId) as CountDownloadedWaybilsByUser
 FROM logs.document_logs dl
 		join usersettings.retclientsset rcs on rcs.ClientCode = dl.ClientCode
 	join Logs.DocumentSendLogs dsl on dsl.DocumentId = dl.RowId
-WHERE (dl.LogTime >= ?StartDateParam AND dl.LogTime <= ?EndDateParam) AND dl.DocumentType = 1 and rcs.ParseWaybills = 1;
+WHERE (dl.LogTime >= ?StartDateParam AND dl.LogTime <= ?EndDateParam) AND dl.DocumentType = 1;
 
 SELECT count(dheaders.Id) as CountParsedWaybills,
 	max(dheaders.WriteTime) as LastParsedWaybillDate,
