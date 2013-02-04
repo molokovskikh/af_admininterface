@@ -408,10 +408,12 @@ INSERT
 INTO pricesregionaldata
 	(
 		regioncode,
-		pricecode
+		pricecode,
+		basecost
 	)
 SELECT DISTINCT regions.regioncode,
-		pricesdata.pricecode
+		pricesdata.pricecode,
+		 @NewPriceCostId
 FROM (Customers.Suppliers s, farm.regions, pricesdata)
 LEFT JOIN pricesregionaldata
 		ON pricesregionaldata.pricecode = pricesdata.pricecode

@@ -221,6 +221,10 @@ namespace Integration.Controllers
 			Assert.That(supplier.Id, Is.GreaterThan(0));
 			var user = supplier.Users.First();
 			Assert.That(user.AssignedPermissions.Count(p => p.Type == UserPermissionTypes.SupplierInterface), Is.GreaterThan(0));
+			var price = session.Query<Price>().First(p => p.Supplier.Id == supplier.Id);
+			foreach (var priceRegionalData in price.RegionalData) {
+				Assert.That(priceRegionalData.Cost.Id, Is.EqualTo(price.Costs[0].Id));
+			}
 		}
 
 		[Test]
