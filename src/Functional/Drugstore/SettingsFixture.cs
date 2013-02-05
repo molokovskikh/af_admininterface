@@ -286,7 +286,6 @@ namespace Functional.Drugstore
 		[Test, Description("При удалении региона заказа у клиента, он должен удалиться у пользователя")]
 		public void After_remove_client_order_region_user_region_settings_must_be_update()
 		{
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			// Когда добавляем регион заказа, автоматически добавляется такой же регион работы
 			var workRegion = GetOrderRegion(browser, "Курск");
 			workRegion.Checked = true;
