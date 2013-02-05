@@ -1,7 +1,7 @@
 ﻿<% supplierUser = user.SupplierUser() %>
 <div class="block">
 	<h3>Региональные настройки</h3>
-	<table style="width: 100%;">
+	<table class="fullWidth">
 		<tr>
 			<td><h4>Регионы работы</h4></td>
 			<%if not supplierUser: %>

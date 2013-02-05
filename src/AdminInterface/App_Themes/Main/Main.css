@@ -332,3 +332,7 @@ table.Test
     background-color: #FFBABA;
     background-image: url('../../images/error.png');
 }
+
+.fullWidth {
+	width: 100%;
+}
