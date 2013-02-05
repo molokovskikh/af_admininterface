@@ -467,6 +467,7 @@
     <Content Include="Assets\Javascripts\request.coffee" />
     <Content Include="Assets\Javascripts\table.editor.js" />
     <Content Include="Assets\Javascripts\UserCommon.js" />
+    <Content Include="Assets\Javascripts\UserRegionsEditor.js" />
     <Content Include="Assets\Javascripts\UserScripts.js" />
     <Content Include="Assets\Javascripts\WaybillExcludeFiles.js" />
     <Content Include="Assets\Stylesheets\billing.css" />

@@ -268,6 +268,7 @@ namespace Functional.Drugstore
 			using (new SessionScope()) {
 				var client = session.Load<Client>(clientCode);
 				browser.Link(Find.ByText(client.Users[0].Login)).Click();
+				Click("Настройка");
 				var pass = false;
 				for (var i = 0; i < 10; i++) {
 					var regionCheckBox = browser.CheckBox(Find.ByName(String.Format("WorkRegions[{0}]", i)));

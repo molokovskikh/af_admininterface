@@ -429,6 +429,7 @@ namespace Functional.Drugstore
 			Flush();
 
 			Open(user, "Edit");
+			Click("Настройка");
 			Assert.IsTrue(browser.CheckBox("WorkRegions[0]").Checked);
 			Assert.IsFalse(browser.CheckBox("WorkRegions[1]").Checked);
 			Assert.IsFalse(browser.CheckBox("WorkRegions[2]").Checked);
@@ -442,6 +443,7 @@ namespace Functional.Drugstore
 			browser.CheckBox("WorkRegions[1]").Checked = true;
 			browser.CheckBox("OrderRegions[0]").Checked = true;
 			browser.Button(Find.ByValue("Сохранить")).Click();
+			Click("Настройка");
 
 			session.Refresh(user);
 			Assert.AreEqual(3, user.WorkRegionMask);
@@ -450,6 +452,7 @@ namespace Functional.Drugstore
 			browser.CheckBox("WorkRegions[1]").Checked = false;
 			browser.CheckBox("OrderRegions[0]").Checked = false;
 			browser.Button(Find.ByValue("Сохранить")).Click();
+			Click("Настройка");
 
 			session.Refresh(user);
 			Assert.AreEqual(2, user.WorkRegionMask);
@@ -509,7 +512,7 @@ namespace Functional.Drugstore
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
 			browser.Refresh();
 			browser.Link(Find.ByText(login.ToString())).Click();
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", login)));
+			Click("Настройка");
 			// Проверяем, чтобы были доступны нужные регионы. Берем с первого региона, т.к. галку с нулевого сняли
 			for (var i = 1; i < browseRegions.Length; i++)
 				Assert.IsTrue(browser.CheckBox(Find.ById(String.Format("WorkRegions[{0}]", i))).Checked);

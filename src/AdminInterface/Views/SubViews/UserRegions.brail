@@ -1,4 +1,6 @@
-﻿<% supplierUser = user.SupplierUser() %>
+﻿${app.Asset("UserRegionsEditor.js")}
+
+<% supplierUser = user.SupplierUser() %>
 <div class="block">
 	<h3>Региональные настройки</h3>
 	<table class="fullWidth">

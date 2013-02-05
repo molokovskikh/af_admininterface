@@ -226,9 +226,11 @@ Where pc.PriceCode = :PriceId1")
 		{
 			Open(user);
 			browser.TextField(Find.ByName("user.Name")).Value = "Тестовый";
+			Click("Настройка");
 			browser.CheckBox(Find.ByName("WorkRegions[1]")).Checked = true;
 			Click("Сохранить");
 			AssertText("$$$Изменено 'Регионы работы' Удалено 'Все регионы' Добавлено 'Воронеж'");
+			Click("Настройка");
 			browser.CheckBox(Find.ByName("WorkRegions[0]")).Checked = true;
 			Click("Сохранить");
 			AssertText("$$$Изменено 'Регионы работы' Удалено 'Воронеж' Добавлено 'Все регионы'");

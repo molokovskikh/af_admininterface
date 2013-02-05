@@ -212,6 +212,7 @@ namespace Functional.Drugstore
 			workRegion.Checked = true;
 			browser.Button(b => b.Value == "Сохранить").Click();
 			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			Click("Настройка");
 
 			Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
 			Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
@@ -234,15 +235,18 @@ namespace Functional.Drugstore
 			workRegion.Checked = true;
 			browser.Button(b => b.Value == "Сохранить").Click();
 			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			Click("Настройка");
 			Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
 			Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
 
+			browser.Back();
 			browser.Back();
 			browser.Link(Find.ByText("Настройка")).Click();
 			workRegion = GetWorkRegion(browser, "Воронеж");
 			workRegion.Checked = false;
 			browser.Button(b => b.Value == "Сохранить").Click();
 			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			Click("Настройка");
 
 			Assert.IsFalse(UserWorkRegionExists(browser, "Воронеж"));
 			// При удалении региона работы должен автоматически удаляться регион заказа
@@ -264,6 +268,7 @@ namespace Functional.Drugstore
 			workRegion.Checked = true;
 			browser.Button(b => b.Value == "Сохранить").Click();
 			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			Click("Настройка");
 			Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
 			Assert.IsTrue(UserOrderRegionExists(browser, "Воронеж"));
 			Assert.IsTrue(UserOrderRegionExists(browser, "Липецк"));
@@ -281,21 +286,26 @@ namespace Functional.Drugstore
 		[Test, Description("При удалении региона заказа у клиента, он должен удалиться у пользователя")]
 		public void After_remove_client_order_region_user_region_settings_must_be_update()
 		{
+			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			// Когда добавляем регион заказа, автоматически добавляется такой же регион работы
 			var workRegion = GetOrderRegion(browser, "Курск");
 			workRegion.Checked = true;
 			browser.Button(b => b.Value == "Сохранить").Click();
 			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			Click("Настройка");
+
 			Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
 			Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
 			Assert.IsTrue(UserOrderRegionExists(browser, "Курск"));
 
+			browser.Back();
 			browser.Back();
 			browser.Link(Find.ByText("Настройка")).Click();
 			workRegion = GetOrderRegion(browser, "Курск");
 			workRegion.Checked = false;
 			browser.Button(b => b.Value == "Сохранить").Click();
 			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			Click("Настройка");
 
 			Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
 			Assert.IsTrue(UserOrderRegionExists(browser, "Воронеж"));
