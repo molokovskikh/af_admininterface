@@ -285,14 +285,13 @@ namespace AdminInterface.Controllers
 				else
 					RedirectUsingRoute("Suppliers", "show", new { service.Id });
 			}
-			else
-				if (string.IsNullOrEmpty(jsonSource)) {
-					Flash["newUser"] = true;
-					Flash["password"] = password;
-					Redirect("main", "report", new { id = user.Id });
-				}
-				else {
-					Response.StatusCode = 200;
+			else if (string.IsNullOrEmpty(jsonSource)) {
+				Flash["newUser"] = true;
+				Flash["password"] = password;
+				Redirect("main", "report", new { id = user.Id });
+			}
+			else {
+				Response.StatusCode = 200;
 			}
 		}
 
