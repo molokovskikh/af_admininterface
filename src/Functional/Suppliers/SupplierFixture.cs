@@ -66,13 +66,13 @@ namespace Functional.Suppliers
 			Assert.That(browser.Text, Is.StringContaining("Настройка"));
 			Click("Настройка");
 			Assert.That(browser.Text, Is.StringContaining("Настройки пользователя"));
-			var permission = GetPermission("Управлять заказами");
+			var permission = GetPermission("Статистика заказов");
 			Assert.That(permission.Checked, Is.True);
 			permission.Click();
 			Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			Click("Настройка");
-			permission = GetPermission("Управлять заказами");
+			permission = GetPermission("Статистика заказов");
 			Assert.That(permission.Checked, Is.False);
 		}
 
