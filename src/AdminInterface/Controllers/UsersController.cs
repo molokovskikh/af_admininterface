@@ -288,6 +288,7 @@ namespace AdminInterface.Controllers
 				}
 				else {
 					Response.StatusCode = 200;
+					CancelView();
 				}
 			}
 			else if (string.IsNullOrEmpty(jsonSource)) {
@@ -297,6 +298,7 @@ namespace AdminInterface.Controllers
 			}
 			else {
 				Response.StatusCode = 200;
+				CancelView();
 			}
 		}
 
