@@ -280,10 +280,15 @@ namespace AdminInterface.Controllers
 
 				Notify("Пользователь создан");
 
-				if (service.IsClient())
-					RedirectUsingRoute("Clients", "show", new { service.Id });
-				else
-					RedirectUsingRoute("Suppliers", "show", new { service.Id });
+				if (string.IsNullOrEmpty(jsonSource)) {
+					if (service.IsClient())
+						RedirectUsingRoute("Clients", "show", new { service.Id });
+					else
+						RedirectUsingRoute("Suppliers", "show", new { service.Id });
+				}
+				else {
+					Response.StatusCode = 200;
+				}
 			}
 			else if (string.IsNullOrEmpty(jsonSource)) {
 				Flash["newUser"] = true;
