@@ -16,14 +16,6 @@
 		$("form#ReseteUin").validate({
 			rules: { "reason": "required" }
 		});
-
-		$('.regionDiv').children('input').click(function () {
-			$('.maxRegionDiv').children('input').attr("checked", false);
-		});
-		$('.maxRegionDiv').children('input').click(function () {
-		if (this.checked)
-			$('.regionDiv').children('input').attr("checked", false);
-		});
 	});
 </script>
 
@@ -154,55 +146,6 @@
 		<% if user.Client: %>
 		<% OutputSubView("/Templates/Addresses") %>
 		<% end %>
-
-		<% supplierUser = user.SupplierUser() %>
-		<div class="block">
-			<h3>Региональные настройки</h3>
-			<table style="width: 100%;">
-				<tr>
-					<td><h4>Регионы работы</h4></td>
-					<%if not supplierUser: %>
-					<td><h4>Регионы заказа</h4></td>
-					<%end %>
-				</tr>
-				<%if (not supplierUser) and (user.AvaliableAddresses.Count == 0): %>
-				<tr>
-					<td></td><td><label class="error">(заказ невозможен-нет ни одного подключ. адреса)</label></td>
-				</tr>
-				<%end %>
-				<tr>
-					<td valign="top">
-					<% for i, region in enumerate(AllowWorkRegions): %>
-						<%if supplierUser and i == 0: %>
-						<div class="maxRegionDiv">
-							<input type="checkbox" name="WorkRegions[0]" id="WorkRegions[0]" ${"checked" if (user.WorkRegionMask == maxRegion) } value="${maxRegion}"/>
-							<label for="WorkRegions[0]" >Все</label>
-						</div>
-						<%end %>
-						<% if supplierUser: 
-								J = i + 1;
-							else:
-								J = i
-							end%>
-						<div  class="regionDiv">
-							<input type="checkbox" name="WorkRegions[${J}]" id="WorkRegions[${J}]" ${"checked" if (user.WorkRegionMask & region.Id) > 0 and (not supplierUser or user.WorkRegionMask != maxRegion) } value="${region.Id}"/>
-							<label for="WorkRegions[${J}]" >${region.Name}</label>
-						</div>
-					<% end %>
-					</td>
-					<%if not supplierUser: %>
-						<td valign="top">
-						<% for i, region in enumerate(AllowOrderRegions): %>
-							<div>
-								<input type="checkbox" name="OrderRegions[${i}]" id="OrderRegions[${i}]" ${"checked" if (user.OrderRegionMask & region.Id) > 0} value="${region.Id}"/>
-								<label for="OrderRegions[${i}]" >${region.Name}</label>
-							</div>
-						<% end %>
-						</td>
-					<%end %>
-				</tr>
-			</table>
-		</div>
 
 
 		<div class=save>

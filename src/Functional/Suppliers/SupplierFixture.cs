@@ -66,13 +66,13 @@ namespace Functional.Suppliers
 			Assert.That(browser.Text, Is.StringContaining("Настройка"));
 			Click("Настройка");
 			Assert.That(browser.Text, Is.StringContaining("Настройки пользователя"));
-			var permission = GetPermission("Управлять заказами");
+			var permission = GetPermission("Статистика заказов");
 			Assert.That(permission.Checked, Is.True);
 			permission.Click();
 			Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			Click("Настройка");
-			permission = GetPermission("Управлять заказами");
+			permission = GetPermission("Статистика заказов");
 			Assert.That(permission.Checked, Is.False);
 		}
 
@@ -226,9 +226,11 @@ Where pc.PriceCode = :PriceId1")
 		{
 			Open(user);
 			browser.TextField(Find.ByName("user.Name")).Value = "Тестовый";
+			Click("Настройка");
 			browser.CheckBox(Find.ByName("WorkRegions[1]")).Checked = true;
 			Click("Сохранить");
 			AssertText("$$$Изменено 'Регионы работы' Удалено 'Все регионы' Добавлено 'Воронеж'");
+			Click("Настройка");
 			browser.CheckBox(Find.ByName("WorkRegions[0]")).Checked = true;
 			Click("Сохранить");
 			AssertText("$$$Изменено 'Регионы работы' Удалено 'Воронеж' Добавлено 'Все регионы'");
