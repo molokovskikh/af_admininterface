@@ -77,7 +77,7 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public virtual string Address { get; set; }
 
-		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style, Auditable("Отключен")]
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style]
 		public override bool Disabled
 		{
 			get { return _disabled; }
@@ -85,11 +85,15 @@ namespace AdminInterface.Models.Suppliers
 			{
 				if (_disabled != value) {
 					_disabled = value;
+					Enabled = !_disabled;
 					if (Payer != null)
 						Payer.UpdatePaymentSum();
 				}
 			}
 		}
+
+		[Property, Auditable("Включен")]
+		public virtual bool Enabled { get; set; }
 
 		public virtual string INN
 		{
@@ -182,7 +186,7 @@ namespace AdminInterface.Models.Suppliers
 
 		public virtual IEnumerable<IAuditRecord> GetAuditRecords(IEnumerable<AuditableProperty> properties)
 		{
-			if (properties != null && properties.Any(p => p.Property.Name.Equals("Disabled")))
+			if (properties != null && properties.Any(p => p.Property.Name.Equals("Disabled") || p.Property.Name.Equals("Enabled")))
 				return new List<IAuditRecord> {
 					new PayerAuditRecord(Payer, "$$$", EditComment) {
 						ShowOnlyPayer = true,

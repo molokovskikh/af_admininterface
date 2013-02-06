@@ -225,6 +225,7 @@ namespace Integration.Controllers
 			foreach (var priceRegionalData in price.RegionalData) {
 				Assert.That(priceRegionalData.Cost.Id, Is.EqualTo(price.Costs[0].Id));
 			}
+			Assert.That(supplier.Disabled, Is.EqualTo(!supplier.Enabled));
 		}
 
 		[Test]
