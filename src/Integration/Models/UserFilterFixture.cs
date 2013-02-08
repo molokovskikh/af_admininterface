@@ -200,6 +200,32 @@ namespace Integration.Models
 			}
 		}
 
+		[Test]
+		public void SearchEmailInPerson()
+		{
+			var user = DataMother.CreateSupplierUser();
+			var supplier = (Supplier)user.RootService;
+
+			var email = "testSearchEmailInPerson@mail.ru";
+			var contactGroup = new ContactGroup {
+				Type = ContactGroupType.General,
+				Specialized = true,
+				Name = email,
+				ContactGroupOwner = supplier.ContactGroupOwner
+			};
+			session.Save(contactGroup);
+			contactGroup.AddPerson("testPerson");
+			contactGroup.Persons.Last().AddContact(ContactType.Email, email);
+			user.ContactGroup = contactGroup;
+			session.SaveOrUpdate(user);
+			Flush();
+			filter.SearchBy = SearchUserBy.ByContacts;
+			filter.SearchText = email;
+			var result = filter.Find();
+			Assert.That(result.Count, Is.EqualTo(1));
+			Assert.That(result[0].ClientId, Is.EqualTo(supplier.Id));
+		}
+
 		private string RandomPhone()
 		{
 			return String.Format("{0}-{1}", RandomDigits(random, 4).Implode(""), RandomDigits(random, 6).Implode(""));
