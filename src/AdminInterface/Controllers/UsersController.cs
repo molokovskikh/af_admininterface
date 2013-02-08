@@ -254,9 +254,7 @@ namespace AdminInterface.Controllers
 				var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены следующие адреса доставки: \r\n {2}",
 					user.Id,
 					user.Name,
-					user.AvaliableAddresses.Select(a => Address.TryFind(a.Id))
-						.Where(a => a != null)
-						.Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
+					user.AvaliableAddresses.Select(a => Address.TryFind(a.Id)).Where(a => a != null).Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
 				new AuditRecord(message, user.Client) { MessageType = LogMessageType.System }.Save();
 			}
 
@@ -281,15 +279,26 @@ namespace AdminInterface.Controllers
 				DbSession.SaveOrUpdate(passwordChangeLog);
 
 				Notify("Пользователь создан");
-				if (service.IsClient())
-					RedirectUsingRoute("Clients", "show", new { service.Id });
-				else
-					RedirectUsingRoute("Suppliers", "show", new { service.Id });
+
+				if (string.IsNullOrEmpty(jsonSource)) {
+					if (service.IsClient())
+						RedirectUsingRoute("Clients", "show", new { service.Id });
+					else
+						RedirectUsingRoute("Suppliers", "show", new { service.Id });
+				}
+				else {
+					Response.StatusCode = 200;
+					CancelView();
+				}
 			}
-			else {
+			else if (string.IsNullOrEmpty(jsonSource)) {
 				Flash["newUser"] = true;
 				Flash["password"] = password;
 				Redirect("main", "report", new { id = user.Id });
+			}
+			else {
+				Response.StatusCode = 200;
+				CancelView();
 			}
 		}
 
