@@ -159,7 +159,7 @@ namespace Integration.Models
 			payer.INN = DataMother.RandomInn();
 			payer.SaveAndFlush();
 
-			var items = new PayerFilter { SearchText = payer.INN, SearchBy = SearchBy.Inn }.Find();
+			var items = new PayerFilter { SearchText = payer.INN, SearchBy = SearchBy.Inn, ClientStatus = SearchClientStatus.All }.Find();
 			Assert.That(items.Count, Is.EqualTo(1));
 			Assert.That(items[0].PayerId, Is.EqualTo(payer.Id));
 		}

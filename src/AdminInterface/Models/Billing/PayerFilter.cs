@@ -109,7 +109,7 @@ namespace AdminInterface.Models.Billing
 		public IList<BillingSearchItem> Find()
 		{
 			var where = new StringBuilder("1 = 1");
-			var having = new StringBuilder();
+			var having = new StringBuilder("1 = 1");
 			var groupFilter = new StringBuilder();
 
 			var query = new DetachedSqlQuery();
