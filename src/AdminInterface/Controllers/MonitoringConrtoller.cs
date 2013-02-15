@@ -80,6 +80,7 @@ namespace AdminInterface.Controllers
 		public void Orders()
 		{
 			PropertyBag["Orders"] = new OrderFilter { NotSent = true }.Find();
+			PropertyBag["IsMonitoring"] = true;
 		}
 
 		public void InboundPriceItemsList()

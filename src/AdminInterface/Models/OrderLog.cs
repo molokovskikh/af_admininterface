@@ -8,6 +8,10 @@ namespace AdminInterface.Models
 {
 	public class OrderLog
 	{
+		public bool IsOldOrderForQueue
+		{
+			get { return WriteTime.AddMinutes(5) < DateTime.Now; }
+		}
 		public uint Id { get; set; }
 		public uint? ClientOrderId { get; set; }
 		public DateTime WriteTime { get; set; }
@@ -15,6 +19,7 @@ namespace AdminInterface.Models
 
 		public uint AddressId { get; set; }
 		public uint UserId { get; set; }
+		public uint SupplierId { get; set; }
 
 		public string Drugstore { get; set; }
 		public string Address { get; set; }

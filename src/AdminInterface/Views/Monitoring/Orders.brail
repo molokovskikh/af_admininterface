@@ -1,5 +1,5 @@
 ﻿<% component CaptureFor, {"id" : "Title"}: %>
 	Очередь заказов к отправке
 <% end %>
-
+${app.Asset("MonitoringOrder.css")}
 <% OutputSubView("/Logs/OrdersTable", {@empty: "Нет заказов в очереди"}) %>

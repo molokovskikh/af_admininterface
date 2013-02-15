@@ -19,7 +19,7 @@
 		<tbody id="SearchResults">
 		<% for i, order in enumerate(orders): %>
 		<tr class="${ViewHelper.GetRowStyle(i)}">
-			<td>
+			<td <% if order.IsOldOrderForQueue and IsDefined("IsMonitoring"): %> class="redCell" <% end %>>
 				<a href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${order.Id}, '${siteroot}/Orders/Details?id=${order.Id}', 'details');">${order.Id}</a>
 			</td>
 			<td>${order.ClientOrderId}</td>
@@ -29,7 +29,11 @@
 			<td>${UrlHelper.Link(order.Address, {@controller: @Addresses, @params: {@id: order.AddressId}})}</td>
 			<td>${UrlHelper.Link(order.User, {@controller: @Users, @params: {@id: order.UserId}})}</td>
 			<td>${order.Region}</td>
-			<td>${order.Supplier}</td>
+			<% if IsDefined("IsMonitoring"): %>
+				<td>${UrlHelper.Link(order.Supplier, {@controller: @Suppliers, @params: {@id: order.SupplierId}})}</td>
+			<% else: %>
+				<td>${order.Supplier}</td>
+			<% end %>
 			<td>${order.PriceName}</td>
 			<td>${order.RowCount}</td>
 			<td>${order.GetResult()}</td>

@@ -472,6 +472,7 @@
     <Content Include="Assets\Javascripts\WaybillExcludeFiles.js" />
     <Content Include="Assets\Stylesheets\billing.css" />
     <Content Include="Assets\Stylesheets\ClientsShow.css" />
+    <Content Include="Assets\Stylesheets\MonitoringOrder.css" />
     <Content Include="Assets\Stylesheets\News.css" />
     <Content Include="Assets\Stylesheets\ManagerReport.css" />
     <Content Include="Assets\Stylesheets\PrintRevisionAct.css" />
@@ -798,7 +799,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>60927</DevelopmentServerPort>
+          <DevelopmentServerPort>64260</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
