@@ -22,6 +22,12 @@ namespace AdminInterface.Controllers.Filters
 			var data = new DataSet();
 
 			var additionalSql = @"
+SELECT date_format(Max(RequestTime), '%d.%m.%Y %H:%i:%S') as LastSendTime
+FROM logs.document_logs d ,logs.documentsendlogs s ,logs.analitfupdates a
+where d.rowid=s.documentid
+and s.updateid=a.updateid
+and (FileDelivered =1 or DocumentDelivered = 1) and d.documenttype=1 and requesttime>=?StartDateParam;
+
 SELECT count(dlogs.RowId) as CountDownloadedWaybills,
 	max(dlogs.LogTime) as LastDownloadedWaybillDate,
 	count(distinct dlogs.ClientCode) as CountDownloadedWaybilsByClient,
