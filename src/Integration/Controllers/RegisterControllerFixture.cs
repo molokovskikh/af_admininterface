@@ -226,6 +226,13 @@ namespace Integration.Controllers
 				Assert.That(priceRegionalData.Cost.Id, Is.EqualTo(price.Costs[0].Id));
 			}
 			Assert.That(supplier.Disabled, Is.EqualTo(!supplier.Enabled));
+			foreach (var regionalData in supplier.RegionalData) {
+				var schedule = session.Query<ReorderSchedule>().Where(s => s.RegionalData == regionalData).ToList();
+				Assert.AreEqual(schedule.Count, 7);
+				Assert.AreEqual(schedule.Count(s => s.TimeOfStopsOrders == TimeSpan.FromTicks(684000000000)), 5);
+				Assert.AreEqual(schedule.Count(s => s.TimeOfStopsOrders == TimeSpan.FromTicks(504000000000)), 1);
+				Assert.AreEqual(schedule.Count(s => s.TimeOfStopsOrders == TimeSpan.FromTicks(0)), 1);
+			}
 		}
 
 		[Test]
