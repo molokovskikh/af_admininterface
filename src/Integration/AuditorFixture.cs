@@ -7,6 +7,7 @@ using AdminInterface.Queries;
 using Castle.ActiveRecord;
 using Integration.ForTesting;
 using NHibernate;
+using NHibernate.Linq;
 using NUnit.Framework;
 
 namespace Integration
@@ -14,6 +15,51 @@ namespace Integration
 	[TestFixture]
 	public class AuditorFixture : Test.Support.IntegrationFixture
 	{
+		[Test(Description = "Проверяет корректную работу обновления логов")]
+		public void UpdateLogTest()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.Users[0];
+			var oldName = user.Name;
+			user.Name += "1";
+			session.SaveOrUpdate(user);
+
+			Flush();
+			var newClient = DataMother.TestClient();
+			session.Clear();
+			AuditRecord.UpdateLogs(newClient.Id, user);
+			var logs = session.Query<AuditRecord>().Where(l => l.ObjectId == user.Id && l.Type == LogObjectType.User).ToList();
+			Assert.That(logs[0].Message,
+				Is.StringContaining(String.Format("$$$Изменено 'Комментарий' было '{0}' стало '{1}'", oldName, user.Name)));
+			Assert.That(logs[0].Service.Id, Is.EqualTo(newClient.Id));
+		}
+
+		[Test(Description = "Проверяет корректную работу обновления логов при совпадении идентификаторов у разных сущностей")]
+		public void UpdateLogWithOtherTypeTest()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.Users[0];
+			var oldName = user.Name;
+			user.Name += "1";
+			session.SaveOrUpdate(user);
+
+			Flush();
+			var logs = session.Query<AuditRecord>().Where(l => l.ObjectId == user.Id && l.Type == LogObjectType.User).ToList();
+			Assert.That(logs[0].Message,
+				Is.StringContaining(String.Format("$$$Изменено 'Комментарий' было '{0}' стало '{1}'", oldName, user.Name)));
+			Assert.That(logs[0].Service.Id, Is.EqualTo(client.Id));
+			session.Clear();
+			var newClient = DataMother.TestClient();
+			var address = new Address() {
+				Id = user.Id
+			};
+			AuditRecord.UpdateLogs(newClient.Id, address);
+			logs = session.Query<AuditRecord>().Where(l => l.ObjectId == user.Id && l.Type == LogObjectType.User).ToList();
+			Assert.That(logs[0].Message,
+				Is.StringContaining(String.Format("$$$Изменено 'Комментарий' было '{0}' стало '{1}'", oldName, user.Name)));
+			Assert.That(logs[0].Service.Id, Is.EqualTo(client.Id));
+		}
+
 		[Test]
 		public void Audit_client_changes()
 		{

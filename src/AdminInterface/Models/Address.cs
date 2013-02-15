@@ -319,7 +319,7 @@ set @skip = 0;
 			Client = newOwner;
 			Payer = newLegalEntity.Payer;
 			LegalEntity = newLegalEntity;
-			AuditRecord.UpdateLogs(newOwner.Id, Id);
+			AuditRecord.UpdateLogs(newOwner.Id, this);
 			Save();
 
 			return new AuditRecord(message, this);

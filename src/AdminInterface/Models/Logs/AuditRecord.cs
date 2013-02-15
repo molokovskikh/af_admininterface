@@ -214,13 +214,15 @@ namespace AdminInterface.Models.Logs
 			return Message;
 		}
 
-		public static void UpdateLogs(uint serviceId, uint objectId)
+		public static void UpdateLogs(uint serviceId, object entity)
 		{
+			var auditRecord = new AuditRecord(entity);
 			ArHelper.WithSession(s => s.CreateSQLQuery(@"
 update logs.clientsinfo set ServiceId = :serviceId
-where ObjectId = :objectId")
+where ObjectId = :objectId and Type = :Type")
 				.SetParameter("serviceId", serviceId)
-				.SetParameter("objectId", objectId)
+				.SetParameter("objectId", auditRecord.ObjectId)
+				.SetParameter("Type", auditRecord.Type)
 				.ExecuteUpdate());
 		}
 

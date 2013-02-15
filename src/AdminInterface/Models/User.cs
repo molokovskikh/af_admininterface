@@ -665,7 +665,7 @@ WHERE
 				}
 			}
 			var message = String.Format("Перемещение пользователя от {0} к {1}", Client, newOwner);
-			AuditRecord.UpdateLogs(newOwner.Id, Id);
+			AuditRecord.UpdateLogs(newOwner.Id, this);
 			Client = newOwner;
 			RootService = newOwner;
 			Payer = legalEntity.Payer;
