@@ -161,6 +161,17 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 							convertedLine += core.ProducerSynonym.Synonym;
 					}
 				}
+				else if(line.CatalogProduct != null) {
+					Producer producer = null;
+					if(line.CatalogProducer != null)
+						producer = DbSession.Query<Producer>().FirstOrDefault(p => p.Id == line.CatalogProducer.Id);
+					var product = DbSession.Query<Catalog>().FirstOrDefault(p => p.Id == line.CatalogProduct.Catalog.Id);
+					if(product != null || producer != null) {
+						convertedLine = (product == null ? "" : (product.Name + "<br>"))
+							+ (producer == null ? "" : producer.Name);
+					}
+					PropertyBag["notFindAssortment"] = "* не указан ассортиментный прайс-лист для конвертации";
+				}
 			}
 			PropertyBag["convertedLine"] = convertedLine;
 			PropertyBag["lineId"] = id;

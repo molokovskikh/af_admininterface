@@ -3,5 +3,10 @@
 		<div id="Converted${lineId}">
 		${convertedLine}
 		</div>
+		<% if IsDefined("notFindAssortment"):%>
+		<div class="redText">
+			${notFindAssortment}
+		</div>
+		<% end %>
 	</td>
 </tr>
