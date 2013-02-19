@@ -60,7 +60,6 @@ namespace Functional
 		public void TechOperatingModeSettingsTest()
 		{
 			Open("main/Settings");
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			AssertText("Настройки по умолчанию");
 			Click("Режим работы техподдержки");
 			browser.TextField("defaults_TechOperatingModeBegin").Value = "70.30";
@@ -84,7 +83,6 @@ namespace Functional
 			browser.TextField("Defaults_ProcessingAboutFirmBody").AppendText("testFirmBody_interface");
 			browser.TextField("Defaults_ProcessingAboutNamesSubject").AppendText("testNameSubject_interface");
 			browser.TextField("Defaults_ProcessingAboutNamesBody").AppendText("testNameBody_interface");
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			Click("Сохранить");
 			AssertText("Сохранено");
 		}
