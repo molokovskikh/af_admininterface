@@ -80,10 +80,10 @@ namespace Functional
 			Open("main/Settings");
 			AssertText("Настройки по умолчанию");
 			Click("Уведомления Обработки");
-			/*browser.TextField("Defaults_ProcessingAboutFirmSubject").AppendText("testFirmSubject_interface");
+			browser.TextField("Defaults_ProcessingAboutFirmSubject").AppendText("testFirmSubject_interface");
 			browser.TextField("Defaults_ProcessingAboutFirmBody").AppendText("testFirmBody_interface");
 			browser.TextField("Defaults_ProcessingAboutNamesSubject").AppendText("testNameSubject_interface");
-			browser.TextField("Defaults_ProcessingAboutNamesBody").AppendText("testNameBody_interface");*/
+			browser.TextField("Defaults_ProcessingAboutNamesBody").AppendText("testNameBody_interface");
 			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			Click("Сохранить");
 			AssertText("Сохранено");
