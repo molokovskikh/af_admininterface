@@ -39,7 +39,31 @@ ${app.Asset("MainSettings.js")}
 		<li>
 			<a id="techOperatingSettings" href="#">Режим работы техподдержки</a>
 		</li>
+		<li>
+			<a id="processingNotices" href="#">Уведомления Обработки</a>
+		</li>
 	</ul>
+</div>
+
+<div id="processingNotices-tab" class="tab">
+	<fieldset class="tabFieldset">
+		<legend>Уведомления о нераспознанных изготовителях</legend>
+		${app.GetLabel("Defaults.ProcessingAboutFirmSubject")} <br/>
+		${app.Edit("Defaults.ProcessingAboutFirmSubject", {@class: @width600px})}
+		${app.GetValidationError(Defaults, "ProcessingAboutFirmSubject")}
+		<br/> <br/>
+		${FormHelper.TextArea("Defaults.ProcessingAboutFirmBody", { @class: @allWidth, @rows: "10" })}
+		${app.GetValidationError(Defaults, "ProcessingAboutFirmBody")}
+	</fieldset>
+	<fieldset class="tabFieldset">
+		<legend>Текст уведомления о нераспознанных наименованиях</legend>
+		${app.GetLabel("Defaults.ProcessingAboutNamesSubject")} <br/>
+		${app.Edit("Defaults.ProcessingAboutNamesSubject", {@class: @width600px})}
+		${app.GetValidationError(Defaults, "ProcessingAboutNamesSubject")}
+		<br/> <br/>
+		${FormHelper.TextArea("Defaults.ProcessingAboutNamesBody", { @class: @allWidth, @rows: "10" })}
+		${app.GetValidationError(Defaults, "ProcessingAboutNamesBody" )}
+	</fieldset>
 </div>
 
 <div id="techOperatingSettings-tab" class="tab">
