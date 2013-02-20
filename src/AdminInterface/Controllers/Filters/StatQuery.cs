@@ -22,6 +22,12 @@ namespace AdminInterface.Controllers.Filters
 			var data = new DataSet();
 
 			var additionalSql = @"
+SELECT date_format(Max(RequestTime), '%d.%m.%Y %H:%i:%S') as LastSendTime
+FROM logs.document_logs d ,logs.documentsendlogs s ,logs.analitfupdates a
+where d.rowid=s.documentid
+and s.updateid=a.updateid
+and (FileDelivered =1 or DocumentDelivered = 1) and d.documenttype=1 and requesttime>=?StartDateParam;
+
 SELECT count(dlogs.RowId) as CountDownloadedWaybills,
 	max(dlogs.LogTime) as LastDownloadedWaybillDate,
 	count(distinct dlogs.ClientCode) as CountDownloadedWaybilsByClient,
@@ -173,6 +179,13 @@ from orders.ordershead oh
 where	oh.processed = 0
 		and oh.submited = 1
 		and oh.deleted = 0;
+
+select count(oh.RowId) as NonProcOrdersCountOld
+from orders.ordershead oh
+where	oh.processed = 0
+		and oh.submited = 1
+		and oh.deleted = 0
+ and (oh.writetime + interval 5 minute) < now();
 
 SELECT sum(if(afu.UpdateType = 6, 1, 0)) as UpdatesErr,
 	   cast(concat(Sum(afu.UpdateType IN (5)) ,'(' ,count(DISTINCT if(afu.UpdateType  IN (5), u.Id, null)) ,')') as CHAR) UpdatesAD,

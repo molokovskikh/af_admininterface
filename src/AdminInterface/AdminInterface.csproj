@@ -530,6 +530,7 @@
     <None Include="Views\Logs\OrdersTable.brail" />
     <None Include="Views\Logs\Statistics.brail" />
     <Content Include="Views\Mail\ModifyAct.brail" />
+    <Content Include="Views\Mail\DeletePayer.brail" />
     <None Include="Views\Mail\RegisterNews.brail" />
     <Content Include="Views\ManagerReports\ClientAddressesMonitor.brail" />
     <None Include="Views\ManagerReports\ClientConditionsMonitoring.brail" />

@@ -190,7 +190,7 @@
 					<td class="statistic-label">
 						Очередь:
 					</td>
-					<td class="statistic-value ${"to-many-orders" if NonProcOrdersCount > 100}">
+					<td class="statistic-value ${"to-many-orders" if NonProcOrdersCountOld > 100}">
 						<% if NonProcOrdersCount == 0: %>
 						-
 						<% else: %>
@@ -284,6 +284,11 @@
 					</td>
 					<td class="statistic-label">Последний разбор:</td>
 					<td class="statistic-value">${LastParsedWaybillDate}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label" colspan=2></td>
+					<td class="statistic-label">Последняя отправка:</td>
+					<td class="statistic-value">${LastSendTime}</td>
 				</tr>
 				<tr>
 					<td class="statistic-label" colspan=2>Всего позиций:</td>

@@ -448,6 +448,17 @@ namespace AdminInterface.Mailers
 			Attachments.Add(new Attachment(memory, "Счет.html"));
 		}
 
+		public MonorailMailer PayerDelete(Payer payer)
+		{
+			GeneralizationPropertyChanged(payer, payer.Comment);
+			To = "BillingList@analit.net";
+			IsBodyHtml = true;
+			Template = "DeletePayer";
+			Subject = string.Format("Удален плательщик {0}", payer.Name);
+			PropertyBag["payer"] = payer;
+			return this;
+		}
+
 		public MonorailMailer PayerRegistred(Payer payer)
 		{
 			GeneralizationPropertyChanged(payer, payer.Comment);

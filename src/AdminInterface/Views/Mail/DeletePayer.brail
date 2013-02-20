@@ -1,0 +1,41 @@
+﻿Дата удаления: ${System.DateTime.Now}</br>
+Сотрудник: ${admin.Name}</br>
+Хост: ${admin.Host}</br>
+<b>Удален плательщик:</b></br>
+${idLabel}: ${entity.Id}</br>
+Краткое наименование: ${payer.Name}</br>
+Полное наименование: ${payer.JuridicalName}</br>
+Комментарий: </br>
+${message}
+
+<%if payer.Suppliers.Count > 0: %>
+</br></br>
+При удалении Плательщика были удалены Поставщики:
+<table>
+	<tbody>
+<% for i, supplier in enumerate(payer.Suppliers): %>
+	<tr>
+		<td>${supplier.Id} - </td>
+		<td>${supplier.Name}</td>
+		<td>(${supplier.HomeRegion.Name})</td>
+	</tr>
+<%end%>
+	</tbody>
+</table>
+<%end%>
+
+<%if payer.Clients.Count > 0: %>
+</br>
+При удалении Плательщика были удалены Клиенты:
+<table>
+	<tbody>
+<% for i, client in enumerate(payer.Clients): %>
+	<tr>
+		<td>${client.Id} - </td>
+		<td>${client.Name}</td>
+		<td>(${client.HomeRegion.Name})</td>
+	</tr>
+<%end%>
+	</tbody>
+</table>
+<%end%>
