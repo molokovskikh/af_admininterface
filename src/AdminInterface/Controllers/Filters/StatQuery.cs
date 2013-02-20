@@ -180,6 +180,13 @@ where	oh.processed = 0
 		and oh.submited = 1
 		and oh.deleted = 0;
 
+select count(oh.RowId) as NonProcOrdersCountOld
+from orders.ordershead oh
+where	oh.processed = 0
+		and oh.submited = 1
+		and oh.deleted = 0
+ and (oh.writetime + interval 5 minute) < now();
+
 SELECT sum(if(afu.UpdateType = 6, 1, 0)) as UpdatesErr,
 	   cast(concat(Sum(afu.UpdateType IN (5)) ,'(' ,count(DISTINCT if(afu.UpdateType  IN (5), u.Id, null)) ,')') as CHAR) UpdatesAD,
 	   cast(concat(sum(afu.UpdateType = 2) ,'(' ,count(DISTINCT if(afu.UpdateType = 2, u.Id, null)) ,')') as CHAR) CumulativeUpdates,
