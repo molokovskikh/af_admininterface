@@ -74,6 +74,18 @@ namespace AdminInterface.Models
 		[Property, ValidateNonEmpty]
 		public string TechOperatingModeTemplate { get; set; }
 
+		[Property, ValidateNonEmpty]
+		public string ProcessingAboutFirmBody { get; set; }
+
+		[Property, ValidateNonEmpty, Description("Тема письма о нераспознанных изготовителях")]
+		public string ProcessingAboutFirmSubject { get; set; }
+
+		[Property, ValidateNonEmpty, Description("Тема письма о нераспознанных наименованиях")]
+		public string ProcessingAboutNamesSubject { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string ProcessingAboutNamesBody { get; set; }
+
 		[Property, Description("Начало рабочего дня:"), ValidateRegExp("^([0-1]?[0-9]|[2][0-3])(.([0-5][0-9]))$", "Некорректное время начала рабочего дня, время должно содержать часы (0-24) и минуты (00-59), разделенные точкой")]
 		public string TechOperatingModeBegin { get; set; }
 
