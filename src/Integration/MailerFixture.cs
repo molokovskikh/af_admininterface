@@ -32,6 +32,7 @@ namespace Integration
 		private Client client;
 		private User user;
 		private Payer payer;
+		private Supplier supplier;
 
 		[SetUp]
 		public void Setup()
@@ -46,13 +47,19 @@ namespace Integration
 			ForTest.InitializeMailer();
 			mailer = ForTest.TestMailer(m => message = m);
 
-			payer = new Payer("Тестовый плательщик") { PayerID = 10 };
+			payer = new Payer("Тестовый плательщик") { PayerID = 10, JuridicalName = "FullTestPayerName" };
 			client = new Client(payer, Data.DefaultRegion) {
 				Id = 58,
 				Name = "Тестовый клиент",
 				HomeRegion = new Region { Name = "test" },
 				Settings = new DrugstoreSettings()
 			};
+			supplier = new Supplier {
+				Name = "Тестовый поставщик",
+				HomeRegion = new Region { Name = "testSupplierRegion" }
+			};
+			payer.Clients.Add(client);
+			payer.Suppliers.Add(supplier);
 			user = new User(payer, client);
 			client.Users.Add(user);
 		}
@@ -309,6 +316,24 @@ namespace Integration
 
 			Assert.That(message.IsBodyHtml, Is.True);
 			Assert.That(message.Body, Is.StringContaining("Изменено 'Комментарий'"));
+		}
+
+		[Test]
+		public void Payer_delete()
+		{
+			mailer.PayerDelete(payer);
+			mailer.Send();
+
+			Assert.That(message.IsBodyHtml, Is.True);
+			Assert.That(message.Subject, Is.StringContaining("Удален плательщик"));
+			Assert.That(message.Body, Is.StringContaining("Тестовый плательщик"));
+			Assert.That(message.Body, Is.StringContaining("При удалении Плательщика были удалены Клиенты"));
+			Assert.That(message.Body, Is.StringContaining(client.Name));
+			Assert.That(message.Body, Is.StringContaining(client.HomeRegion.Name));
+			Assert.That(message.Body, Is.StringContaining("При удалении Плательщика были удалены Поставщики"));
+			Assert.That(message.Body, Is.StringContaining(supplier.Name));
+			Assert.That(message.Body, Is.StringContaining(supplier.HomeRegion.Name));
+			Assert.That(message.Body, Is.StringContaining("FullTestPayerName"));
 		}
 
 		[Test]

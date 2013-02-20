@@ -521,6 +521,11 @@ namespace AdminInterface.Models.Billing
 			session.Delete(this);
 		}
 
+		public virtual void NotifyAboutDelete(MonorailMailer mailer)
+		{
+			mailer.PayerDelete(this).Send();
+		}
+
 		public virtual IEnumerable<ModelAction> Actions
 		{
 			get

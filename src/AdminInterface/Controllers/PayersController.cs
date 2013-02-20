@@ -9,6 +9,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using NHibernate;
 using NHibernate.Linq;
@@ -207,7 +208,9 @@ namespace AdminInterface.Controllers
 			var payer = DbSession.Load<Payer>(id);
 
 			try {
+				var notifyPayer = payer;
 				payer.Delete(DbSession);
+				notifyPayer.NotifyAboutDelete(this.Mailer());
 				Notify("Удалено");
 				Redirect("Billing", "Search");
 			}
