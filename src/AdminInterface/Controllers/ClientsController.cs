@@ -336,12 +336,16 @@ where Phone like :phone")
 			RenderView("SearchClientSubview");
 		}
 
-		public void ChangePayer(uint clientId, uint payerId, uint orgId)
+		public void ChangePayer(uint clientId, uint payerId, uint orgId, bool andJurdicalOrganization)
 		{
 			var client = Client.FindAndCheck<Client>(clientId);
 			var payer = Payer.Find(payerId);
 			var org = payer.JuridicalOrganizations.FirstOrDefault(j => j.Id == orgId);
-			client.ChangePayer(DbSession, payer, org);
+			if (!andJurdicalOrganization)
+				client.ChangePayer(DbSession, payer, org);
+			else {
+				client.ChangePayer(DbSession, payer);
+			}
 
 			Notify("Изменено");
 			RedirectToAction("Show", new { id = client.Id });

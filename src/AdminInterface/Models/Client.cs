@@ -182,7 +182,11 @@ namespace AdminInterface.Models
 
 		public virtual bool CanChangePayer
 		{
-			get { return Payers.Count == 1 && Payers[0].JuridicalOrganizations.Count == 1; }
+			get
+			{
+				var addressPayers = Addresses.Select(a => a.Payer);
+				return Payers.Count == 1 && Payers[0].JuridicalOrganizations.Count == 1 && addressPayers.All(a => a.Id == Payers[0].Id);
+			}
 		}
 
 		public static Client FindClietnForBilling(uint clientCode)
@@ -414,6 +418,46 @@ group by u.ClientId")
 
 		public virtual void ChangePayer(ISession session, Payer payer, LegalEntity org)
 		{
+			CommonChangePayer(() => {
+				foreach (var address in Addresses) {
+					address.Payer.Addresses.Remove(address);
+					address.Payer = payer;
+					address.LegalEntity = org;
+					address.Payer.Addresses.Add(address);
+				}
+
+				session.CreateSQLQuery(@"
+update Customers.intersection
+set LegalEntityId = :orgId
+where ClientId = :clientId")
+				.SetParameter("clientId", Id)
+				.SetParameter("orgId", org.Id)
+				.ExecuteUpdate();
+			}, payer);
+		}
+
+		public virtual void ChangePayer(ISession session, Payer payer)
+		{
+			var oldPayers = Payers.ToArray();
+			CommonChangePayer(() => {
+				foreach (var address in Addresses) {
+					address.Payer.Addresses.Remove(address);
+					address.Payer = payer;
+					address.Payer.Addresses.Add(address);
+				}
+
+				var legalEntities = oldPayers.SelectMany(p => p.JuridicalOrganizations).ToList();
+				if (legalEntities.Count > 1)
+					throw new Exception(string.Format("Количество ЮрЛиц у клиента {0} более одного, не могу поменять плательщика у клиента", Id));
+
+				var legalEntity = legalEntities.First();
+				legalEntity.Payer = payer;
+				session.SaveOrUpdate(legalEntity);
+			}, payer);
+		}
+
+		protected virtual void CommonChangePayer(Action changer, Payer payer)
+		{
 			var oldPayers = Payers.ToArray();
 			Payers.Clear();
 			Payers.Add(payer);
@@ -423,20 +467,7 @@ group by u.ClientId")
 				user.Payer.Users.Add(user);
 			}
 
-			foreach (var address in Addresses) {
-				address.Payer.Addresses.Remove(address);
-				address.Payer = payer;
-				address.LegalEntity = org;
-				address.Payer.Addresses.Add(address);
-			}
-
-			session.CreateSQLQuery(@"
-update Customers.intersection
-set LegalEntityId = :orgId
-where ClientId = :clientId")
-				.SetParameter("clientId", Id)
-				.SetParameter("orgId", org.Id)
-				.ExecuteUpdate();
+			changer();
 
 			payer.UpdatePaymentSum();
 			foreach (var oldPayer in oldPayers)

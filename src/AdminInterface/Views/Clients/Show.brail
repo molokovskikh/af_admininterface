@@ -80,6 +80,8 @@
 </script>
 
 ${app.Asset("ClientsShow.css")}
+${app.Asset("Client.js")}
+
 <h2>Клиент ${client.Name}, Код ${client.Id}</h2>
 
 <div class="MainDiv">
@@ -144,9 +146,15 @@ ${app.Asset("ClientsShow.css")}
 					<label>Выберете плательщика:</label>
 					<select name=payerId class=result></select>
 					<br>
-					<label>Выберете Юр.Лицо:</label>
-					<select name=orgId id=orgs></select>
-					<br>
+					<div id="selectJurdicalOrganizationBlock">
+						<label>Выберете Юр.Лицо:</label>
+						<select name=orgId id=orgs></select>
+						<br>
+					</div>
+					<label>Перенести вместе с Юр. Лицом:</label>
+					<input type="checkbox" onclick="AndJurdicalOrganization(this);" />
+					<input name="andJurdicalOrganization" id="andJurdicalOrganization" type="hidden" />
+					<br/>
 					<input type=submit value="Изменить">
 					<input type=button class=cancel value="Отменить">
 				</div>

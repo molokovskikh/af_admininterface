@@ -456,6 +456,7 @@
     <Content Include="Assets\Javascripts\autosubmit.coffee" />
     <Content Include="Assets\Javascripts\billing.js" />
     <Content Include="Assets\Javascripts\billing.search.js" />
+    <Content Include="Assets\Javascripts\Client.js" />
     <Content Include="Assets\Javascripts\confirmation.coffee" />
     <Content Include="Assets\Javascripts\EditPayment.js" />
     <Content Include="Assets\Javascripts\input.dependency.coffee" />

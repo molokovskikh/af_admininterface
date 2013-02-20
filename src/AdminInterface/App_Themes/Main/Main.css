@@ -336,3 +336,11 @@ table.Test
 .fullWidth {
 	width: 100%;
 }
+
+.noDisplay {
+	display: none;
+}
+
+.display {
+	display: block;
+}
