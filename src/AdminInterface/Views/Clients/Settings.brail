@@ -3,7 +3,7 @@
 <% component CaptureFor, {@id : @Title}: %>
 	Конфигурация клиента ${client.Name}
 <% end %>
-
+${app.Asset("Documents.css")}
 <script>
 	$(function () {
 		activateSearch();
@@ -61,6 +61,11 @@
 				<tr>
 					<td>
 						${app.Edit("drugstore.IsConvertFormat", {@class: @activate})}
+						<% if drugstore.IsConvertFormat and drugstore.AssortimentPrice is null: %>
+						<div class="redText">
+							* не указан ассортиментный прайс-лист для конвертации
+						</div>
+						<% end %>
 					</td>
 					<td>
 						${app.SearchEdit("drugstore.AssortimentPrice",

@@ -559,6 +559,16 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			AssertText("Сброшена");
 		}
 
+		[Test(Description = "Проверяет отображение предупреждения о том, что для конвертации не выбран ассортиментный ПЛ")]
+		public void NotSetAssortmentPriceInConvert()
+		{
+			browser.CheckBox("drugstore_IsConvertFormat").Click();
+			Click("Сохранить");
+			AssertText("Сохранено");
+			Click("Настройка");
+			AssertText("* не указан ассортиментный прайс-лист для конвертации");
+		}
+
 		private SelectList GetHomeRegionSelect(Browser browser)
 		{
 			return browser.SelectList(Find.ById("HomeRegionComboBox"));
