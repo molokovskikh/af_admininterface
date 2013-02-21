@@ -196,8 +196,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining(String.Format("Клиент {0}, Код {1}", client.Name, client.Id)));
 		}
 
-		[Test]
-		public void Change_client_payer()
+		private Payer Prepare_change_paer()
 		{
 			var payer = DataMother.CreatePayer();
 			payer.INN = "123321123";
@@ -212,8 +211,34 @@ namespace Functional.Drugstore
 			var select = (SelectList)Css("select[name=payerId]");
 			Assert.That(select.SelectedItem, Is.EqualTo(String.Format("{0}, {1}", payer.Id, payer.Name)));
 
+			return payer;
+		}
+
+		[Test]
+		public void Change_client_payer()
+		{
+			var payer = Prepare_change_paer();
+
 			Css("#ChangePayer [type=submit]").Click();
+			session.Refresh(payer);
+			Assert.IsFalse(payer.JuridicalOrganizations.Contains(client.Orgs().First()));
 			Assert.That(browser.Text, Is.StringContaining("Изменено"));
+			AssertText("ИНН: " + payer.INN);
+			session.Refresh(client);
+			Assert.That(client.Payers, Is.EquivalentTo(new[] { payer }));
+		}
+
+		[Test]
+		public void Change_payer_and_jurdical_organization()
+		{
+			var payer = Prepare_change_paer();
+			browser.CheckBox("andJurdicalOrganizationCheckbox").Checked = true;
+
+			Css("#ChangePayer [type=submit]").Click();
+			session.Refresh(payer);
+
+			Assert.IsTrue(client.Orgs().Count() == 1);
+			Assert.IsTrue(payer.JuridicalOrganizations.Contains(client.Orgs().First()));
 			AssertText("ИНН: " + payer.INN);
 			session.Refresh(client);
 			Assert.That(client.Payers, Is.EquivalentTo(new[] { payer }));

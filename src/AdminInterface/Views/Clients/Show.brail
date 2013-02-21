@@ -152,7 +152,7 @@ ${app.Asset("Client.js")}
 						<br>
 					</div>
 					<label>Перенести вместе с Юр. Лицом:</label>
-					<input type="checkbox" onclick="AndJurdicalOrganization(this);" />
+					<input type="checkbox" id="andJurdicalOrganizationCheckbox" onclick="AndJurdicalOrganization(this);" />
 					<input name="andJurdicalOrganization" id="andJurdicalOrganization" type="hidden" />
 					<br/>
 					<input type=submit value="Изменить">
