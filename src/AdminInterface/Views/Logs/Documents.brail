@@ -10,7 +10,7 @@
 	<% end %>
 <% end %>
 
-
+${app.Asset("Documents.css")}
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.Supplier.Id")}
 ${FormHelper.HiddenField("filter.Client.Id")}

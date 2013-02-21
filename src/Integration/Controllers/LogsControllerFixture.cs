@@ -48,8 +48,11 @@ namespace Integration.Controllers
 			Prepare(_controller);
 		}
 
-		[Test]
-		public void ConvertDocumentLineTest()
+		private Product _product;
+		private Producer _producer;
+		private DocumentLine _line;
+
+		private void PrepareTestDocumentLog()
 		{
 			var catalogName = new TestCatalogName { Name = "testName" };
 			var catalogForm = new TestCatalogForm { Form = "testForm" };
@@ -58,21 +61,38 @@ namespace Integration.Controllers
 
 			var documentLog = new FullDocument(_document);
 			var catalog = new Catalog { Name = "testCatalog", NameId = catalogName.Id, FormId = catalogForm.Id };
-			var product = new Product(catalog);
-			var producer = new Producer { Name = "testProducer" };
+			_product = new Product(catalog);
+			_producer = new Producer { Name = "testProducer" };
 			session.Save(catalog);
-			session.Save(product);
-			session.Save(producer);
-			var line = new DocumentLine {
-				CatalogProducer = producer,
-				CatalogProduct = product,
+			session.Save(_product);
+			session.Save(_producer);
+			_line = new DocumentLine {
+				CatalogProducer = _producer,
+				CatalogProduct = _product,
 				Product = "123",
 				Document = documentLog
 			};
 			documentLog.Lines = new List<DocumentLine>();
-			documentLog.Lines.Add(line);
+			documentLog.Lines.Add(_line);
 			session.Save(documentLog);
+			session.Flush();
+		}
 
+		[Test]
+		public void ConvertDocumentWithoutAssortmentTest()
+		{
+			PrepareTestDocumentLog();
+			_controller.Converted(_line.Id, _client.Id);
+
+			Assert.That(_controller.PropertyBag["convertedLine"], Is.StringContaining("testCatalog"));
+			Assert.That(_controller.PropertyBag["convertedLine"], Is.StringContaining("testProducer"));
+			Assert.That(_controller.PropertyBag["notFindAssortment"], Is.StringContaining("* не указан ассортиментный прайс-лист для конвертации"));
+		}
+
+		[Test]
+		public void ConvertDocumentLineTest()
+		{
+			PrepareTestDocumentLog();
 			var assortPrice = _supplier.AddPrice("Ассортиментный", PriceType.Assortment);
 			_client.Settings.AssortimentPrice = assortPrice;
 			session.Save(_client.Settings);
@@ -83,17 +103,17 @@ namespace Integration.Controllers
 			var core = new Core {
 				Code = "0000",
 				CodeCr = "1111",
-				CodeFirmCr = (int)producer.Id,
+				CodeFirmCr = (int)_producer.Id,
 				Price = assortPrice,
 				ProducerSynonym = prSynonym,
 				ProductSynonym = synonym,
-				ProductId = (int)product.Id,
+				ProductId = (int)_product.Id,
 				Quantity = "1"
 			};
 
 			session.Save(core);
 			session.Flush();
-			_controller.Converted(line.Id, _client.Id);
+			_controller.Converted(_line.Id, _client.Id);
 
 			Assert.That(_controller.PropertyBag["convertedLine"], Is.StringContaining("0000 Тестовый синоним"));
 			Assert.That(_controller.PropertyBag["convertedLine"], Is.StringContaining("1111 Тестовый синоним"));
