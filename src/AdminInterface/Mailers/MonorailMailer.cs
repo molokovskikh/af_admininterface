@@ -448,9 +448,9 @@ namespace AdminInterface.Mailers
 			Attachments.Add(new Attachment(memory, "Счет.html"));
 		}
 
-		public MonorailMailer PayerDelete(Payer payer)
+		public MonorailMailer PayerDelete(Payer payer, string deleteComment)
 		{
-			GeneralizationPropertyChanged(payer, payer.Comment);
+			GeneralizationPropertyChanged(payer, deleteComment.Replace("\r\n", "<br/>"));
 			To = "BillingList@analit.net";
 			IsBodyHtml = true;
 			Template = "DeletePayer";

@@ -509,7 +509,7 @@ namespace AdminInterface.Models.Billing
 
 		public virtual void Delete(ISession session)
 		{
-			CheckBeforeDelete(session);
+			//CheckBeforeDelete(session);
 
 			var clients = Clients.Where(c => c.CanDelete(session)).ToArray();
 			foreach (var client in clients)
@@ -521,9 +521,9 @@ namespace AdminInterface.Models.Billing
 			session.Delete(this);
 		}
 
-		public virtual void NotifyAboutDelete(MonorailMailer mailer)
+		public virtual void NotifyAboutDelete(MonorailMailer mailer, string deleteComment)
 		{
-			mailer.PayerDelete(this).Send();
+			mailer.PayerDelete(this, deleteComment).Send();
 		}
 
 		public virtual IEnumerable<ModelAction> Actions

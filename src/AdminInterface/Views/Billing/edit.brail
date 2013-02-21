@@ -16,6 +16,7 @@ ${app.Asset("billing.css")}
 <div class="deletePayerDiv">
 	<form id="deletePayerForm" method="post" action="${SiteRoot}/Payers/Delete">
 	<input type="hidden" id="id" name="id" value="${payer.Id}">
+	<input type="hidden" id="deleteComment" name="deleteComment">
 	<input type="button" value="Удалить Плательщика" onclick="DeletePayer('${payer.Name}')">
 </form>
 

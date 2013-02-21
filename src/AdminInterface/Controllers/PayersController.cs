@@ -203,14 +203,14 @@ namespace AdminInterface.Controllers
 			PropertyBag["payer"] = payer;
 		}
 
-		public void Delete(uint id)
+		public void Delete(uint id, string deleteComment)
 		{
 			var payer = DbSession.Load<Payer>(id);
 
 			try {
 				var notifyPayer = payer;
 				payer.Delete(DbSession);
-				notifyPayer.NotifyAboutDelete(this.Mailer());
+				notifyPayer.NotifyAboutDelete(this.Mailer(), deleteComment);
 				Notify("Удалено");
 				Redirect("Billing", "Search");
 			}

@@ -321,7 +321,7 @@ namespace Integration
 		[Test]
 		public void Payer_delete()
 		{
-			mailer.PayerDelete(payer);
+			mailer.PayerDelete(payer, "testComment");
 			mailer.Send();
 
 			Assert.That(message.IsBodyHtml, Is.True);
