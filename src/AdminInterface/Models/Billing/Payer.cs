@@ -509,7 +509,7 @@ namespace AdminInterface.Models.Billing
 
 		public virtual void Delete(ISession session)
 		{
-			//CheckBeforeDelete(session);
+			CheckBeforeDelete(session);
 
 			var clients = Clients.Where(c => c.CanDelete(session)).ToArray();
 			foreach (var client in clients)
