@@ -196,7 +196,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining(String.Format("Клиент {0}, Код {1}", client.Name, client.Id)));
 		}
 
-		private Payer Prepare_change_paer()
+		private Payer Prepare_change_payer()
 		{
 			var payer = DataMother.CreatePayer();
 			payer.INN = "123321123";
@@ -217,10 +217,11 @@ namespace Functional.Drugstore
 		[Test]
 		public void Change_client_payer()
 		{
-			var payer = Prepare_change_paer();
+			var payer = Prepare_change_payer();
 
 			Css("#ChangePayer [type=submit]").Click();
 			session.Refresh(payer);
+
 			Assert.IsFalse(payer.JuridicalOrganizations.Contains(client.Orgs().First()));
 			Assert.That(browser.Text, Is.StringContaining("Изменено"));
 			AssertText("ИНН: " + payer.INN);
@@ -231,7 +232,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Change_payer_and_jurdical_organization()
 		{
-			var payer = Prepare_change_paer();
+			var payer = Prepare_change_payer();
 			browser.CheckBox("andJurdicalOrganizationCheckbox").Checked = true;
 
 			Css("#ChangePayer [type=submit]").Click();
