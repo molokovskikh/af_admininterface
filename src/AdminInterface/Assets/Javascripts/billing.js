@@ -71,20 +71,11 @@ function ShowMessage(userId) {
 }
 
 function DeletePayer(payerName) {
-	$("<form id='deleteForm' onsubmit='return false;'><div><label>Введите причину удаления</label><textarea id='CommentField' rows='10' class='deleteComment'></textarea></div></form>")
+	$("<form id='deleteForm' onsubmit='return false;'><div><label>Введите причину удаления</label><textarea id='CommentField' rows='10' class='deleteComment required'></textarea></div></form>")
 		.dialog({
 			modal: true,
 			buttons: {
 				"Продолжить": function () {
-					$('#deleteForm').validate();
-					$('#CommentField').rules("add", {
-						required: true,
-						minlength: 120,
-						messages: {
-							required: "Введите причину удаления",
-							minlength: "Минимум 120 символов"
-						}
-					});
 					if (!$(this).valid()) {
 						return;
 					}
