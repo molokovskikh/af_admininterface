@@ -35,7 +35,12 @@ namespace Printer
 			try {
 				var printer = args[1];
 				var name = args[0];
-				var ids = args[2].Split(',').Select(id => Convert.ToUInt32(id.Trim())).ToArray();
+				var ids = args[2].Split(',').Select(id => {
+					uint result = 0;
+					if(UInt32.TryParse(id.Trim(), out result))
+						return result;
+					return 0;
+				}).ToArray();
 
 				var brail = StandaloneInitializer.Init();
 				IEnumerable documents = null;
