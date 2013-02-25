@@ -35,7 +35,7 @@ namespace Printer
 			try {
 				var printer = args[1];
 				var name = args[0];
-				var ids = args[2].Split(',').Select(id => {
+				var ids = args[2].Split(',').Select<string, uint>(id => {
 					uint result = 0;
 					if(UInt32.TryParse(id.Trim(), out result))
 						return result;
