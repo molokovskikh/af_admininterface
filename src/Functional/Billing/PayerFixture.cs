@@ -72,14 +72,16 @@ namespace Functional.Billing
 		}
 
 		[Test]
-		public void Delete_payer_yes_no_dialog()
+		public void Delete_payer_dialog()
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			Open(payer);
 			Click("Удалить Плательщика");
-			AssertText("Да");
-			AssertText("Нет");
-			Click("Да");
+			AssertText("Введите причину удаления");
+			Click("Продолжить");
+			AssertText("Это поле необходимо заполнить.");
+			browser.TextField("CommentField").AppendText("123456");
+			Click("Продолжить");
 		}
 
 		[Test]
