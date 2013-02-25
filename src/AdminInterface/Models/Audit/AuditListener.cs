@@ -60,6 +60,9 @@ namespace AdminInterface.Models.Audit
 			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region")) {
 				return new MaskedAuditableProperty(property, name, newState, oldState);
 			}
+			if(property.PropertyType == typeof(bool) && property.Name == "Disabled" && entity.GetType() == typeof(Suppliers.Supplier)) {
+				return base.GetAuditableProperty(property, name, oldState, newState, entity);
+			}
 			return base.GetAuditableProperty(property, name, newState, oldState, entity);
 		}
 	}

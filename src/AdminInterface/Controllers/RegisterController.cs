@@ -114,7 +114,6 @@ namespace AdminInterface.Controllers
 				currentPayer.UpdatePaymentSum();
 				AddContacts(supplier.ContactGroupOwner, supplierContacts);
 				supplier.OrderRules.Add(new OrderSendRules(Defaults, supplier));
-				supplier.Enabled = !supplier.Disabled;
 				DbSession.Save(supplier);
 
 				foreach (var group in supplier.ContactGroupOwner.ContactGroups) {

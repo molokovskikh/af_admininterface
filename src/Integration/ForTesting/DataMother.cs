@@ -263,7 +263,6 @@ namespace Integration.ForTesting
 				FullName = "Тестовый поставщик",
 				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
 			};
-			supplier.Enabled = !supplier.Disabled;
 			supplier.RegionalData.Add(new RegionalData { Region = homeRegion, Supplier = supplier });
 			supplier.AddPrice("Базовый", PriceType.Regular);
 			if (action != null)
