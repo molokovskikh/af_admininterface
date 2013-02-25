@@ -348,3 +348,7 @@ table.Test
 .deleteComment {
 	width: 100%;
 }
+
+#source_WaybillUrl, #source_RejectUrl {
+	width: 200px;
+}

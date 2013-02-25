@@ -108,6 +108,9 @@ namespace AdminInterface.Models.Suppliers
 		[Nested]
 		public virtual RegistrationInfo Registration { get; set; }
 
+		[OneToOne(Cascade = CascadeEnum.All)]
+		public virtual WaybillSource WaybillSource { get; set; }
+
 		[BelongsTo(Cascade = CascadeEnum.All)]
 		public virtual Payer Payer { get; set; }
 

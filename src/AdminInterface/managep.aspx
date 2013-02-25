@@ -32,6 +32,7 @@
 				<ul class="navigation-menu">
 					<li><asp:HyperLink runat="server" ID="HandlersLink">Настройка форматеров и отправщиков доступных поставщику</asp:HyperLink></li>
 					<li><asp:HyperLink runat="server" ID="WaybillExcludeFiles">Файлы, исключенные из разбора в качестве накладных</asp:HyperLink></li>
+					<li><asp:HyperLink runat="server" ID="WaybillSourceSettings">Настройки передачи документов</asp:HyperLink></li>
 				</ul>
 			</div>
 			<div class="BorderedBlock">

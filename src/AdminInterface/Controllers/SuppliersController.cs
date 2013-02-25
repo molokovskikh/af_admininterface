@@ -168,5 +168,28 @@ namespace AdminInterface.Controllers
 			Notify("Удалено");
 			Redirect("Users", "Search");
 		}
+
+		public void WaybillSourceSettings(uint supplierId)
+		{
+			var supplier = DbSession.Get<Supplier>(supplierId);
+			PropertyBag["supplier"] = supplier;
+			PropertyBag["source"] = supplier.WaybillSource;
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void WaybillSourceSettings([ARDataBind("source")]WaybillSource source)
+		{
+			if (IsValid(source)) {
+				DbSession.SaveOrUpdate(source);
+				Notify("Сохранено");
+				RedirectToAction("WaybillSourceSettings", new Dictionary<string, string> { { "supplierId", source.Id.ToString() } });
+				PropertyBag["supplier"] = DbSession.Get<Supplier>(source.Id);
+				PropertyBag["source"] = source;
+				return;
+			}
+			Notify("Ошибка сохранения");
+			PropertyBag["supplier"] = DbSession.Get<Supplier>(source.Id);
+			PropertyBag["source"] = source;
+		}
 	}
 }

@@ -180,6 +180,7 @@
     <Compile Include="Models\ReorderSchedule.cs" />
     <Compile Include="Models\Validators\PayerNotNullValidator.cs" />
     <Compile Include="Models\WaybillExcludeFile.cs" />
+    <Compile Include="Models\WaybillSource.cs" />
     <Compile Include="Queries\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="Queries\ClientAddressFilter.cs" />
     <Compile Include="Queries\ClientConditionsMonitoring.cs" />
@@ -472,6 +473,7 @@
     <Content Include="Assets\Javascripts\UserRegionsEditor.js" />
     <Content Include="Assets\Javascripts\UserScripts.js" />
     <Content Include="Assets\Javascripts\WaybillExcludeFiles.js" />
+    <Content Include="Assets\Javascripts\WaybillSourceSettings.js" />
     <Content Include="Assets\Stylesheets\billing.css" />
     <Content Include="Assets\Stylesheets\ClientsShow.css" />
     <Content Include="Assets\Stylesheets\Documents.css" />
@@ -605,6 +607,7 @@
     <None Include="Views\LegalEntity\Add.brail" />
     <None Include="Views\SubViews\UserRegions.brail" />
     <Content Include="Views\Suppliers\WaybillExcludeFiles.brail" />
+    <Content Include="Views\Suppliers\WaybillSourceSettings.brail" />
     <None Include="Views\Templates\UnknownCalls.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>

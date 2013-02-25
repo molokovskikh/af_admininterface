@@ -13,6 +13,7 @@ using WatiN.Core;
 using Test.Support.Web;
 using Test.Support;
 using WatiN.Core.Native.Windows;
+using WaybillSourceType = AdminInterface.Models.WaybillSourceType;
 
 namespace Functional.Suppliers
 {
@@ -209,6 +210,18 @@ Where pc.PriceCode = :PriceId1")
 			Click("Сохранить");
 			Refresh();
 			Assert.AreEqual(browser.TextField(Find.ByClass("excludeFileMask")).Text, "0000");
+		}
+
+		[Test]
+		public void Waybill_Source_Settings_Test()
+		{
+			var waybillSource = new WaybillSource { SourceType = WaybillSourceType.Email, ReaderClassName = "testReaderClass", Supplier = supplier };
+			session.Save(waybillSource);
+			Flush();
+			Open("Suppliers/WaybillSourceSettings?supplierId=" + supplier.Id);
+			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
+			browser.SelectList("source_SourceType").SelectByValue("4");
+			AssertText("Настройка данных для доступа к FTP");
 		}
 
 		[Test]

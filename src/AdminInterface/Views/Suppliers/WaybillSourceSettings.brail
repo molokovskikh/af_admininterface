@@ -1,0 +1,32 @@
+﻿${app.Asset("WaybillSourceSettings.js")}
+
+<% component Bubble, {"bredcrumbs" : [("Поставщик ${supplier.Name}", "${siteroot}/Suppliers/${supplier.Id}")]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	Настройки передачи документов в нашу систему.
+<% end %>
+
+<script type="text/javascript">
+	var ReaderClassName = "${source.ReaderClassName}";
+	var WaybillUrl = "${source.WaybillUrl}";
+	var RejectUrl = "${source.RejectUrl}";
+	var UserName = "${source.UserName}";
+	var Password = "${source.Password}";
+	var DownloadInterval = "${source.DownloadInterval}";
+	var ActiveMode = ${source.FtpActiveMode.ToString().ToLower()};
+</script>
+
+<form method="post" action="WaybillSourceSettings">
+	${FormHelper.HiddenField("source.Id", source.Id, null)}
+	${FormHelper.HiddenField("source.EMailFrom", source.EMailFrom, null)}
+	<div class="block">
+	${FormHelper.LabelFor("source.SourceType", "Источник документов: ")}
+	<select id="source_SourceType" name="source.SourceType">
+	<% for i, item in enumerate(BindingHelper.GetDescriptionsDictionary(source.SourceType.GetType())): %>
+		<option value="${item.Key}" ${"selected" if source.SourceType == item.Key} >${item.value}</option>
+	<%end%>
+	<select>
+	<div id="selectorBlock"></div>
+	</div>
+	${FormHelper.Submit("Сохранить")}
+</form>
