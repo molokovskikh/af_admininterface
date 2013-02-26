@@ -24,6 +24,10 @@ namespace Printer
 {
 	public class Program
 	{
+		/// <summary>
+		/// идентификаторы документов для тестирования
+		/// </summary>
+		public static IEnumerable DocumentsForTest { get; set; }
 		public static void Main(string[] args)
 		{
 			//сохранение счетов\актов производится внутри транзации что бы она гарантировано
@@ -35,8 +39,16 @@ namespace Printer
 			try {
 				var printer = args[1];
 				var name = args[0];
-				var ids = args[2].Split(',').Select(id => Convert.ToUInt32(id.Trim())).ToArray();
-
+				var ids = args[2].Split(',').Select<string, uint>(id => {
+					uint result = 0;
+					if(UInt32.TryParse(id.Trim(), out result))
+						return result;
+					return 0;
+				}).ToArray();
+#if DEBUG
+				DocumentsForTest = ids;
+				return;
+#endif
 				var brail = StandaloneInitializer.Init();
 				IEnumerable documents = null;
 				using (new SessionScope(FlushAction.Never)) {
