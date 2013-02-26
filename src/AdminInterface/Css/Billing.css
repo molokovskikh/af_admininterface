@@ -68,17 +68,17 @@ td.short
 
 table.DataTable tbody tr.free, td.free, .free
 {
-	background-color: #b0ffb0;
+	background-color: #d8f9d5;
 }
 
 table.DataTable tr.EvenRow.consolidate-free
 {
-	background-color: #b0ffb0;
+	background-color: #d8f9d5;
 }
 
 table.DataTable tr.OddRow.consolidate-free
 {
-	background-color: #b0ffb0;
+	background-color: #d8f9d5;
 }
 
 table.DataTable tbody tr.has-no-connected-users, td.has-no-connected-users, .has-no-connected-users

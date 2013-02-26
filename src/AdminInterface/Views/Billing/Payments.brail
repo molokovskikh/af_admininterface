@@ -245,7 +245,7 @@ function RefreshTotalSum() {
 						<td class=short>
 							<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("0.#")}" ${"disabled" unless admin.CanChangePayment}>
 						</td>
-						<td>
+						<td class="login">
 							<a id="UserLink${user.Id}" href="javascript:" data-filter="User${user.Id}" data-id="${user.Id}">${user.Id}</a>
 						</td>
 						<td class=short>
@@ -395,6 +395,8 @@ function RefreshTotalSum() {
 	component Legend, { "LegendItems" : {	"Выключен" : "disabled",
 											"Работает бесплатно" : "free",
 											"Не получал обновлений более 7 дней" : "old-user-update",
+											"Пользователь загрузки заказов" : "allow-download-unconfirmed-orders",
+											"Пользователь первый стол" : "first-table",
 											"Адрес не имеет подключенных пользователей" : "has-no-connected-users",
 											"Пользователь не производит заказ" : "can-not-order"},
 						"ByCenter" : false}

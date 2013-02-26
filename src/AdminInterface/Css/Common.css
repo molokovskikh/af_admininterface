@@ -167,9 +167,19 @@ table.DataTable tr.update-is-uncommited td.update-date
 	background-color: #77ac6c;
 }
 
+#UserListBody .DataTable tr.allow-download-unconfirmed-orders td.login
+{
+	background-color: #77ac6c;
+}
+
+#UserListBody .DataTable tr.first-table td.login
+{
+	background-color: #b5fb8e;
+}
+
 .DataTable #SearchResults tr.first-table td.user-name, #users td.first-table, .first-table
 {
-	background-color: #c4f7a8;
+	background-color: #b5fb8e;
 }
 
 .NotCommitedUpdate

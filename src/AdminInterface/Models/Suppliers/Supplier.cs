@@ -465,7 +465,7 @@ where s.Id = :supplierId")
 					if (day == DayOfWeek.Saturday)
 						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(504000000000);
 					if (day == DayOfWeek.Sunday)
-						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(0);
+						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(863400000000);
 					DbSession.Save(reorderSchedule);
 				}
 			}
