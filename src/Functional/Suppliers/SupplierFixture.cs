@@ -215,13 +215,18 @@ Where pc.PriceCode = :PriceId1")
 		[Test]
 		public void Waybill_Source_Settings_Test()
 		{
-			var waybillSource = new WaybillSource { SourceType = WaybillSourceType.Email, ReaderClassName = "testReaderClass", Supplier = supplier };
+			var waybillSource = new WaybillSource { SourceType = WaybillSourceType.FtpSupplier, ReaderClassName = "testReaderClass", Supplier = supplier };
 			session.Save(waybillSource);
 			Flush();
 			Open("Suppliers/WaybillSourceSettings?supplierId=" + supplier.Id);
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
-			browser.SelectList("source_SourceType").SelectByValue("4");
 			AssertText("Настройка данных для доступа к FTP");
+			browser.TextField("source_WaybillUrl").AppendText("testUrl");
+			browser.TextField("source_RejectUrl").AppendText("testUrl");
+			browser.TextField("userName").AppendText("testUser");
+			browser.TextField("source_Password").AppendText("testPassword");
+			browser.TextField("source_downloadInterval").AppendText("5");
+			Click("Сохранить");
+			AssertText("Сохранено");
 		}
 
 		[Test]

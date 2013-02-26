@@ -16,7 +16,7 @@
 	var ActiveMode = ${source.FtpActiveMode.ToString().ToLower()};
 </script>
 
-<form method="post" action="WaybillSourceSettings">
+<form method="post" id="WaybillSourceSettingsForm" action="WaybillSourceSettings">
 	${FormHelper.HiddenField("source.Id", source.Id, null)}
 	${FormHelper.HiddenField("source.EMailFrom", source.EMailFrom, null)}
 	<div class="block">

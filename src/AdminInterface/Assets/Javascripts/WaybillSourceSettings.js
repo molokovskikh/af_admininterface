@@ -46,4 +46,29 @@ function GetFTPEditor() {
 	html += "</tbody></table>";
 	$("#selectorBlock").empty();
 	$("#selectorBlock").append(html);
+
+	$('#WaybillSourceSettingsForm').validate();
+
+	$("#selectorBlock input[type=text]").each(function () {
+		$(this).rules("add", {
+			required: true,
+			messages: {
+				required: "Поле не может быть пустым",
+			}
+		});
+	});
+
+	$('#source_Password').rules("add", {
+		required: true,
+		messages: {
+			required: "Поле не может быть пустым",
+		}
+	});
+
+	$('#source_downloadInterval').rules("add", {
+		digits: true,
+		messages: {
+			digits: "Должно быть введено число",
+		}
+	});
 }
