@@ -175,6 +175,9 @@ namespace AdminInterface.Controllers
 			var supplier = DbSession.Get<Supplier>(supplierId);
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["source"] = supplier.WaybillSource ?? new WaybillSource();
+			if (supplier.WaybillSource == null) {
+				Error("Для данного поставщика ещё не заданы параметры передачи документов");
+			}
 		}
 
 		[AccessibleThrough(Verb.Post)]
