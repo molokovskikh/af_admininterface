@@ -168,6 +168,7 @@
     <Compile Include="Controllers\BalanceOperationsController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\Filters\StatisticsFilter.cs" />
+    <Compile Include="Controllers\MailsModeringController.cs" />
     <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
@@ -186,6 +187,7 @@
     <Compile Include="Queries\ClientConditionsMonitoring.cs" />
     <Compile Include="Queries\FormPositionFilter.cs" />
     <Compile Include="Queries\IFiltrable.cs" />
+    <Compile Include="Queries\MiniMailFilter.cs" />
     <Compile Include="Queries\ParsedWaybillsFilter.cs" />
     <Compile Include="Queries\RegistrationInformation.cs" />
     <Compile Include="Queries\SwitchOffClientsFilter.cs" />
@@ -462,6 +464,7 @@
     <Content Include="Assets\Javascripts\EditPayment.js" />
     <Content Include="Assets\Javascripts\input.dependency.coffee" />
     <Content Include="Assets\Javascripts\MainSettings.js" />
+    <Content Include="Assets\Javascripts\MiniMail.js" />
     <Content Include="Assets\Javascripts\order.delivery.group.editor.coffee" />
     <Content Include="Assets\Javascripts\payer.send.message.coffee" />
     <Content Include="Assets\Javascripts\Payments.js" />

@@ -1,5 +1,24 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Поставщик ${supplier.Name}", "${siteroot}/Suppliers/${supplier.Id}")]} %>
+﻿<% component Bubble, {"bredcrumbs" : []} %>
 
 <% component CaptureFor, {@id : @Title}: %>
 	Модерирование минипочты
 <% end %>
+ ${app.Asset("MiniMail.js")}
+
+${app.BeginFormFor("filter")}
+${FormHelper.HiddenField("filter.SortBy")}
+${FormHelper.HiddenField("filter.SortDirection")}
+<table class="CenterBlock">
+<tbody>
+	${app.FilterFor("filter.Period")}
+	<tr>
+		<td class="filter-label">Поставщик</td>
+		<td>
+			${app.Edit("filter.SupplierName")}
+			${FormHelper.HiddenField("filter.SupplierId")}
+		</td>
+	</tr>
+		${app.EndFormFor("filter")}
+	</tr>
+</tbody>
+</table>
