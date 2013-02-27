@@ -16,6 +16,7 @@ using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -173,17 +174,23 @@ namespace AdminInterface.Controllers
 		{
 			var supplier = DbSession.Get<Supplier>(supplierId);
 			PropertyBag["supplier"] = supplier;
-			PropertyBag["source"] = supplier.WaybillSource;
+			PropertyBag["source"] = supplier.WaybillSource ?? new WaybillSource();
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void WaybillSourceSettings([ARDataBind("source")]WaybillSource source)
+		public void WaybillSourceSettings([ARDataBind("source", AutoLoadBehavior.NullIfInvalidKey)]WaybillSource source, uint supplierId)
 		{
+			var supplier = DbSession.Get<Supplier>(supplierId);
+			if (source == null) {
+				source = (WaybillSource)BindObject(ParamStore.Form, typeof(WaybillSource), "source");
+				source.Id = supplierId;
+				source.Supplier = supplier;
+			}
 			if (IsValid(source)) {
-				DbSession.SaveOrUpdate(source);
+				DbSession.Save(source);
 				Notify("Сохранено");
 				RedirectToAction("WaybillSourceSettings", new Dictionary<string, string> { { "supplierId", source.Id.ToString() } });
-				PropertyBag["supplier"] = DbSession.Get<Supplier>(source.Id);
+				PropertyBag["supplier"] = supplier;
 				PropertyBag["source"] = source;
 				return;
 			}
