@@ -703,8 +703,9 @@ ORDER BY region;";
 				//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
 				SessionScope.Current.Commit();
 
-				var updateCommand = new MySqlCommand(
-					@"
+				using (var transaction = DbSession.BeginTransaction()) {
+					var updateCommand = new MySqlCommand(
+						@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
@@ -731,13 +732,16 @@ WHERE s.Id = ?ClientCode
 				AND prd.RegionCode = r.RegionCode
 		);
 ", connection);
-				updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
-				updateCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
-				updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-				updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				updateCommand.ExecuteNonQuery();
+					updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
+					updateCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
+					updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+					updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+					updateCommand.ExecuteNonQuery();
 
-				RegionalData.AddForSuppler(DbSession, supplier);
+					RegionalData.AddForSuppler(DbSession, supplier);
+
+					transaction.Commit();
+				}
 
 				//описание см ст 430
 				using (new ConnectionScope(connection, FlushAction.Never))
