@@ -390,7 +390,7 @@ namespace AdminInterface.Controllers
 				var payer = Payer.Find(payerId);
 				legalEntity.Payer = payer;
 				legalEntity.CreateAndFlush();
-				Maintainer.LegalEntityCreated(legalEntity, DbSession);
+				Maintainer.LegalEntityCreated(legalEntity);
 
 				Notify("Юридическое лицо создано");
 			}

@@ -94,7 +94,7 @@ namespace Functional.Drugstore
 		{
 			var supplier = dataMother.CreateMatrix();
 
-			Maintainer.MaintainIntersection(client, client.Orgs().First(), session);
+			Maintainer.MaintainIntersection(client, client.Orgs().First());
 
 			Css("#drugstore_EnableOfferMatrix").Click();
 
@@ -137,7 +137,7 @@ namespace Functional.Drugstore
 				s.AddPrice("Матрица", PriceType.Assortment);
 			});
 			Save(supplier);
-			Maintainer.MaintainIntersection(client, client.Orgs().First(), session);
+			Maintainer.MaintainIntersection(client, client.Orgs().First());
 			session.Save(new ParseAlgorithm { Name = "testParse" });
 			Flush();
 
@@ -441,7 +441,7 @@ namespace Functional.Drugstore
 		{
 			var supplier = DataMother.CreateSupplier();
 			MakeNameUniq(supplier);
-			Maintainer.MaintainIntersection(supplier, session);
+			Maintainer.MaintainIntersection(supplier);
 			Refresh();
 
 			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;

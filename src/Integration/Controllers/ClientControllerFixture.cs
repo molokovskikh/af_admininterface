@@ -184,7 +184,7 @@ namespace Integration.Controllers
 			session.Save(DataMother.CreateSupplier());
 			Flush();
 
-			Maintainer.MaintainIntersection(client, client.Orgs().First(), session);
+			Maintainer.MaintainIntersection(client, client.Orgs().First());
 			var suppliers = controller.SearchSuppliers(client.Id, "тест");
 			Assert.That(suppliers.Length, Is.GreaterThan(0));
 		}

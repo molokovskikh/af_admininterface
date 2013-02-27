@@ -52,9 +52,7 @@ namespace Integration.ForTesting
 			ActiveRecordMediator.SaveAndFlush(client);
 			client.Users.Each(u => u.Setup());
 
-			ArHelper.WithSession(s => {
-				client.MaintainIntersection(s);
-			});
+			client.MaintainIntersection();
 
 			return client;
 		}
