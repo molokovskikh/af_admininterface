@@ -36,7 +36,8 @@ namespace AdminInterface.Models.Security
 		CallHistory = 20,
 		ChangePayment = 22,
 
-		ManagerReport = 23
+		ManagerReport = 23,
+		MiniMailModering = 24
 	}
 
 	[ActiveRecord(Schema = "accessright", Lazy = false)]
@@ -131,6 +132,10 @@ namespace AdminInterface.Models.Security
 			}
 			if (Type == PermissionType.ManagerReport) {
 				var controllers = new[] { "ManagerReports" };
+				return controllers.Any(c => c.ToLower() == controller.ToLower());
+			}
+			if (Type == PermissionType.MiniMailModering) {
+				var controllers = new[] { "MailsModering" };
 				return controllers.Any(c => c.ToLower() == controller.ToLower());
 			}
 			if(Type == PermissionType.CallHistory) {

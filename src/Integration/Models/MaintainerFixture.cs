@@ -90,7 +90,9 @@ namespace Integration.Models
 			row["IsLocal"] = 0;
 			table.Rows.Add(row);
 			var message = "";
-			(new managep()).Save(supplier, data, "", ref message);
+			var manage = new managep();
+			manage.DbSession = session;
+			manage.Save(supplier, data, "", ref message);
 
 			session.Refresh(supplier);
 			Assert.That(supplier.Prices.Count, Is.EqualTo(3));

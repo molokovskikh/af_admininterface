@@ -1,0 +1,5 @@
+﻿<% component Bubble, {"bredcrumbs" : [("Поставщик ${supplier.Name}", "${siteroot}/Suppliers/${supplier.Id}")]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	Модерирование минипочты
+<% end %>
