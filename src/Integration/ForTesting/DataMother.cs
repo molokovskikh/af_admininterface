@@ -186,14 +186,10 @@ namespace Integration.ForTesting
 
 		public static UpdateLogEntity CreateTestUpdateLogEntity(Client client)
 		{
-			var updateEntity = new UpdateLogEntity {
-				User = client.Users[0],
+			var updateEntity = new UpdateLogEntity(client.Users[0]) {
 				AppVersion = 1000,
 				Addition = "Test update",
-				Commit = false,
-				RequestTime = DateTime.Now,
 				UpdateType = UpdateType.LoadingDocuments,
-				UserName = client.Users[0].Name,
 			};
 			return updateEntity;
 		}

@@ -42,7 +42,6 @@ namespace AdminInterface.Models.Logs
 			RequestTime = DateTime.Now;
 			UpdateType = UpdateType.Accumulative;
 			User = user;
-			UserName = user.Login;
 		}
 
 		[PrimaryKey("UpdateId")]
@@ -65,9 +64,6 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public bool Commit { get; set; }
-
-		[Property]
-		public string UserName { get; set; }
 
 		[BelongsTo("UserId")]
 		public User User { get; set; }

@@ -42,14 +42,10 @@ namespace Functional.Drugstore
 		public void View_update_logs()
 		{
 			var user = testClient.Users.First();
-			var updateLogEnity = new UpdateLogEntity {
-				RequestTime = DateTime.Now,
+			var updateLogEnity = new UpdateLogEntity(user) {
 				AppVersion = 833,
-				UpdateType = UpdateType.Accumulative,
 				ResultSize = 1 * 1024 * 1024,
 				Commit = true,
-				UserName = user.Login,
-				User = user,
 			};
 			Save(updateLogEnity);
 			browser.Link(l => l.Text == "История обновлений").Click();
