@@ -147,7 +147,7 @@ namespace AdminInterface.Controllers
 				scope.Flush();
 
 				CreateSupplier(supplier);
-				Maintainer.MaintainIntersection(supplier, DbSession);
+				Maintainer.MaintainIntersection(supplier);
 
 				user.UpdateContacts(userContacts);
 				foreach (var person in userPersons)
@@ -367,7 +367,7 @@ namespace AdminInterface.Controllers
 			DbSession.Save(client);
 			DbSession.Flush();
 
-			client.MaintainIntersection(DbSession);
+			client.MaintainIntersection();
 			client.Addresses.Each(a => a.MaintainInscribe());
 		}
 

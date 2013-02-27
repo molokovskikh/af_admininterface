@@ -18,6 +18,7 @@
 
 <form method="post" id="WaybillSourceSettingsForm" action="WaybillSourceSettings">
 	${FormHelper.HiddenField("source.Id", source.Id, null)}
+	${FormHelper.HiddenField("supplierId", supplier.Id, null)}
 	${FormHelper.HiddenField("source.EMailFrom", source.EMailFrom, null)}
 	<div class="block">
 	${FormHelper.LabelFor("source.SourceType", "Источник документов: ")}
