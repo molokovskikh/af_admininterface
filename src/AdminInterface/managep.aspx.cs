@@ -253,6 +253,7 @@ order by r.Region;";
 			UpdateHomeRegion();
 			UpdateMaskRegion();
 			ProcessChanges();
+			DbSession.Transaction.Commit();
 			var message = "";
 			Save(supplier, Data, HttpContext.Current.Request.UserHostAddress, ref message);
 
@@ -458,7 +459,7 @@ WHERE RowId = ?Id;
 
 						//FlushAction.Never - что бы не автоматически не запускать транзакцию
 						var addedPriceId = currentSupplier.Prices.Max(p => p.Id);
-						Maintainer.MaintainIntersection(supplier);
+						Maintainer.MaintainIntersection(supplier, DbSession);
 						ArHelper.WithSession(s => {
 							s.CreateSQLQuery(
 								@"
@@ -684,30 +685,27 @@ ORDER BY region;";
 
 		private void UpdateMaskRegion()
 		{
-			using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
-				connection.Open();
-				var oldMaskRegion = supplier.RegionMask;
-				var newMaskRegion = oldMaskRegion;
-				foreach (ListItem item in WorkRegionList.Items) {
-					if (item.Selected)
-						newMaskRegion |= Convert.ToUInt64(item.Value);
-					else
-						newMaskRegion &= ~Convert.ToUInt64(item.Value);
-				}
+			//using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
+			//	connection.Open();
+			var oldMaskRegion = supplier.RegionMask;
+			var newMaskRegion = oldMaskRegion;
+			foreach (ListItem item in WorkRegionList.Items) {
+				if (item.Selected)
+					newMaskRegion |= Convert.ToUInt64(item.Value);
+				else
+					newMaskRegion &= ~Convert.ToUInt64(item.Value);
+			}
 
-				if (oldMaskRegion == newMaskRegion)
-					return;
+			if (oldMaskRegion == newMaskRegion)
+				return;
 
-				supplier.RegionMask = newMaskRegion;
-				ActiveRecordMediator.SaveAndFlush(supplier);
-				//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
-				SessionScope.Current.Commit();
+			supplier.RegionMask = newMaskRegion;
+			DbSession.Save(supplier);
 
-				using (var transaction = DbSession.BeginTransaction()) {
-					var updateCommand = new MySqlCommand(
-						@"
-SET @InHost = ?UserHost;
-SET @InUser = ?UserName;
+			DbSession.CreateSQLQuery(
+				@"
+SET @InHost = :UserHost;
+SET @InUser = :UserName;
 
 INSERT 
 INTO    pricesregionaldata
@@ -722,7 +720,7 @@ SELECT  r.RegionCode,
 		if(p.pricetype<>1, 1, 0),
 		(select prd.basecost from usersettings.pricesregionaldata prd where prd.pricecode = p.pricecode limit 1)
 FROM pricesdata p, Customers.Suppliers s, farm.regions r
-WHERE s.Id = ?ClientCode
+WHERE s.Id = :ClientCode
 		AND p.FirmCode = s.Id
 		AND (r.RegionCode & s.RegionMask > 0)
 		AND not exists
@@ -731,22 +729,15 @@ WHERE s.Id = ?ClientCode
 		WHERE   prd.PriceCode      = p.PriceCode 
 				AND prd.RegionCode = r.RegionCode
 		);
-", connection);
-					updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
-					updateCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
-					updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-					updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-					updateCommand.ExecuteNonQuery();
+")
+				.SetParameter("ClientCode", supplier.Id)
+				.SetParameter("UserHost", HttpContext.Current.Request.UserHostAddress)
+				.SetParameter("UserName", SecurityContext.Administrator.UserName)
+				.ExecuteUpdate();
 
-					RegionalData.AddForSuppler(DbSession, supplier);
+			RegionalData.AddForSuppler(DbSession, supplier);
 
-					transaction.Commit();
-				}
-
-				//описание см ст 430
-				using (new ConnectionScope(connection, FlushAction.Never))
-					Maintainer.MaintainIntersection(supplier);
-			}
+			Maintainer.MaintainIntersection(supplier, DbSession);
 		}
 
 		private void UpdateHomeRegion()
@@ -756,9 +747,9 @@ WHERE s.Id = ?ClientCode
 				return;
 
 			supplier.HomeRegion = Common.Web.Ui.Models.Region.Find(currentHomeRegion);
-			ActiveRecordMediator.SaveAndFlush(supplier);
+			DbSession.Save(supplier);
 			//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
-			SessionScope.Current.Commit();
+			//SessionScope.Current.Commit();
 		}
 
 		protected void RegionalSettingsGrid_RowCreated(object sender, GridViewRowEventArgs e)

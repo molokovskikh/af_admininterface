@@ -23,7 +23,7 @@ namespace Integration.Models
 			var address = client.Addresses.First();
 			var legalEntity = recepient.Orgs().First();
 
-			address.MoveToAnotherClient(recepient, legalEntity);
+			address.MoveToAnotherClient(recepient, legalEntity, session);
 
 			ArHelper.WithSession(s => {
 				s.CreateSQLQuery(@"update Customers.AddressIntersection ai

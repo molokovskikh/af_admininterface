@@ -270,10 +270,10 @@ group by u.ClientId")
 			return Users.Any(u => ADHelper.IsLoginExists(u.Login) && ADHelper.IsLocked(u.Login));
 		}
 
-		public virtual void MaintainIntersection()
+		public virtual void MaintainIntersection(ISession session)
 		{
 			foreach (var legalEntity in Orgs())
-				Maintainer.MaintainIntersection(this, legalEntity);
+				Maintainer.MaintainIntersection(this, legalEntity, session);
 		}
 
 		public virtual IEnumerable<LegalEntity> Orgs()
