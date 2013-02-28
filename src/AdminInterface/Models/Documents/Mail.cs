@@ -50,6 +50,9 @@ namespace AdminInterface.Models.Documents
 		[HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true)]
 		public virtual IList<MailRecipient> Recipients { get; set; }
 
+		[HasMany(Lazy = true)]
+		public virtual IList<MailSendLog> Logs { get; set; }
+
 		public virtual void AddRecipient(Client client)
 		{
 			Recipients.Add(new MailRecipient {
@@ -77,6 +80,9 @@ namespace AdminInterface.Models.Documents
 
 		[BelongsTo("RecipientId")]
 		public virtual MailRecipient Recipient { get; set; }
+
+		[Property]
+		public virtual bool Committed { get; set; }
 	}
 
 	[ActiveRecord(Schema = "Documents", Lazy = true)]

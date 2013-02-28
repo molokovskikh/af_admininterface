@@ -6,15 +6,18 @@ using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Helpers;
 using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
+	[Helper(typeof(TableHelper), "tableHelper")]
 	public class MailsModeringController : AdminInterfaceController
 	{
-		public void Index([DataBind("filter")] MiniMailFilter filter)
+		public void Index()
 		{
-			PropertyBag["filter"] = filter;
+			var filter = BindFilter<MiniMailFilter, BaseItemForTable>();
+			FindFilter(filter);
 		}
 
 		[return: JSONReturnBinder]

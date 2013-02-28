@@ -12,6 +12,10 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 <tbody>
 	${app.FilterFor("filter.Period")}
 	<tr>
+		<td class="filter-label">Регион</td>
+		<td>${app.Edit("filter.Region")}</td>
+	</tr>
+	<tr>
 		<td class="filter-label">Поставщик</td>
 		<td>
 			${app.Edit("filter.SupplierName")}
@@ -22,3 +26,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	</tr>
 </tbody>
 </table>
+
+<div id="AnalysisOfWorkDrugstoresTable">
+${tableHelper.ViewResult(Items, filter, app)}
+</div>
