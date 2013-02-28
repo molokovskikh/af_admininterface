@@ -52,7 +52,7 @@ namespace Integration.Controllers
 			var message = notifications.First();
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), notifications.Implode(n => n.Subject));
 			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == supplier.Id).ToList();
-			Assert.That(logs.FirstOrDefault(l => l.Message.Contains("$$$Изменено 'Включен'") && l.Type == LogObjectType.Supplier), Is.Not.Null, logs.Implode());
+			Assert.That(logs.FirstOrDefault(l => l.Message.Contains("$$$Изменено 'Включен' было 'вкл'") && l.Type == LogObjectType.Supplier), Is.Not.Null, logs.Implode());
 		}
 
 		[Test]
