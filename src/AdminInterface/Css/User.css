@@ -250,3 +250,15 @@ table thead.CenterHead th
 	font: 16px bolder;
 	font-family: Segoe UI, Tahoma, Arial;
 }
+
+.paddingLeft10 {
+	padding-left: 10px;
+}
+
+.attachment {
+	background: url("/Images/Attachment.png");
+	background-repeat: no-repeat;
+	height: 16px;
+	width: 16px;
+	display: block;
+}

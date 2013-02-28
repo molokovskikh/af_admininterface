@@ -42,15 +42,15 @@ namespace AdminInterface.Queries
 				foreach (var mailRecipient in group) {
 					switch (mailRecipient.Type) {
 						case RecipientType.Address: {
-							to += mailRecipient.Address.Name + ";";
+							to += AddPadding(mailRecipient.Address.Name);
 							break;
 						}
 						case RecipientType.Client: {
-							to += mailRecipient.Client.Name + ";";
+							to += AddPadding(mailRecipient.Client.Name);
 							break;
 						}
 						case RecipientType.Region: {
-							to += mailRecipient.Region.Name + ";";
+							to += AddPadding(mailRecipient.Region.Name);
 							break;
 						}
 					}
@@ -58,8 +58,13 @@ namespace AdminInterface.Queries
 			}
 			To = to;
 			Subject = item.Subject;
-			DeleteLink = string.Format("<a href=':javascript(0)'>Удалить</a>");
-			ShowLink = string.Format("<a href=':javascript(0)'>Показать</a>");
+			DeleteLink = string.Format("<a href='javascript:void(0);' onclick='DeleteMiNiMail({0})'>Удалить</a>", item.Id);
+			ShowLink = string.Format("<a href='javascript:void(0);' onclick='ShowMiNiMail({0})'>Показать</a>", item.Id);
+		}
+
+		private string AddPadding(string value)
+		{
+			return string.Format("<div class=\"paddingLeft10\">{0}</div>", value);
 		}
 
 		public void SetAddresseeCount(MailCounter counter)
@@ -198,7 +203,9 @@ group by m.id;")
 				}
 			}
 
-			return Sort(result).Cast<BaseItemForTable>().ToList();
+			RowsCount = result.Count;
+
+			return Sort(result).Skip(CurrentPage * PageSize).Take(PageSize).Cast<BaseItemForTable>().ToList();
 		}
 	}
 }

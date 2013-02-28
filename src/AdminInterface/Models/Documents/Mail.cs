@@ -6,6 +6,7 @@ using AddUser;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models.Documents
@@ -60,6 +61,11 @@ namespace AdminInterface.Models.Documents
 				Client = client,
 				Type = RecipientType.Client
 			});
+		}
+
+		public virtual string GetHtmlBody()
+		{
+			return AppealHelper.GetTransformedAppeal(Body);
 		}
 	}
 

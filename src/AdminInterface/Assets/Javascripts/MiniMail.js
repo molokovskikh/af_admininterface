@@ -14,3 +14,20 @@
 			.appendTo(ul);
 	};
 });
+
+function ShowMiNiMail(mailId) {
+	$.ajax({
+		url: "ShowMail",
+		type: "GET",
+		cache: false,
+		data: { mailId: mailId },
+		success: function (data) {
+			$(data).dialog({
+				modal: true,
+				position: ['center', 'center'],
+				width : 500,
+				heigth : 500
+			});
+		}
+	});
+}

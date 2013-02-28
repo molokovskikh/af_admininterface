@@ -1,0 +1,53 @@
+﻿<div id="MailDialog">
+	<table class="DataTable">
+		<thead>
+			<tr>
+				<th colspan=2>Письмо поставщика '${mail.Supplier.Name}' от ${mail.LogTime}<th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Получатели:</td>
+				<td>
+					<%count = 0%>
+					<%for i, group in enumerate(recipients): %>
+						<%if group.items.Count > 0:%>
+							<%if group.items[0].Region:%>
+								<b>Регионы:</b>
+							<%end%>
+							<%if group.items[0].Client:%>
+								<b>Клиенты:</b>
+							<%end%>
+							<%if group.items[0].Address:%>
+								<b>Адреса:</b>
+							<%end%>
+						<%end%>
+						<%for j, item in enumerate(group.items): %>
+							<%if item.Region: %>
+								<div class="paddingLeft10">${item.Region.Name}</div>
+							<%end%>
+							<%if item.Client: %>
+								<div class="paddingLeft10">${item.Client.Name}</div>
+							<%end%>
+							<%if item.Address: %>
+								<div class="paddingLeft10">${item.Address.Name}</div>
+							<%end%>
+						<%end%>
+					<%end%>
+				</td>
+			<tr>
+			<tr>
+				<td>Текст письма:</td>
+				<td>${mail.GetHtmlBody()}</td>
+			</tr>
+			<tr>
+				<td>Вложения</td>
+				<td>
+					<%for j, item in enumerate(mail.Attachments): %>
+						<span class="attachment"></span>
+					<%end%>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
