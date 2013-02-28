@@ -733,14 +733,24 @@ WHERE s.Id = ?ClientCode
 		WHERE   prd.PriceCode      = p.PriceCode 
 				AND prd.RegionCode = r.RegionCode
 		);
+
+INSERT INTO regionaldata(FirmCode, RegionCode)
+SELECT s.Id, r.RegionCode
+FROM Customers.Suppliers s, Farm.Regions r
+WHERE   s.Id = ?ClientCode
+		AND(r.RegionCode & s.RegionMask) > 0
+		AND NOT exists
+		(SELECT *
+		FROM regionaldata rd
+		WHERE rd.FirmCode = s.Id
+			AND rd.RegionCode = r.RegionCode
+		);
 ", connection);
 				updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
 				updateCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
 				updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 				updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				updateCommand.ExecuteNonQuery();
-
-				RegionalData.AddForSuppler(DbSession, supplier);
 
 				//описание см ст 430
 				using (new ConnectionScope(connection, FlushAction.Never))

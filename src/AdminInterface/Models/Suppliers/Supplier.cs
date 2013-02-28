@@ -23,7 +23,6 @@ using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
-using NHibernate.Linq;
 using log4net;
 
 namespace AdminInterface.Models.Suppliers
@@ -78,7 +77,7 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public virtual string Address { get; set; }
 
-		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style]
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style, Auditable("Включен")]
 		public override bool Disabled
 		{
 			get { return _disabled; }
@@ -86,15 +85,11 @@ namespace AdminInterface.Models.Suppliers
 			{
 				if (_disabled != value) {
 					_disabled = value;
-					Enabled = !_disabled;
 					if (Payer != null)
 						Payer.UpdatePaymentSum();
 				}
 			}
 		}
-
-		[Property, Auditable("Включен")]
-		public virtual bool Enabled { get; set; }
 
 		public virtual string INN
 		{
@@ -448,27 +443,5 @@ where s.Id = :supplierId")
 
 		[Property(NotNull = true)]
 		public virtual string OperativeInfo { get; set; }
-
-		public static void AddForSuppler(ISession DbSession, Supplier supplier)
-		{
-			var supplierRegions = DbSession.Query<Region>().Where(r => (r.Id & supplier.RegionMask) > 0).ToList();
-			var supplierRegionalData = DbSession.Query<RegionalData>().Where(r => r.Supplier == supplier).Select(r => r.Region).ToList();
-			var newRegions = supplierRegions.Where(n => !supplierRegionalData.Contains(n)).ToList();
-			foreach (var newRegion in newRegions) {
-				var regionalData = new RegionalData(newRegion, supplier);
-				DbSession.Save(regionalData);
-				DbSession.Flush();
-				foreach (var value in Enum.GetValues(typeof(DayOfWeek))) {
-					var day = (DayOfWeek)value;
-					var reorderSchedule = new ReorderSchedule(regionalData, day);
-					reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(684000000000);
-					if (day == DayOfWeek.Saturday)
-						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(504000000000);
-					if (day == DayOfWeek.Sunday)
-						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(863400000000);
-					DbSession.Save(reorderSchedule);
-				}
-			}
-		}
 	}
 }

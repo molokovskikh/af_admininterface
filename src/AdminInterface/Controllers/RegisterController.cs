@@ -114,7 +114,6 @@ namespace AdminInterface.Controllers
 				currentPayer.UpdatePaymentSum();
 				AddContacts(supplier.ContactGroupOwner, supplierContacts);
 				supplier.OrderRules.Add(new OrderSendRules(Defaults, supplier));
-				supplier.Enabled = !supplier.Disabled;
 				DbSession.Save(supplier);
 
 				foreach (var group in supplier.ContactGroupOwner.ContactGroups) {
@@ -391,6 +390,21 @@ SET @NewPriceCostId = Last_Insert_ID();
 INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 
 
 INSERT
+INTO regionaldata
+	(
+		regioncode,
+		firmcode
+	)
+SELECT DISTINCT regions.regioncode,
+		s.Id
+FROM (Customers.Suppliers s, farm.regions, pricesdata)
+	LEFT JOIN regionaldata ON regionaldata.firmcode = s.id AND regionaldata.regioncode = regions.regioncode
+WHERE   pricesdata.firmcode = s.Id
+		AND s.Id = :ClientCode
+		AND (s.RegionMask & regions.regioncode)>0
+		AND regionaldata.firmcode is null;
+
+INSERT
 INTO pricesregionaldata
 	(
 		regioncode,
@@ -414,8 +428,6 @@ WHERE   pricesdata.firmcode = s.Id
 					.SetParameter("ClientCode", supplier.Id)
 					.ExecuteUpdate();
 			});
-
-			RegionalData.AddForSuppler(DbSession, supplier);
 		}
 
 		private void CreateUser(User user, UserPermission[] permissions, Person[] persons)
