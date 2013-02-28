@@ -1,6 +1,6 @@
 ﻿$(function () {
 	$("#filter_SupplierName").autocomplete({
-		source: "MailsModering/GetSullierList",
+		source: "GetSullierList",
 		minLength: 2,
 		select: function (event, ui) {
 			$('#filter_SupplierId').val(ui.item.id);
@@ -10,14 +10,14 @@
 	$.ui.autocomplete.prototype._renderItem = function (ul, item) {
 		return $("<li></li>")
 			.data("item.autocomplete", item)
-			.append("<a href='Suppliers/" + item.id + "'>" + item.label + "</a>")
+			.append("<a href='Suppliers/" + item.id + "'>[" + item.id + "] " + item.label + "</a>")
 			.appendTo(ul);
 	};
 });
 
 function ShowMiNiMail(mailId) {
 	$.ajax({
-		url: "ShowMail",
+		url: "GetMail",
 		type: "GET",
 		cache: false,
 		data: { mailId: mailId },
@@ -25,9 +25,18 @@ function ShowMiNiMail(mailId) {
 			$(data).dialog({
 				modal: true,
 				position: ['center', 'center'],
-				width : 500,
+				width : 600,
 				heigth : 500
 			});
 		}
+	});
+}
+
+function DeleteMiNiMail(mailId, supplier, date) {
+	var dialogText = "Вы действительно хотите удалить письмо поставщика '" + supplier + "' от " + date;
+	YesNoDialog("Удалить письмо", dialogText, function () {
+		$.post("Delete", { id: mailId }, function () {
+			location.reload();
+		});
 	});
 }

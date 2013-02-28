@@ -54,6 +54,9 @@ namespace AdminInterface.Models.Documents
 		[HasMany(Lazy = true)]
 		public virtual IList<MailSendLog> Logs { get; set; }
 
+		[Property]
+		public virtual bool Deleted { get; set; }
+
 		public virtual void AddRecipient(Client client)
 		{
 			Recipients.Add(new MailRecipient {

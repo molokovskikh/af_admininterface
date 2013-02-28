@@ -259,6 +259,10 @@ table thead.CenterHead th
 	background: url("/Images/Attachment.png");
 	background-repeat: no-repeat;
 	height: 16px;
-	width: 16px;
 	display: block;
+	padding-left: 20px;
+}
+
+.DataTable tbody tr.deleted-mini-mail {
+	background-color: #FFBABA;
 }

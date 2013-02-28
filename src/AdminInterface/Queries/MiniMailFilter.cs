@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Web;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models.Documents;
+using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
@@ -18,10 +19,10 @@ namespace AdminInterface.Queries
 	{
 		public MailItem(Mail item)
 		{
-			MailId = item.Id;
+			Mail = item;
 			Date = item.LogTime;
-			Supplier = item.Supplier.Name;
 			Region = item.Supplier.HomeRegion.Name;
+			DeletedMiniMail = item.Deleted;
 			var to = string.Empty;
 			var recipients = item.Recipients.GroupBy(r => r.Type);
 			foreach (var group in recipients) {
@@ -58,7 +59,7 @@ namespace AdminInterface.Queries
 			}
 			To = to;
 			Subject = item.Subject;
-			DeleteLink = string.Format("<a href='javascript:void(0);' onclick='DeleteMiNiMail({0})'>Удалить</a>", item.Id);
+			DeleteLink = string.Format("<a href='javascript:void(0);' onclick=\"DeleteMiNiMail({0}, '{1}', '{2}')\">Удалить</a>", item.Id, item.Supplier.Name.Replace("'", string.Empty).Trim(), item.LogTime);
 			ShowLink = string.Format("<a href='javascript:void(0);' onclick='ShowMiNiMail({0})'>Показать</a>", item.Id);
 		}
 
@@ -73,16 +74,22 @@ namespace AdminInterface.Queries
 			Counter = counter;
 		}
 
-		public uint MailId { get; set; }
+		public Mail Mail { get; set; }
 
 		[Display(Name = "Дата", Order = 0)]
 		public DateTime Date { get; set; }
 
 		[Display(Name = "Отправитель", Order = 1)]
-		public string Supplier { get; set; }
+		public string SupplierName
+		{
+			get { return Link(Mail.Supplier.Name, "Suppliers", new System.Tuple<string, object>("Id", Mail.Supplier.Id)); }
+		}
 
 		[Display(Name = "Дом. регион отправителя", Order = 2)]
 		public string Region { get; set; }
+
+		[Style]
+		public bool DeletedMiniMail { get; set; }
 
 		private string _to;
 
@@ -100,15 +107,25 @@ namespace AdminInterface.Queries
 		[Display(Name = "Тема", Order = 4)]
 		public string Subject { get; set; }
 
-		[Display(Name = "Общее количество получателей", Order = 5)]
+		[Display(Name = "Число получателей (доставлено/нет)", Order = 5, GroupName = "CenterClass")]
 		public string AddresseeCount { get; set; }
 
 		public MailCounter Counter { get; set; }
 
-		[Display(Name = "Удалить", Order = 7)]
-		public string DeleteLink { get; set; }
+		private string _deleteLink;
 
-		[Display(Name = "Показать", Order = 6)]
+		[Display(Name = "Удалить", Order = 7, GroupName = "CenterClass")]
+		public string DeleteLink {
+			get
+			{
+				if (!DeletedMiniMail)
+					return _deleteLink;
+				return string.Empty;
+			}
+			set { _deleteLink = value; }
+		}
+
+		[Display(Name = "Показать", Order = 6, GroupName = "CenterClass")]
 		public string ShowLink { get; set; }
 	}
 
@@ -136,7 +153,7 @@ namespace AdminInterface.Queries
 			LoadDefault = true;
 			SortKeyMap = new Dictionary<string, string> {
 				{ "Date", "Date" },
-				{ "Supplier", "Supplier" },
+				{ "SupplierName", "SupplierName" },
 				{ "Region", "Region" },
 				{ "Subject", "Subject" },
 				{ "AddresseeCount", "AddresseeCount" }
@@ -150,7 +167,7 @@ namespace AdminInterface.Queries
 				func = mail => mail.Date;
 
 			if (SortBy == "Supplier")
-				func = mail => mail.Supplier;
+				func = mail => mail.Mail.Supplier.Name;
 
 			if (SortBy == "Region")
 				func = mail => mail.Region;
@@ -199,7 +216,7 @@ group by m.id;")
 					.ToDictionary(k => k.MailId);
 
 				foreach (var mailItem in result) {
-					mailItem.SetAddresseeCount(counters[mailItem.MailId]);
+					mailItem.SetAddresseeCount(counters[mailItem.Mail.Id]);
 				}
 			}
 

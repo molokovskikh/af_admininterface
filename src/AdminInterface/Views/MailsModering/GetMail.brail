@@ -40,14 +40,16 @@
 				<td>Текст письма:</td>
 				<td>${mail.GetHtmlBody()}</td>
 			</tr>
+			<%if mail.Attachments.Count > 0 :%>
 			<tr>
-				<td>Вложения</td>
+				<td>Вложения:</td>
 				<td>
 					<%for j, item in enumerate(mail.Attachments): %>
-						<span class="attachment"></span>
+						<a href="Attachment?id=${item.Id}"><span class="attachment">${item.Filename}</span></a>
 					<%end%>
 				</td>
 			</tr>
+			<%end%>
 		</tbody>
 	</table>
 </div>
