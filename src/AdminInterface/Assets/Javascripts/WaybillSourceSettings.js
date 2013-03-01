@@ -1,26 +1,85 @@
 ﻿$(function () {
+	$('#WaybillSourceSettingsForm').validate();
+
 	EditorChange();
 	$('#source_SourceType').change(function () {
 		EditorChange();
+	});
+
+	$('#AddEmailButton').click(function() {
+		var html = "<div><input type='text' id='EmailBox_" + EmailCount + "' class='EmailFieldBox' name='Emails[" + EmailCount + "]' /><a href='javescript:void(0);' onclick='DeleteEmail(this);'>Удалить</a></div>";
+		$("#emailBox").append(html);
+		EmailValidation($("#EmailBox_" + EmailCount));
+		EmailCount++;
+	});
+
+	$('.EmailFieldBox').each(function () {
+		EmailValidation(this);
 	});
 });
 
 function EditorChange() {
 	var val = $('#source_SourceType').val();
-	if (val == 4 || val == 5) {
+	if (val == 5) {
 		GetFTPEditor();
 	} else {
-		$("#selectorBlock").empty();
+		if (val == 4) {
+			GetAnalitFTPEditor();
+		} else {
+			$("#selectorBlock").empty();
+		}
 	}
 }
 
-function GetFTPEditor() {
+function DeleteEmail(item) {
+	$(item).parent().remove();
+}
+
+function EmailValidation(item) {
+	$(item).rules("add", {
+		required: true,
+		email: true,
+		messages: {
+			required: "Поле не может быть пустым",
+			email: "Ошибка ввода емейла",
+		}
+	});
+}
+
+function SelectorBlockEmtyValidation() {
+	$("#selectorBlock input[type=text]").each(function () {
+		$(this).rules("add", {
+			required: true,
+			messages: {
+				required: "Поле не может быть пустым",
+			}
+		});
+	});
+}
+
+function GetClassFieldEditor() {
 	var html = "<div class='block'><h3>Настройка данных для доступа к FTP</h3></div>";
 	html += "<table><tbody><tr><td>";
 	html += "<label for='source_WaybillUrl'>Имя класса</label></td>";
 	if (ReaderClassName == "")
 		ReaderClassName = "SupplierFtpReader";
 	html += "<td><input type='text' name='source.ReaderClassName' id='source_ReaderClassName' value='" + ReaderClassName + "'/></td></tr>";
+	return html;
+}
+
+function GetAnalitFTPEditor() {
+	var html = GetClassFieldEditor();
+
+	html += "</tbody></table>";
+
+	$("#selectorBlock").empty();
+	$("#selectorBlock").append(html);
+
+	SelectorBlockEmtyValidation();
+}
+
+function GetFTPEditor() {
+	var html = GetClassFieldEditor();
 
 	html += "<tr><td><label for='source_WaybillUrl'>Источник накладных</label></td>";
 	html += "<td><input type='text' name='source.WaybillUrl' id='source_WaybillUrl' value='" + WaybillUrl + "'/></td></tr>";
@@ -47,16 +106,7 @@ function GetFTPEditor() {
 	$("#selectorBlock").empty();
 	$("#selectorBlock").append(html);
 
-	$('#WaybillSourceSettingsForm').validate();
-
-	$("#selectorBlock input[type=text]").each(function () {
-		$(this).rules("add", {
-			required: true,
-			messages: {
-				required: "Поле не может быть пустым",
-			}
-		});
-	});
+	SelectorBlockEmtyValidation();
 
 	$('#source_Password').rules("add", {
 		required: true,

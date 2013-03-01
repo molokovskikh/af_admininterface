@@ -14,6 +14,7 @@
 	var Password = "${source.Password}";
 	var DownloadInterval = "${source.DownloadInterval}";
 	var ActiveMode = ${source.FtpActiveMode.ToString().ToLower()};
+	var EmailCount = ${source.GetEmailsList().Count}
 </script>
 
 <form method="post" id="WaybillSourceSettingsForm" action="WaybillSourceSettings">
@@ -27,6 +28,13 @@
 		<option value="${item.Key}" ${"selected" if source.SourceType == item.Key} >${item.value}</option>
 	<%end%>
 	<select>
+	<div id="emailBox" class="emailBox">
+		<h3>Список емейлов поставщика</h3>
+		<% for i, item in enumerate(source.GetEmailsList()): %>
+			<div>${FormHelper.TextFieldValue("Emails[${i}]", item, {@class : @EmailFieldBox})} <a href='javescript:void(0);' onclick='DeleteEmail(this);'>Удалить</a> </div>
+		<%end%>
+	</div>
+	<button type="button" id="AddEmailButton">Добавить Email</button>
 	<div id="selectorBlock"></div>
 	</div>
 	${FormHelper.Submit("Сохранить")}

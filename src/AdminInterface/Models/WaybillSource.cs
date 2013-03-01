@@ -51,5 +51,10 @@ namespace AdminInterface.Models
 
 		[Property]
 		public virtual bool FtpActiveMode { get; set; }
+
+		public virtual IList<string> GetEmailsList()
+		{
+			return EMailFrom.Split(new[] { ',' }).Select(s => s.Trim()).ToList();
+		}
 	}
 }

@@ -181,7 +181,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void WaybillSourceSettings([ARDataBind("source", AutoLoadBehavior.NullIfInvalidKey)]WaybillSource source, uint supplierId)
+		public void WaybillSourceSettings([ARDataBind("source", AutoLoadBehavior.NullIfInvalidKey)]WaybillSource source, uint supplierId, [DataBind("Emails")]string[] emails)
 		{
 			var supplier = DbSession.Get<Supplier>(supplierId);
 			if (source == null) {
@@ -190,6 +190,7 @@ namespace AdminInterface.Controllers
 				source.Supplier = supplier;
 			}
 			if (IsValid(source)) {
+				source.EMailFrom = emails.Implode();
 				DbSession.Save(source);
 				Notify("Сохранено");
 				RedirectToAction("WaybillSourceSettings", new Dictionary<string, string> { { "supplierId", source.Id.ToString() } });
