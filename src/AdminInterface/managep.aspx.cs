@@ -254,8 +254,6 @@ order by r.Region;";
 			UpdateMaskRegion();
 			ProcessChanges();
 
-			DbSession.Transaction.Commit();
-
 			var message = "";
 			Save(supplier, Data, HttpContext.Current.Request.UserHostAddress, ref message);
 
