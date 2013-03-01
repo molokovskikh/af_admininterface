@@ -60,7 +60,7 @@ namespace AdminInterface.Queries
 			To = to;
 			Subject = item.Subject;
 			DeleteLink = string.Format("<a href='javascript:void(0);' onclick=\"DeleteMiNiMail({0}, '{1}', '{2}')\">Удалить</a>", item.Id, item.Supplier.Name.Replace("'", string.Empty).Trim(), item.LogTime);
-			ShowLink = string.Format("<a href='javascript:void(0);' onclick='ShowMiNiMail({0})'>Показать</a>", item.Id);
+			ShowLink = string.Format("<a href='javascript:void(0);' class=\"ShowMailLink\" onclick='ShowMiNiMail({0})'>Показать</a>", item.Id);
 		}
 
 		private string AddPadding(string value)
@@ -158,6 +158,7 @@ namespace AdminInterface.Queries
 				{ "Subject", "Subject" },
 				{ "AddresseeCount", "AddresseeCount" }
 			};
+			SortBy = "Date";
 		}
 
 		private IList<MailItem> Sort(IList<MailItem> query)
@@ -166,7 +167,7 @@ namespace AdminInterface.Queries
 			if (SortBy == "Date")
 				func = mail => mail.Date;
 
-			if (SortBy == "Supplier")
+			if (SortBy == "SupplierName")
 				func = mail => mail.Mail.Supplier.Name;
 
 			if (SortBy == "Region")
@@ -206,9 +207,9 @@ namespace AdminInterface.Queries
 
 			if (mails.Count > 0) {
 				var counters = Session.CreateSQLQuery(@"
-SELECT m.Id as MailId, count(m.id) as AllCount, count(if (ms.Committed, 1, null)) as CommittedCount, count(if (not ms.Committed, 1, null)) as NoCommitedCount
+SELECT m.Id as MailId, count(ms.id) as AllCount, count(if (ms.Committed, 1, null)) as CommittedCount, count(if (not ms.Committed, 1, null)) as NoCommitedCount
 FROM documents.Mails M
-join `logs`.MailSendLogs ms on ms.mailid = m.id
+left join `logs`.MailSendLogs ms on ms.mailid = m.id
 where m.id in (:mails)
 group by m.id;")
 					.SetParameterList("mails", mails.Select(m => m.Id).ToList())

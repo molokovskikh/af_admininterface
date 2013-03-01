@@ -263,6 +263,10 @@ table thead.CenterHead th
 	padding-left: 20px;
 }
 
-.DataTable tbody tr.deleted-mini-mail {
+.DataTable tbody tr.deleted-mini-mail, .deleted-mini-mail {
 	background-color: #FFBABA;
+}
+
+#filter_SupplierName {
+	width: 178px;
 }

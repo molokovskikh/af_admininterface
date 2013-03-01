@@ -30,3 +30,5 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 <div id="AnalysisOfWorkDrugstoresTable">
 ${tableHelper.ViewResult(Items, filter, app)}
 </div>
+
+<% component Legend, { "LegendItems" : { "Письмо удалено" : "deleted-mini-mail" }, "ByCenter" : false} %>

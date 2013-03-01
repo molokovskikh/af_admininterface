@@ -24,6 +24,7 @@ function ShowMiNiMail(mailId) {
 		success: function (data) {
 			$(data).dialog({
 				modal: true,
+				async: true,
 				position: ['center', 'center'],
 				width : 600,
 				heigth : 500
