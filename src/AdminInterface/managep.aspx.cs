@@ -253,6 +253,7 @@ order by r.Region;";
 			UpdateHomeRegion();
 			UpdateMaskRegion();
 			ProcessChanges();
+
 			var message = "";
 			Save(supplier, Data, HttpContext.Current.Request.UserHostAddress, ref message);
 
