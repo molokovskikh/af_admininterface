@@ -54,6 +54,8 @@ namespace AdminInterface.Models
 
 		public virtual IList<string> GetEmailsList()
 		{
+			if (string.IsNullOrEmpty(EMailFrom))
+				return new List<string>();
 			return EMailFrom.Split(new[] { ',' }).Select(s => s.Trim()).ToList();
 		}
 	}
