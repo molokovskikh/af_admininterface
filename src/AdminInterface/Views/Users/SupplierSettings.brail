@@ -15,7 +15,7 @@
 		<% OutputSubView("ShowUsers") %>
 		<div class=block>
 			<h3>
-				Права доступа в клиентском интерфейсе
+				Права доступа в Личном Кабинете Поставщика
 			</h3>
 			<div>
 				<% for i, permission in enumerate(Permissions): %>
