@@ -431,14 +431,15 @@ where Phone like :phone")
 			if (user == null)
 				return Enumerable.Empty<object>().ToArray();
 
-			DbSession.CreateSQLQuery(@"call Customers.GetPrices(:userid)")
-				.SetParameter("userid", user.Id)
+			DbSession.CreateSQLQuery(@"call Customers.GetPricesForClient(:clientId)")
+				.SetParameter("clientId", client.Id)
 				.ExecuteUpdate();
 
 			return DbSession.CreateSQLQuery(@"
-select s.Id, s.Name from Prices ap
+select s.Id, s.Name from PricesForClient ap
 join Customers.Suppliers s on s.Id = ap.FirmCode
-where s.Name like :SearchText")
+where s.Name like :SearchText
+group by s.Id")
 				.SetParameter("SearchText", "%" + text + "%")
 				.List()
 				.Cast<object[]>()

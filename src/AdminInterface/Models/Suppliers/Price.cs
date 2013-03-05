@@ -20,7 +20,7 @@ namespace AdminInterface.Models.Suppliers
 		Vip
 	}
 
-	[ActiveRecord(Schema = "Farm")]
+	[ActiveRecord("matrices", Schema = "Farm")]
 	public class Matrix
 	{
 		[PrimaryKey]
