@@ -480,7 +480,7 @@ namespace AdminInterface.Controllers
 				if (supplier != null) {
 					PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(supplier.RegionMask);
 				}
-				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.SupplierInterface);
+				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.SupplierInterface).OrderBy(p => p.OrderIndex).ToArray();
 				RenderView("SupplierSettings");
 			}
 			else {

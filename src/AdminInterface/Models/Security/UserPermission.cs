@@ -42,6 +42,9 @@ namespace AdminInterface.Models.Security
 		[Property]
 		public bool AssignDefaultValue { get; set; }
 
+		[Property]
+		public int OrderIndex { get; set; }
+
 		public static UserPermission[] DefaultPermissions(ISession session, UserPermissionAvailability availability)
 		{
 			return session.Query<UserPermission>()
