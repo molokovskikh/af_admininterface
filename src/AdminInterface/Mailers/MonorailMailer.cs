@@ -364,7 +364,7 @@ namespace AdminInterface.Mailers
 		public MonorailMailer DeleteMiniMailToOffice(Mail mail)
 		{
 			From = "office@analit.net";
-			To = "a.zolotarev@analit.net";
+			To = "AFNews@subscribe.analit.net";
 			Subject = "Удаление письма минипочты";
 			IsBodyHtml = true;
 			var mailItem = new MailItem(mail);
