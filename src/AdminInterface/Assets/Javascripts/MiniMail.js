@@ -13,6 +13,31 @@
 			.append("<a href='Suppliers/" + item.id + "'>[" + item.id + "] " + item.label + "</a>")
 			.appendTo(ul);
 	};
+
+	$('.deleteGroupBox').change(
+		function() {
+			$('.deleteGroupBox').parent().parent().removeClass('markedForDeleteMail');
+			$(".deleteGroupBox").each(function() {
+				if (this.checked) {
+					$(this).parent().parent().addClass('markedForDeleteMail');
+				}
+			});
+		});
+
+	$('#deleteSelectedButton').click(function() {
+		var dialogText = "Вы действительно хотите удалить выбранные письма?'";
+		YesNoDialog("Удалить письмо", dialogText, function () {
+			var items = new Array();
+			$(".deleteGroupBox").each(function () {
+				if (this.checked) {
+					items.push($(this).val());
+				}
+			});
+			$.post("DeleteGroup", { 'ids[]' : items }, function () {
+				location.reload();
+			});
+		});
+	});
 });
 
 function ShowMiNiMail(mailId) {

@@ -538,6 +538,7 @@
     <Content Include="Views\Mail\DeletePayer.brail" />
     <Content Include="Views\MailsModering\ShowMails.brail" />
     <Content Include="Views\MailsModering\GetMail.brail" />
+    <Content Include="Views\Mail\DeleteMiniMail.brail" />
     <None Include="Views\Mail\RegisterNews.brail" />
     <Content Include="Views\ManagerReports\ClientAddressesMonitor.brail" />
     <None Include="Views\ManagerReports\ClientConditionsMonitoring.brail" />

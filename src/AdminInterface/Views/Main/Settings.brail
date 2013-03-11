@@ -42,7 +42,18 @@ ${app.Asset("MainSettings.js")}
 		<li>
 			<a id="processingNotices" href="#">Уведомления Обработки</a>
 		</li>
+		<li>
+			<a id="deletingMinimails" href="#">Удаление минипочты</a>
+		</li>
 	</ul>
+</div>
+
+<div id="deletingMinimails-tab" class="tab">
+	<fieldset class="tabFieldset">
+		<legend>Текст письма, отсылаемого поставщику, при удалении письма</legend>
+		${FormHelper.TextArea("Defaults.DeletingMiniMailText", { @class: @allWidth, @rows: "10" })}
+		${app.GetValidationError(Defaults, "DeletingMiniMailText")}
+	</fieldset>
 </div>
 
 <div id="processingNotices-tab" class="tab">

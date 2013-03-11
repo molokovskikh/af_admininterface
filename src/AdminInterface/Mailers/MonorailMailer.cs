@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net.Mail;
 using System.Text;
 using AdminInterface.Models;
 using AdminInterface.Models.Audit;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Documents;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Internal;
@@ -21,6 +22,7 @@ using Common.Web.Ui.NHibernateExtentions;
 using ExcelLibrary.SpreadSheet;
 using NHibernate;
 using log4net;
+using Attachment = System.Net.Mail.Attachment;
 
 namespace AdminInterface.Mailers
 {
@@ -344,6 +346,30 @@ namespace AdminInterface.Mailers
 			PropertyBag["oldClient"] = oldClient;
 			PropertyBag["oldLegalEntity"] = oldLegalEntity;
 			PropertyBag["admin"] = SecurityContext.Administrator;
+
+			return this;
+		}
+
+		public MonorailMailer DeleteMiniMailToSupplier(string email, string body)
+		{
+			From = "office@analit.net";
+			To = email;
+			Subject = "Удаление письма минипочты";
+			PropertyBag["body"] = body;
+			Template = "DeleteMiniMail";
+
+			return this;
+		}
+
+		public MonorailMailer DeleteMiniMailToOffice(Mail mail)
+		{
+			From = "office@analit.net";
+			To = "a.zolotarev@analit.net";
+			Subject = "Удаление письма минипочты";
+			IsBodyHtml = true;
+			var mailItem = new MailItem(mail);
+			PropertyBag["body"] = string.Format("Удалено письмо минипочты поставщика '{0}' от {1}. </br> {2}", mail.Supplier.Name, mail.LogTime, mailItem.To);
+			Template = "DeleteMiniMail";
 
 			return this;
 		}

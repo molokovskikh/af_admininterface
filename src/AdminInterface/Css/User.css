@@ -264,9 +264,17 @@ table thead.CenterHead th
 }
 
 .DataTable tbody tr.deleted-mini-mail, .deleted-mini-mail {
-	background-color: #FFBABA;
+	background-color: #f9a8a8;
+}
+
+.DataTable tbody tr.markedForDeleteMail {
+	background-color: #f5d7d7;
 }
 
 #filter_SupplierName {
 	width: 178px;
+}
+
+.checkBoxTD {
+	width: 20px;
 }

@@ -47,6 +47,13 @@ namespace AdminInterface.Controllers
 			this.RenderFile(attachment.StorageFilename(Config), attachment.Filename);
 		}
 
+		public void DeleteGroup(uint[] ids)
+		{
+			foreach (var item in ids) {
+				Delete(item);
+			}
+		}
+
 		public void Delete(uint id)
 		{
 			var mail = DbSession.Get<Mail>(id);
@@ -56,6 +63,8 @@ namespace AdminInterface.Controllers
 				if (!mailSendLog.Committed)
 					DbSession.Delete(mailSendLog);
 			}
+			this.Mailer().DeleteMiniMailToSupplier(mail.SupplierEmail, Defaults.DeletingMiniMailText).Send();
+			this.Mailer().DeleteMiniMailToOffice(mail).Send();
 			Notify("Удалено");
 			CancelView();
 			CancelLayout();

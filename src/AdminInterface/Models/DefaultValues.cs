@@ -75,6 +75,9 @@ namespace AdminInterface.Models
 		public string TechOperatingModeTemplate { get; set; }
 
 		[Property, ValidateNonEmpty]
+		public string DeletingMiniMailText { get; set; }
+
+		[Property, ValidateNonEmpty]
 		public string ProcessingAboutFirmBody { get; set; }
 
 		[Property, ValidateNonEmpty, Description("Тема письма о нераспознанных изготовителях")]

@@ -29,6 +29,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 
 <div id="AnalysisOfWorkDrugstoresTable">
 ${tableHelper.ViewResult(Items, filter, app)}
+<button type='button' id='deleteSelectedButton'>Удалить отмеченные</buttom>
 </div>
 
 <% component Legend, { "LegendItems" : { "Письмо удалено" : "deleted-mini-mail" }, "ByCenter" : false} %>

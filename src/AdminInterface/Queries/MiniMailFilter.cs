@@ -19,6 +19,8 @@ namespace AdminInterface.Queries
 	{
 		public MailItem(Mail item)
 		{
+			if (item == null)
+				return;
 			Mail = item;
 			Date = item.LogTime;
 			Region = item.Supplier.HomeRegion.Name;
@@ -76,16 +78,32 @@ namespace AdminInterface.Queries
 
 		public Mail Mail { get; set; }
 
-		[Display(Name = "Дата", Order = 0)]
+		private string _groupDeleteLink;
+
+		[Display(Name = "", Order = 0, GroupName = "checkBoxTD")]
+		public string GroupDeleteLink
+		{
+			get
+			{
+				if (DeletedMiniMail)
+					return string.Empty;
+				if (!string.IsNullOrEmpty(_groupDeleteLink))
+					return _groupDeleteLink;
+				return string.Format("<input type='checkbox' class='deleteGroupBox' value='{0}'/>", Mail.Id);
+			}
+			set { _groupDeleteLink = value; }
+		}
+
+		[Display(Name = "Дата", Order = 1)]
 		public DateTime Date { get; set; }
 
-		[Display(Name = "Отправитель", Order = 1)]
+		[Display(Name = "Отправитель", Order = 2)]
 		public string SupplierName
 		{
 			get { return Link(Mail.Supplier.Name, "Suppliers", new System.Tuple<string, object>("Id", Mail.Supplier.Id)); }
 		}
 
-		[Display(Name = "Дом. регион отправителя", Order = 2)]
+		[Display(Name = "Дом. регион отправителя", Order = 3)]
 		public string Region { get; set; }
 
 		[Style]
@@ -93,10 +111,12 @@ namespace AdminInterface.Queries
 
 		private string _to;
 
-		[Display(Name = "Получатель", Order = 3)]
+		[Display(Name = "Получатель", Order = 4)]
 		public string To {
 			get
 			{
+				if (string.IsNullOrEmpty(_to))
+					return string.Empty;
 				if (_to.Count(c => c == ';') > 1)
 					return _to.Replace(";", "<br/>");
 				return _to.Replace(";", string.Empty);
@@ -104,17 +124,17 @@ namespace AdminInterface.Queries
 			set { _to = value; }
 		}
 
-		[Display(Name = "Тема", Order = 4)]
+		[Display(Name = "Тема", Order = 5)]
 		public string Subject { get; set; }
 
-		[Display(Name = "Число получателей (доставлено/нет)", Order = 5, GroupName = "CenterClass")]
+		[Display(Name = "Число получателей (доставлено/нет)", Order = 6, GroupName = "CenterClass")]
 		public string AddresseeCount { get; set; }
 
 		public MailCounter Counter { get; set; }
 
 		private string _deleteLink;
 
-		[Display(Name = "Удалить", Order = 7, GroupName = "CenterClass")]
+		[Display(Name = "Удалить", Order = 8, GroupName = "CenterClass")]
 		public string DeleteLink {
 			get
 			{
@@ -125,7 +145,7 @@ namespace AdminInterface.Queries
 			set { _deleteLink = value; }
 		}
 
-		[Display(Name = "Показать", Order = 6, GroupName = "CenterClass")]
+		[Display(Name = "Показать", Order = 7, GroupName = "CenterClass")]
 		public string ShowLink { get; set; }
 	}
 
