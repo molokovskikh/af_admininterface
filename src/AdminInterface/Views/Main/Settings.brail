@@ -23,7 +23,7 @@ ${app.Asset("MainSettings.js")}
 <h3>Настройки по умолчанию</h3>
 
 <form method=post class=vertical>
-	<input type=hidden value=${defaults.Id} name="defaults.Id" />
+	<input type=hidden value=${defaults.Id} name="Defaults.Id" />
 
 <div class="tabs">
 	<ul>
@@ -139,7 +139,7 @@ ${app.Asset("MainSettings.js")}
 			<% end %>
 		</select>
 		<label>Отправщик:</label>
-		<select name="defaults.Formater.Id">
+		<select name="defaults.Sender.Id">
 			<% for sender in senders: %>
 			<option value=${sender.Id} ${"selected" if sender.Id == defaults.Sender.Id}>${sender.ClassName}</option>
 			<% end %>

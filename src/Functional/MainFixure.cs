@@ -42,7 +42,8 @@ namespace Functional
 				ProcessingAboutFirmBody = "temp",
 				ProcessingAboutFirmSubject = "temp",
 				ProcessingAboutNamesBody = "temp",
-				ProcessingAboutNamesSubject = "temp"
+				ProcessingAboutNamesSubject = "temp",
+				DeletingMiniMailText = "temp"
 			};
 			session.Save(defaults);
 		}
