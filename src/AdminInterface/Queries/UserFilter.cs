@@ -147,6 +147,8 @@ join Customers.Services s on s.Id = u.RootService
 	left join contacts.Persons ON Persons.ContactGroupId = cg.Id and if(rdg.ContactGroupId is not null, (rdg.RegionId & sup.RegionMask > 0), 1)
 	left join contacts.Contacts as ContactsPerson on ContactsPerson.ContactOwnerId = Persons.Id
 join Billing.Payers p on p.PayerId = u.PayerId
+left join contacts.payerownercontacts poc on poc.Payer = p.PayerId
+left join contacts.Contacts PayerCont on PayerCont.Id = poc.Contact
 WHERE
 ((Clients.MaskRegion & :RegionMask > 0) or (sup.RegionMask & :RegionMask > 0))
 {0}
@@ -314,14 +316,16 @@ LOWER(s.Name) like '{0}' ",
 						filter = AddFilterCriteria(filter,
 							String.Format(@"
 (REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1 ) or 
-(REPLACE(ContactsAddresses.ContactText, '-', '') like '{0}' and ContactsAddresses.Type = 1 )
+(REPLACE(ContactsAddresses.ContactText, '-', '') like '{0}' and ContactsAddresses.Type = 1 ) or
+(REPLACE(PayerCont.ContactText, '-', '') like '{0}' and PayerCont.Type = 1 )
 ", sqlSearchText.Replace("-", "")));
 					else
 						filter = AddFilterCriteria(filter,
 							String.Format(@"
 (LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0 and ((cg.Specialized = false) or (cg.id = ifnull(u.ContactGroupId, (cg.Specialized = false))))) or
 (LOWER(ContactsAddresses.ContactText) like '{0}' and ContactsAddresses.Type = 0 and ((cga.Specialized = false) or (cga.id = ifnull(u.ContactGroupId, (cga.Specialized = false))))) or
-(LOWER(ContactsPerson.ContactText) like '{0}' and ContactsPerson.Type = 0)
+(LOWER(ContactsPerson.ContactText) like '{0}' and ContactsPerson.Type = 0) or
+(LOWER(PayerCont.ContactText) like '{0}' and PayerCont.Type = 0)
 ", sqlSearchText));
 					break;
 				}

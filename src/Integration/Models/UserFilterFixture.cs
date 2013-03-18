@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
@@ -174,6 +175,32 @@ namespace Integration.Models
 			user.Delete();
 			user2.Delete();
 			Flush();
+		}
+
+		[Test]
+		public void Test_search_payer_contact()
+		{
+			var user = DataMother.CreateSupplierUser();
+			var supplier = (Supplier)user.RootService;
+			session.Save(supplier.Payer);
+			Flush();
+			session.Flush();
+
+			var tempEmail = Guid.NewGuid().ToString().Replace("-", string.Empty).Substring(0, 10);
+
+			session.CreateSQLQuery(string.Format(@"
+insert into contacts.contacts (contacttext, contactOwnerId) value ('{0}', {2});
+
+set @setId = last_insert_id();
+
+insert into contacts.payerownercontacts (contact, payer) value (@setId, {1});",
+				tempEmail + "@test.ru", supplier.Payer.Id, supplier.Payer.ContactGroupOwner.Id)).ExecuteUpdate();
+			Flush();
+			filter.SearchBy = SearchUserBy.ByContacts;
+			filter.SearchText = tempEmail;
+			var result = filter.Find();
+			Assert.That(result.Count, Is.EqualTo(1), tempEmail);
+			Assert.That(result[0].ClientId, Is.EqualTo(supplier.Id));
 		}
 
 		[Test]

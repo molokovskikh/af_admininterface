@@ -116,7 +116,7 @@ namespace Functional
 		public void Show_monitoring_priceList_page()
 		{
 			Open();
-			Click("Всего: 0, загруженные: 0, перепроводимые: 0");
+			Click("Всего: 0, загруженные: 0, перепроводимые: 0, Error: 0");
 			AssertText("Очередь обработки прайс листов");
 			AssertText("Загруженные");
 			AssertText("Перепроводимые");
