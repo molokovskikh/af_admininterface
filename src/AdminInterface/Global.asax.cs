@@ -34,6 +34,7 @@ namespace AddUser
 		public string DocsPath { get; set; }
 
 		public string AttachmentsPath { get; set; }
+		public string ErrorFilesPath { get; set; }
 	}
 
 	public class Global : WebApplication, IMonoRailConfigurationEvents

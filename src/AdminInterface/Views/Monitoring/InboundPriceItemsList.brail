@@ -25,17 +25,24 @@
 		</tr>
 	</thead>
 <%firstPosition = Items[0].Downloaded%>
+<%errorEed = Items[0].Error%>
+<%showedError = false%>
 <tr class="${ViewHelper.GetRowStyle(1)}">
 	<td colspan=8 class="subHeadTable">
-		<%if firstPosition: %>
-			Загруженные
+		<%if errorEed:%>
+			Ошибки
+			<%showedError = true%>
 		<%else:%>
-			Перепроводимые
+			<%if firstPosition: %>
+				Загруженные
+			<%else:%>
+				Перепроводимые
+			<%end%>
 		<%end%>
 	</td>
 </tr>
 <% for i, item in enumerate(Items): %>
-	<%if (firstPosition != item.Downloaded):%>
+	<%if (firstPosition != item.Downloaded) and not item.Error:%>
 	<tr class="${ViewHelper.GetRowStyle(1)}">
 		<td colspan=8 class="subHeadTable">
 		<%if item.Downloaded: %>
@@ -46,6 +53,11 @@
 		</td>
 	</tr>
 	<%firstPosition = item.Downloaded%>
+	<%else:%>
+		<%if item.Error and not showedError:%>
+			<tr class="${ViewHelper.GetRowStyle(1)}"><td colspan=8 class="subHeadTable">Ошибки</td></tr>
+		<%showedError = true;
+		end%>
 	<%end%>
 	<tr class="${ViewHelper.GetRowStyle(i)} ${"FormalizedNow" if item.FormalizedNow }">
 		<td>${app.LinkTo(item.Supplier, item.SupplierCode, "")}</td>
@@ -55,12 +67,12 @@
 		<td>${item.Extension}</td>
 		<td>${item.PriceTime}</td>
 		<td>
-			<%if not item.FormalizedNow: %>
+			<%if not item.FormalizedNow and not item.Error: %>
 			<a href="#" onclick="DeleteItemInInboundList(${item.Hash}, '${item.PriceName}')">Удалить</a>
 			<%end%>
 		</td>
 		<td>
-			<%if not item.FormalizedNow:%>
+			<%if not item.FormalizedNow and not item.Error:%>
 			${app.LinkTo("Вверх", @Monitoring, @TopInInboundList, { @hashCode : item.Hash})}
 			<%end%>
 		</td>

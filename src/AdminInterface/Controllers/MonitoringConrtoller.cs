@@ -11,6 +11,7 @@ using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using NHibernate.Linq;
 using NHibernate.SqlCommand;
 using RemotePriceProcessor;
 
@@ -18,7 +19,7 @@ namespace AdminInterface.Controllers
 {
 	public class InboundPriceItems
 	{
-		public InboundPriceItems(bool down, Price price, string filePath, DateTime priceTime, int hash, bool formalizedNow)
+		public InboundPriceItems(bool down, Price price, string filePath, DateTime? priceTime, int hash, bool formalizedNow)
 		{
 			Downloaded = down;
 			if (price != null) {
@@ -41,9 +42,10 @@ namespace AdminInterface.Controllers
 		public uint PriceCode { get; set; }
 		public string PriceName { get; set; }
 		public string Extension { get; set; }
-		public DateTime PriceTime { get; set; }
+		public DateTime? PriceTime { get; set; }
 		public int Hash { get; set; }
 		public bool FormalizedNow { get; set; }
+		public bool Error { get; set; }
 	}
 
 	[
@@ -92,16 +94,36 @@ namespace AdminInterface.Controllers
 			});
 #else
 			items = new[] {
-				new WcfPriceProcessItem(0, false, "jjj.AAA", 0, null, DateTime.Now.AddMinutes(50), 0),
-				new WcfPriceProcessItem(0, true, "jjj.123", 0, null, DateTime.Now.AddMinutes(10), 0),
-				new WcfPriceProcessItem(0, false, "jjj.BBB", 0, null, DateTime.Now.AddMinutes(100), 0) { FormalizedNow = true },
-				new WcfPriceProcessItem(0, true, "jjj.789", 0, null, DateTime.Now.AddMinutes(500), 0)
+				new WcfPriceProcessItem(1, false, "jjj.AAA", 0, null, DateTime.Now.AddMinutes(50), 0),
+				new WcfPriceProcessItem(2, true, "jjj.123", 0, null, DateTime.Now.AddMinutes(10), 0),
+				new WcfPriceProcessItem(3, false, "jjj.BBB", 0, null, DateTime.Now.AddMinutes(100), 0) { FormalizedNow = true },
+				new WcfPriceProcessItem(4, true, "jjj.789", 0, null, DateTime.Now.AddMinutes(500), 0)
 			};
 #endif
+			var codes = items.Select(i => Convert.ToUInt32(i.PriceCode)).ToList();
+			var prices = DbSession.Query<Price>().Where(p => codes.Contains(p.Id)).ToList().ToDictionary(k => k.Id);
+
 			var result = items.Select(i => {
-				var price = DbSession.Get<Price>((uint)i.PriceCode);
+				var price = prices[(uint)i.PriceCode];
 				return new InboundPriceItems(i.Downloaded, price, i.FilePath, i.CreateTime, i.HashCode, i.FormalizedNow);
 			}).ToList();
+
+			if (Directory.Exists(Config.ErrorFilesPath)) {
+				var errorsItems = Directory.GetFiles(Config.ErrorFilesPath).Select(f => new { name = Path.GetFileNameWithoutExtension(f), time = File.GetCreationTime(f), file = f }).ToDictionary(k => k.name);
+				var itemIds = errorsItems.Select(e => Convert.ToUInt32(e.Key)).ToList();
+				var errorPrices = DbSession.Query<Cost>().Where(p => itemIds.Contains(p.PriceItem.Id)).Select(p => p.Price).Distinct().ToList();
+				result.AddRange(errorPrices.Select(e => {
+					DateTime? time = null;
+					var file = string.Empty;
+					foreach (var cost in e.Costs) {
+						if (itemIds.Contains(cost.PriceItem.Id)) {
+							time = errorsItems[cost.PriceItem.Id.ToString()].time;
+							file = errorsItems[cost.PriceItem.Id.ToString()].file;
+						}
+					}
+					return new InboundPriceItems(false, e, file, time, 0, false) { Error = true };
+				}));
+			}
 
 			var sortable = new Sortable();
 			BindObjectInstance(sortable, "filter");
@@ -113,6 +135,7 @@ namespace AdminInterface.Controllers
 			var retranse = result.Where(r => !r.Downloaded).Sort(ref sortBy, ref direction, "PriceTime").ToList();
 			var form = result.Where(r => r.Downloaded).Sort(ref sortBy, ref direction, "PriceTime").ToList();
 			form.AddRange(retranse);
+			form = form.OrderBy(f => f.Error).ToList();
 
 			PropertyBag["items"] = form.ToList();
 			PropertyBag["filter"] = sortable;

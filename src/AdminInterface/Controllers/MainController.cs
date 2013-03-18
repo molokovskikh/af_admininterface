@@ -2,6 +2,7 @@
 using System;
 using System.Data;
 using System.Globalization;
+using System.IO;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
@@ -50,11 +51,15 @@ namespace AdminInterface.Controllers
 
 			var data = query.Load(fromDate, toDate);
 			var statuses = new StatusServices();
+
+			int errorsPrices = 0;
+			if (Directory.Exists(Config.ErrorFilesPath))
+				errorsPrices = Directory.GetFiles(Config.ErrorFilesPath).Length;
 #if !DEBUG
 			RemoteServiceHelper.RemotingCall(s => {
 				var itemList = s.GetPriceItemList();
 				var downloadedCount = itemList.Count(i => i.Downloaded);
-				PropertyBag["FormalizationQueue"] = string.Format("Всего: {0}, загруженные: {1}, перепроводимые: {2}", itemList.Length, downloadedCount, itemList.Length - downloadedCount);
+				PropertyBag["FormalizationQueue"] = string.Format("Всего: {0}, загруженные: {1}, перепроводимые: {2}, Error: {3}", itemList.Length, downloadedCount, itemList.Length - downloadedCount, errorsPrices);
 			});
 
 
@@ -65,7 +70,7 @@ namespace AdminInterface.Controllers
 			statuses.OrderProcStatus = "";
 			statuses.PriceProcessorMasterStatus = "";
 			PropertyBag["StatusServices"] = statuses;
-			PropertyBag["FormalizationQueue"] = "Всего: 0, загруженные: 0, перепроводимые: 0";
+			PropertyBag["FormalizationQueue"] = "Всего: 0, загруженные: 0, перепроводимые: 0, Error: 0";
 #endif
 
 			foreach (var pair in data.ToKeyValuePairs()) {
