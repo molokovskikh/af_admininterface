@@ -337,7 +337,6 @@
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
     <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="MonoRailExtentions\StandaloneInitializer.cs" />
-    <Compile Include="NHibernateExtentions\ConnectionScope.cs" />
     <Compile Include="NHibernateExtentions\PeriodUserType.cs" />
     <Compile Include="Queries\MessageQuery.cs" />
     <Compile Include="Queries\OrderFilter.cs" />

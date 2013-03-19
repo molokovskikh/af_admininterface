@@ -21,6 +21,7 @@ using Common.MySql;
 using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.NHibernateExtentions;
 using MySql.Data.MySqlClient;
 using NHibernate.Linq;
 
