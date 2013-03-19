@@ -194,7 +194,7 @@ insert into contacts.contacts (contacttext, contactOwnerId) value ('{0}', {2});
 set @setId = last_insert_id();
 
 insert into contacts.payerownercontacts (contact, payer) value (@setId, {1});",
-				tempEmail + "@test.ru", supplier.Payer.Id, supplier.Payer.ContactGroupOwner.Id)).ExecuteUpdate();
+				tempEmail + "@test.ru", supplier.Payer.Id, supplier.Payer.ContactGroupOwner.ContactGroups.First().Id)).ExecuteUpdate();
 			Flush();
 			filter.SearchBy = SearchUserBy.ByContacts;
 			filter.SearchText = tempEmail;

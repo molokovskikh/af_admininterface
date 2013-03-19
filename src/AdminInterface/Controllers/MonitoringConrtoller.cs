@@ -103,10 +103,17 @@ namespace AdminInterface.Controllers
 			var codes = items.Select(i => Convert.ToUInt32(i.PriceCode)).ToList();
 			var prices = DbSession.Query<Price>().Where(p => codes.Contains(p.Id)).ToList().ToDictionary(k => k.Id);
 
+#if DEBUG
+			prices = new Dictionary<uint, Price>() { { 1u, new Price { Supplier = new Supplier() } }, { 4, new Price() { Supplier = new Supplier() } } };
+#endif
+
 			var result = items.Select(i => {
-				var price = prices[(uint)i.PriceCode];
-				return new InboundPriceItems(i.Downloaded, price, i.FilePath, i.CreateTime, i.HashCode, i.FormalizedNow);
-			}).ToList();
+				if (prices.Keys.Contains((uint)i.PriceCode)) {
+					var price = prices[(uint)i.PriceCode];
+					return new InboundPriceItems(i.Downloaded, price, i.FilePath, i.CreateTime, i.HashCode, i.FormalizedNow);
+				}
+				return null;
+			}).Where(p => p != null).ToList();
 
 			if (Directory.Exists(Config.ErrorFilesPath)) {
 				var errorsItems = Directory.GetFiles(Config.ErrorFilesPath).Select(f => new { name = Path.GetFileNameWithoutExtension(f), time = File.GetCreationTime(f), file = f }).ToDictionary(k => k.name);
