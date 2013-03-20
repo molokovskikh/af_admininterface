@@ -688,6 +688,7 @@ ORDER BY region;";
 		{
 			using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
 				connection.Open();
+				var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
 				var oldMaskRegion = supplier.RegionMask;
 				var newMaskRegion = oldMaskRegion;
 				foreach (ListItem item in WorkRegionList.Items) {
@@ -739,11 +740,12 @@ WHERE s.Id = ?ClientCode
 				updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				updateCommand.ExecuteNonQuery();
 
-				RegionalData.AddForSuppler(DbSession, supplier);
-
 				//описание см ст 430
-				using (new ConnectionScope(connection, FlushAction.Never))
+				using (new ConnectionScope(connection, FlushAction.Never)) {
+					ArHelper.WithSession(s => RegionalData.AddForSuppler(s, supplier));
 					Maintainer.MaintainIntersection(supplier);
+				}
+				transaction.Commit();
 			}
 		}
 
