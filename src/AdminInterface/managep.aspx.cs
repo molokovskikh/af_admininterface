@@ -688,7 +688,6 @@ ORDER BY region;";
 		{
 			using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
 				connection.Open();
-				var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
 				var oldMaskRegion = supplier.RegionMask;
 				var newMaskRegion = oldMaskRegion;
 				foreach (ListItem item in WorkRegionList.Items) {
@@ -705,6 +704,7 @@ ORDER BY region;";
 				ActiveRecordMediator.SaveAndFlush(supplier);
 				//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
 				SessionScope.Current.Commit();
+				var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
 
 				var updateCommand = new MySqlCommand(
 					@"
