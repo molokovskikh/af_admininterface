@@ -142,7 +142,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[RequiredPermission(PermissionType.EditSettings)]
-		public void Settings()
+		public void Settings(string pageTab)
 		{
 			var defaults = Defaults;
 			if (IsPost) {
@@ -150,7 +150,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(defaults, ParamStore.Form, "defaults");
 				if (IsValid(defaults)) {
 					Notify("Сохранено");
-					RedirectToReferrer();
+					RedirectToUrl(Request.UrlReferrer + pageTab);
 				}
 				else {
 					ActiveRecordMediator.Evict(defaults);

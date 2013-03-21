@@ -24,6 +24,7 @@ ${app.Asset("MainSettings.js")}
 
 <form method=post class=vertical>
 	<input type=hidden value=${defaults.Id} name="Defaults.Id" />
+	<input type="hidden" name="pageTab" id="activeTabName" />
 
 <div class="tabs">
 	<ul>

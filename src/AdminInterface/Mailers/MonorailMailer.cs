@@ -350,12 +350,20 @@ namespace AdminInterface.Mailers
 			return this;
 		}
 
-		public MonorailMailer DeleteMiniMailToSupplier(string email, string body)
+		public MonorailMailer DeleteMiniMailToSupplier(Mail email, string body)
 		{
+			var mailItem = new MailItem(email);
+			var mailFooter = new StringBuilder();
+			mailFooter.AppendLine("<br/><br/>");
+			mailFooter.AppendLine(string.Format("<b>Тема:</b> {0} <br/>", email.Subject));
+			mailFooter.AppendLine(string.Format("<b>Дата:</b> {0} <br/>", email.LogTime));
+			mailFooter.AppendLine(string.Format("<b>Получатели:</b> <br/> {0}", mailItem.To));
+
 			From = "office@analit.net";
-			To = email;
+			To = email.SupplierEmail;
 			Subject = "Удаление письма минипочты";
-			PropertyBag["body"] = body;
+			IsBodyHtml = true;
+			PropertyBag["body"] = body + mailFooter;
 			Template = "DeleteMiniMail";
 
 			return this;

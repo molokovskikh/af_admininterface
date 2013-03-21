@@ -63,7 +63,7 @@ namespace AdminInterface.Controllers
 				if (!mailSendLog.Committed)
 					DbSession.Delete(mailSendLog);
 			}
-			this.Mailer().DeleteMiniMailToSupplier(mail.SupplierEmail, Defaults.DeletingMiniMailText).Send();
+			this.Mailer().DeleteMiniMailToSupplier(mail, Defaults.DeletingMiniMailText).Send();
 			this.Mailer().DeleteMiniMailToOffice(mail).Send();
 			Notify("Удалено");
 			CancelView();
