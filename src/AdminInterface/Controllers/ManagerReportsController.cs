@@ -257,7 +257,7 @@ namespace AdminInterface.Controllers
 					c.Status == ClientStatus.On &&
 					c.Settings.InvisibleOnFirm == DrugstoreType.Standart)
 				.ToList()
-				.Select(c => new { id = c.Id, label = c.Name })
+				.Select(c => new { id = c.Id, label = c.Name, region = c.HomeRegion.Name })
 				.ToList();
 		}
 

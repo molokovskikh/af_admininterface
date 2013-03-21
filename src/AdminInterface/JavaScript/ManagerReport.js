@@ -10,7 +10,7 @@
 	$.ui.autocomplete.prototype._renderItem = function (ul, item) {
 		return $("<li></li>")
 			.data("item.autocomplete", item)
-			.append("<a href='#'>" + item.label + "</a>")
+			.append("<a href='#'>" + '[' + item.id + '] ' + item.label + ' - ' + item.region + "</a>")
 			.appendTo(ul);
 	};
 
