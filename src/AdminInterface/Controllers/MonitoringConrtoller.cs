@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
@@ -10,6 +11,7 @@ using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using NHibernate.Linq;
 using NHibernate.SqlCommand;
@@ -85,6 +87,25 @@ namespace AdminInterface.Controllers
 			PropertyBag["IsMonitoring"] = true;
 		}
 
+		public static uint ParseId(string filename)
+		{
+			var name = Path.GetFileNameWithoutExtension(filename);
+
+			if (String.IsNullOrEmpty(name))
+				return 0;
+
+			var matches = new[] {
+				Regex.Match(name, @"^(\d+)$"),
+				Regex.Match(name, @"^d(\d+)_")
+			};
+
+			var match = matches.FirstOrDefault(m => m.Success);
+			if (match != null) {
+				return SafeConvert.ToUInt32(match.Groups[1].Value);
+			}
+			return 0;
+		}
+
 		public void InboundPriceItemsList()
 		{
 			var items = new WcfPriceProcessItem[0];
@@ -117,7 +138,7 @@ namespace AdminInterface.Controllers
 
 			if (Directory.Exists(Config.ErrorFilesPath)) {
 				var errorsItems = Directory.GetFiles(Config.ErrorFilesPath).Select(f => new { name = Path.GetFileNameWithoutExtension(f), time = File.GetCreationTime(f), file = f }).ToDictionary(k => k.name);
-				var itemIds = errorsItems.Select(e => Convert.ToUInt32(e.Key)).ToList();
+				var itemIds = errorsItems.Select(e => ParseId(e.Key)).ToList();
 				var errorPrices = DbSession.Query<Cost>().Where(p => itemIds.Contains(p.PriceItem.Id)).Select(p => p.Price).Distinct().ToList();
 				result.AddRange(errorPrices.Select(e => {
 					DateTime? time = null;
