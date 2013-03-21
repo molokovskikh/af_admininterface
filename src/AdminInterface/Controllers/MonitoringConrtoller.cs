@@ -137,16 +137,16 @@ namespace AdminInterface.Controllers
 			}).Where(p => p != null).ToList();
 
 			if (Directory.Exists(Config.ErrorFilesPath)) {
-				var errorsItems = Directory.GetFiles(Config.ErrorFilesPath).Select(f => new { name = Path.GetFileNameWithoutExtension(f), time = File.GetCreationTime(f), file = f }).ToDictionary(k => k.name);
-				var itemIds = errorsItems.Select(e => ParseId(e.Key)).ToList();
+				var errorsItems = Directory.GetFiles(Config.ErrorFilesPath).Select(f => new { name = Path.GetFileNameWithoutExtension(f), time = File.GetCreationTime(f), file = f }).ToDictionary(k => ParseId(k.name));
+				var itemIds = errorsItems.Select(e => e.Key).ToList();
 				var errorPrices = DbSession.Query<Cost>().Where(p => itemIds.Contains(p.PriceItem.Id)).Select(p => p.Price).Distinct().ToList();
 				result.AddRange(errorPrices.Select(e => {
 					DateTime? time = null;
 					var file = string.Empty;
 					foreach (var cost in e.Costs) {
 						if (itemIds.Contains(cost.PriceItem.Id)) {
-							time = errorsItems[cost.PriceItem.Id.ToString()].time;
-							file = errorsItems[cost.PriceItem.Id.ToString()].file;
+							time = errorsItems[cost.PriceItem.Id].time;
+							file = errorsItems[cost.PriceItem.Id].file;
 						}
 					}
 					return new InboundPriceItems(false, e, file, time, 0, false) { Error = true };
