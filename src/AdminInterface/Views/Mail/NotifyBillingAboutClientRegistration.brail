@@ -11,6 +11,6 @@
 ${payer.Comment}
 <% if user and user.Accounting.RegistrationMessage: %>
 <br>
-${user.Account.RegistrationMessage}
+${user.Accounting.RegistrationMessage}
 <br>
 <% end %>
