@@ -120,6 +120,8 @@ namespace Functional
 			AssertText("Очередь обработки прайс листов");
 			AssertText("Загруженные");
 			AssertText("Перепроводимые");
+			AssertText("Домашний регион");
+			AssertText("test2");
 			AssertText("AAA");
 			AssertText("789");
 		}

@@ -13,6 +13,7 @@ using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using NHibernate.Linq;
 using NHibernate.SqlCommand;
 using RemotePriceProcessor;
@@ -28,6 +29,7 @@ namespace AdminInterface.Controllers
 				Supplier = price.Supplier;
 				SupplierCode = price.Supplier.Id;
 				SupplierName = price.Supplier.Name;
+				SupplierRegion = price.Supplier.HomeRegion.Name;
 				PriceCode = price.Id;
 				PriceName = price.Name;
 			}
@@ -41,6 +43,7 @@ namespace AdminInterface.Controllers
 		public Supplier Supplier { get; set; }
 		public uint SupplierCode { get; set; }
 		public string SupplierName { get; set; }
+		public string SupplierRegion { get; set; }
 		public uint PriceCode { get; set; }
 		public string PriceName { get; set; }
 		public string Extension { get; set; }
@@ -125,7 +128,7 @@ namespace AdminInterface.Controllers
 			var prices = DbSession.Query<Price>().Where(p => codes.Contains(p.Id)).ToList().ToDictionary(k => k.Id);
 
 #if DEBUG
-			prices = new Dictionary<uint, Price>() { { 1u, new Price { Supplier = new Supplier() } }, { 4, new Price() { Supplier = new Supplier() } } };
+			prices = new Dictionary<uint, Price>() { { 1u, new Price { Supplier = new Supplier { HomeRegion = new Region("test") } } }, { 4, new Price() { Supplier = new Supplier { HomeRegion = new Region("test2") } } } };
 #endif
 
 			var result = items.Select(i => {

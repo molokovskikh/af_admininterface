@@ -18,6 +18,7 @@
 		<tr>
 			<th>${app.Sortable("Код поставщика", "SupplierCode")}</th>
 			<th>${app.Sortable("Поставщик", "SupplierName")}</th>
+			<th>${app.Sortable("Домашний регион", "SupplierRegion")}</th>
 			<th>${app.Sortable("Код прайса", "PriceCode")}</th>
 			<th>${app.Sortable("Прайс", "PriceName")}</th>
 			<th>${app.Sortable("Формат плайса", "Extension")}</th>
@@ -62,6 +63,7 @@
 	<tr class="${ViewHelper.GetRowStyle(i)} ${"FormalizedNow" if item.FormalizedNow }">
 		<td>${app.LinkTo(item.Supplier, item.SupplierCode, "")}</td>
 		<td>${app.LinkTo(item.Supplier)}</td>
+		<td>${item.SupplierRegion}</td>
 		<td>${item.PriceCode}</td>
 		<td>${item.PriceName}</td>
 		<td>${item.Extension}</td>
