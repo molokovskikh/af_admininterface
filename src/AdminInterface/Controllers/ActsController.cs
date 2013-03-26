@@ -56,6 +56,7 @@ namespace AdminInterface.Controllers
 
 		public void Process([ARDataBind("acts", AutoLoadBehavior.Always)] Act[] acts)
 		{
+			var filter = (PayerDocumentFilter)BindObject(ParamStore.Form, typeof(PayerDocumentFilter), "filter");
 			if (Form["delete"] != null) {
 				foreach (var act in acts) {
 					act.Delete();
@@ -67,7 +68,8 @@ namespace AdminInterface.Controllers
 			}
 			if (Form["print"] != null) {
 				var printer = Form["printer"];
-				var arguments = String.Format("act \"{0}\" \"{1}\"", printer, acts.Implode(a => a.Id));
+				filter.PrepareFindActInvoiceIds(acts.Implode(i => i.Id));
+				var arguments = String.Format("act \"{0}\" \"{1}\"", printer, filter.Find<Act>().Implode(i => i.Id));
 				Printer.Execute(arguments);
 				Flash["message"] = "Отправлено на печать";
 				RedirectToReferrer();

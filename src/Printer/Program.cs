@@ -54,12 +54,14 @@ namespace Printer
 				using (new SessionScope(FlushAction.Never)) {
 					if (name == "invoice") {
 						documents = Invoice.Queryable.Where(a => ids.Contains(a.Id))
-							.OrderBy(a => a.PayerName)
+							.ToList()
+							.OrderBy(a => ids.IndexOf(a.Id))
 							.ToArray();
 					}
 					else if (name == "act") {
 						documents = Act.Queryable.Where(a => ids.Contains(a.Id))
-							.OrderBy(a => a.PayerName)
+							.ToList()
+							.OrderBy(a => ids.IndexOf(a.Id))
 							.ToArray();
 					}
 					Print(brail, printer, name, documents);

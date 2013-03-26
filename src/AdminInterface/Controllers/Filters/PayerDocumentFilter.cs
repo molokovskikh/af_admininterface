@@ -25,6 +25,7 @@ namespace AdminInterface.Controllers.Filters
 
 		public int Count { get; private set; }
 		public decimal Sum { get; private set; }
+		public bool FindActInvoiceIfIds { get; set; }
 
 		public DateTime? CreatedOn { get; set; }
 
@@ -40,6 +41,12 @@ namespace AdminInterface.Controllers.Filters
 				{ "Period", "Period" },
 				{ "Date", "Date" }
 			};
+		}
+
+		public void PrepareFindActInvoiceIds(string query)
+		{
+			SearchText = query;
+			FindActInvoiceIfIds = true;
 		}
 
 		public IList<T> Find<T>()
@@ -74,7 +81,7 @@ namespace AdminInterface.Controllers.Filters
 					.ToArray();
 
 				if (ids.Length == parts.Length)
-					criteria.Add(Expression.In("p.PayerID", ids));
+					criteria.Add(FindActInvoiceIfIds ? Expression.In("Id", ids) : Expression.In("p.PayerID", ids));
 				else
 					criteria.Add(Expression.Like("p.Name", SearchText, MatchMode.Anywhere));
 			}

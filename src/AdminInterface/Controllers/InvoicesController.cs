@@ -33,6 +33,7 @@ namespace AdminInterface.Controllers
 
 		public void Process()
 		{
+			var filter = (PayerDocumentFilter)BindObject(ParamStore.Form, typeof(PayerDocumentFilter), "filter");
 			var binder = new ARDataBinder();
 			binder.AutoLoad = AutoLoadBehavior.Always;
 			SetBinder(binder);
@@ -47,7 +48,8 @@ namespace AdminInterface.Controllers
 			}
 			if (Form["print"] != null) {
 				var printer = Form["printer"];
-				var arguments = String.Format("invoice \"{0}\" \"{1}\"", printer, invoices.Implode(i => i.Id));
+				filter.PrepareFindActInvoiceIds(invoices.Implode(i => i.Id));
+				var arguments = String.Format("invoice \"{0}\" \"{1}\"", printer, filter.Find<Invoice>().Implode(i => i.Id));
 				Printer.Execute(arguments);
 
 				Notify("Отправлено на печать");

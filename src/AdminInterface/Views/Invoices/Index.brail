@@ -72,6 +72,8 @@
 			<input name=delete type=submit value="Удалить">
 
 			<input name=print type=submit value="Напечатать">
+			${FormHelper.HiddenField("filter.SortDirection", filter.SortDirection, null)}
+			${FormHelper.HiddenField("filter.SortBy", filter.SortBy, null)}
 			<label>Принтер</label>
 			<select name=printer>
 			<% for printer in printers: %>
