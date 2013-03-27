@@ -319,7 +319,7 @@ order by r.Region;";
 				LoadPageData();
 			}
 			catch (MySqlException ex) {
-				if (ex.Message.Contains("Timeout expired")) {
+				if (ExceptionHelper.HaveMessage(ex, "Timeout expired")) {
 					messageDiv.InnerText = "Ваши изменения не выполнились за отведенное время";
 					messageDiv.Style.Add("display", "block");
 				}

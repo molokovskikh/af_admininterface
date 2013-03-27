@@ -361,3 +361,7 @@ table.Test
 a:link.ToolTip {
 	color: #f75555;
 }
+
+a:visited.ToolTip {
+	color: #f75555;
+}
