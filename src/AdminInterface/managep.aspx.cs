@@ -68,6 +68,58 @@ namespace AddUser
 				ConnectDataSource();
 		}
 
+		public bool CanDelete(object priceCode)
+		{
+			var code = Convert.ToUInt32(priceCode);
+			var isParentSynonim = IsParentSynonym(code);
+
+			var haveOrders = HaveOrders(code);
+
+			var havePriceReplace = HavePriceReplace(code);
+
+			return !isParentSynonim && !haveOrders && havePriceReplace;
+		}
+
+		public string GetNoDeleteReason(object priceCode)
+		{
+			var reason = string.Empty;
+			var code = Convert.ToUInt32(priceCode);
+
+			if (IsParentSynonym(code))
+				reason += "Носитель родительских синонимов. ";
+			if (HaveOrders(code))
+				reason += "Существуют заказы. ";
+			if (!HavePriceReplace(code))
+				reason += "Нет подходящей замены для обновления ordersOld.";
+
+			return reason;
+		}
+
+		private bool IsParentSynonym(uint priceCode)
+		{
+			return DbSession.Query<Price>().Any(p => p.ParentSynonym.Id == priceCode);
+		}
+
+		private bool HaveOrders(uint priceCode)
+		{
+			return DbSession.CreateSQLQuery(@"
+SELECT count(RowId) as CountOrders FROM orders.ordershead o
+where PriceCode = :Code")
+				.SetParameter("Code", priceCode)
+				.UniqueResult<long?>() > 0;
+		}
+
+		private bool HavePriceReplace(uint priceCode)
+		{
+			return DbSession.CreateSQLQuery(@"
+SELECT count(pd.PriceCode) as CountPrice FROM usersettings.pricesdata p
+join usersettings.pricesdata pd on pd.FirmCode = p.Firmcode and pd.PriceCode <> :Code
+and pd.enabled and pd. agencyenabled
+where p.pricecode = :Code;")
+				.SetParameter("Code", priceCode)
+				.UniqueResult<long?>() > 0;
+		}
+
 		private void LoadPageData()
 		{
 			Data = GetData(supplier);
@@ -273,6 +325,19 @@ order by r.Region;";
 				@"
 Set @InHost = ?UserHost;
 Set @InUser = ?UserName;
+
+delete from usersettings.PriceItems
+where id in (select pc.priceItemId from usersettings.pricescosts pc
+where pc.PriceCode = ?PriceCode);
+
+set @maxReplacePrice = (SELECT max(pd.PriceCode) FROM usersettings.pricesdata p
+join usersettings.pricesdata pd on pd.FirmCode = p.Firmcode and pd.PriceCode <> ?PriceCode
+and pd.enabled and pd. agencyenabled
+where p.pricecode = ?PriceCode);
+
+update ordersold.ordershead o
+set priceCode = @maxReplacePrice
+where priceCode = ?PriceCode;
 
 DELETE FROM PricesData
 WHERE PriceCode = ?PriceCode;

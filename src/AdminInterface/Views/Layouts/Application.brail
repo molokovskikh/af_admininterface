@@ -16,7 +16,7 @@
 		${app.Asset("jquery.validate.js")}
 		${app.Asset("underscore.js")}
 		${app.Asset("backbone.js")}
-		${app.Asset("jquery-ui-1.8.16.js")}
+		${app.Asset("jquery-ui-1.10.2.js")}
 		${app.Asset("knockout-2.1.0.js")}
 		${app.Asset("search.editor.js")}
 

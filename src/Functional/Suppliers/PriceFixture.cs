@@ -33,6 +33,54 @@ namespace Functional.Suppliers
 		}
 
 		[Test]
+		public void Success_price_delete()
+		{
+			var generator = new Random();
+			var baseItems = supplier.Prices[0].Costs.Select(c => c.PriceItem.Id).ToList();
+			Assert.That(baseItems.Count, Is.EqualTo(1));
+			Save(supplier.Prices[0]);
+			var price = supplier.AddPrice("forDelete", PriceType.Regular);
+			Save(price);
+			session.CreateSQLQuery(string.Format("insert into ordersold.ordershead (RowId, PriceCode) value ({0}, {1})", generator.Next(10000), supplier.Prices[0].Id)).ExecuteUpdate();
+			Flush();
+
+			Open("managep.aspx?cc=" + supplier.Id);
+			Click("Удалить");
+			Click("Применить");
+			Close();
+
+			var afterDeleting = session.Query<PriceItem>().Where(i => baseItems.Contains(i.Id)).ToList();
+			var ordersOldUpdate = session.CreateSQLQuery(string.Format("select count(RowId) from ordersold.ordershead where PriceCode ={0};", supplier.Prices[1].Id)).UniqueResult<long?>();
+			Assert.AreEqual(afterDeleting.Count, 0);
+			Assert.AreEqual(ordersOldUpdate, 1);
+		}
+
+		[Test]
+		public void No_price_retrance_price_delete()
+		{
+			Open("managep.aspx?cc=" + supplier.Id);
+			Assert.That(browser.Html, Is.StringContaining("Нет подходящей замены для обновления ordersOld."));
+		}
+
+		[Test]
+		public void Parent_synonym_price_no_delete()
+		{
+			var price = supplier.Prices[0];
+			price.ParentSynonym = price;
+			Save(price);
+			Open("managep.aspx?cc=" + supplier.Id);
+			Assert.That(browser.Html, Is.StringContaining("Носитель родительских синонимов."));
+		}
+
+		[Test]
+		public void Have_orders_price_no_delete()
+		{
+			session.CreateSQLQuery(string.Format("insert into orders.ordershead (PriceCode) value ({0})", supplier.Prices[0].Id)).ExecuteUpdate();
+			Open("managep.aspx?cc=" + supplier.Id);
+			Assert.That(browser.Html, Is.StringContaining("Существуют заказы."));
+		}
+
+		[Test]
 		public void CreateCostColumnTest()
 		{
 			var price = supplier.Prices[0];

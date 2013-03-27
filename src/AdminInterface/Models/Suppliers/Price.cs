@@ -79,6 +79,9 @@ namespace AdminInterface.Models.Suppliers
 		[BelongsTo("FirmCode")]
 		public virtual Supplier Supplier { get; set; }
 
+		[BelongsTo("ParentSynonym")]
+		public virtual Price ParentSynonym { get; set; }
+
 		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<Cost> Costs { get; set; }
 

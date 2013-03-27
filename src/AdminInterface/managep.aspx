@@ -6,8 +6,11 @@
 		<asp:ScriptManager ID="ScriptManager1" runat="server" AjaxFrameworkMode="Disabled" EnableScriptLocalization="False" EnableScriptGlobalization="False" EnablePageMethods="False" EnablePartialRendering="False" EnableSecureHistoryState="False">
 			<Scripts>
 				<asp:ScriptReference Path="~/Assets/Javascripts/jquery-1.6.2.min.js" />
+				<asp:ScriptReference Path="~/Assets/Javascripts/jquery-ui-1.10.2.min.js" />
 			</Scripts>
 		</asp:ScriptManager>
+
+		<link rel="stylesheet" href="../Assets/Stylesheets/themes/base/jquery-ui.css" type="text/css" />
 
 		<script type="text/javascript">
 			$(function () {
@@ -19,6 +22,10 @@
 					} else {
 						$('#messageDiv').css("display", "none");
 					}
+				});
+
+				$(document).tooltip({
+					hide: { effect: "explode", duration: 400 },
 				});
 			});
 		</script>
@@ -48,7 +55,8 @@
 									<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить" />
 								</HeaderTemplate>
 								<ItemTemplate>
-									<asp:Button ID="DeleteButton" runat="server" CommandName="Delete" Text="Удалить" />
+									<asp:Button ID="DeleteButton" runat="server" Visible='<%# CanDelete(Eval("PriceCode")) %>' CommandName="Delete" Text="Удалить" />
+									<asp:HyperLink ID="ToolTip" CssClass="ToolTip" title='<%# GetNoDeleteReason(Eval("PriceCode")) %>' runat="server" Visible='<%# !CanDelete(Eval("PriceCode")) %>' Text='Запрещено' NavigateUrl='#' />
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField>
