@@ -296,26 +296,37 @@ order by r.Region;";
 
 		protected void SaveButton_Click(object sender, EventArgs e)
 		{
-			if (!WorkRegionList.Items.Cast<ListItem>().Any(i => i.Selected)) {
-				RegionValidationError.Visible = true;
-				return;
+			try {
+				if (!WorkRegionList.Items.Cast<ListItem>().Any(i => i.Selected)) {
+					RegionValidationError.Visible = true;
+					return;
+				}
+
+				RegionValidationError.Visible = false;
+				ShowAllRegionsCheck.Checked = false;
+				UpdateHomeRegion();
+				UpdateMaskRegion();
+				ProcessChanges();
+
+				var message = "";
+				Save(supplier, Data, HttpContext.Current.Request.UserHostAddress, ref message);
+
+				if (!String.IsNullOrEmpty(message)) {
+					messageDiv.InnerText = message;
+					messageDiv.Style.Add("display", "block");
+				}
+
+				LoadPageData();
 			}
-
-			RegionValidationError.Visible = false;
-			ShowAllRegionsCheck.Checked = false;
-			UpdateHomeRegion();
-			UpdateMaskRegion();
-			ProcessChanges();
-
-			var message = "";
-			Save(supplier, Data, HttpContext.Current.Request.UserHostAddress, ref message);
-
-			if (!String.IsNullOrEmpty(message)) {
-				messageDiv.InnerText = message;
-				messageDiv.Style.Add("display", "block");
+			catch (MySqlException ex) {
+				if (ex.Message.Contains("Timeout expired")) {
+					messageDiv.InnerText = "Ваши изменения не выполнились за отведенное время";
+					messageDiv.Style.Add("display", "block");
+				}
+				else {
+					throw;
+				}
 			}
-
-			LoadPageData();
 		}
 
 		public void Save(Supplier supplier, DataSet data, string host, ref string message)
