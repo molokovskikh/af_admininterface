@@ -70,6 +70,9 @@ namespace AddUser
 
 		public bool CanDelete(object priceCode)
 		{
+			if (priceCode == DBNull.Value)
+				return true;
+
 			var code = Convert.ToUInt32(priceCode);
 			var isParentSynonim = IsParentSynonym(code);
 
@@ -83,6 +86,10 @@ namespace AddUser
 		public string GetNoDeleteReason(object priceCode)
 		{
 			var reason = string.Empty;
+
+			if (priceCode == DBNull.Value)
+				return reason;
+
 			var code = Convert.ToUInt32(priceCode);
 
 			if (IsParentSynonym(code))
