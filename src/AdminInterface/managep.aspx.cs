@@ -164,7 +164,7 @@ SELECT  pd.PriceCode,
 		pd.BuyingMatrix,
 		pd.IsLocal
 FROM pricesdata pd
-	JOIN usersettings.pricescosts pc on pd.PriceCode = pc.PriceCode and (pc.BaseCost = 1 or exists(select * from userSettings.pricesregionaldata prd where prd.PriceCode = pd.PriceCode and prd.BaseCost=pc.CostCode))
+	JOIN usersettings.pricescosts pc on pd.PriceCode = pc.PriceCode and exists(select * from userSettings.pricesregionaldata prd where prd.PriceCode = pd.PriceCode and prd.BaseCost=pc.CostCode)
 		JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
 WHERE pd.firmcode = ?supplierId
 GROUP BY pd.PriceCode;
@@ -396,7 +396,7 @@ SET @NewSourceId = Last_Insert_ID();
 INSERT INTO usersettings.PriceItems(FormRuleId, SourceId) VALUES(@NewFormRulesId, @NewSourceId);
 SET @NewPriceItemId = Last_Insert_ID();
 
-INSERT INTO PricesCosts (PriceCode, BaseCost, PriceItemId) SELECT @InsertedPriceCode, 1, @NewPriceItemId;
+INSERT INTO PricesCosts (PriceCode, PriceItemId) SELECT @InsertedPriceCode, @NewPriceItemId;
 SET @NewPriceCostId:=Last_Insert_ID(); 
 
 INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;

@@ -384,7 +384,7 @@ SET @NewSourceId = Last_Insert_ID();
 INSERT INTO usersettings.PriceItems(FormRuleId, SourceId) VALUES(@NewFormRulesId, @NewSourceId);
 SET @NewPriceItemId = Last_Insert_ID();
 
-INSERT INTO PricesCosts (PriceCode, BaseCost, PriceItemId) SELECT @NewPriceCode, 1, @NewPriceItemId;
+INSERT INTO PricesCosts (PriceCode, PriceItemId) SELECT @NewPriceCode, @NewPriceItemId;
 SET @NewPriceCostId = Last_Insert_ID(); 
 
 INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 

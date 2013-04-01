@@ -36,10 +36,6 @@ namespace AddUser
 						if (dataSet.Tables[0].Rows[i]["CostCode"].ToString() == ((HiddenField)Itm.FindControl("CostCode")).Value) {
 							if (dataSet.Tables[0].Rows[i]["CostName"].ToString() != ((TextBox)(Itm.FindControl("CostName"))).Text)
 								dataSet.Tables[0].Rows[i]["CostName"] = ((TextBox)(Itm.FindControl("CostName"))).Text;
-							if (dataSet.Tables[0].Rows[i]["CostCode"].ToString() == Request.Form["uid"])
-								dataSet.Tables[0].Rows[i]["BaseCost"] = true;
-							else
-								dataSet.Tables[0].Rows[i]["BaseCost"] = false;
 							if (Convert.ToInt32(dataSet.Tables[0].Rows[i]["Enabled"]) != Convert.ToInt32(((CheckBox)(Itm.FindControl("Ena"))).Checked))
 								dataSet.Tables[0].Rows[i]["Enabled"] = Convert.ToInt32(((CheckBox)(Itm.FindControl("Ena"))).Checked);
 							if (Convert.ToInt32(dataSet.Tables[0].Rows[i]["AgencyEnabled"]) != Convert.ToInt32(((CheckBox)(Itm.FindControl("Pub"))).Checked))
@@ -71,11 +67,6 @@ namespace AddUser
 				command.Parameters["?CostName"].SourceColumn = "CostName";
 				command.Parameters["?CostName"].SourceVersion = DataRowVersion.Current;
 
-				command.Parameters.Add(new MySqlParameter("?BaseCost", MySqlDbType.Bit));
-				command.Parameters["?BaseCost"].Direction = ParameterDirection.Input;
-				command.Parameters["?BaseCost"].SourceColumn = "BaseCost";
-				command.Parameters["?BaseCost"].SourceVersion = DataRowVersion.Current;
-
 				command.Parameters.Add(new MySqlParameter("?Enabled", MySqlDbType.Bit));
 				command.Parameters["?Enabled"].Direction = ParameterDirection.Input;
 				command.Parameters["?Enabled"].SourceColumn = "Enabled";
@@ -96,11 +87,10 @@ set @inHost = ?Host;
 set @inUser = ?UserName;
 
 UPDATE pricescosts
-SET		BaseCost	 =?BaseCost,
-		CostName     =?CostName,
-		Enabled      =?Enabled,
-		AgencyEnabled=?AgencyEnabled
-WHERE   CostCode     =?CostCode;
+SET CostName = ?CostName,
+	Enabled = ?Enabled,
+	AgencyEnabled = ?AgencyEnabled
+WHERE CostCode =?CostCode;
 ";
 				adapter.Update(dataSet, "Costs");
 
@@ -203,7 +193,6 @@ SELECT  pc.CostCode,
 		cast(concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) as CHAR) CostID,
 		pc.CostName,
 		pi.PriceDate,
-		pc.BaseCost,
 		pc.Enabled,
 		pc.AgencyEnabled,
 		exists (select * from PricesRegionalData prd where prd.BaseCost = pc.CostCode) as RegionBaseCode

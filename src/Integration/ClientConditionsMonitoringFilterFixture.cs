@@ -152,7 +152,6 @@ delete from  usersettings.pricesdata;")
 		{
 			foreach (var intersection in AllIntersection()) {
 				var cost = intersection.Cost;
-				cost.BaseCost = false;
 				session.Save(cost);
 			}
 			Flush();
