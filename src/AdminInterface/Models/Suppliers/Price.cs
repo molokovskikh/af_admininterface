@@ -90,10 +90,8 @@ namespace AdminInterface.Models.Suppliers
 
 		public virtual Cost AddCost()
 		{
-			var isBase = Costs.Count == 0;
 			var cost = new Cost {
 				Price = this,
-				BaseCost = isBase,
 				Name = "Базовая",
 				PriceItem = new PriceItem {
 					FormRule = new FormRule(),
@@ -172,9 +170,6 @@ namespace AdminInterface.Models.Suppliers
 	{
 		[PrimaryKey("CostCode")]
 		public virtual uint Id { get; set; }
-
-		[Property]
-		public virtual bool BaseCost { get; set; }
 
 		[Property("CostName")]
 		public virtual string Name { get; set; }

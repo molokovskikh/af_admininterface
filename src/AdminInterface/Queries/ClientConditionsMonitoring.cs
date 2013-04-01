@@ -294,7 +294,7 @@ SELECT
 	i.PriceId as PriceCode,
 	pd.PriceName as PriceName,
 	pc.CostName as CostName,
-	if (pc.BaseCost or prd.BaseCost=i.CostId, true, false) as BaseCost,
+	if (prd.BaseCost=i.CostId, true, false) as BaseCost,
 	i.PriceMarkup as PriceMarkup,
 	i.SupplierClientId as SupplierClientId,
 	i.SupplierPaymentId as SupplierPaymentId,
@@ -305,7 +305,7 @@ SELECT
 	pd.pricetype as PriceType,
 
 (SELECT
-(count(IF(ti.CostId=prd.BaseCost or pc.BaseCost, 1, NULL)) / count(ti.id))
+(count(IF(ti.CostId=prd.BaseCost, 1, NULL)) / count(ti.id))
  FROM customers.Intersection tI
 join Usersettings.PricesCosts pc on pc.CostCode = ti.CostId
 JOIN Customers.Clients c ON c.Id = ti.ClientId
