@@ -369,14 +369,14 @@ namespace AdminInterface.Mailers
 			return this;
 		}
 
-		public MonorailMailer DeleteMiniMailToOffice(Mail mail)
+		public MonorailMailer DeleteMiniMailToOffice(Mail mail, string userAddress)
 		{
 			From = "office@analit.net";
 			To = "AFNews@subscribe.analit.net";
 			Subject = "Удаление письма минипочты";
 			IsBodyHtml = true;
 			var mailItem = new MailItem(mail);
-			PropertyBag["body"] = string.Format("Удалено письмо минипочты поставщика '{0}' от {1}. </br> {2}", mail.Supplier.Name, mail.LogTime, mailItem.To);
+			PropertyBag["body"] = string.Format("Удалено письмо минипочты поставщика '{0}' от {1}. <br/> {2} <br/> Удалил: {3} <br/> Ip адрес: {4} <br/> Дата: {5}", mail.Supplier.Name, mail.LogTime, mailItem.To, SecurityContext.Administrator.Name, userAddress, DateTime.Now);
 			Template = "DeleteMiniMail";
 
 			return this;

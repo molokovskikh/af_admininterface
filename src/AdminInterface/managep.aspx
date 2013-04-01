@@ -10,7 +10,7 @@
 			</Scripts>
 		</asp:ScriptManager>
 
-		<link rel="stylesheet" href="../Assets/Stylesheets/themes/base/jquery-ui.css" type="text/css" />
+		<link rel="stylesheet" href="adm/Assets/Stylesheets/themes/base/jquery-ui.css" type="text/css" />
 
 		<script type="text/javascript">
 			$(function () {
