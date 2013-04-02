@@ -210,8 +210,7 @@ SELECT  RowId,
 		UpCost,
 		MinReq,
 		Enabled,
-		BaseCost,
-		(select CostCode from PricesCosts pc where pc.pricecode=prd.pricecode and pc.BaseCost=1) as BaseRCost
+		BaseCost
 FROM PricesRegionalData prd
 	JOIN Farm.Regions r ON prd.RegionCode = r.RegionCode
 WHERE PriceCode = ?PriceCode
@@ -329,11 +328,7 @@ delete from usersettings.pricescosts where costcode = ?costcode;";
 			var price = DbSession.QueryOver<Price>().Where(t => t.Id == priceId).SingleOrDefault();
 			baseCost.DataSource = price.Costs;
 			baseCost.DataBind();
-			if(((DataRowView)e.Row.DataItem)["BaseCost"] == DBNull.Value) {
-				baseCost.SelectedValue = ((DataRowView)e.Row.DataItem)["BaseRCost"].ToString();
-			}
-			else
-				baseCost.SelectedValue = ((DataRowView)e.Row.DataItem)["BaseCost"].ToString();
+			baseCost.SelectedValue = ((DataRowView)e.Row.DataItem)["BaseCost"].ToString();
 		}
 	}
 }
