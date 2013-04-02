@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
+using Common.Web.Ui.Models.Audit;
 using Integration.ForTesting;
 using NUnit.Framework;
 

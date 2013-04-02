@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models.Billing
 {

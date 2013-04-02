@@ -4,6 +4,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using Common.Web.Ui.Models.Audit;
 using NHibernate;
 using NHibernate.Linq;
 

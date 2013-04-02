@@ -274,6 +274,7 @@ namespace AdminInterface.Models
 
 		//public virtual RegionSettings[] RegionSettings { get; set; }
 		public virtual IList<int> RegionSettings { get; set; }
+		public virtual string EmailForCard { get; set; }
 
 		public virtual List<string> AvalilableAnalitFVersions
 		{

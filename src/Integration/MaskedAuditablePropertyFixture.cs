@@ -1,6 +1,7 @@
 ﻿using AdminInterface.Models;
 using AdminInterface.Models.Audit;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using NUnit.Framework;
 
 namespace Integration

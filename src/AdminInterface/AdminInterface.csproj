@@ -223,7 +223,6 @@
     <Compile Include="Initializers\Test.cs" />
     <Compile Include="Models\Audit\AuditListener.cs" />
     <Compile Include="Models\Audit\DiffAuditableProperty.cs" />
-    <Compile Include="Models\Audit\MaskedAuditableProperty.cs" />
     <Compile Include="Models\Billing\AddressAccount.cs" />
     <Compile Include="Models\Billing\BalanceSummary.cs" />
     <Compile Include="Helpers\BaseRemoteRequest.cs" />

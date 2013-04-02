@@ -16,24 +16,6 @@ using NHibernate;
 
 namespace AdminInterface.Models.Logs
 {
-	public enum LogObjectType
-	{
-		[Description("Поставщик")] Supplier,
-		[Description("Клиент")] Client,
-		[Description("Пользователь")] User,
-		[Description("Адрес")] Address,
-		[Description("Отчет")] Report,
-		[Description("Плательщик")] Payer
-	}
-
-	public enum LogMessageType
-	{
-		[Description("Пользовательское")] User,
-		[Description("Системное")] System,
-		[Description("Статистическое")] Stat,
-		[Description("Биллинг")] Payer
-	}
-
 	[ActiveRecord(Table = "clientsinfo", Schema = "logs")]
 	public class AuditRecord : ActiveRecordLinqBase<AuditRecord>, IUrlContributor, IAuditRecord
 	{

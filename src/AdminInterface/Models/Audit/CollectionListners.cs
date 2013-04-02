@@ -47,56 +47,15 @@ namespace AdminInterface.Models.Audit
 	}
 
 	[EventListener]
-	public class UpdateCollectionListner : IPostCollectionRemoveEventListener
+	public class UpdateCollectionListner : BaseUpdateCollectionListner
 	{
-		public void OnPostRemoveCollection(PostCollectionRemoveEvent @event)
+		public override void DoRecord(IEventSource session, object owner, string message)
 		{
-			var item = @event.AffectedOwnerOrNull;
-			if (item != null) {
-				var itemStringTypes = @event.Collection.Role.Split(new[] { '.' });
-				var propertyName = itemStringTypes.Last();
-				var auditables = item.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetCustomAttributes(typeof(Auditable), true);
-				if (auditables.Length > 0) {
-					IEnumerable<object> oldList = new List<object>();
-					IEnumerable<object> newList = new List<object>();
-					if (@event.Collection.StoredSnapshot != null)
-						oldList = ((IList<object>)@event.Collection.StoredSnapshot).ToList();
-					if (NHibernateUtil.IsInitialized(item)) {
-						var persistentBag = item.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetValue(item, null);
-						if (NHibernateUtil.IsInitialized(persistentBag))
-							newList = (IEnumerable<object>)persistentBag;
-					}
-
-					var name = ((Auditable)auditables[0]).Name;
-					var message = String.Format("$$$Изменено '{0}'", name);
-
-					BuildMessage(@event, message, newList, oldList);
-				}
-			}
-		}
-
-		public void BuildMessage(AbstractCollectionEvent @event, string message, IEnumerable<object> newList, IEnumerable<object> oldList)
-		{
-			var added = newList.Except(oldList).ToArray();
-			var removed = oldList.Except(newList).ToArray();
-
-			if (removed.Length > 0)
-				message += "</br> <b> Удалено </b>" + GetListString(removed);
-
-			if (added.Length > 0)
-				message += "</br> <b> Добавлено </b>" + GetListString(added);
-
-			if (removed.Length > 0 || added.Length > 0)
-				AuditListener.LoadData(@event.Session, () =>
-					@event.Session.Save(new AuditRecord(message, @event.AffectedOwnerOrNull) {
-						MessageType = LogMessageType.System,
-						IsHtml = true
-					}));
-		}
-
-		public static string GetListString(IEnumerable<object> item)
-		{
-			return item.Implode(a => string.Format("</br> {0}", ((dynamic)a).Name));
+			BaseAuditListener.LoadData(session, () =>
+				session.Save(new AuditRecord(message, owner) {
+					MessageType = LogMessageType.System,
+					IsHtml = true
+				}));
 		}
 	}
 }

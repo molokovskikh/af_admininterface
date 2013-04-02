@@ -31,6 +31,7 @@ using System.Web;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using System.Linq;
+using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
@@ -261,11 +262,11 @@ namespace AdminInterface.Controllers
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
 				(contacts.Any(contact => contact.Type == ContactType.Email));
 			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
-			if (sendClientCard && haveMails) {
+			if (sendClientCard && (haveMails || !string.IsNullOrEmpty(user.EmailForCard))) {
 				var contactEmails = contacts
 					.Where(c => c.Type == ContactType.Email)
 					.Implode(c => c.ContactText);
-				mails = String.Concat(contactEmails, ",", mails);
+				mails = String.Concat(contactEmails, ",", mails, ",", user.EmailForCard);
 				if (mails.EndsWith(","))
 					mails = mails.Remove(mails.Length - 1);
 				if (mails.StartsWith(","))

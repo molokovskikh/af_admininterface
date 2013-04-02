@@ -6,6 +6,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Tools;
+using Common.Web.Ui.Models.Audit;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
