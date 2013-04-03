@@ -1,4 +1,4 @@
-<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.managep" CodeBehind="managep.aspx.cs"
+	<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.managep" CodeBehind="managep.aspx.cs"
 	Theme="Main" MasterPageFile="~/Main.Master" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">

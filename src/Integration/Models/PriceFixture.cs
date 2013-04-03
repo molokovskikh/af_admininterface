@@ -72,6 +72,37 @@ namespace Integration.Models
 			CheckForceReplicationIsValue(supplier, false);
 		}
 
+		[Test]
+		public void Update_priec_cost_type()
+		{
+			var supplier = DataMother.CreateSupplier();
+			var price = supplier.Prices[0];
+			price.CostType = 0;
+			price.AddCost();
+			Save(supplier);
+			Assert.AreEqual(price.Costs[0].PriceItem, price.Costs[1].PriceItem);
+
+			session.CreateSQLQuery("call UpdateCostType(:priceId, :costType)")
+				.SetParameter("priceId", price.Id)
+				.SetParameter("costType", 1)
+				.ExecuteUpdate();
+
+			session.Clear();
+			price = session.Load<Price>(price.Id);
+			Assert.AreEqual(price.CostType, 1);
+			Assert.AreNotEqual(price.Costs[0].PriceItem, price.Costs[1].PriceItem);
+
+			session.CreateSQLQuery("call UpdateCostType(:priceId, :costType)")
+				.SetParameter("priceId", price.Id)
+				.SetParameter("costType", 0)
+				.ExecuteUpdate();
+
+			session.Clear();
+			price = session.Load<Price>(price.Id);
+			Assert.AreEqual(price.CostType, 0);
+			Assert.AreEqual(price.Costs[0].PriceItem, price.Costs[1].PriceItem);
+		}
+
 		private void CheckForceReplicationIsValue(Supplier supplier, bool value)
 		{
 			var info = session.CreateSQLQuery("select ForceReplication from Usersettings.AnalitfReplicationInfo where FirmCode = :SupplierId")
