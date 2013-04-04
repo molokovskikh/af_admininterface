@@ -74,7 +74,7 @@
 						Обновления:
 					</td>
 					<td class="statistic-header header-description" colspan=2>
-						в скобках указано количество уникальных клиентов
+						В скобках указано количество уникальных пользователей
 					</td>
 				</tr>
 				<tr>
@@ -268,7 +268,7 @@
 				<tr>
 					<td class="statistic-label">Загружено:</td>
 					<td class="statistic-value">
-						<abbr title="В скобках указано количество уникальных клиентов.">
+						<abbr title="В скобках указано количество уникальных пользователей.">
 							${CountDownloadedWaybills}/${CountDownloadedWaybilsByUser}/${CountDownloadedWaybilsByClient}/${CountDownloadedWaybilsBySupplier}
 						</abbr>
 					</td>
@@ -278,7 +278,7 @@
 				<tr>
 					<td class="statistic-label">Разобрано:</td>
 					<td class="statistic-value">
-						<abbr title="В скобках указано количество уникальных клиентов.">
+						<abbr title="В скобках указано количество уникальных пользователей.">
 							${CountParsedWaybills}/${CountParsedWaybillsByUser}/${CountParsedWaybillsByClient}/${CountParsedWaybillsBySupplier}
 						</abbr>
 					</td>
@@ -368,7 +368,7 @@
 				</tr>
 				<tr>
 					<td class="statistic-top-header" colspan=4>
-						В скобках указано количество уникальных клиентов.
+						В скобках указано количество уникальных пользователей.
 					</td>
 				</tr>
 			</table>
