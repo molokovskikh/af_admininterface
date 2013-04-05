@@ -55,6 +55,7 @@
 			"columns.css")}
 		<script>
 			$(function () {
+				window.siteroot = "${siteroot}";
 				$.ajaxPrefilter(function (options, originalOptions, jqXHR) {
 					var root = "${siteroot}";
 					var url = options.url;

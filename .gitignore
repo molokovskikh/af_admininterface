@@ -13,3 +13,4 @@ lib/Chrome.Printer/Debug
 lib/Chrome.Printer/Chrome.Printer/GeneratedFiles
 packages/
 *.Cache
+src/*.properties

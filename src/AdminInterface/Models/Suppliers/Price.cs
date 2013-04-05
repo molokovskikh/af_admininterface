@@ -93,11 +93,18 @@ namespace AdminInterface.Models.Suppliers
 			var cost = new Cost {
 				Price = this,
 				Name = "Базовая",
-				PriceItem = new PriceItem {
+			};
+
+			if (CostType == 0) {
+				cost.PriceItem = Costs.Select(c => c.PriceItem).FirstOrDefault();
+			}
+
+			if (cost.PriceItem == null) {
+				cost.PriceItem = new PriceItem {
 					FormRule = new FormRule(),
 					Source = new PriceSource()
-				}
-			};
+				};
+			}
 			cost.CostFormRule = new CostFormRule { Cost = cost, FieldName = "" };
 			Costs.Add(cost);
 			return cost;
