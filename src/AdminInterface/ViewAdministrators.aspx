@@ -8,7 +8,7 @@
 	<form id="form1" runat="server">
 		<div>
 			<h3>Пользователи офиса</h3>
-			<asp:GridView ID="Administrators" runat="server" AutoGenerateColumns="False" OnRowCommand="Administrators_RowCommand" CssClass="HighLightCurrentRow" DataKeyNames="ID">
+			<asp:GridView ID="Administrators" runat="server"  AllowSorting="True" OnSorting="SortRecords" AutoGenerateColumns="False" OnRowCommand="Administrators_RowCommand" CssClass="HighLightCurrentRow" DataKeyNames="ID">
 				<Columns>
 					<asp:TemplateField ShowHeader="False">
 						<HeaderTemplate>
@@ -27,14 +27,14 @@
 						</ItemTemplate>
 					</asp:TemplateField>					
 					<asp:BoundField DataField="Id" HeaderText="AdministratorID" Visible="False" />
-					<asp:BoundField DataField="ManagerName" HeaderText="ФИО" />
-					<asp:TemplateField HeaderText="Имя пользователя" SortExpression="Login">
+					<asp:BoundField DataField="ManagerName" HeaderText="ФИО" SortExpression="ManagerName"/>
+					<asp:TemplateField HeaderText="Имя пользователя" SortExpression="UserName">
 						<ItemTemplate>
 							<asp:LinkButton CommandArgument='<%# Bind("Id") %>' ID="LinkButton1" Text='<%# Bind("UserName") %>' runat="server" CommandName="Edit">LinkButton</asp:LinkButton>
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="Email" HeaderText="E-mail" SortExpression="Email" />
-					<asp:BoundField DataField="PhoneSupport" HeaderText="Телефон" SortExpression="Phone" />
+					<asp:BoundField DataField="PhoneSupport" HeaderText="Телефон" SortExpression="PhoneSupport" />
 				</Columns>
 			</asp:GridView>
 		</div>
