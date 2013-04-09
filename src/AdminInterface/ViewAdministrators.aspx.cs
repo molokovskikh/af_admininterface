@@ -13,6 +13,18 @@ public partial class ViewAdministrators : Page
 {
 	private IList<Permission> permissions;
 
+	public SortDirection SortDirection
+	{
+		get
+		{
+			if (ViewState["SortDirection"] == null) {
+				ViewState["SortDirection"] = SortDirection.Ascending;
+			}
+			return (SortDirection)ViewState["SortDirection"];
+		}
+		set { ViewState["SortDirection"] = value; }
+	}
+
 	protected void Page_Load(object sender, EventArgs e)
 	{
 		System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
@@ -23,9 +35,27 @@ public partial class ViewAdministrators : Page
 		if (IsPostBack)
 			return;
 
-		var administrators = Administrator.FindAll();
+		var administrators = Administrator.FindAll().OrderBy(a => a.ManagerName).ToList();
 		Administrators.DataSource = administrators;
 		DataBind();
+	}
+
+	protected void SortRecords(object sender, GridViewSortEventArgs e)
+	{
+		var sortExpression = e.SortExpression;
+		string direction;
+
+		if (SortDirection == SortDirection.Ascending) {
+			SortDirection = SortDirection.Descending;
+			direction = "descending";
+		}
+		else {
+			SortDirection = SortDirection.Ascending;
+			direction = "ascending";
+		}
+		var administrators = Administrator.FindAll().Sort(ref sortExpression, ref direction, "ManagerName").ToList();
+		Administrators.DataSource = administrators;
+		Administrators.DataBind();
 	}
 
 	protected void Administrators_RowCommand(object sender, GridViewCommandEventArgs e)
