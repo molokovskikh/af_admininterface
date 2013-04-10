@@ -12,7 +12,7 @@ namespace AdminInterface.Models
 		public static void MaintainIntersection(Supplier supplier, ISession session)
 		{
 			MaintainIntersection("AND s.Id = :supplierId",
-				q => q.SetParameter("supplierId", supplier.Id));
+				q => q.SetParameter("supplierId", supplier.Id), session);
 		}
 
 		public static void MaintainIntersection(Client client, LegalEntity legalEntity)

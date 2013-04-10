@@ -137,7 +137,7 @@ namespace Functional.Suppliers
 			browser.CheckBox("MainContentPlaceHolder_WorkRegionList_0").Checked = true;
 			Click("Применить");
 			session.Clear();
-			var savedPrice = session.Load<Price>(price.Id);
+			var savedPrice = session.Get<Price>(price.Id);
 			Assert.That(savedPrice.RegionalData.Count(d => d.Cost.Id == regionalData.Cost.Id), Is.EqualTo(2));
 		}
 

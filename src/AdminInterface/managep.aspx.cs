@@ -762,14 +762,11 @@ ORDER BY region;";
 			if (oldMaskRegion == newMaskRegion)
 				return;
 
-			supplier.RegionMask = newMaskRegion;
-			DbSession.Save(supplier);
-
 			var updateCommand = new MySqlCommand(
 				@"
-/*update customers.Suppliers s
+update customers.Suppliers s
 set RegionMask = ?MaskRegion
-where s.id = ?ClientCode;*/
+where s.id = ?ClientCode;
 
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;

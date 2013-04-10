@@ -78,11 +78,11 @@ namespace Integration.Models
 			intersection.SupplierDeliveryId = "d2";
 			Save(intersection);
 			Flush();
+			session.Clear();
 
-			var managen = new managep();
-			managen.DbSession = session;
+			var manage = new managep { DbSession = session };
 
-			var data = managen.GetData(supplier);
+			var data = manage.GetData(supplier);
 			var table = data.Tables["Prices"];
 			var row = table.NewRow();
 			row["BuyingMatrix"] = 0;
@@ -93,11 +93,9 @@ namespace Integration.Models
 			row["IsLocal"] = 0;
 			table.Rows.Add(row);
 			var message = "";
-			var manage = new managep();
-			manage.DbSession = session;
 			manage.Save(supplier, data, "", ref message);
 
-			session.Refresh(supplier);
+			supplier = session.Get<Supplier>(supplier.Id);
 			Assert.That(supplier.Prices.Count, Is.EqualTo(3));
 			intersection = session.Query<AddressIntersection>()
 				.First(a => a.Intersection.Price == price && a.Intersection.Client == client);
