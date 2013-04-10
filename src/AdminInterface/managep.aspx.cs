@@ -769,28 +769,26 @@ ORDER BY region;";
 
 		private void UpdateMaskRegion()
 		{
+			var oldMaskRegion = supplier.RegionMask;
+			var newMaskRegion = oldMaskRegion;
+			foreach (ListItem item in WorkRegionList.Items) {
+				if (item.Selected)
+					newMaskRegion |= Convert.ToUInt64(item.Value);
+				else
+					newMaskRegion &= ~Convert.ToUInt64(item.Value);
+			}
+			if (oldMaskRegion == newMaskRegion)
+				return;
+
 			using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
 				connection.Open();
-				var oldMaskRegion = supplier.RegionMask;
-				var newMaskRegion = oldMaskRegion;
-				foreach (ListItem item in WorkRegionList.Items) {
-					if (item.Selected)
-						newMaskRegion |= Convert.ToUInt64(item.Value);
-					else
-						newMaskRegion &= ~Convert.ToUInt64(item.Value);
-				}
-
-				if (oldMaskRegion == newMaskRegion)
-					return;
-
-				supplier.RegionMask = newMaskRegion;
-				ActiveRecordMediator.SaveAndFlush(supplier);
-				//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
-				SessionScope.Current.Commit();
 				var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
-
 				var updateCommand = new MySqlCommand(
 					@"
+update customers.Suppliers s
+set RegionMask = ?MaskRegion
+where s.id = ?ClientCode;
+
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
