@@ -441,7 +441,7 @@ namespace Functional.Drugstore
 		{
 			var supplier = DataMother.CreateSupplier();
 			MakeNameUniq(supplier);
-			Maintainer.MaintainIntersection(supplier);
+			Maintainer.MaintainIntersection(supplier, session);
 			Refresh();
 
 			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;

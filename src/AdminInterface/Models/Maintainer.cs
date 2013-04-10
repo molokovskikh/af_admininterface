@@ -9,7 +9,7 @@ namespace AdminInterface.Models
 {
 	public class Maintainer
 	{
-		public static void MaintainIntersection(Supplier supplier)
+		public static void MaintainIntersection(Supplier supplier, ISession session)
 		{
 			MaintainIntersection("AND s.Id = :supplierId",
 				q => q.SetParameter("supplierId", supplier.Id));
@@ -24,8 +24,12 @@ namespace AdminInterface.Models
 
 		public static void MaintainIntersection(string filter, Action<IQuery> prepare)
 		{
-			ArHelper.WithSession(s => {
-				var query = s.CreateSQLQuery(String.Format(@"
+			ArHelper.WithSession(s => MaintainIntersection(filter, prepare, s));
+		}
+
+		public static void MaintainIntersection(string filter, Action<IQuery> prepare, ISession session)
+		{
+			var query = session.CreateSQLQuery(String.Format(@"
 set @skip = 0;
 
 INSERT
@@ -76,9 +80,8 @@ WHERE i.Id IS NULL
 	{0}
 group by pd.pricecode, regions.regioncode, drugstore.Id, le.Id;
 ", filter));
-				prepare(query);
-				query.ExecuteUpdate();
-			});
+			prepare(query);
+			query.ExecuteUpdate();
 		}
 
 		public static void LegalEntityCreated(LegalEntity legalEntity)

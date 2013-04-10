@@ -146,7 +146,7 @@ namespace AdminInterface.Controllers
 				scope.Flush();
 
 				CreateSupplier(supplier);
-				Maintainer.MaintainIntersection(supplier);
+				Maintainer.MaintainIntersection(supplier, DbSession);
 
 				user.UpdateContacts(userContacts);
 				foreach (var person in userPersons)

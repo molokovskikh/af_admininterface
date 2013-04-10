@@ -79,7 +79,10 @@ namespace Integration.Models
 			Save(intersection);
 			Flush();
 
-			var data = managep.GetData(supplier);
+			var managen = new managep();
+			managen.DbSession = session;
+
+			var data = managen.GetData(supplier);
 			var table = data.Tables["Prices"];
 			var row = table.NewRow();
 			row["BuyingMatrix"] = 0;

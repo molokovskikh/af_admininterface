@@ -60,7 +60,7 @@ namespace AddUser
 			supplier = Supplier.Find(id);
 			HandlersLink.NavigateUrl = "~/SpecialHandlers/?supplierId=" + supplier.Id;
 			WaybillExcludeFiles.NavigateUrl = "~/Suppliers/WaybillExcludeFiles?supplierId=" + supplier.Id;
-			WaybillSourceSettings.NavigateUrl = "~/Suppliers/WaybillSourceSettings?supplierId="  + supplier.Id;
+			WaybillSourceSettings.NavigateUrl = "~/Suppliers/WaybillSourceSettings?supplierId=" + supplier.Id;
 
 			if (!IsPostBack)
 				LoadPageData();
@@ -147,7 +147,7 @@ where p.pricecode = :Code;")
 			OrderSendRules.DataSource = Data;
 		}
 
-		public static DataSet GetData(Supplier supplier)
+		public DataSet GetData(Supplier supplier)
 		{
 			var data = new DataSet();
 
@@ -231,42 +231,38 @@ where s.Id = ?ClientCode
 	  and s.RegionMask & ?AdminRegionMask & r.regioncode > 0
 order by r.Region;";
 
+			var dataAdapter = new MySqlDataAdapter(pricesCommandText, (MySqlConnection)DbSession.Connection);
+			dataAdapter.SelectCommand.Parameters.AddWithValue("?supplierId", supplier.Id);
+			dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
+			dataAdapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
+			dataAdapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", supplier.HomeRegion.Id);
 
-			With.Connection(
-				c => {
-					var dataAdapter = new MySqlDataAdapter(pricesCommandText, c);
-					dataAdapter.SelectCommand.Parameters.AddWithValue("?supplierId", supplier.Id);
-					dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
-					dataAdapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
-					dataAdapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", supplier.HomeRegion.Id);
+			dataAdapter.Fill(data, "Prices");
 
-					dataAdapter.Fill(data, "Prices");
+			dataAdapter.SelectCommand.CommandText = regionSettingsCommnadText;
+			dataAdapter.Fill(data, "RegionSettings");
 
-					dataAdapter.SelectCommand.CommandText = regionSettingsCommnadText;
-					dataAdapter.Fill(data, "RegionSettings");
+			dataAdapter.SelectCommand.CommandText = regionsCommandText;
+			dataAdapter.Fill(data, "Regions");
 
-					dataAdapter.SelectCommand.CommandText = regionsCommandText;
-					dataAdapter.Fill(data, "Regions");
+			dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
+			dataAdapter.Fill(data, "EnableRegions");
 
-					dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
-					dataAdapter.Fill(data, "EnableRegions");
+			dataAdapter.SelectCommand.CommandText = orderSendConfig;
+			dataAdapter.Fill(data, "OrderSendConfig");
 
-					dataAdapter.SelectCommand.CommandText = orderSendConfig;
-					dataAdapter.Fill(data, "OrderSendConfig");
+			dataAdapter.SelectCommand.CommandText = senders;
+			dataAdapter.Fill(data, "Senders");
 
-					dataAdapter.SelectCommand.CommandText = senders;
-					dataAdapter.Fill(data, "Senders");
+			dataAdapter.SelectCommand.CommandText = formaters;
+			dataAdapter.Fill(data, "Formaters");
 
-					dataAdapter.SelectCommand.CommandText = formaters;
-					dataAdapter.Fill(data, "Formaters");
-
-					dataAdapter.SelectCommand.CommandText = sendRuleRegions;
-					dataAdapter.Fill(data, "SenRuleRegions");
-					var row = data.Tables["SenRuleRegions"].NewRow();
-					row["RegionCode"] = DBNull.Value;
-					row["Region"] = "Любой регион";
-					data.Tables["SenRuleRegions"].Rows.InsertAt(row, 0);
-				});
+			dataAdapter.SelectCommand.CommandText = sendRuleRegions;
+			dataAdapter.Fill(data, "SenRuleRegions");
+			var row = data.Tables["SenRuleRegions"].NewRow();
+			row["RegionCode"] = DBNull.Value;
+			row["Region"] = "Любой регион";
+			data.Tables["SenRuleRegions"].Rows.InsertAt(row, 0);
 			return data;
 		}
 
@@ -308,11 +304,10 @@ order by r.Region;";
 					RegionValidationError.Visible = true;
 					return;
 				}
-
 				RegionValidationError.Visible = false;
 				ShowAllRegionsCheck.Checked = false;
 				UpdateHomeRegion();
-				UpdateMaskRegion();
+				UpdateMaskRegion((MySqlConnection)DbSession.Connection);
 				ProcessChanges();
 
 				var message = "";
@@ -506,10 +501,10 @@ WHERE RowId = ?Id;
 			var vipChangeFlag = false;
 			foreach (
 				var dataRow in modifiedIntersection.Where(dataRow => Convert.ToInt32(dataRow["PriceType"]) == (int)PriceType.Vip)) {
-				ActiveRecordLinqBase<Intersection>.Queryable.Where(i => i.Price.Id == Convert.ToUInt32(dataRow["PriceCode"])).ToList().ForEach(
+				DbSession.Query<Intersection>().Where(i => i.Price.Id == Convert.ToUInt32(dataRow["PriceCode"])).ToList().ForEach(
 					inter => {
 						inter.AvailableForClient = false;
-						ActiveRecordMediator.Save(inter);
+						DbSession.Save(inter);
 					});
 				vipChangeFlag = true;
 			}
@@ -517,36 +512,30 @@ WHERE RowId = ?Id;
 				message = "Все клиенты были отключены от VIP прайсов";
 			}
 
+			var connection = (MySqlConnection)DbSession.Connection;
 
-			With.Transaction((connection, transaction) => {
-				pricesDataAdapter.InsertCommand.Connection = connection;
-				pricesDataAdapter.InsertCommand.Transaction = transaction;
-				pricesDataAdapter.UpdateCommand.Connection = connection;
-				pricesDataAdapter.UpdateCommand.Transaction = transaction;
-				pricesDataAdapter.DeleteCommand.Connection = connection;
-				pricesDataAdapter.DeleteCommand.Transaction = transaction;
-				regionalSettingsDataAdapter.UpdateCommand.Transaction = transaction;
-				regionalSettingsDataAdapter.UpdateCommand.Connection = connection;
+			pricesDataAdapter.InsertCommand.Connection = connection;
+			pricesDataAdapter.UpdateCommand.Connection = connection;
+			pricesDataAdapter.DeleteCommand.Connection = connection;
+			regionalSettingsDataAdapter.UpdateCommand.Connection = connection;
 
-				pricesDataAdapter.Update(data.Tables["Prices"]);
-				regionalSettingsDataAdapter.Update(data.Tables["RegionSettings"]);
-				using (var scope = new ConnectionScope(connection, FlushAction.Never)) {
-					var currentSupplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(supplier.Id);
+			pricesDataAdapter.Update(data.Tables["Prices"]);
+			regionalSettingsDataAdapter.Update(data.Tables["RegionSettings"]);
+			var currentSupplier = DbSession.Get<Supplier>(supplier.Id);
 
-					BindRule(currentSupplier, data);
-					ActiveRecordMediator.Save(currentSupplier);
+			BindRule(currentSupplier, data);
+			DbSession.Save(currentSupplier);
 
-					if (updateIntersection) {
-						//нагрузка балансируется (один запрос может уйти в одну базу, другой в другую)
-						//если код ниже будет выполнен в другой транзакции то в той базе где он выполнится
-						//может еще не быть создаваемого прайса
+			if (updateIntersection) {
+				//нагрузка балансируется (один запрос может уйти в одну базу, другой в другую)
+				//если код ниже будет выполнен в другой транзакции то в той базе где он выполнится
+				//может еще не быть создаваемого прайса
 
-						//FlushAction.Never - что бы не автоматически не запускать транзакцию
-						var addedPriceId = currentSupplier.Prices.Max(p => p.Id);
-						Maintainer.MaintainIntersection(supplier);
-						ArHelper.WithSession(s => {
-							s.CreateSQLQuery(
-								@"
+				//FlushAction.Never - что бы не автоматически не запускать транзакцию
+				var addedPriceId = currentSupplier.Prices.Max(p => p.Id);
+				Maintainer.MaintainIntersection(supplier, DbSession);
+				DbSession.CreateSQLQuery(
+					@"
 DROP TEMPORARY TABLE IF EXISTS tmp;
 CREATE TEMPORARY TABLE tmp ENGINE MEMORY
 SELECT adr.Id, rootAdr.SupplierDeliveryId
@@ -570,14 +559,10 @@ where tmp.Id = adr.Id
 limit 1)
 WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.IntersectionId and ins.PriceId = :priceId
 );")
-								.SetParameter("priceId", addedPriceId)
-								.SetParameter("supplierId", supplier.Id)
-								.ExecuteUpdate();
-						});
-					}
-					scope.Flush();
-				}
-			});
+				 .SetParameter("priceId", addedPriceId)
+				 .SetParameter("supplierId", supplier.Id)
+				 .ExecuteUpdate();
+			}
 		}
 
 		private void BindRule(Supplier supplier, DataSet data)
@@ -637,8 +622,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 		public void CreateNewSpecialOrders(Supplier supplier, uint formaterId, string specialName, HandlerTypes handlerType)
 		{
 			var orderHandler = DbSession.Query<OrderHandler>().FirstOrDefault(t => t.Id == formaterId);
-			if(DbSession.Query<SpecialHandler>()
-				.FirstOrDefault(t => t.Supplier.Id == supplier.Id && t.Handler.Id == formaterId) == null
+			if (DbSession.Query<SpecialHandler>().FirstOrDefault(t => t.Supplier.Id == supplier.Id && t.Handler.Id == formaterId) == null
 				&& !OrderHandler.DefaultHandlerByType[handlerType].Contains(orderHandler.ClassName)) {
 				var handler = new SpecialHandler {
 					Supplier = supplier,
@@ -647,14 +631,12 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 				// задаем имя по умолчанию
 				var handlerName = specialName;
 				// проверяем свободно ли имя и если нет, то ищем свободное
-				if(DbSession.Query<SpecialHandler>()
-					.Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName) != 0) {
+				if (DbSession.Query<SpecialHandler>().Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName) != 0) {
 					handlerName += DateTime.Now.ToString("yyMMdd");
 				}
 				int i = 1;
 				string postfix = "";
-				while(DbSession.Query<SpecialHandler>()
-					.Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName + postfix) != 0) {
+				while (DbSession.Query<SpecialHandler>().Count(t => t.Supplier.Id == supplier.Id && t.Name.ToLower() == handlerName + postfix) != 0) {
 					postfix = "_" + i;
 					i++;
 				}
@@ -767,7 +749,7 @@ ORDER BY region;";
 			SetRegions();
 		}
 
-		private void UpdateMaskRegion()
+		private void UpdateMaskRegion(MySqlConnection connection)
 		{
 			var oldMaskRegion = supplier.RegionMask;
 			var newMaskRegion = oldMaskRegion;
@@ -780,14 +762,14 @@ ORDER BY region;";
 			if (oldMaskRegion == newMaskRegion)
 				return;
 
-			using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
-				connection.Open();
-				var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				var updateCommand = new MySqlCommand(
-					@"
-update customers.Suppliers s
+			supplier.RegionMask = newMaskRegion;
+			DbSession.Save(supplier);
+
+			var updateCommand = new MySqlCommand(
+				@"
+/*update customers.Suppliers s
 set RegionMask = ?MaskRegion
-where s.id = ?ClientCode;
+where s.id = ?ClientCode;*/
 
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
@@ -815,19 +797,17 @@ WHERE s.Id = ?ClientCode
 				AND prd.RegionCode = r.RegionCode
 		);
 ", connection);
-				updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
-				updateCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
-				updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-				updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				updateCommand.ExecuteNonQuery();
+			updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
+			updateCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
+			updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+			updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+			updateCommand.ExecuteNonQuery();
 
-				//описание см ст 430
-				using (new ConnectionScope(connection, FlushAction.Never)) {
-					ArHelper.WithSession(s => RegionalData.AddForSuppler(s, supplier));
-					Maintainer.MaintainIntersection(supplier);
-				}
-				transaction.Commit();
-			}
+			//описание см ст 430
+			//using (new ConnectionScope(connection, FlushAction.Never)) {
+			RegionalData.AddForSuppler(DbSession, supplier);
+			Maintainer.MaintainIntersection(supplier, DbSession);
+			//}
 		}
 
 		private void UpdateHomeRegion()
@@ -837,9 +817,9 @@ WHERE s.Id = ?ClientCode
 				return;
 
 			supplier.HomeRegion = Common.Web.Ui.Models.Region.Find(currentHomeRegion);
-			ActiveRecordMediator.SaveAndFlush(supplier);
+			DbSession.Save(supplier);
 			//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
-			SessionScope.Current.Commit();
+			//SessionScope.Current.Commit();
 		}
 
 		protected void RegionalSettingsGrid_RowCreated(object sender, GridViewRowEventArgs e)

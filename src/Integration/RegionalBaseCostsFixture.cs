@@ -44,7 +44,7 @@ namespace Integration
 			Save(price);
 			Flush();
 			// вставка в intersection
-			Maintainer.MaintainIntersection(supplier);
+			Maintainer.MaintainIntersection(supplier, session);
 			// проверяем, что все вставилось с правильной базовой ценой
 			var intersection = session.Query<Intersection>().Where(i => i.Price.Id == price.Id);
 			foreach (var intersectionItem in intersection) {
