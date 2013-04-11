@@ -414,7 +414,7 @@ WHERE   pricesdata.firmcode = s.Id
 					.ExecuteUpdate();
 			});
 
-			RegionalData.AddForSuppler(DbSession, supplier);
+			RegionalData.AddForSuppler(DbSession, supplier.Id, supplier.RegionMask);
 		}
 
 		private void CreateUser(User user, UserPermission[] permissions, Person[] persons)

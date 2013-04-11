@@ -445,15 +445,16 @@ where s.Id = :supplierId")
 		[Property(NotNull = true)]
 		public virtual string OperativeInfo { get; set; }
 
-		public static void AddForSuppler(ISession DbSession, Supplier supplier)
+		public static void AddForSuppler(ISession DbSession, uint supplierId, ulong newMask)
 		{
-			var supplierRegions = DbSession.Query<Region>().Where(r => (r.Id & supplier.RegionMask) > 0).ToList();
+			var supplier = DbSession.Get<Supplier>(supplierId);
+			var supplierRegions = DbSession.Query<Region>().Where(r => (r.Id & newMask) > 0).ToList();
 			var supplierRegionalData = DbSession.Query<RegionalData>().Where(r => r.Supplier == supplier).Select(r => r.Region).ToList();
 			var newRegions = supplierRegions.Where(n => !supplierRegionalData.Contains(n)).ToList();
 			foreach (var newRegion in newRegions) {
 				var regionalData = new RegionalData(newRegion, supplier);
 				DbSession.Save(regionalData);
-				DbSession.Flush();
+				//DbSession.Flush();
 				foreach (var value in Enum.GetValues(typeof(DayOfWeek))) {
 					var day = (DayOfWeek)value;
 					var reorderSchedule = new ReorderSchedule(regionalData, day);

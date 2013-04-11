@@ -399,13 +399,13 @@ INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 call UpdateCostType(@InsertedPriceCode, ?CostType);
 
 INSERT
-INTO    pricesregionaldata
-		(
-				regioncode,
-				pricecode,
-				enabled,
-				basecost
-		)
+INTO pricesregionaldata
+(
+	regioncode,
+	pricecode,
+	enabled,
+	basecost
+)
 SELECT  r.RegionCode,
 		p.PriceCode,
 		if(p.pricetype<>1, 1, 0),
@@ -491,8 +491,7 @@ WHERE RowId = ?Id;
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?Storage", MySqlDbType.Bit, 0, "Storage");
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "RowID");
 
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost",
-				host);
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", host);
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
 			var updateIntersection = data.Tables["Prices"].Rows.Cast<DataRow>().Any(r => r.RowState == DataRowState.Added);
@@ -762,6 +761,9 @@ ORDER BY region;";
 			if (oldMaskRegion == newMaskRegion)
 				return;
 
+			supplier.RegionMask = newMaskRegion;
+			DbSession.Save(supplier);
+
 			var updateCommand = new MySqlCommand(
 				@"
 update customers.Suppliers s
@@ -771,14 +773,14 @@ where s.id = ?ClientCode;
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
-INSERT 
-INTO    pricesregionaldata
-		(
-				regioncode,
-				pricecode,
-				enabled,
-				basecost
-		)
+INSERT
+INTO pricesregionaldata
+(
+	regioncode,
+	pricecode,
+	enabled,
+	basecost
+)
 SELECT  r.RegionCode,
 		p.PriceCode,
 		if(p.pricetype<>1, 1, 0),
@@ -801,10 +803,8 @@ WHERE s.Id = ?ClientCode
 			updateCommand.ExecuteNonQuery();
 
 			//описание см ст 430
-			//using (new ConnectionScope(connection, FlushAction.Never)) {
-			RegionalData.AddForSuppler(DbSession, supplier);
+			RegionalData.AddForSuppler(DbSession, supplier.Id, newMaskRegion);
 			Maintainer.MaintainIntersection(supplier, DbSession);
-			//}
 		}
 
 		private void UpdateHomeRegion()
