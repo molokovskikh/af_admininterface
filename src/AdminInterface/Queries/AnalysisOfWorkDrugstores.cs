@@ -88,16 +88,16 @@ namespace AdminInterface.ManagerReportsFilters
 		public int CurWeekObn { get; set; }
 		public int LastWeekObn { get; set; }
 
-		[Display(Name = "Обновления (Новый/Старый)", Order = 5)]
+		[Display(Name = "Обновления (Старый/Новый)", Order = 5)]
 		public string Obn
 		{
-			get { return string.Format("{0}/{1}", CurWeekObn, LastWeekObn); }
+			get { return string.Format("{0}/{1}", LastWeekObn, CurWeekObn); }
 		}
 
 		public int CurWeekZak { get; set; }
 		public int LastWeekZak { get; set; }
 
-		[Display(Name = "Заказы (Новый/Старый)", Order = 7)]
+		[Display(Name = "Заказы (Старый/Новый)", Order = 7)]
 		public string Zak
 		{
 			get { return string.Format("{0}/{1}", LastWeekZak.ToString("C"), CurWeekZak.ToString("C")); }
