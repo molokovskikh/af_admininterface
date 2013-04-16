@@ -226,7 +226,7 @@ namespace AdminInterface.Controllers
 			}
 			else {
 				user.WorkRegionMask = BitConverter.ToUInt64(user.RegionSettings.Select(r => Convert.ToByte(r)).ToArray(), 0);
-				mails = user.GetAddressForSendingClientCard();
+				mails = user.EmailForCard;
 			}
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 			DbSession.Save(passwordChangeLog);
@@ -266,7 +266,7 @@ namespace AdminInterface.Controllers
 				var contactEmails = contacts
 					.Where(c => c.Type == ContactType.Email)
 					.Implode(c => c.ContactText);
-				mails = String.Concat(contactEmails, ",", mails, ",", user.EmailForCard);
+				mails = String.Concat(contactEmails, ",", mails);
 				if (mails.EndsWith(","))
 					mails = mails.Remove(mails.Length - 1);
 				if (mails.StartsWith(","))
