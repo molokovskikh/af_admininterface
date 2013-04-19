@@ -1,4 +1,6 @@
-﻿<%
+﻿${app.Asset("RegisterPayer.js")}
+
+<%
 def WriteInputGroupHeader(localHeader as string) as string:
 %>
 	<tr>
@@ -22,64 +24,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	<%
 end
 %>
-
-<script>
-	document.observe("dom:loaded", function() {
-		
-		if ($('PaymentOptions_WorkForFree') != null)
-		{
-			$('PaymentOptions_WorkForFree').observe("change", function() {
-				
-				if (checkBox.checked)
-				{
-					$('CalendarInputField0').disable();
-					$('PaymentOptions_Comment').disable();
-				}
-				else
-				{
-					$('CalendarInputField0').enable();
-					$('PaymentOptions_Comment').enable();
-				}
-			});
-		}
-	
-		Validation.add("CommentValidator", "Клиент слишком долго работает бесплатно, нужно указать причину", function(v){
-		
-			var checkBox = $('PaymentOptions_WorkForFree');
-			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
-				return true;
-				
-			if (!$("PaymentOptions_Comment").empty())
-				return true;
-			
-			var maxFreeWorkWithoutMessage = Date.today().add(45).days();
-			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
-			return paymentPeriodBeginDate < maxFreeWorkWithoutMessage;
-		});
-		
-		Validation.add("CheckDate", "Не корректная дата", function(v){
-		
-			var checkBox = $('PaymentOptions_WorkForFree');
-			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
-				return true;
-		
-			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
-			return paymentPeriodBeginDate != null;
-		});
-		
-		Validation.add("DateInFuture", "Дата начала платного периода меньше текущей", function(v){
-		
-			var checkBox = $('PaymentOptions_WorkForFree');
-			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
-				return true;
-		
-			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
-			return paymentPeriodBeginDate >= Date.today();
-		});
-
-		new Validation("PayerInfo");
-	});
-</script>
 
 <% component Bubble, {"bredcrumbs" : [("Регистрация плательщика", "")]} %>
 <% component CaptureFor, {"id" : "Title"}:%>
