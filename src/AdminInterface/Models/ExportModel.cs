@@ -11,12 +11,12 @@ using System.Security.AccessControl;
 using System.Web;
 using AdminInterface.Controllers;
 using AdminInterface.Controllers.Filters;
-using AdminInterface.Helpers;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models.Telephony;
 using AdminInterface.Queries;
 using Castle.Components.DictionaryAdapter;
 using Common.Web.Ui.ActiveRecordExtentions;
+using Common.Web.Ui.Excel;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
@@ -29,6 +29,7 @@ using NPOI.HSSF.Util;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using BorderStyle = NPOI.SS.UserModel.BorderStyle;
+using ExcelHelper = AdminInterface.Helpers.ExcelHelper;
 using HorizontalAlignment = NPOI.SS.UserModel.HorizontalAlignment;
 
 namespace AdminInterface.Models

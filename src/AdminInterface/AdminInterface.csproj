@@ -173,7 +173,6 @@
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
-    <Compile Include="Helpers\NPOIExcelHelper.cs" />
     <Compile Include="Models\Core.cs" />
     <Compile Include="Models\Markup.cs" />
     <Compile Include="Models\ProducerSynonym.cs" />
@@ -467,6 +466,7 @@
     <Content Include="Assets\Javascripts\payer.send.message.coffee" />
     <Content Include="Assets\Javascripts\Payments.js" />
     <Content Include="Assets\Javascripts\Regions.js" />
+    <Content Include="Assets\Javascripts\RegisterPayer.js" />
     <Content Include="Assets\Javascripts\registration.js" />
     <Content Include="Assets\Javascripts\request.coffee" />
     <Content Include="Assets\Javascripts\table.editor.js" />
@@ -786,6 +786,10 @@
     <ProjectReference Include="..\Common.Tools\Common.Tools\Common.Tools.csproj">
       <Project>{72AFCFE8-C9E9-45FA-9698-BEE896A517A3}</Project>
       <Name>Common.Tools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.Web.UI\Common.Web.Ui.Excel\Common.Web.Ui.Excel.csproj">
+      <Project>{d6853570-4238-430a-adfe-3caace172954}</Project>
+      <Name>Common.Web.Ui.Excel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Common.Web.Ui\Common.Web.Ui\Common.Web.Ui.csproj">
       <Project>{95E2C313-46FA-4B4B-9EFF-3228662908F4}</Project>
