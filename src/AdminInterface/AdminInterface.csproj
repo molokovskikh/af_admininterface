@@ -278,7 +278,6 @@
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Extentions\EnumExtentions.cs" />
     <Compile Include="Helpers\AppHelper.cs" />
-    <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\Extentions.cs" />
     <!--todo: исправить реакцию stylecop на фигурные скобки в лямбда-выражениях-->
     <Compile Include="Helpers\RemoteServiceHelper.cs">

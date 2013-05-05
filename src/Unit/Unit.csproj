@@ -84,7 +84,6 @@
     <Compile Include="Data.cs" />
     <Compile Include="DataBinderFixture.cs" />
     <Compile Include="DiffFixture.cs" />
-    <Compile Include="EmailHelperFixture.cs" />
     <Compile Include="Extentions\EnumExtentionsFixtre.cs" />
     <Compile Include="Extentions\SortExtentionsFixture.cs" />
     <Compile Include="FixutreSetup.cs" />

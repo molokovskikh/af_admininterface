@@ -5,6 +5,7 @@ using System.Net.Mail;
 using AddUser;
 using AdminInterface.Models;
 using AdminInterface.Properties;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Microsoft.Reporting.WinForms;
 
