@@ -140,21 +140,18 @@ namespace AdminInterface.Controllers
 			}).Where(p => p != null).ToList();
 
 			if (Directory.Exists(Config.ErrorFilesPath)) {
-				var errorsItems = Directory.GetFiles(Config.ErrorFilesPath).Select(f => new { name = Path.GetFileNameWithoutExtension(f), time = File.GetCreationTime(f), file = f }).ToDictionary(k => ParseId(k.name));
-				var itemIds = errorsItems.Select(e => e.Key).ToList();
+				var errorsItems = Directory.GetFiles(Config.ErrorFilesPath).Select(f => new { name = Path.GetFileNameWithoutExtension(f), time = File.GetCreationTime(f), file = f, priceItemId = ParseId(Path.GetFileNameWithoutExtension(f)) });
+				var itemIds = errorsItems.Select(e => e.priceItemId).ToList();
 				var errorPrices = DbSession.Query<Cost>().Where(p => itemIds.Contains(p.PriceItem.Id)).Select(p => p.Price).Distinct().ToList();
-				result.AddRange(errorPrices.Select(e => {
-					DateTime? time = null;
-					var file = string.Empty;
-					foreach (var cost in e.Costs) {
-						if (itemIds.Contains(cost.PriceItem.Id)) {
-							time = errorsItems[cost.PriceItem.Id].time;
-							file = errorsItems[cost.PriceItem.Id].file;
-						}
-					}
-					return new InboundPriceItems(false, e, file, time, 0, false) { Error = true };
+				result.AddRange(errorsItems.Select(e => {
+					var price = errorPrices.FirstOrDefault(p => p.Costs.Select(c => c.PriceItem.Id).Contains(e.priceItemId));
+					if (price != null)
+						return new InboundPriceItems(false, price, e.file, e.time, 0, false) { Error = true };
+					return null;
 				}));
 			}
+
+			result = result.Where(r => r != null).ToList();
 
 			var sortable = new Sortable();
 			BindObjectInstance(sortable, "filter");
