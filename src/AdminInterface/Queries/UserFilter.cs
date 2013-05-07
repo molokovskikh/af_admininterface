@@ -15,6 +15,7 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
+using NHibernate.Linq;
 
 namespace AdminInterface.Queries
 {
@@ -95,6 +96,8 @@ namespace AdminInterface.Queries
 			var administrator = SecurityContext.Administrator;
 			var orderFilter = String.Format("ORDER BY {0} {1}", GetSortProperty(), GetSortDirection());
 			var filter = String.Empty;
+			var oldSearchText = SearchText;
+			SearchText = MiniMailPrepare();
 			filter = AddFilterCriteria(filter, GetFilterBy());
 			filter = AddFilterCriteria(filter, GetTypeFilter(ClientType));
 			filter = AddFilterCriteria(filter, GetStatusFilter(SearchStatus));
@@ -203,7 +206,44 @@ u.Id in ({1})
 					result = bufResult;
 				}
 			}
+			SearchText = oldSearchText;
 			return result;
+		}
+
+		private string MiniMailPrepare()
+		{
+			if (SearchText.EndsWith("@docs.analit.net")) {
+				var addressIdStr = SearchText.Substring(0, SearchText.Length - "@docs.analit.net".Length);
+				uint addressId;
+				if (uint.TryParse(addressIdStr, out addressId)) {
+					var address = session.Get<Address>(addressId);
+					if (address != null) {
+						SearchBy = SearchUserBy.ByClientId;
+						ClientType = SearchClientType.Drugstore;
+						return address.Client.Id.ToString();
+					}
+				}
+				else {
+					var region = session.Query<Region>().FirstOrDefault(r => r.ShortAliase == addressIdStr);
+					if (region != null) {
+						Region = region;
+						SearchBy = SearchUserBy.Auto;
+						ClientType = SearchClientType.All;
+						SearchStatus = SearchClientStatus.All;
+						return string.Empty;
+					}
+				}
+			}
+			else if (SearchText.EndsWith("@client.docs.analit.net")) {
+				var clientIdStr = SearchText.Substring(0, SearchText.Length - "@client.docs.analit.net".Length);
+				uint clientId;
+				if (uint.TryParse(clientIdStr, out clientId)) {
+					SearchBy = SearchUserBy.ByClientId;
+					ClientType = SearchClientType.Drugstore;
+					return clientId.ToString();
+				}
+			}
+			return SearchText;
 		}
 
 		private static string AddFilterCriteria(string filter, string criteria)

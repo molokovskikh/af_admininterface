@@ -59,6 +59,39 @@ namespace Integration.Models
 		}
 
 		[Test]
+		public void ForMiniMailAddressTest()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			session.SaveOrUpdate(client);
+			var searchString = client.Addresses[0].Id + "@docs.analit.net";
+			filter.SearchText = searchString;
+			var result = filter.Find();
+			Assert.That(result.Count, Is.EqualTo(1));
+		}
+
+		[Test]
+		public void ForMiniMailRegionTest()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			session.SaveOrUpdate(client);
+			var searchString = client.HomeRegion.ShortAliase + "@docs.analit.net";
+			filter.SearchText = searchString;
+			var result = filter.Find();
+			Assert.That(result.Count, Is.GreaterThanOrEqualTo(1));
+		}
+
+		[Test]
+		public void ForMiniMailClientTest()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			session.SaveOrUpdate(client);
+			var searchString = client.Id + "@client.docs.analit.net";
+			filter.SearchText = searchString;
+			var result = filter.Find();
+			Assert.That(result.Count, Is.EqualTo(1));
+		}
+
+		[Test]
 		public void Search_by_address_mail()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
