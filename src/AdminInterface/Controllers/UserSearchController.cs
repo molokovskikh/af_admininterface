@@ -33,18 +33,6 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 				var result = filter.Find();
 				PropertyBag["SearchResults"] = result;
-				AutoOpen(result);
-			}
-		}
-
-		public void AutoOpen(IList<UserSearchItem> result)
-		{
-			if (result.Count == 1) {
-				var item = result.First();
-				if (item.ClientType == SearchClientType.Supplier)
-					RedirectUsingRoute("suppliers", "show", new { id = item.ClientId });
-				else
-					RedirectUsingRoute("users", "edit", new { id = item.UserId });
 			}
 		}
 	}

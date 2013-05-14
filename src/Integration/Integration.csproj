@@ -123,7 +123,6 @@
     <Compile Include="Controllers\PaymentsControllerFixture.cs" />
     <Compile Include="Controllers\RevisionActControllerFixture.cs" />
     <Compile Include="Controllers\SupplierControllerFixture.cs" />
-    <Compile Include="Controllers\UserSearchControllerFixture.cs" />
     <Compile Include="DocumentBuildFilterFixture.cs" />
     <Compile Include="FormPositionFilterFixture.cs" />
     <Compile Include="ForTesting\ModelExtension.cs" />
