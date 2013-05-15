@@ -45,7 +45,6 @@ namespace Functional.Suppliers
 			Flush();
 
 			Open("managep.aspx?cc=" + supplier.Id);
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			Click("Удалить");
 			Click("Применить");
 			Close();
