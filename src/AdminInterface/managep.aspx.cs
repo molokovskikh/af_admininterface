@@ -356,7 +356,7 @@ where id in (select pc.priceItemId from usersettings.pricescosts pc
 where pc.PriceCode = ?PriceCode);
 
 set @maxReplacePrice = (SELECT max(pd.PriceCode) FROM usersettings.pricesdata p
-join usersettings.pricesdata pd on pd.FirmCode = p.Firmcode and pd.PriceCode <> ?PriceCode and (p.RegionMask & pd.RegionMask) > 0
+join usersettings.pricesdata pd on pd.FirmCode = p.Firmcode and pd.PriceCode <> ?PriceCode
 and pd.enabled and pd.agencyenabled
 where p.pricecode = ?PriceCode
 and exists(

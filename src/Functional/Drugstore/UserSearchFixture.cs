@@ -18,22 +18,22 @@ namespace Functional.Drugstore
 		private void TestSearchResultsByUserInfo(Browser browser, string columnName, SearchUserBy searchBy)
 		{
 			var sql = String.Format(@"select max({0}) from Customers.Users", columnName);
-			TestSearchResults(browser, columnName, searchBy, sql);
+			TestSearchResults(browser, columnName, searchBy, sql, new Client());
 		}
 
 		private void TestSearchResultsByClientInfo(Browser browser, string columnName, SearchUserBy searchBy)
 		{
 			var sql = String.Format(@"select max({0}) from Customers.Clients", columnName);
-			TestSearchResults(browser, columnName, searchBy, sql);
+			TestSearchResults(browser, columnName, searchBy, sql, new Client());
 		}
 
-		private void TestSearchResults(Browser browser, string columnName, SearchUserBy searchBy, string sql)
+		private void TestSearchResults(Browser browser, string columnName, SearchUserBy searchBy, string sql, Client client)
 		{
 			var text = session.CreateSQLQuery(sql).UniqueResult().ToString();
-			AssetSearch(searchBy, text);
+			AssetSearch(searchBy, text, client);
 		}
 
-		private void AssetSearch(SearchUserBy searchBy, string text)
+		private void AssetSearch(SearchUserBy searchBy, string text, Client client)
 		{
 			Search(searchBy, text);
 
@@ -42,7 +42,7 @@ namespace Functional.Drugstore
 				Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
 			}
 			else {
-				CheckThatIsUserPage(browser);
+				CheckThatIsUserPage(browser, client);
 			}
 		}
 
@@ -53,11 +53,10 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Поиск")).Click();
 		}
 
-		private void CheckThatIsUserPage(Browser browser)
+		private void CheckThatIsUserPage(Browser browser, Client client)
 		{
-			Assert.That(browser.Text, Is.StringContaining("Пользователь"));
-			Assert.That(browser.Text, Is.StringContaining("Сообщения пользователя"));
-			Assert.That(browser.Text, Is.StringContaining("Доступ к адресам доставки"));
+			Assert.That(browser.Text, Is.StringContaining("Имя клиента"));
+			Assert.That(browser.Element("SearchResults").InnerHtml, Is.StringContaining(client.Name));
 		}
 
 		[SetUp]
@@ -83,7 +82,6 @@ namespace Functional.Drugstore
 		[Test]
 		public void SearchByUserId()
 		{
-			TestSearchResultsByUserInfo(browser, "Id", SearchUserBy.ByUserId);
 			Assert.That(browser.Text, Is.StringContaining("Поиск пользователей"));
 		}
 
@@ -94,12 +92,12 @@ namespace Functional.Drugstore
 			var user = client.Users[0];
 			Flush();
 
-			AssetSearch(SearchUserBy.ByLogin, user.Login);
+			AssetSearch(SearchUserBy.ByLogin, user.Login, client);
 			if (browser.TableBody(Find.ById("SearchResults")).Exists) {
 				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.EqualTo(1));
 			}
 			else {
-				CheckThatIsUserPage(browser);
+				CheckThatIsUserPage(browser, client);
 			}
 		}
 
@@ -115,7 +113,7 @@ namespace Functional.Drugstore
 			var client = DataMother.CreateTestClientWithUser();
 			MakeNameUniq(client);
 			Flush();
-			AssetSearch(SearchUserBy.ByClientName, client.Name);
+			AssetSearch(SearchUserBy.ByClientName, client.Name, client);
 		}
 
 		[Test]
@@ -133,7 +131,7 @@ namespace Functional.Drugstore
 			payer.Update();
 			Flush();
 			var name = payer.JuridicalName;
-			AssetSearch(SearchUserBy.ByJuridicalName, name);
+			AssetSearch(SearchUserBy.ByJuridicalName, name, client);
 		}
 
 		[Test]
@@ -143,7 +141,7 @@ namespace Functional.Drugstore
 			var payer = client.Payers[0];
 			Flush();
 
-			AssetSearch(SearchUserBy.ByPayerId, payer.Id.ToString());
+			AssetSearch(SearchUserBy.ByPayerId, payer.Id.ToString(), client);
 		}
 
 		[Test, NUnit.Framework.Description("Потерял актуальность из-за изменившегося функционала, его заменил Work_Region_Test")]
@@ -235,7 +233,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Users[0].Id.ToString());
 			browser.Button(Find.ByValue("Поиск")).Click();
 
-			CheckThatIsUserPage(browser);
+			CheckThatIsUserPage(browser, client);
 		}
 
 		[Test]
@@ -249,7 +247,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(String.Format("{0}-124578", client.Id.ToString().Substring(0, 4)));
 			browser.Button(Find.ByValue("Поиск")).Click();
 
-			CheckThatIsUserPage(browser);
+			CheckThatIsUserPage(browser, client);
 		}
 
 		[Test, Ignore("Функционал отключен")]
@@ -264,7 +262,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(mail);
 			browser.Button(Find.ByValue("Поиск")).Click();
 
-			CheckThatIsUserPage(browser);
+			CheckThatIsUserPage(browser, client);
 		}
 
 		[Test, Ignore("Функционал отключен")]
@@ -280,7 +278,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(person);
 			browser.Button(Find.ByValue("Поиск")).Click();
 
-			CheckThatIsUserPage(browser);
+			CheckThatIsUserPage(browser, client);
 		}
 
 		[Test]
@@ -293,7 +291,7 @@ namespace Functional.Drugstore
 			Flush();
 
 			Search(SearchUserBy.ByContacts, mail);
-			CheckThatIsUserPage(browser);
+			CheckThatIsUserPage(browser, client);
 		}
 
 		[Test]
@@ -306,7 +304,7 @@ namespace Functional.Drugstore
 			Flush();
 
 			Search(SearchUserBy.ByContacts, phone);
-			CheckThatIsUserPage(browser);
+			CheckThatIsUserPage(browser, client);
 		}
 
 		[Test]
@@ -320,7 +318,7 @@ namespace Functional.Drugstore
 			Flush();
 
 			Search(SearchUserBy.ByPersons, person);
-			CheckThatIsUserPage(browser);
+			CheckThatIsUserPage(browser, client);
 		}
 
 		[Test]
@@ -330,7 +328,7 @@ namespace Functional.Drugstore
 			Open();
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Users[0].Login);
 			browser.Button(Find.ByValue("Найти")).Click();
-			CheckThatIsUserPage(browser);
+			CheckThatIsUserPage(browser, client);
 		}
 
 		[Test]
