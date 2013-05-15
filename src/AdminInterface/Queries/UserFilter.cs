@@ -212,6 +212,8 @@ u.Id in ({1})
 
 		private string MiniMailPrepare()
 		{
+			if (string.IsNullOrEmpty(SearchText))
+				return SearchText;
 			if (SearchText.EndsWith("@docs.analit.net")) {
 				var addressIdStr = SearchText.Substring(0, SearchText.Length - "@docs.analit.net".Length);
 				uint addressId;
