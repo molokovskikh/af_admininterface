@@ -7,6 +7,7 @@ using AdminInterface.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using AdminInterface.Models.Logs;
 using AdminInterface.Security;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
@@ -50,11 +51,20 @@ namespace AdminInterface.Helpers
 		public DateTime? LastLogOnDate;
 		public DateTime? BadPasswordDate;
 		public DateTime? LastPasswordChange;
+		public AuthorizationLogEntity Logs;
 
 		public void CalculateLastLogon(DateTime? value)
 		{
 			if (value.GetValueOrDefault() > LastLogOnDate.GetValueOrDefault())
 				LastLogOnDate = value;
+			if (Logs != null && LastLogOnDate != null) {
+				if (!(LastLogOnDate > Logs.AFTime &&
+					LastLogOnDate > Logs.CITime &&
+					LastLogOnDate > Logs.AOLTime &&
+					LastLogOnDate > Logs.IOLTime)) {
+					LastLogOnDate = null;
+				}
+			}
 		}
 	}
 
@@ -285,7 +295,8 @@ namespace AdminInterface.Helpers
 		{
 			var login = user.Login;
 			var result = new ADUserInformation {
-				LastLogOnDate = user.Logs.LastLogon
+				LastLogOnDate = user.Logs.LastLogon,
+				Logs = user.Logs
 			};
 			try {
 				result.Login = login;

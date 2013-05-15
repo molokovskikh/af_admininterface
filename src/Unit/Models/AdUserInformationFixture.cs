@@ -1,5 +1,6 @@
 ﻿using System;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Logs;
 using NUnit.Framework;
 
 namespace Unit.Models
@@ -20,6 +21,28 @@ namespace Unit.Models
 
 			info.CalculateLastLogon(value.AddDays(1));
 			Assert.That(info.LastLogOnDate, Is.EqualTo(value.AddDays(1)));
+		}
+
+		[Test]
+		public void CalculateLastLogonIfLogsNotNull()
+		{
+			var dtOld = DateTime.Now.AddHours(-1);
+			var logs = new AuthorizationLogEntity {
+				AFTime = dtOld,
+				CITime = dtOld,
+				AOLTime = dtOld,
+				IOLTime = dtOld
+			};
+			var info = new ADUserInformation { Logs = logs };
+			var value = DateTime.Now;
+
+			info.CalculateLastLogon(value);
+			Assert.That(info.LastLogOnDate, Is.EqualTo(value));
+
+			info.Logs.AFTime = DateTime.Now.AddHours(1);
+
+			info.CalculateLastLogon(value);
+			Assert.That(info.LastLogOnDate, Is.EqualTo(null));
 		}
 	}
 }
