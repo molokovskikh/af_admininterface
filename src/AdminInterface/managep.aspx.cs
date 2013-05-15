@@ -80,7 +80,9 @@ namespace AddUser
 
 			var havePriceReplace = HavePriceReplace(code);
 
-			return !isParentSynonim && !haveOrders && havePriceReplace;
+			var regionFlag = HavePriceInThisRgionMask(code);
+
+			return !isParentSynonim && !haveOrders && havePriceReplace && regionFlag;
 		}
 
 		public string GetNoDeleteReason(object priceCode)
@@ -97,7 +99,9 @@ namespace AddUser
 			if (HaveOrders(code))
 				reason += "Существуют заказы. ";
 			if (!HavePriceReplace(code))
-				reason += "Нет подходящей замены для обновления ordersOld.";
+				reason += "Нет подходящей замены для обновления ordersOld. ";
+			if (!HavePriceInThisRgionMask(code))
+				reason += "Нет прайса в регионах работы данного прайса для замены.";
 
 			return reason;
 		}
@@ -105,6 +109,14 @@ namespace AddUser
 		private bool IsParentSynonym(uint priceCode)
 		{
 			return DbSession.Query<Price>().Any(p => p.ParentSynonym.Id == priceCode);
+		}
+
+		private bool HavePriceInThisRgionMask(uint priceCode)
+		{
+			var price = DbSession.Get<Price>(priceCode);
+			var priceRegions = price.RegionalData.Select(r => r.Region.Id);
+			var alternatePrices = price.Supplier.Prices.Count(p => p.Enabled && p.AgencyEnabled && p.RegionalData.Any(r => priceRegions.Contains(r.Region.Id)));
+			return alternatePrices > 0;
 		}
 
 		private bool HaveOrders(uint priceCode)
@@ -121,7 +133,7 @@ where PriceCode = :Code")
 			return DbSession.CreateSQLQuery(@"
 SELECT count(pd.PriceCode) as CountPrice FROM usersettings.pricesdata p
 join usersettings.pricesdata pd on pd.FirmCode = p.Firmcode and pd.PriceCode <> :Code
-and pd.enabled and pd. agencyenabled
+and pd.enabled and pd.agencyenabled
 where p.pricecode = :Code;")
 				.SetParameter("Code", priceCode)
 				.UniqueResult<long?>() > 0;
@@ -344,9 +356,15 @@ where id in (select pc.priceItemId from usersettings.pricescosts pc
 where pc.PriceCode = ?PriceCode);
 
 set @maxReplacePrice = (SELECT max(pd.PriceCode) FROM usersettings.pricesdata p
-join usersettings.pricesdata pd on pd.FirmCode = p.Firmcode and pd.PriceCode <> ?PriceCode
-and pd.enabled and pd. agencyenabled
-where p.pricecode = ?PriceCode);
+join usersettings.pricesdata pd on pd.FirmCode = p.Firmcode and pd.PriceCode <> ?PriceCode and (p.RegionMask & pd.RegionMask) > 0
+and pd.enabled and pd.agencyenabled
+where p.pricecode = ?PriceCode
+and exists(
+select pd1.pricecode from
+usersettings.pricesregionaldata pd1, usersettings.pricesregionaldata pd2
+where pd1.PriceCode = p.PriceCode
+and pd2.RegionCode = pd1.RegionCode and pd2.PriceCode = pd.PriceCode
+));
 
 update ordersold.ordershead o
 set priceCode = @maxReplacePrice
