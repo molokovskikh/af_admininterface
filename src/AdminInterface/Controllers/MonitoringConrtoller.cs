@@ -134,7 +134,7 @@ namespace AdminInterface.Controllers
 			var result = items.Select(i => {
 				if (prices.Keys.Contains((uint)i.PriceCode)) {
 					var price = prices[(uint)i.PriceCode];
-					return new InboundPriceItems(i.Downloaded, price, i.FilePath, i.FileTime, i.HashCode, i.FormalizedNow);
+					return new InboundPriceItems(i.Downloaded, price, i.FilePath, i.FileTime ?? i.CreateTime, i.HashCode, i.FormalizedNow);
 				}
 				return null;
 			}).Where(p => p != null).ToList();
