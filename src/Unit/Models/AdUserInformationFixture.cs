@@ -43,6 +43,14 @@ namespace Unit.Models
 
 			info.CalculateLastLogon(value);
 			Assert.That(info.LastLogOnDate, Is.EqualTo(null));
+
+			info.Logs.AFTime = null;
+			info.Logs.AOLTime = null;
+			info.Logs.IOLTime = null;
+			info.LastLogOnDate = null;
+
+			info.CalculateLastLogon(value);
+			Assert.That(info.LastLogOnDate, Is.EqualTo(value));
 		}
 	}
 }
