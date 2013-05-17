@@ -611,7 +611,6 @@
     <None Include="Views\SubViews\UserRegions.brail" />
     <Content Include="Views\Suppliers\WaybillExcludeFiles.brail" />
     <Content Include="Views\Suppliers\WaybillSourceSettings.brail" />
-    <None Include="Views\Templates\UnknownCalls.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>
