@@ -6,6 +6,7 @@ using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
 using AdminInterface.Models.Telephony;
+using WatiN.Core.Native.Windows;
 
 namespace Functional
 {
@@ -30,16 +31,17 @@ namespace Functional
 			Open(client.Users[0]);
 		}
 
-		[Test]
+		[Test, Ignore("Функционал отключен")]
 		public void Client_page_should_contains_not_detected_phones()
 		{
 			Assert.That(browser.Text, Is.StringContaining("Неопознанные звонки"));
 			Assert.That(GetUnknownPhones(browser), Is.EqualTo(new[] { "4732606000", "4732299224", "4732299223", "4732605000", "4732299222" }));
 		}
 
-		[Test]
+		[Test, Ignore("Функционал отключен")]
 		public void On_bind_click_call_must_move_to_known_phone_contact_group()
 		{
+			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			var row = browser.Table(Find.ById("UnknownPhones")).TableRows.First();
 			row.Button(Find.ByValue("Связать")).Click();
 
