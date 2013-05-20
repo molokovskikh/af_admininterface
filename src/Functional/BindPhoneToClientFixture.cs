@@ -41,7 +41,6 @@ namespace Functional
 		[Test, Ignore("Функционал отключен")]
 		public void On_bind_click_call_must_move_to_known_phone_contact_group()
 		{
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			var row = browser.Table(Find.ById("UnknownPhones")).TableRows.First();
 			row.Button(Find.ByValue("Связать")).Click();
 
