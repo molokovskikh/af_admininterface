@@ -56,7 +56,7 @@
 								</HeaderTemplate>
 								<ItemTemplate>
 									<asp:Button ID="DeleteButton" runat="server" Visible='<%# CanDelete(Eval("PriceCode")) %>' CommandName="Delete" Text="Удалить" />
-									<asp:HyperLink ID="ToolTip" CssClass="ToolTip" title='<%# GetNoDeleteReason(Eval("PriceCode")) %>' runat="server" Visible='<%# !CanDelete(Eval("PriceCode")) %>' Text='Запрещено' NavigateUrl='#' />
+									<asp:HyperLink ID="ToolTip" CssClass="ToolTip" title='<%# GetNoDeleteReason(Eval("PriceCode")) %>' runat="server" Visible='<%# !CanDelete(Eval("PriceCode")) %>' Text='Запрет удалять' NavigateUrl='#' />
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField>
