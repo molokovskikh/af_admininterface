@@ -210,6 +210,9 @@ namespace AdminInterface.Models.Suppliers
 
 		[BelongsTo("SourceId", Cascade = CascadeEnum.All, NotFoundBehaviour = NotFoundBehaviour.Ignore)]
 		public virtual PriceSource Source { get; set; }
+
+		[HasMany]
+		public virtual IList<DownloadLog> DownloadLogs { get; set; }
 	}
 
 	[ActiveRecord("Sources", Schema = "Farm", Lazy = true)]
@@ -224,6 +227,34 @@ namespace AdminInterface.Models.Suppliers
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
+	}
+
+	[ActiveRecord("downlogs", Schema = "logs")]
+	public class DownloadLog
+	{
+		[PrimaryKey("RowId")]
+		public virtual uint Id { get; set; }
+
+		[Property]
+		public virtual DateTime LogTime { get; set; }
+
+		[BelongsTo("PriceItemId")]
+		public virtual PriceItem PriceItem { get; set; }
+
+		[Property]
+		public virtual string Host { get; set; }
+
+		[Property]
+		public virtual string Addition { get; set; }
+
+		[Property]
+		public virtual uint ResultCode { get; set; }
+
+		[Property]
+		public virtual string ArchFileName { get; set; }
+
+		[Property]
+		public virtual string ExtrFileName { get; set; }
 	}
 
 	[ActiveRecord("CostFormRules", Schema = "Farm", Lazy = true)]

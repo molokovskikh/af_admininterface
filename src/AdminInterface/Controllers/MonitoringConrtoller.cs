@@ -118,14 +118,16 @@ namespace AdminInterface.Controllers
 			});
 #else
 			items = new[] {
-				new WcfPriceProcessItem(1, false, "jjj.AAA", 0, null, DateTime.Now.AddMinutes(50), 0),
-				new WcfPriceProcessItem(2, true, "jjj.123", 0, null, DateTime.Now.AddMinutes(10), 0),
+				new WcfPriceProcessItem(1, false, "jjj.AAA", 2983, null, DateTime.Now.AddMinutes(50), 0),
+				new WcfPriceProcessItem(2, true, "jjj.123", 384, null, DateTime.Now.AddMinutes(10), 0),
 				new WcfPriceProcessItem(3, false, "jjj.BBB", 0, null, DateTime.Now.AddMinutes(100), 0) { FormalizedNow = true },
-				new WcfPriceProcessItem(4, true, "jjj.789", 0, null, DateTime.Now.AddMinutes(500), 0)
+				new WcfPriceProcessItem(4, true, "jjj.789", 1264, null, DateTime.Now.AddMinutes(500), 0)
 			};
 #endif
 			var codes = items.Select(i => Convert.ToUInt32(i.PriceCode)).ToList();
 			var prices = DbSession.Query<Price>().Where(p => codes.Contains(p.Id)).ToList().ToDictionary(k => k.Id);
+			var itemsCodes = items.Select(i => (uint)i.PriceItemId).ToList();
+			var priceItems = DbSession.Query<PriceItem>().Where(i => itemsCodes.Contains(i.Id)).ToList().ToDictionary(k => k.Id);
 
 #if DEBUG
 			prices = new Dictionary<uint, Price>() { { 1u, new Price { Supplier = new Supplier { HomeRegion = new Region("test") } } }, { 4, new Price() { Supplier = new Supplier { HomeRegion = new Region("test2") } } } };
@@ -134,7 +136,13 @@ namespace AdminInterface.Controllers
 			var result = items.Select(i => {
 				if (prices.Keys.Contains((uint)i.PriceCode)) {
 					var price = prices[(uint)i.PriceCode];
-					return new InboundPriceItems(i.Downloaded, price, i.FilePath, i.FileTime ?? i.CreateTime, i.HashCode, i.FormalizedNow);
+					DateTime? log = null;
+					if (priceItems.Keys.Contains((uint)i.PriceItemId)) {
+						var logs = priceItems[(uint)i.PriceItemId].DownloadLogs;
+						if (logs.Count > 0)
+							log = logs.Max(d => d.LogTime);
+					}
+					return new InboundPriceItems(i.Downloaded, price, i.FilePath, log ?? (i.FileTime ?? i.CreateTime), i.HashCode, i.FormalizedNow);
 				}
 				return null;
 			}).Where(p => p != null).ToList();
