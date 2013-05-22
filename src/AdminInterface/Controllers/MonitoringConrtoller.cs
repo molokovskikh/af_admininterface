@@ -137,7 +137,7 @@ namespace AdminInterface.Controllers
 				if (prices.Keys.Contains((uint)i.PriceCode)) {
 					var price = prices[(uint)i.PriceCode];
 					DateTime? log = null;
-					if (priceItems.Keys.Contains((uint)i.PriceItemId)) {
+					if (priceItems.Keys.Contains((uint)i.PriceItemId) && i.Downloaded) {
 						var logs = priceItems[(uint)i.PriceItemId].DownloadLogs;
 						if (logs.Count > 0)
 							log = logs.Max(d => d.LogTime);
