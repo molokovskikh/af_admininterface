@@ -369,6 +369,48 @@ group by u.ClientId")
 			return Payers.All(p => p.PayerID != 921);
 		}
 
+		public virtual void AddPriceToClient(ISession session)
+		{
+			session.CreateSQLQuery(@"
+update customers.intersection i
+join usersettings.PricesData pd on pd.PriceCode = i.PriceId
+set
+i.AvailableForClient = if (pd.PriceType <> :priceType, true, false),
+i.AgencyEnabled = true
+where i.Clientid = :clientId;")
+				.SetParameter("priceType", (int)PriceType.Vip)
+				.SetParameter("clientId", Id)
+				.ExecuteUpdate();
+			AddMissingUserPrices(session);
+		}
+
+
+		public virtual void AddMissingUserPrices(ISession session)
+		{
+			session.CreateSQLQuery(@"
+DROP TEMPORARY TABLE IF EXISTS customers.MissUserPrices;
+
+CREATE TEMPORARY TABLE customers.MissUserPrices (
+UserId INT unsigned,
+PriceId INT unsigned,
+RegionId BIGINT(20)) engine=MEMORY ;
+
+insert into customers.MissUserPrices
+SELECT u.id as UserId, i.PriceId, i.RegionId FROM customers.intersection i
+join customers.users u on u.clientid = i.clientid
+where i.clientid = :ClientId
+and not (exists (select up.* from customers.userprices up
+where up.UserId = u.Id and up.RegionId = i.RegionId and up.PriceId = i.PriceId))
+group by i.PriceId, i.RegionId, u.Id;
+
+insert into customers.userprices (UserId, PriceId, RegionId)
+select mup.UserId, mup.PriceId, mup.RegionId from
+ customers.MissUserPrices mup;
+")
+				.SetParameter("ClientId", Id)
+				.ExecuteUpdate();
+		}
+
 		public virtual void AddBillingComment(string billingMessage)
 		{
 			if (String.IsNullOrEmpty(billingMessage))

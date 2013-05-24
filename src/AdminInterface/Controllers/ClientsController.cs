@@ -304,6 +304,9 @@ where Phone like :phone")
 					drugstore.SmartOrderRules = smartOrderRules;
 				}
 			}
+			if (drugstore.IsChanged(d => d.IgnoreNewPrices) && !drugstore.IgnoreNewPrices) {
+				client.AddPriceToClient(DbSession);
+			}
 			drugstore.BeforeSave();
 			DbSession.Save(client);
 			DbSession.Save(drugstore);

@@ -10,6 +10,8 @@ using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models
 {

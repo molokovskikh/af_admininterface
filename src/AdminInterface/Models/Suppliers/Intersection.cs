@@ -31,6 +31,9 @@ namespace AdminInterface.Models.Suppliers
 		public virtual bool AvailableForClient { get; set; }
 
 		[Property]
+		public virtual bool AgencyEnabled { get; set; }
+
+		[Property]
 		public virtual double PriceMarkup { get; set; }
 
 		[Property]
