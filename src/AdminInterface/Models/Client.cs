@@ -369,7 +369,7 @@ group by u.ClientId")
 			return Payers.All(p => p.PayerID != 921);
 		}
 
-		public virtual void AddPriceToClient(ISession session)
+		public virtual void UpdatePricesForClient(ISession session)
 		{
 			session.CreateSQLQuery(@"
 update customers.intersection i

@@ -305,7 +305,7 @@ where Phone like :phone")
 				}
 			}
 			if (drugstore.IsChanged(d => d.IgnoreNewPrices) && !drugstore.IgnoreNewPrices) {
-				client.AddPriceToClient(DbSession);
+				client.UpdatePricesForClient(DbSession);
 			}
 			drugstore.BeforeSave();
 			DbSession.Save(client);

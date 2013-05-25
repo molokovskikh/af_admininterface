@@ -5,10 +5,13 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Tools;
+using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support;
 using Test.Support.log4net;
+using PriceType = AdminInterface.Models.Suppliers.PriceType;
 
 namespace Integration.Models
 {
@@ -101,6 +104,48 @@ namespace Integration.Models
 
 			Assert.That(session.Get<Client>(clientId), Is.Null);
 			Assert.That(session.Get<Payer>(payerId), Is.Null);
+		}
+
+		[Test(Description = "Проверяет, что метод UpdatePricesForClient у клиента добавляет недостающие записи в UserPrices и включает должным образхом флаги в intersection")]
+		public void UpdatePricesForClientTest()
+		{
+			var region = session.Query<Region>().First();
+			var supplier = DataMother.CreateSupplier();
+			session.Save(supplier);
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			session.Save(client);
+			var intersection = session.Query<Intersection>().First(i => i.Client == client && i.Price.PriceType != PriceType.Vip);
+			intersection.AgencyEnabled = false;
+			intersection.AvailableForClient = false;
+			session.Save(intersection);
+			var vipPrice = supplier.AddPrice("vip", PriceType.Vip);
+			session.Save(vipPrice);
+			var vipIntersection = new Intersection { Client = client, Region = region, Price = vipPrice, Org = client.GetLegalEntity().First(), AgencyEnabled = false, AvailableForClient = false };
+			session.Save(vipIntersection);
+			Reopen();
+
+			session.CreateSQLQuery(@"delete from customers.userprices").ExecuteUpdate();
+
+
+			client.UpdatePricesForClient(session);
+			Reopen();
+
+			intersection = session.Get<Intersection>(intersection.Id);
+			Assert.IsTrue(intersection.AgencyEnabled);
+			Assert.IsTrue(intersection.AvailableForClient);
+			vipIntersection = session.Get<Intersection>(vipIntersection.Id);
+			Assert.IsTrue(vipIntersection.AgencyEnabled);
+			Assert.IsFalse(vipIntersection.AvailableForClient);
+
+			var usePricesCount = session.CreateSQLQuery(@"
+select count(*) from
+customers.userprices u
+where u.UserId = :userId
+")
+				.SetParameter("userId", client.Users[0].Id)
+				.UniqueResult<long?>();
+			var intCount = session.Query<Intersection>().Count(i => i.Client == client);
+			Assert.AreEqual(usePricesCount, intCount);
 		}
 	}
 }
