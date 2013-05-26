@@ -473,7 +473,6 @@
     <Content Include="Assets\Javascripts\UserRegionsEditor.js" />
     <Content Include="Assets\Javascripts\UserScripts.js" />
     <Content Include="Assets\Javascripts\WaybillExcludeFiles.js" />
-    <Content Include="Assets\Javascripts\WaybillSourceSettings.js" />
     <Content Include="Assets\Stylesheets\billing.css" />
     <Content Include="Assets\Stylesheets\ClientsShow.css" />
     <Content Include="Assets\Stylesheets\Documents.css" />
@@ -610,7 +609,6 @@
     <None Include="Views\LegalEntity\Add.brail" />
     <None Include="Views\SubViews\UserRegions.brail" />
     <Content Include="Views\Suppliers\WaybillExcludeFiles.brail" />
-    <Content Include="Views\Suppliers\WaybillSourceSettings.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>

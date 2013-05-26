@@ -126,7 +126,6 @@ namespace Integration.Models
 
 			session.CreateSQLQuery(@"delete from customers.userprices").ExecuteUpdate();
 
-
 			client.UpdatePricesForClient(session);
 			Reopen();
 
