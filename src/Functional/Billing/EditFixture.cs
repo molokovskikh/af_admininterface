@@ -55,6 +55,7 @@ namespace Functional.Billing
 			checkBox.Checked = false;
 			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
 			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
+			Thread.Sleep(500);
 			browser.Refresh();
 			AssertText("TestComment");
 		}
