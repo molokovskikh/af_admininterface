@@ -122,16 +122,14 @@ namespace Integration.Models
 			session.Save(vipPrice);
 			var vipIntersection = new Intersection { Client = client, Region = region, Price = vipPrice, Org = client.GetLegalEntity().First(), AgencyEnabled = false, AvailableForClient = false };
 			session.Save(vipIntersection);
-			Reopen();
 
 			session.CreateSQLQuery(@"delete from customers.userprices").ExecuteUpdate();
 
 			client.UpdatePricesForClient(session);
-			Reopen();
-
-			intersection = session.Get<Intersection>(intersection.Id);
+			session.Refresh(intersection);
 			Assert.IsTrue(intersection.AgencyEnabled);
 			Assert.IsTrue(intersection.AvailableForClient);
+			session.Refresh(vipIntersection);
 			vipIntersection = session.Get<Intersection>(vipIntersection.Id);
 			Assert.IsTrue(vipIntersection.AgencyEnabled);
 			Assert.IsFalse(vipIntersection.AvailableForClient);

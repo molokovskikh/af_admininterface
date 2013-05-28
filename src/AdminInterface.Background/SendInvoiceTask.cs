@@ -20,7 +20,7 @@ namespace AdminInterface.Background
 		public void Process()
 		{
 			using (new SessionScope(FlushAction.Never)) {
-				var invoices = Invoice.Queryable.Where(i => (i.SendToEmail || i.SendToMinimail) && i.Date <= DateTime.Today);
+				var invoices = Invoice.Queryable.Where(i => ((i.SendToEmail && i.Payer.InvoiceSettings.EmailInvoice) || (i.SendToMinimail && i.Payer.InvoiceSettings.SendToMinimail)) && i.Date <= DateTime.Today);
 				foreach (var invoice in invoices) {
 					_mailer.Clear();
 					using (var transaction = new TransactionScope(OnDispose.Rollback)) {

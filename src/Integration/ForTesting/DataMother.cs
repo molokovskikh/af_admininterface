@@ -38,7 +38,7 @@ namespace Integration.ForTesting
 				FullName = "test",
 				HomeRegion = homeRegion,
 				MaskRegion = homeRegion.Id,
-				ContactGroupOwner = new ContactGroupOwner(),
+				ContactGroupOwner = new ContactGroupOwner()
 			};
 
 			client.Settings.WorkRegionMask = homeRegion.Id;
