@@ -71,7 +71,7 @@ namespace Functional.Drugstore
 		{
 			Open();
 
-			browser.Link(Find.ByText("Поиск пользователей")).Click();
+			Click("Поиск пользователей");
 			Assert.That(browser.Text, Is.StringContaining("Поиск пользователей"));
 			Assert.That(browser.Text, Is.StringContaining("Введите текст для поиска"));
 			browser.Button(Find.ByValue("Поиск")).Click();
