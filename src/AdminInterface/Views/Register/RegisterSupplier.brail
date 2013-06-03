@@ -182,6 +182,11 @@ ${FormHelper.FormTag("", {})}
 		<h3>Настройка</h3>
 		<table cellpadding="1" border="0" width="100%">
 			<tr>
+				<td colspan="2">
+					${app.Edit("supplier.CertificateSource", {@emptyValue: ""})}
+				</td>
+			</tr>
+			<tr>
 				<td width="50%">
 					<input type="checkbox" id="PayerExists" class="payer" name="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
 					<input type="hidden" id="PayerExistsValue" name="options.PayerExists" value="false" />
