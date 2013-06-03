@@ -10,6 +10,7 @@ using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
+using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -87,7 +88,9 @@ namespace AdminInterface.Controllers
 
 			var supplier = new Supplier();
 			supplier.RegionMask = regionSettings.GetBrowseMask();
+			SetARDataBinder(AutoLoadBehavior.NewRootInstanceIfInvalidKey);
 			BindObjectInstance(supplier, "supplier");
+			SetBinder(new DataBinder());
 
 			using (var scope = new TransactionScope(OnDispose.Rollback)) {
 				DbLogHelper.SetupParametersForTriggerLogging();
