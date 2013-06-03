@@ -183,6 +183,7 @@ ${FormHelper.FormTag("", {})}
 		<table cellpadding="1" border="0" width="100%">
 			<tr>
 				<td colspan="2">
+					${app.Label("supplier.CertificateSource")}<br>
 					${app.Edit("supplier.CertificateSource", {@emptyValue: ""})}
 				</td>
 			</tr>

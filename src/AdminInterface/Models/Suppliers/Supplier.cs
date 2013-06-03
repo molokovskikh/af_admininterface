@@ -142,6 +142,7 @@ namespace AdminInterface.Models.Suppliers
 			return CertificateSources.FirstOrDefault();
 		}
 
+		[Description("Источник сертификатов:")]
 		public virtual CertificateSource CertificateSource
 		{
 			get { return CertificateSources.FirstOrDefault(); }
