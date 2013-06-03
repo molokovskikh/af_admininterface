@@ -39,7 +39,7 @@ namespace Functional.Drugstore
 
 			if (browser.Text.Contains("Поиск пользователей") && browser.Text.Contains("Введите текст для поиска:")) {
 				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
-				Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
+				Assert.That(browser.Text, Is.Not.StringContaining("По вашему запросу ничего не найдено"));
 			}
 			else {
 				CheckThatIsUserPage(browser, client);
@@ -76,7 +76,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining("Введите текст для поиска"));
 			browser.Button(Find.ByValue("Поиск")).Click();
 			Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
-			Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
+			Assert.That(browser.Text, Is.Not.StringContaining("По вашему запросу ничего не найдено"));
 		}
 
 		[Test]
@@ -176,7 +176,7 @@ namespace Functional.Drugstore
 			var tableBody = browser.TableBody(Find.ById("SearchResults"));
 			Assert.That(tableBody.TableRows.Count, Is.GreaterThan(0));
 			Assert.That(tableBody.Text, Is.StringContaining(client.Id.ToString()));
-			Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
+			Assert.That(browser.Text, Is.Not.StringContaining("По вашему запросу ничего не найдено"));
 		}
 
 		[Test]
@@ -196,7 +196,7 @@ namespace Functional.Drugstore
 			Assert.That(tableBody.TableRows.Count, Is.GreaterThan(0));
 			Assert.That(tableBody.Text, Is.StringContaining(client.Id.ToString()));
 
-			Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
+			Assert.That(browser.Text, Is.Not.StringContaining("По вашему запросу ничего не найдено"));
 		}
 
 		[Test]
