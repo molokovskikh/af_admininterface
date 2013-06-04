@@ -170,8 +170,8 @@ WHERE RowID = ?Id
 		private DataSet FillDataSet()
 		{
 			var data = new DataSet();
+			var price = DbSession.Load<Price>(priceId);
 			With.Transaction((c, t) => {
-				var price = ActiveRecordMediator<Price>.FindByPrimaryKey(priceId);
 				var supplier = price.Supplier;
 				SecurityContext.Administrator.CheckRegion(supplier.HomeRegion.Id);
 				PriceNameLB.Text = price.Name;
@@ -226,7 +226,7 @@ WHERE PriceCode = ?PriceCode
 		{
 			var costId = Convert.ToUInt32(e.CommandArgument);
 
-			var cost = ActiveRecordMediator<Cost>.FindByPrimaryKey(costId);
+			var cost = DbSession.Load<Cost>(costId);
 			var skipWarning = ((Button)e.CommandSource).Text == "Все равно удалить";
 			if (!skipWarning && cost.IsConfigured) {
 				warningCostId = costId;
@@ -252,7 +252,7 @@ where pc.CostCode = ?CostCode;";
 				uint sourceId;
 				uint ruleId;
 				uint itemId;
-				uint region;
+				ulong region;
 				var deleteCommandText = "";
 				using (var reader = command.ExecuteReader()) {
 					reader.Read();
@@ -262,7 +262,7 @@ where pc.CostCode = ?CostCode;";
 						sourceId = reader.GetUInt32("SourceId");
 						ruleId = reader.GetUInt32("RuleId");
 						itemId = reader.GetUInt32("ItemId");
-						region = reader.GetUInt32("Region");
+						region = reader.GetUInt64("Region");
 						deleteCommandText += String.Format(@"
 update Customers.Intersection
 set CostId = {0}
