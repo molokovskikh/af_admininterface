@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
@@ -163,6 +164,12 @@ namespace Functional.Billing
 
 			client = session.Load<Client>(client.Id);
 			Assert.That(address.AvaliableFor(user), Is.True);
+		}
+
+		[Test]
+		public void Test()
+		{
+			Console.WriteLine(File.ReadAllText("c:/1.txt"));
 		}
 
 		[Test]
