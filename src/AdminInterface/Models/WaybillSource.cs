@@ -5,6 +5,9 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Web.Ui.ActiveRecordExtentions;
+using NHibernate;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models
 {

@@ -47,6 +47,7 @@ namespace AdminInterface.Models.Suppliers
 
 		public Supplier()
 		{
+			CertificateSources = new List<CertificateSource>();
 			Registration = new RegistrationInfo();
 			OrderRules = new List<OrderSendRules>();
 			Prices = new List<Price>();
@@ -139,6 +140,18 @@ namespace AdminInterface.Models.Suppliers
 		public virtual CertificateSource GetSertificateSource()
 		{
 			return CertificateSources.FirstOrDefault();
+		}
+
+		[Description("Источник сертификатов:")]
+		public virtual CertificateSource CertificateSource
+		{
+			get { return CertificateSources.FirstOrDefault(); }
+			set
+			{
+				CertificateSources.Clear();
+				if (value != null)
+					CertificateSources.Add(value);
+			}
 		}
 
 		public virtual IList<User> Users

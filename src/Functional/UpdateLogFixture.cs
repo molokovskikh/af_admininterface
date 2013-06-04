@@ -168,13 +168,13 @@ where
 				headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад
 
 				browser.Button(Find.ByValue("Показать")).Click();
-				Assert.That(browser.Text, Text.DoesNotContain("За указанный период клиент не обновлялся"));
+				Assert.That(browser.Text, Is.Not.StringContaining("За указанный период клиент не обновлялся"));
 				browser.Link(Find.ByText("Дата")).Click();
-				Assert.That(browser.Text, Text.DoesNotContain("За указанный период клиент не обновлялся"));
+				Assert.That(browser.Text, Is.Not.StringContaining("За указанный период клиент не обновлялся"));
 				browser.Link(Find.ByText("Версия")).Click();
-				Assert.That(browser.Text, Text.DoesNotContain("За указанный период клиент не обновлялся"));
+				Assert.That(browser.Text, Is.Not.StringContaining("За указанный период клиент не обновлялся"));
 				browser.Link(Find.ByText("Пользователь")).Click();
-				Assert.That(browser.Text, Text.DoesNotContain("За указанный период клиент не обновлялся"));
+				Assert.That(browser.Text, Is.Not.StringContaining("За указанный период клиент не обновлялся"));
 				CheckCommonColumnNames(browser);
 			}
 		}

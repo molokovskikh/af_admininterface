@@ -47,7 +47,7 @@ namespace Functional.Billing
 			Assert.IsNull(_payer.Recipient);
 		}
 
-		[Test]
+		[Test, Ignore("тест содержит ошибку, до починки Золотаревым")]
 		public void Check_comment_with_disable_client()
 		{
 			browser = Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));

@@ -86,7 +86,7 @@ namespace Functional.Drugstore
 			browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", client.Users[1].Id)));
 			browser.Refresh();
 			Assert.That(browser.Text, Is.StringContaining("This message for client"));
-			Assert.That(browser.Text, Text.DoesNotContain("This message for user1"));
+			Assert.That(browser.Text, Is.Not.StringContaining("This message for user1"));
 			browser.TextField(Find.ByName("message")).TypeText("This message for user2");
 			browser.Button(Find.ByValue("Принять")).Click();
 

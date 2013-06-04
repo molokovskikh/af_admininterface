@@ -6,8 +6,12 @@ using System.Web;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Common.MySql;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models.Audit;
+using NHibernate;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models.Certificates
 {
@@ -44,6 +48,16 @@ namespace AdminInterface.Models.Certificates
 		public virtual string GetName()
 		{
 			return string.IsNullOrEmpty(Name) ? SourceClassName : Name;
+		}
+
+		public static IList<CertificateSource> All()
+		{
+			return ArHelper.WithSession(s => All(s));
+		}
+
+		public static IList<CertificateSource> All(ISession session)
+		{
+			return session.Query<CertificateSource>().OrderBy(s => s.Name).ToList();
 		}
 	}
 }
