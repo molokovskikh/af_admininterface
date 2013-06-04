@@ -47,14 +47,15 @@ namespace Functional.Billing
 			Assert.IsNull(_payer.Recipient);
 		}
 
-		[Test, Ignore("тест содержит ошибку, до починки Золотаревым")]
+		[Test]
 		public void Check_comment_with_disable_client()
 		{
 			browser = Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
 			var checkBox = browser.Css("#clients input[name=\"status\"]");
 			checkBox.Checked = false;
 			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
-			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
+			var buttons = browser.Buttons.Where(b => !string.IsNullOrEmpty(b.ClassName) && b.ClassName.Contains("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).ToList();
+			buttons.First(b => b.InnerHtml.Contains("Продолжить")).Click();
 			Thread.Sleep(500);
 			browser.Refresh();
 			AssertText("TestComment");
@@ -68,7 +69,8 @@ namespace Functional.Billing
 			Css("input[name=free]").Checked = true;
 			Css("input[name=FreePeriodEnd]").AppendText(DateTime.Now.AddMonths(1).ToShortDateString());
 			Css("input[name=AddComment]").AppendText("Check_free_accounting");
-			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
+			var buttons = browser.Buttons.Where(b => !string.IsNullOrEmpty(b.ClassName) && b.ClassName.Contains("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).ToList();
+			buttons.First(b => b.InnerHtml.Contains("Продолжить")).Click();
 			var accounted = Css("input[name=accounted]");
 			Assert.IsFalse(accounted.Checked);
 			Assert.IsFalse(accounted.Enabled);
@@ -86,7 +88,8 @@ namespace Functional.Billing
 			Css("#reports input[name=status]").Checked = true;
 			Css("#reports input[name=status]").Checked = false;
 			Css("input[name=AddComment]").AppendText("Check_report_status_test");
-			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
+			var buttons = browser.Buttons.Where(b => !string.IsNullOrEmpty(b.ClassName) && b.ClassName.Contains("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).ToList();
+			buttons.First(b => b.InnerHtml.Contains("Продолжить")).Click();
 			browser.Refresh();
 			AssertText("Check_report_status_test");
 		}

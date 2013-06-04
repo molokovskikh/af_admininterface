@@ -167,12 +167,6 @@ namespace Functional.Billing
 		}
 
 		[Test]
-		public void Test()
-		{
-			Console.WriteLine(File.ReadAllText("c:/1.txt"));
-		}
-
-		[Test]
 		public void Adding_addresses_to_users()
 		{
 			Assert.That(address.AvaliableForUsers.Count, Is.EqualTo(0));
