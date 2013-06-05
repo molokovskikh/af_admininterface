@@ -56,7 +56,7 @@ namespace Functional.Billing
 			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
 			var buttons = browser.Buttons.Where(b => !string.IsNullOrEmpty(b.ClassName) && b.ClassName.Contains("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).ToList();
 			buttons.First(b => b.InnerHtml.Contains("Продолжить")).Click();
-			Thread.Sleep(500);
+			Thread.Sleep(1000);
 			browser.Refresh();
 			AssertText("TestComment");
 		}
