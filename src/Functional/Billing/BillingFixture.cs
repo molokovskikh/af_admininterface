@@ -278,6 +278,7 @@ namespace Functional.Billing
 			browser.Eval("$('input#AddCommentField').trigger($.Event( 'keydown', {which:$.ui.keyCode.ENTER, keyCode:$.ui.keyCode.ENTER}));");
 			Click("Продолжить");
 			Assert.IsFalse(clientStatus.Checked);
+			Thread.Sleep(1000);
 			browser.Refresh();
 			AssertText("TestComment");
 		}
