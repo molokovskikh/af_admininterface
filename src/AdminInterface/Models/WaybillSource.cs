@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Web;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Web.Ui.ActiveRecordExtentions;
+using Common.Web.Ui.Models.Audit;
 using NHibernate;
 using NHibernate.Linq;
 
@@ -19,8 +21,8 @@ namespace AdminInterface.Models
 		[Description("Email")] Email = 1,
 	}
 
-	[ActiveRecord("waybill_sources", Schema = "Documents")]
-	public class WaybillSource
+	[ActiveRecord("waybill_sources", Schema = "Documents"), Auditable]
+	public class WaybillSource : IAuditable
 	{
 		[PrimaryKey("FirmCode", Generator = PrimaryKeyType.Foreign)]
 		public virtual uint Id { get; set; }
@@ -31,7 +33,7 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual string EMailFrom { get; set; }
 
-		[Property("SourceID")]
+		[Property("SourceID"), Auditable, Description("Источник документов")]
 		public virtual WaybillSourceType SourceType { get; set; }
 
 		[Property]
@@ -60,6 +62,11 @@ namespace AdminInterface.Models
 			if (string.IsNullOrEmpty(EMailFrom))
 				return new List<string>();
 			return EMailFrom.Split(new[] { ',' }).Select(s => s.Trim()).ToList();
+		}
+
+		public IAuditRecord GetAuditRecord()
+		{
+			return new AuditRecord(Supplier);
 		}
 	}
 }

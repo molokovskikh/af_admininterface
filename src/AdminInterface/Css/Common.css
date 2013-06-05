@@ -133,6 +133,12 @@ div.flash.notice {
     color:#005F00;
 }
 
+div.flash.WarningFlash {
+    background-color: #f3edb9;
+    border-color: #ddc600;
+    color: #550000;
+}
+
 div.flash.err, #errorExplanation {
     background: url(../images/false.png) 8px 5px no-repeat;
     background-color: #ffe3e3;

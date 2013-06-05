@@ -276,6 +276,7 @@ where Phone like :phone")
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			ulong homeRegion)
 		{
+			Message message = null;
 			Admin.CheckClientPermission(client);
 
 			if (Form["ResetReclameDate"] != null) {
@@ -306,6 +307,7 @@ where Phone like :phone")
 			}
 			if (drugstore.IsChanged(d => d.IgnoreNewPrices) && !drugstore.IgnoreNewPrices) {
 				client.UpdatePricesForClient(DbSession);
+				message = Message.Warning("Вы сняли опцию \"Не подключать новые прайсы 'Административно'\", целесообразно отправить всем поставщикам повторное уведомление о регистрации. Данные сохранены.");
 			}
 			drugstore.BeforeSave();
 			DbSession.Save(client);
@@ -314,7 +316,10 @@ where Phone like :phone")
 			if (oldMaskRegion != client.MaskRegion)
 				client.MaintainIntersection();
 
-			Notify("Сохранено");
+			if (message == null)
+				message = Message.Notify("Сохранено");
+
+			ViewMessage(message);
 			RedirectTo(client);
 		}
 
