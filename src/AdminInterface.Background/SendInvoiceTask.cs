@@ -24,10 +24,10 @@ namespace AdminInterface.Background
 				foreach (var invoice in invoices) {
 					_mailer.Clear();
 					using (var transaction = new TransactionScope(OnDispose.Rollback)) {
-						if (invoice.SendToEmail) {
+						if (invoice.SendToEmail && invoice.Payer.InvoiceSettings.EmailInvoice) {
 							_mailer.InvoiceToEmail(invoice, false);
 						}
-						else if (invoice.SendToMinimail) {
+						else if (invoice.SendToMinimail && invoice.Payer.InvoiceSettings.SendToMinimail) {
 							_mailer.SendInvoiceToMinimail(invoice);
 							invoice.SendToMinimail = false;
 						}
