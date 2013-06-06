@@ -170,8 +170,16 @@ namespace AdminInterface.Controllers
 			Redirect("Users", "Search");
 		}
 
+		private void CommonBag()
+		{
+			var sourceTypes = BindingHelper.GetDescriptionsDictionary(typeof(WaybillSourceType));
+			sourceTypes.Remove((int)WaybillSourceType.Http);
+			PropertyBag["sourceTypes"] = sourceTypes;
+		}
+
 		public void WaybillSourceSettings(uint supplierId)
 		{
+			CommonBag();
 			var supplier = DbSession.Get<Supplier>(supplierId);
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["source"] = supplier.WaybillSource ?? new WaybillSource();
@@ -201,6 +209,7 @@ namespace AdminInterface.Controllers
 			Notify("Ошибка сохранения");
 			PropertyBag["supplier"] = DbSession.Get<Supplier>(source.Id);
 			PropertyBag["source"] = source;
+			CommonBag();
 		}
 	}
 }
