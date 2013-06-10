@@ -27,7 +27,7 @@ namespace Integration.Queries
 
 			var product = new Product(session.Load<Catalog>(DataMother.CreateCatelogProduct()));
 			var line = new OrderLine(order, product, 100, 1);
-			Save(supplier, line, order);
+			Save(supplier, product, line, order);
 
 			query.Execute(session);
 

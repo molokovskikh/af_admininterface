@@ -43,7 +43,8 @@ namespace Integration.Models
 		{
 			var client = DataMother.CreateTestClientWithUser();
 			var supplier = DataMother.CreateSupplier();
-			Flush();
+			session.Save(supplier);
+
 			client.Settings.NoiseCosts = true;
 			session.SaveOrUpdate(client.Settings);
 			Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(0));
@@ -93,12 +94,9 @@ namespace Integration.Models
 		public void Delete_client()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			Reopen();
-
 			var clientId = client.Id;
 			var payerId = client.Payers[0].Id;
 
-			client = ActiveRecordMediator<Client>.FindByPrimaryKey(client.Id);
 			client.Delete(session);
 			Reopen();
 

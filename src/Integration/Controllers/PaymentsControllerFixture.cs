@@ -58,11 +58,5 @@ namespace Integration.Controllers
 			payer = Payer.Find(payer.Id);
 			Assert.That(payer.Balance, Is.EqualTo(3000));
 		}
-
-		private void Reopen()
-		{
-			scope.Dispose();
-			scope = new SessionScope();
-		}
 	}
 }

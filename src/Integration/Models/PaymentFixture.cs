@@ -109,6 +109,11 @@ namespace Integration.Models
 			payment.AdSum = 800;
 			payment.SaveAndFlush();
 			Assert.That(payment.Ad.Id, Is.EqualTo(ad.Id));
+
+			//хак для борьбы с хаком, строчка ниже что бы избежать ошибки
+			//NHibernate.NonUniqueObjectException : a different object with the same identifier value was already associated with the session: 58, of entity: AdminInterface.Models.Billing.Advertising
+			//происходит из-за открытия сессии в Payer.UpdateAd
+			session.Evict(ad);
 		}
 
 		[Test]

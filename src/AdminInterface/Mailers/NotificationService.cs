@@ -9,16 +9,12 @@ using AdminInterface.Models;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
 using AdminInterface.Properties;
+using NHibernate;
 
 namespace AdminInterface.Services
 {
 	public class NotificationService
 	{
-		public NotificationService(DefaultValues defaults)
-		{
-			this.defaults = defaults;
-		}
-
 		private readonly string _messageTemplateForSupplierAboutDrugstoreRegistration =
 			@"Добрый день.
 
@@ -42,6 +38,13 @@ namespace AdminInterface.Services
 				.Replace('\'', '\"');
 
 		private DefaultValues defaults;
+		private ISession session;
+
+		public NotificationService(ISession session, DefaultValues defaults)
+		{
+			this.defaults = defaults;
+			this.session = session;
+		}
 
 		public void NotifySupplierAboutAddressRegistration(Address address)
 		{
@@ -105,63 +108,66 @@ namespace AdminInterface.Services
 
 		public List<string> GetEmailsForNotification(Client client)
 		{
-			using (var connection = new MySqlConnection(Literals.GetConnectionString())) {
-				connection.Open();
-				var dataAdapter = new MySqlDataAdapter(@"
+			var dataAdapter = new MySqlDataAdapter(@"
 select
-	distinct c.contactText
+distinct c.contactText
 from Customers.Suppliers s
-	join contacts.contact_groups cg on s.ContactGroupOwnerId = cg.ContactGroupOwnerId
-	join contacts.contacts c on cg.Id = c.ContactOwnerId
-	join usersettings.PricesData pd on pd.FirmCode = s.Id
-	join usersettings.pricesregionaldata prd on prd.PriceCode = pd.PriceCode
-	join usersettings.PricesCosts pc on pc.PriceCode = pd.pricecode
-	join usersettings.PriceItems pi on pi.Id = pc.PriceItemId
-	join farm.FormRules f on f.Id = pi.FormRuleId
+join contacts.contact_groups cg on s.ContactGroupOwnerId = cg.ContactGroupOwnerId
+join contacts.contacts c on cg.Id = c.ContactOwnerId
+join usersettings.PricesData pd on pd.FirmCode = s.Id
+join usersettings.pricesregionaldata prd on prd.PriceCode = pd.PriceCode
+join usersettings.PricesCosts pc on pc.PriceCode = pd.pricecode
+join usersettings.PriceItems pi on pi.Id = pc.PriceItemId
+join farm.FormRules f on f.Id = pi.FormRuleId
+join Customers.Intersection i on i.PriceId = pd.PriceCode and i.ClientId = ?clientId and i.RegionId = prd.RegionCode
 where length(c.contactText) > 0
-	and s.Disabled = 0
-	and s.RegionMask & ?Region > 0
-	and cg.Type = ?ContactGroupType
-	and c.Type = ?ContactType
-	and prd.enabled = 1
-	and (to_seconds(now()) - to_seconds(pi.PriceDate)) < (f.maxold * 86400)
-	and pd.AgencyEnabled = 1
-	and pd.Enabled = 1
-	and pd.PriceType <> 1
-	and prd.RegionCode = ?Region
+and s.Disabled = 0
+and s.RegionMask & ?Region > 0
+and cg.Type = ?ContactGroupType
+and c.Type = ?ContactType
+and prd.enabled = 1
+and (to_seconds(now()) - to_seconds(pi.PriceDate)) < (f.maxold * 86400)
+and pd.AgencyEnabled = 1
+and pd.Enabled = 1
+and pd.PriceType <> 1
+and prd.RegionCode = ?Region
+and i.AgencyEnabled = 1
 
 union
 
 select
-	distinct c.contactText
+distinct c.contactText
 from Customers.Suppliers s
-	join contacts.contact_groups cg on s.ContactGroupOwnerId = cg.ContactGroupOwnerId
-	join contacts.persons p on cg.id = p.ContactGroupId
-	join contacts.contacts c on p.Id = c.ContactOwnerId
-	join usersettings.PricesData pd on pd.FirmCode = s.Id
-	join usersettings.pricesregionaldata prd on prd.PriceCode = pd.PriceCode
-	join usersettings.PricesCosts pc on pc.PriceCode = pd.pricecode
-	join usersettings.PriceItems pi on pi.Id = pc.PriceItemId
-	join farm.FormRules f on f.Id = pi.FormRuleId
+join contacts.contact_groups cg on s.ContactGroupOwnerId = cg.ContactGroupOwnerId
+join contacts.persons p on cg.id = p.ContactGroupId
+join contacts.contacts c on p.Id = c.ContactOwnerId
+join usersettings.PricesData pd on pd.FirmCode = s.Id
+join usersettings.pricesregionaldata prd on prd.PriceCode = pd.PriceCode
+join usersettings.PricesCosts pc on pc.PriceCode = pd.pricecode
+join usersettings.PriceItems pi on pi.Id = pc.PriceItemId
+join farm.FormRules f on f.Id = pi.FormRuleId
+join Customers.Intersection i on i.PriceId = pd.PriceCode and i.ClientId = ?clientId and i.RegionId = prd.RegionCode
 where length(c.contactText) > 0
-	and s.Disabled = 0
-	and s.RegionMask & ?Region > 0
-	and cg.Type = ?ContactGroupType
-	and c.Type = ?ContactType
-	and prd.enabled = 1
-	and (to_seconds(now()) - to_seconds(pi.PriceDate)) < (f.maxold * 86400)
-	and pd.AgencyEnabled = 1
-	and pd.Enabled = 1
-	and pd.PriceType <> 1
-	and prd.RegionCode = ?Region
-;", connection);
-				dataAdapter.SelectCommand.Parameters.AddWithValue("?Region", client.HomeRegion.Id);
-				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactGroupType", ContactGroupType.ClientManagers);
-				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactType", ContactType.Email);
-				var data = new DataSet();
-				dataAdapter.Fill(data);
-				return data.Tables[0].Rows.Cast<DataRow>().Select(r => r["ContactText"].ToString()).ToList();
-			}
+and s.Disabled = 0
+and s.RegionMask & ?Region > 0
+and cg.Type = ?ContactGroupType
+and c.Type = ?ContactType
+and prd.enabled = 1
+and (to_seconds(now()) - to_seconds(pi.PriceDate)) < (f.maxold * 86400)
+and pd.AgencyEnabled = 1
+and pd.Enabled = 1
+and pd.PriceType <> 1
+and prd.RegionCode = ?Region
+and i.AgencyEnabled = 1
+;", (MySqlConnection)session.Connection);
+			var parameters = dataAdapter.SelectCommand.Parameters;
+			parameters.AddWithValue("?Region", client.HomeRegion.Id);
+			parameters.AddWithValue("?ContactGroupType", ContactGroupType.ClientManagers);
+			parameters.AddWithValue("?ContactType", ContactType.Email);
+			parameters.AddWithValue("?ClientId", client.Id);
+			var data = new DataSet();
+			dataAdapter.Fill(data);
+			return data.Tables[0].Rows.Cast<DataRow>().Select(r => r["ContactText"].ToString()).ToList();
 		}
 	}
 }

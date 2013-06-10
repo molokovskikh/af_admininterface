@@ -234,7 +234,7 @@ namespace AdminInterface.Controllers
 		public void SendSupplierNotification(uint clientCode, uint supplierCode)
 		{
 			var client = DbSession.Get<Client>(clientCode);
-			var service = new NotificationService(Defaults);
+			var service = new NotificationService(DbSession, Defaults);
 			if (supplierCode > 0) {
 				var supplier = DbSession.Get<Supplier>(supplierCode);
 				var contacts = supplier.ContactGroupOwner.GetEmails(ContactGroupType.ClientManagers).ToList();

@@ -298,7 +298,7 @@ namespace AdminInterface.Controllers
 				DbSession.Save(log);
 			}
 
-			Mailer.ClientRegistred(client, comment, Defaults);
+			new Mailer(DbSession).ClientRegistred(client, comment, Defaults);
 			if (!options.FillBillingInfo)
 				this.Mailer().NotifyBillingAboutClientRegistration(client);
 

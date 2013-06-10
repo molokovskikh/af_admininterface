@@ -28,7 +28,9 @@ namespace Integration
 		[SetUp]
 		public void SetUp()
 		{
-			session.CreateSQLQuery("delete from customers.Users").ExecuteUpdate();
+			session.CreateSQLQuery("update Customers.Users set InheritPricesFrom = null;" +
+				" delete from customers.Users;")
+				.ExecuteUpdate();
 
 			client = DataMother.TestClient();
 			session.Save(client);

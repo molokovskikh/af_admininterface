@@ -2,6 +2,7 @@
 using System.Net.Mail;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Castle.Core.Smtp;
 using Castle.MonoRail.Framework;
@@ -43,21 +44,39 @@ namespace Integration.ForTesting
 				}));
 			BaseMailerExtention.SenderForTest = sender;
 
-			scope = new TransactionlessSession();
-
-			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
-			session = sessionHolder.CreateSession(typeof(ActiveRecordBase));
+			Open();
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
+			Close();
+		}
+
+		protected void Reopen()
+		{
+			Close();
+			Open();
+		}
+
+		private void Open()
+		{
+			scope = new TransactionlessSession();
+			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+			session = sessionHolder.CreateSession(typeof(ActiveRecordBase));
+		}
+
+		private void Close()
+		{
 			if (session != null) {
 				session.Flush();
 				ActiveRecordMediator.GetSessionFactoryHolder().ReleaseSession(session);
+				session = null;
 			}
-			if (scope != null)
+			if (scope != null) {
 				scope.Dispose();
+				scope = null;
+			}
 		}
 
 		public void Prepare(SmartDispatcherController controller)

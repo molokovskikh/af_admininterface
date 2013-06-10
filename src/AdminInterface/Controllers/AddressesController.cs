@@ -71,7 +71,7 @@ namespace AdminInterface.Controllers
 
 			address.CreateFtpDirectory();
 			address.AddBillingComment(comment);
-			Mailer.Registred(address, comment, Defaults);
+			new Mailer(DbSession).Registred(address, comment, Defaults);
 			Notify("Адрес доставки создан");
 			RedirectUsingRoute("client", "show", new { client.Id });
 		}
@@ -115,7 +115,7 @@ namespace AdminInterface.Controllers
 		public void Notify(uint id)
 		{
 			var address = Address.Find(id);
-			Mailer.NotifySupplierAboutAddressRegistration(address, Defaults);
+			new Mailer(DbSession).NotifySupplierAboutAddressRegistration(address, Defaults);
 			Mailer.AddressRegistrationResened(address);
 			DbSession.Save(new AuditRecord(string.Format("Разослано повторное уведомление о регистрации адреса {0}", address.Name), address));
 			Notify("Уведомления отправлены");

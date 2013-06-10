@@ -9,6 +9,7 @@ using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using AdminInterface.Services;
+using NHibernate;
 using log4net;
 
 namespace AdminInterface.Mailers
@@ -16,6 +17,12 @@ namespace AdminInterface.Mailers
 	public class Mailer
 	{
 		private static ILog _log = LogManager.GetLogger(typeof(Mailer));
+		private ISession session;
+
+		public Mailer(ISession session)
+		{
+			this.session = session;
+		}
 
 		public static void RegionalAdminCreated(Administrator admin)
 		{
@@ -134,7 +141,7 @@ Email: {2}
 			}
 		}
 
-		public static void Registred(object item, string billingMessage, DefaultValues defaults)
+		public void Registred(object item, string billingMessage, DefaultValues defaults)
 		{
 			try {
 				Client client;
@@ -208,10 +215,10 @@ Email: {2}
 			}
 		}
 
-		public static void NotifySupplierAboutAddressRegistration(Address address, DefaultValues defaults)
+		public void NotifySupplierAboutAddressRegistration(Address address, DefaultValues defaults)
 		{
 			try {
-				new NotificationService(defaults).NotifySupplierAboutAddressRegistration(address);
+				new NotificationService(session, defaults).NotifySupplierAboutAddressRegistration(address);
 			}
 			catch (Exception e) {
 				_log.Error("Ошибка при отправке уведомления", e);
@@ -245,10 +252,10 @@ Email: {2}
 			}
 		}
 
-		public static void ClientRegistred(Client client, string billingMessage, DefaultValues defaults)
+		public void ClientRegistred(Client client, string billingMessage, DefaultValues defaults)
 		{
 			try {
-				new NotificationService(defaults).NotifySupplierAboutDrugstoreRegistration(client, false);
+				new NotificationService(session, defaults).NotifySupplierAboutDrugstoreRegistration(client, false);
 
 				var user = client.Users.FirstOrDefault();
 				var body = new StringWriter();

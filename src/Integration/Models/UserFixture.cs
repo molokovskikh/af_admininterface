@@ -51,15 +51,6 @@ namespace Integration.Models
 		}
 
 		[Test]
-		public void IsPermissionAssignedTest()
-		{
-			var permission = new UserPermission { Shortcut = "AF" };
-			Assert.That(user.IsPermissionAssigned(permission), Is.False);
-			user.AssignedPermissions.Add(new UserPermission { Shortcut = "AF" });
-			Assert.That(user.IsPermissionAssigned(permission));
-		}
-
-		[Test]
 		public void Is_change_password_by_one_self_return_true_if_last_password_change_done_by_client()
 		{
 			var entities = PasswordChangeLogEntity.GetByLogin(user.Login, DateTime.MinValue, DateTime.MaxValue);

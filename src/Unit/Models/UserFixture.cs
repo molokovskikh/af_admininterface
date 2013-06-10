@@ -1,6 +1,7 @@
 ﻿using System;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using NUnit.Framework;
 
@@ -35,6 +36,19 @@ namespace Unit.Models
 
 			Assert.That(address.Accounting.IsFree, Is.True);
 			Assert.That(address.Accounting.FreePeriodEnd, Is.EqualTo(DateTime.Today.AddDays(10)));
+		}
+
+		[Test]
+		public void IsPermissionAssignedTest()
+		{
+			var client = new Client(new Payer(""), Data.DefaultRegion);
+			var user = new User(client);
+			client.AddUser(user);
+
+			var permission = new UserPermission { Shortcut = "AF" };
+			Assert.That(user.IsPermissionAssigned(permission), Is.False);
+			user.AssignedPermissions.Add(new UserPermission { Shortcut = "AF" });
+			Assert.That(user.IsPermissionAssigned(permission));
 		}
 	}
 }

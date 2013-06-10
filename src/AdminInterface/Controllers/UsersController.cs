@@ -245,11 +245,11 @@ namespace AdminInterface.Controllers
 			if (address != null)
 				address.CreateFtpDirectory();
 
-			Mailer.Registred(user, comment, Defaults);
+			new Mailer(DbSession).Registred(user, comment, Defaults);
 			user.AddBillingComment(comment);
 			if (address != null) {
 				address.AddBillingComment(comment);
-				Mailer.Registred(address, comment, Defaults);
+				new Mailer(DbSession).Registred(address, comment, Defaults);
 			}
 			if (user.Client != null) {
 				var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены следующие адреса доставки: \r\n {2}",

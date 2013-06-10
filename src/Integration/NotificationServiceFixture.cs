@@ -1,17 +1,23 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Services;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using MySql.Data.MySqlClient;
 using NHibernate.Linq;
 using NUnit.Framework;
+using Test.Support;
+using ContactGroupType = Common.Web.Ui.Models.ContactGroupType;
+using ContactType = Common.Web.Ui.Models.ContactType;
+using PriceType = AdminInterface.Models.Suppliers.PriceType;
 
 namespace Integration
 {
 	[TestFixture]
-	public class NotificationServiceFixture : Test.Support.IntegrationFixture
+	public class NotificationServiceFixture : IntegrationFixture
 	{
 		private Supplier _supplier;
 		private DefaultValues _defaults;
@@ -36,7 +42,7 @@ namespace Integration
 			Flush();
 
 			_defaults = session.Query<DefaultValues>().First();
-			_service = new NotificationService(_defaults);
+			_service = new NotificationService(session, _defaults);
 
 			_client = DataMother.TestClient();
 
@@ -112,6 +118,18 @@ namespace Integration
 				Save(priceRegionalData);
 			}
 			CheckResult();
+		}
+
+		[Test]
+		public void Do_not_notify_agency_disabled_suppliers()
+		{
+			var intersection = session.Query<TestIntersection>().First(i => i.Client.Id == _client.Id && i.Price.Id == _supplier.Prices[0].Id);
+			intersection.AgencyEnabled = false;
+			session.Save(intersection);
+			session.Flush();
+
+			var emails = _service.GetEmailsForNotification(_client);
+			Assert.That(emails, Is.Not.Contains(_email));
 		}
 
 		private void CheckResult()
