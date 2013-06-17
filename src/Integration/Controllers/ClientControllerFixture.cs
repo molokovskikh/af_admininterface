@@ -53,8 +53,7 @@ namespace Integration.Controllers
 					client.Users[0].Login = adUser1.Login;
 					session.SaveOrUpdate(client);
 
-					using (new SessionScope())
-						controller.Unlock(client.Id);
+					controller.Unlock(client.Id);
 
 					Assert.That(ADHelper.IsLocked(adUser1.Login), Is.False);
 					Assert.That(ADHelper.IsLocked(adUser2.Login), Is.False);
@@ -71,8 +70,7 @@ namespace Integration.Controllers
 
 				session.SaveOrUpdate(new User(client) { Login = "test8779546" });
 
-				using (new SessionScope())
-					controller.Unlock(client.Id);
+				controller.Unlock(client.Id);
 
 				Assert.That(ADHelper.IsLocked(adUser1.Login), Is.False);
 			}
@@ -89,8 +87,7 @@ namespace Integration.Controllers
 
 				ADHelper.Block(adUser1.Login);
 
-				using (new SessionScope())
-					controller.Unlock(client.Id);
+				controller.Unlock(client.Id);
 
 				Assert.That(ADHelper.IsLocked(adUser1.Login), Is.False);
 			}

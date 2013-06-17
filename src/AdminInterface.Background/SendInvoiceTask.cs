@@ -8,7 +8,7 @@ using Castle.ActiveRecord;
 
 namespace AdminInterface.Background
 {
-	public class SendInvoiceTask
+	public class SendInvoiceTask : Task
 	{
 		private MonorailMailer _mailer;
 
@@ -17,26 +17,21 @@ namespace AdminInterface.Background
 			_mailer = mailer;
 		}
 
-		public void Process()
+		protected override void Process()
 		{
-			using (new SessionScope(FlushAction.Never)) {
-				var invoices = Invoice.Queryable.Where(i => ((i.SendToEmail && i.Payer.InvoiceSettings.EmailInvoice) || (i.SendToMinimail && i.Payer.InvoiceSettings.SendToMinimail)) && i.Date <= DateTime.Today);
-				foreach (var invoice in invoices) {
-					_mailer.Clear();
-					using (var transaction = new TransactionScope(OnDispose.Rollback)) {
-						if (invoice.SendToEmail && invoice.Payer.InvoiceSettings.EmailInvoice) {
-							_mailer.InvoiceToEmail(invoice, false);
-						}
-						else if (invoice.SendToMinimail && invoice.Payer.InvoiceSettings.SendToMinimail) {
-							_mailer.SendInvoiceToMinimail(invoice);
-							invoice.SendToMinimail = false;
-						}
-						_mailer.Send();
-
-						invoice.Update();
-						transaction.VoteCommit();
-					}
+			var invoices = Invoice.Queryable.Where(i => ((i.SendToEmail && i.Payer.InvoiceSettings.EmailInvoice) || (i.SendToMinimail && i.Payer.InvoiceSettings.SendToMinimail)) && i.Date <= DateTime.Today);
+			foreach (var invoice in invoices) {
+				_mailer.Clear();
+				if (invoice.SendToEmail && invoice.Payer.InvoiceSettings.EmailInvoice) {
+					_mailer.InvoiceToEmail(invoice, false);
 				}
+				else if (invoice.SendToMinimail && invoice.Payer.InvoiceSettings.SendToMinimail) {
+					_mailer.SendInvoiceToMinimail(invoice);
+					invoice.SendToMinimail = false;
+				}
+				_mailer.Send();
+
+				invoice.Update();
 			}
 		}
 	}

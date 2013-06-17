@@ -8,16 +8,16 @@ using NUnit.Framework;
 namespace Integration.Tasks
 {
 	[TestFixture]
-	public class InvoicePartProcessorFixture : Test.Support.IntegrationFixture
+	public class InvoicePartTaskFixture : Test.Support.IntegrationFixture
 	{
-		private InvoicePartProcessor processor;
+		private InvoicePartTask processor;
 		private Payer payer;
 
 		[SetUp]
 		public void Setup()
 		{
 			payer = DataMother.CreatePayerForBillingDocumentTest();
-			processor = new InvoicePartProcessor();
+			processor = new InvoicePartTask();
 		}
 
 		[Test]
@@ -25,7 +25,7 @@ namespace Integration.Tasks
 		{
 			var invoice = BuildInvoice(DateTime.Now.Date);
 
-			processor.Process();
+			processor.Execute();
 
 			payer.Refresh();
 
@@ -39,7 +39,7 @@ namespace Integration.Tasks
 		{
 			var invoice = BuildInvoice(DateTime.Now.AddDays(1));
 
-			processor.Process();
+			processor.Execute();
 
 			Assert.That(payer.Balance, Is.EqualTo(0));
 			invoice.Refresh();

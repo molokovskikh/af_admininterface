@@ -42,12 +42,12 @@ namespace Integration.Tasks
 			Flush();
 			Close();
 
-			task.Process();
+			task.Execute();
 
 			var message = messages.FirstOrDefault(m => m.Body.Contains(String.Format("Счет №{0}", invoice.Id)));
 			Assert.That(message, Is.Not.Null);
 			messages.Clear();
-			task.Process();
+			task.Execute();
 
 			message = messages.FirstOrDefault(m => m.Body.Contains(String.Format("Счет №{0}", invoice.Id)));
 			Assert.That(message, Is.Null, "Отправили счет повторно");

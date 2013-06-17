@@ -8,15 +8,15 @@ using NUnit.Framework;
 namespace Integration.Tasks
 {
 	[TestFixture]
-	public class ReportProcessorFixture : Test.Support.IntegrationFixture
+	public class ReportTaskFixture : Test.Support.IntegrationFixture
 	{
-		private ReportProcessor processor;
+		private ReportTask processor;
 		private Payer payer;
 
 		[SetUp]
 		public void Setup()
 		{
-			processor = new ReportProcessor();
+			processor = new ReportTask();
 			payer = DataMother.CreatePayer();
 
 			Save(payer);
@@ -28,7 +28,7 @@ namespace Integration.Tasks
 			var report = new Report { Payer = payer };
 			Save(report);
 
-			processor.Process();
+			processor.Execute();
 
 			var account = session.Query<ReportAccount>().FirstOrDefault(r => r.Report == report);
 			Assert.That(account, Is.Not.Null);
@@ -46,7 +46,7 @@ namespace Integration.Tasks
 			session.Delete(account.Report);
 			session.Flush();
 
-			processor.Process();
+			processor.Execute();
 
 			session.Clear();
 			account = session.Get<ReportAccount>(account.Id);

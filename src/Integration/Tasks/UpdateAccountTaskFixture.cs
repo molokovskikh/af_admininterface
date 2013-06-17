@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using AdminInterface.Background;
 using AdminInterface.Models;
@@ -7,11 +8,12 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Scopes;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support.log4net;
 
 namespace Integration.Tasks
 {
 	[TestFixture]
-	public class UpdateAccountProcessorFixture : Test.Support.IntegrationFixture
+	public class UpdateAccountTaskFixture : Test.Support.IntegrationFixture
 	{
 		private Client client;
 		private User user;
@@ -96,7 +98,7 @@ namespace Integration.Tasks
 			Flush();
 			HideScope();
 			try {
-				new UpdateAccountProcessor().Process();
+				new UpdateAccountTask().Execute();
 			}
 			finally {
 				ShowScope();
@@ -108,7 +110,9 @@ namespace Integration.Tasks
 			Flush();
 			HideScope();
 			try {
-				new UpdateAccountProcessor().Process(pageSize);
+				new UpdateAccountTask {
+					PageSize = pageSize
+				}.Execute();
 			}
 			finally {
 				ShowScope();

@@ -25,11 +25,11 @@ namespace AdminInterface.Background
 					SiteRoot = ConfigurationManager.AppSettings["SiteRoot"]
 				};
 
-				new SendInvoiceTask(mailer).Process();
-				new ReportProcessor().Process();
-				new UpdateAccountProcessor().Process();
-				new ReportLogsProcessor().Process();
-				new InvoicePartProcessor().Process();
+				new SendInvoiceTask(mailer).Execute();
+				new ReportTask().Execute();
+				new UpdateAccountTask().Execute();
+				new ReportLogsTask().Execute();
+				new InvoicePartTask().Execute();
 
 				using (new SessionScope())
 					jobs.Each(j => j.Run());

@@ -183,11 +183,11 @@
     <Compile Include="Queries\UpdateOrdersFixture.cs" />
     <Compile Include="RegionalBaseCostsFixture.cs" />
     <Compile Include="BaseFiltersFixture.cs" />
-    <Compile Include="Tasks\InvoicePartProcessorFixture.cs" />
+    <Compile Include="Tasks\InvoicePartTaskFixture.cs" />
     <Compile Include="Tasks\SendInvoiceTaskFixture.cs" />
-    <Compile Include="Tasks\ReportLogProcessorFixture.cs" />
-    <Compile Include="Tasks\ReportProcessorFixture.cs" />
-    <Compile Include="Tasks\UpdateAccountProcessorFixture.cs" />
+    <Compile Include="Tasks\ReportLogTaskFixture.cs" />
+    <Compile Include="Tasks\ReportTaskFixture.cs" />
+    <Compile Include="Tasks\UpdateAccountTaskFixture.cs" />
     <Compile Include="SendPaymentNotificationFixture.cs" />
     <Compile Include="SetupFixture.cs" />
     <Compile Include="UpdatedAndDidNotDoOrdersFixture.cs" />

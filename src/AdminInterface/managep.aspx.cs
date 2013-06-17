@@ -544,11 +544,6 @@ WHERE RowId = ?Id;
 			DbSession.Save(currentSupplier);
 
 			if (updateIntersection) {
-				//нагрузка балансируется (один запрос может уйти в одну базу, другой в другую)
-				//если код ниже будет выполнен в другой транзакции то в той базе где он выполнится
-				//может еще не быть создаваемого прайса
-
-				//FlushAction.Never - что бы не автоматически не запускать транзакцию
 				var addedPriceId = currentSupplier.Prices.Max(p => p.Id);
 				Maintainer.MaintainIntersection(supplier, DbSession);
 				DbSession.CreateSQLQuery(
@@ -819,8 +814,6 @@ WHERE s.Id = ?ClientCode
 			updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			updateCommand.ExecuteNonQuery();
-
-			//описание см ст 430
 			RegionalData.AddForSuppler(DbSession, supplier.Id, newMaskRegion);
 			Maintainer.MaintainIntersection(supplier, DbSession);
 		}
@@ -833,8 +826,6 @@ WHERE s.Id = ?ClientCode
 
 			supplier.HomeRegion = Common.Web.Ui.Models.Region.Find(currentHomeRegion);
 			DbSession.Save(supplier);
-			//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
-			//SessionScope.Current.Commit();
 		}
 
 		protected void RegionalSettingsGrid_RowCreated(object sender, GridViewRowEventArgs e)

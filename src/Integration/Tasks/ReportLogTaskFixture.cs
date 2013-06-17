@@ -1,4 +1,5 @@
-﻿using AdminInterface.Background;
+﻿using System;
+using AdminInterface.Background;
 using AdminInterface.Models.Billing;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -6,7 +7,7 @@ using NUnit.Framework;
 namespace Integration.Tasks
 {
 	[TestFixture]
-	public class ReportLogProcessorFixture : Test.Support.IntegrationFixture
+	public class ReportLogTaskFixture : Test.Support.IntegrationFixture
 	{
 		private Payer payer;
 		private Report report;
@@ -35,7 +36,7 @@ namespace Integration.Tasks
 			Flush();
 			Close();
 
-			new ReportLogsProcessor().Process();
+			new ReportLogsTask().Execute();
 
 			Reopen();
 			payer = Payer.Find(payer.Id);
@@ -52,7 +53,7 @@ namespace Integration.Tasks
 			Flush();
 			Close();
 
-			new ReportLogsProcessor().Process();
+			new ReportLogsTask().Execute();
 
 			Reopen();
 			payer = Payer.Find(payer.Id);

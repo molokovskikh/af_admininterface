@@ -1,49 +1,38 @@
 ﻿using AdminInterface.Helpers;
-using Castle.ActiveRecord;
-using Common.Web.Ui.ActiveRecordExtentions;
-using Common.Web.Ui.Helpers;
 using NUnit.Framework;
+using Test.Support;
 
 namespace Integration
 {
 	[TestFixture]
-	public class DbLogHelperFixture
+	public class DbLogHelperFixture : IntegrationFixture
 	{
 		[Test]
 		public void Set_up_transaction_parameters()
 		{
-			using (new SessionScope()) {
-				DbLogHelper.SetupParametersForTriggerLogging(
-					"test",
-					"localhost");
+			DbLogHelper.SetupParametersForTriggerLogging(
+				"test",
+				"localhost");
 
-				ArHelper.WithSession(
-					session => {
-						Assert.That(session.CreateSQLQuery("select @InUser;").UniqueResult<string>(),
-							Is.EqualTo("test"));
-						Assert.That(session.CreateSQLQuery("select @InHost;").UniqueResult<string>(),
-							Is.EqualTo("localhost"));
-					});
-			}
+			Assert.That(session.CreateSQLQuery("select @InUser;").UniqueResult<string>(),
+				Is.EqualTo("test"));
+			Assert.That(session.CreateSQLQuery("select @InHost;").UniqueResult<string>(),
+				Is.EqualTo("localhost"));
 		}
 
 		[Test]
 		public void Set_up_transaction_parameters_from_ananymous_object()
 		{
-			using (new SessionScope()) {
-				DbLogHelper.SetupParametersForTriggerLogging(new {
-					InUser = "test",
-					InHost = "localhost"
-				});
+			DbLogHelper.SetupParametersForTriggerLogging(new {
+				InUser = "test",
+				InHost = "localhost"
+			});
 
-				ArHelper.WithSession(
-					session => {
-						Assert.That(session.CreateSQLQuery("select @InUser;").UniqueResult<string>(),
-							Is.EqualTo("test"));
-						Assert.That(session.CreateSQLQuery("select @InHost;").UniqueResult<string>(),
-							Is.EqualTo("localhost"));
-					});
-			}
+
+			Assert.That(session.CreateSQLQuery("select @InUser;").UniqueResult<string>(),
+				Is.EqualTo("test"));
+			Assert.That(session.CreateSQLQuery("select @InHost;").UniqueResult<string>(),
+				Is.EqualTo("localhost"));
 		}
 	}
 }
