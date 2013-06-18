@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
+using System.Text;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
@@ -12,6 +15,8 @@ using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Linq;
+using NHibernate.SqlTypes;
+using NHibernate.UserTypes;
 
 namespace AdminInterface.Models
 {

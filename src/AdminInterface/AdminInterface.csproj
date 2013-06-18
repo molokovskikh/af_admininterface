@@ -473,6 +473,7 @@
     <Content Include="Assets\Javascripts\UserRegionsEditor.js" />
     <Content Include="Assets\Javascripts\UserScripts.js" />
     <Content Include="Assets\Javascripts\WaybillExcludeFiles.js" />
+    <Content Include="Assets\Stylesheets\alt.form.css" />
     <Content Include="Assets\Stylesheets\billing.css" />
     <Content Include="Assets\Stylesheets\ClientsShow.css" />
     <Content Include="Assets\Stylesheets\Documents.css" />

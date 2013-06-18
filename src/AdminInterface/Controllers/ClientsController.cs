@@ -266,6 +266,7 @@ where Phone like :phone")
 			PropertyBag["client"] = client;
 			PropertyBag["regions"] = regions;
 			PropertyBag["drugstore"] = drugstore;
+			PropertyBag["encodings"] = SmartOrderRules.PosibleEncodings;
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -300,6 +301,7 @@ where Phone like :phone")
 			if (drugstore.EnableSmartOrder) {
 				if (drugstore.SmartOrderRules == null && smartOrderRules == null) {
 					drugstore.SmartOrderRules = SmartOrderRules.TestSmartOrder();
+					BindObjectInstance(drugstore.SmartOrderRules, "drugstore.SmartOrderRules");
 				}
 				else {
 					drugstore.SmartOrderRules = smartOrderRules;

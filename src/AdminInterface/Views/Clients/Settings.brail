@@ -4,6 +4,8 @@
 	Конфигурация клиента ${client.Name}
 <% end %>
 ${app.Asset("Documents.css")}
+${app.Asset("alt.form.css")}
+
 <script>
 	$(function () {
 		activateSearch();
@@ -89,7 +91,7 @@ ${app.Asset("Documents.css")}
 						${app.Edit("drugstore.CalculateLeader")}<br>
 						${app.Edit("drugstore.AllowAnalitFSchedule")}<br>
 						${app.Edit("drugstore.DebugOrders")}<br>
-						<label>Формат для сохранения накладных Протек</label>
+						${app.Label("drugstore.ProtekWaybillSavingType")}
 						${app.Edit("drugstore.ProtekWaybillSavingType")}<br>
 
 						<h4>AnalitF</h4>
@@ -101,26 +103,83 @@ ${app.Asset("Documents.css")}
 
 						<h4>Недельный заказ</h4>
 						${app.Edit("drugstore.CheckWeeklyOrdersSum")}<br>
-						Максимальный недельный заказ:
-						<input type="text" name="drugstore.MaxWeeklyOrdersSum" value="${drugstore.MaxWeeklyOrdersSum}" /><br />
+						${app.Label("drugstore.MaxWeeklyOrdersSum")}
+						${app.Edit("drugstore.MaxWeeklyOrdersSum")}
 					</td>
 				</tr>
 				<tr>
-					<td>
+					<td colspan="2">
 						${app.Edit("drugstore.EnableSmartOrder", {@class : @activate})}
-					</td>
-					<td>
 						<div>
-							${app.SearchEdit("drugstore.SmartOrderRules.AssortimentPriceCode", {"data-search-editor": @assortmentPrice,
+							${app.SearchEdit("drugstore.SmartOrderRules.AssortimentPriceCode", {
+								"data-search-editor": @assortmentPrice,
 								"data-depend-on": "drugstore_EnableSmartOrder",
 								"data-search-title": "Выберите ассортиментный прайс лист"})}
 							${app.GetValidationError("drugstore.SmartOrderRules.AssortimentPriceCode")}
 						</div>
 						<div>
-							${app.SearchEdit("drugstore.SmartOrderRules.ParseAlgorithm", {"data-search-editor": @parser,
+							${app.SearchEdit("drugstore.SmartOrderRules.ParseAlgorithm", {
+								"data-search-editor": @parser,
 								"data-depend-on": "drugstore_EnableSmartOrder",
 								"data-search-title": "Выберите парсер"})}
 							${app.GetValidationError("drugstore.SmartOrderRules.ParseAlgorithm")}
+						</div>
+						<div class=settings data-depend-on="drugstore_EnableSmartOrder">
+							<h4>Настройка разбора файла</h4>
+							<div class="desc">
+								Настройка правил разбора производится для источников DbfSource, ExcelSource, TextSource. <br>
+								Для всех остальных источников правила разбора игнорируются
+							</div>
+							<div class="form-block">
+								${app.Label("drugstore.SmartOrderRules.Loader")}
+								${app.Edit("drugstore.SmartOrderRules.Loader")}
+							</div>
+							<div class="form-block">
+								${app.Label("drugstore.SmartOrderRules.ColumnSeparator")}
+								${app.Edit("drugstore.SmartOrderRules.ColumnSeparator")}
+								<div class="desc">
+									для обозначение табулятора используется последовательноть символов "\t"
+								</div>
+							</div>
+							<div class="form-block">
+								${app.Label("drugstore.SmartOrderRules.StartLine")}
+								${app.Edit("drugstore.SmartOrderRules.StartLine")}
+								<div class="desc">
+									нумерация начинается с "0"
+								</div>
+							</div>
+							<div class="form-block">
+								${app.Label("drugstore.SmartOrderRules.CodePage")}
+								${FormHelper.Select("drugstore.SmartOrderRules.CodePage", encodings, {
+									@firstoption: "Определить автоматически",
+									@firstoptionvalue: "",
+									@text: "HeaderName",
+									@value: "CodePage"})}
+							</div>
+
+							<div class="form-block">
+								${app.Label("drugstore.SmartOrderRules.CodeColumn")}
+								${app.Edit("drugstore.SmartOrderRules.CodeColumn")}
+								<div class="desc">
+									для текстовых и excel файлов колонки задаются с помощью номера, начиная с "0"
+								</div>
+							</div>
+							<div class="form-block">
+								${app.Label("drugstore.SmartOrderRules.CodeCrColumn")}
+								${app.Edit("drugstore.SmartOrderRules.CodeCrColumn")}
+							</div>
+							<div class="form-block">
+								${app.Label("drugstore.SmartOrderRules.ProductColumn")}
+								${app.Edit("drugstore.SmartOrderRules.ProductColumn")}
+							</div>
+							<div class="form-block">
+								${app.Label("drugstore.SmartOrderRules.ProducerColumn")}
+								${app.Edit("drugstore.SmartOrderRules.ProducerColumn")}
+							</div>
+							<div class="form-block">
+								${app.Label("drugstore.SmartOrderRules.QuantityColumn")}
+								${app.Edit("drugstore.SmartOrderRules.QuantityColumn")}
+							</div>
 						</div>
 					</td>
 				</tr>

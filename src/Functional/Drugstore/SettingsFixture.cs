@@ -143,6 +143,10 @@ namespace Functional.Drugstore
 
 			Css("#drugstore_EnableSmartOrder").Click();
 			Css("#drugstore_EnableSmartOrder").Click();
+			Css("#drugstore_SmartOrderRules_ColumnSeparator").TypeText("\t");
+			Css("#drugstore_SmartOrderRules_CodePage").Select("windows-1251");
+			Css("#drugstore_SmartOrderRules_CodeColumn").TypeText("0");
+			Css("#drugstore_SmartOrderRules_QuantityColumn").TypeText("1");
 
 			Search("Фармаимпекс", "Выберите ассортиментный прайс лист");
 			Assert.That(SearchRoot("Выберите ассортиментный прайс лист")
@@ -157,6 +161,13 @@ namespace Functional.Drugstore
 			Click("Настройка");
 			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
 			Assert.That(browser.Text, Is.StringContaining("testParse"));
+
+			var rule = client.Settings.SmartOrderRules;
+			session.Refresh(rule);
+			Assert.AreEqual(@"\t", rule.ColumnSeparator);
+			Assert.AreEqual(1251, rule.CodePage);
+			Assert.AreEqual(@"0", rule.CodeColumn);
+			Assert.AreEqual(@"1", rule.QuantityColumn);
 		}
 
 		[Test]

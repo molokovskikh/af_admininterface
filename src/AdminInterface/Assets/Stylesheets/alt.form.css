@@ -1,0 +1,10 @@
+﻿div.form-block label
+{
+	clear: both;
+	display: block;
+}
+.desc
+{
+	font-size: smaller;
+	padding-bottom: 4px;
+}
