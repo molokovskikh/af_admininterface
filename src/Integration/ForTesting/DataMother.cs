@@ -260,7 +260,7 @@ namespace Integration.ForTesting
 				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
 			};
 			supplier.RegionalData.Add(new RegionalData { Region = homeRegion, Supplier = supplier });
-			supplier.AddPrice("Базовый", PriceType.Regular);
+			supplier.AddPrice("Базовый");
 			if (action != null)
 				action(supplier);
 			return supplier;

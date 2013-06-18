@@ -322,7 +322,7 @@ namespace AdminInterface.Models.Suppliers
 			}
 		}
 
-		public virtual Price AddPrice(string name, PriceType priceType)
+		public virtual Price AddPrice(string name, PriceType priceType = PriceType.Regular)
 		{
 			var price = new Price {
 				AgencyEnabled = true,

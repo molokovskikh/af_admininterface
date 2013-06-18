@@ -63,7 +63,7 @@ namespace Integration.Models
 		public void Copy_supplier_code_from_base_price()
 		{
 			var supplier = DataMother.CreateSupplier();
-			var price = supplier.AddPrice("Тестовый 1", PriceType.Regular);
+			var price = supplier.AddPrice("Тестовый 1");
 			Save(supplier);
 
 			var client = DataMother.CreateTestClientWithAddress();
@@ -104,6 +104,25 @@ namespace Integration.Models
 			intersection = session.Query<AddressIntersection>()
 				.First(a => a.Intersection.Price == supplier.Prices[2] && a.Intersection.Client == client);
 			Assert.That(intersection.SupplierDeliveryId, Is.EqualTo("d1"));
+		}
+
+		[Test]
+		public void Copy_user_price_settings_with_ignore_new_price()
+		{
+			var supplier = DataMother.CreateSupplier();
+			session.Save(supplier);
+			var client = DataMother.CreateTestClientWithUser();
+			client.Settings.IgnoreNewPriceForUser = true;
+			var user = client.Users[0];
+			var price = supplier.AddPrice("Тестовый");
+			session.Flush();
+			client.MaintainIntersection();
+
+			var count = session.CreateSQLQuery("select count(*) from Customers.UserPrices where userId = :userId and priceId = :priceId")
+				.SetParameter("userId", user.Id)
+				.SetParameter("priceId", price.Id)
+				.UniqueResult<long>();
+			Assert.AreEqual(count, 1);
 		}
 	}
 }

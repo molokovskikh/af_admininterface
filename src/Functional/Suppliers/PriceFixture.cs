@@ -39,7 +39,7 @@ namespace Functional.Suppliers
 			var baseItems = supplier.Prices[0].Costs.Select(c => c.PriceItem.Id).ToList();
 			Assert.That(baseItems.Count, Is.EqualTo(1));
 			Save(supplier.Prices[0]);
-			var price = supplier.AddPrice("forDelete", PriceType.Regular);
+			var price = supplier.AddPrice("forDelete");
 			Save(price);
 			session.CreateSQLQuery(string.Format("insert into ordersold.ordershead (RowId, PriceCode) value ({0}, {1})", generator.Next(10000), supplier.Prices[0].Id)).ExecuteUpdate();
 			Flush();
