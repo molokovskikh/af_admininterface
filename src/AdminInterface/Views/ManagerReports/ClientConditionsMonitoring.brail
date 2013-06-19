@@ -19,7 +19,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		</td>
 	</tr>
 	<tr>
-		<td>${app.ExportLink("Выгрузить отчет в Ехсel", "ExcelClientConditionsMonitoring", filter)}</td>
+		<td>${app.ExportLink("Выгрузить отчет в Ехcel", "ExcelClientConditionsMonitoring", filter)}</td>
 		${app.EndFormFor("filter")}
 	</tr>
 </tbody>

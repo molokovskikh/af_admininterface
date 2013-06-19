@@ -14,7 +14,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<td>${app.Edit("filter.Region")}</td>
 	</tr>
 	<tr>
-		<td colspan=3>${app.ExportLink("Выгрузить отчет в Ехсel", "ExcelSwitchOffClients", filter)}</td>
+		<td colspan=3>${app.ExportLink("Выгрузить отчет в Ехcel", "ExcelSwitchOffClients", filter)}</td>
 	</tr>
 	<tr>
 		${app.EndFormFor("filter")}

@@ -72,7 +72,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		</td>
 	</tr>
 	<tr>
-		<td colspan=3 class="ExcelLink">${app.ExportLink("Выгрузить отчет в Ехсel", "ExcelAnalysisOfWorkDrugstores", filter)}</td>
+		<td colspan=3 class="ExcelLink">${app.ExportLink("Выгрузить отчет в Ехcel", "ExcelAnalysisOfWorkDrugstores", filter)}</td>
 	</tr>
 	<tr>
 	</tr>

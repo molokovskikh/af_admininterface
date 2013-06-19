@@ -23,7 +23,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<td>${app.Edit("filter.Region")}</td>
 	</tr>
 	<tr>
-		<td colspan=3 style="text-align:right;">${app.ExportLink("Выгрузить отчет в Ехсel", "GetUsersAndAdresses", filter)}</td>
+		<td colspan=3 style="text-align:right;">${app.ExportLink("Выгрузить отчет в Ехcel", "GetUsersAndAdresses", filter)}</td>
 	</tr>
 	<tr>
 		${app.EndFormFor("filter")}

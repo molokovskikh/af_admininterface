@@ -53,7 +53,7 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[Property, Description("Колока код"), Auditable]
+		[Property, Description("Колонка код"), Auditable]
 		public virtual string CodeColumn { get; set; }
 
 		[Property, Description("Колонка код производителя"), Auditable]
