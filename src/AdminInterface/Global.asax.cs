@@ -46,6 +46,7 @@ namespace AddUser
 		public Global()
 			: base(Assembly.Load("AdminInterface"))
 		{
+			FixMonorailConponentBug = false;
 			LibAssemblies.Add(Assembly.Load("Common.Web.Ui"));
 			Logger.ErrorSubject = "Ошибка в Административном интерфейсе";
 			Logger.SmtpHost = "box.analit.net";
