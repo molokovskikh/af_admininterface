@@ -142,9 +142,6 @@ namespace AdminInterface.Controllers
 					continue;
 				}
 				var value = obj.Value.ToString();
-				if (obj.Value.Type == JTokenType.String) {
-					value = value.Substring(1, value.Length - 2);
-				}
 				if (obj.Value.Type == JTokenType.Null)
 					value = string.Empty;
 				result.Add(objName + "." + obj.Key, value);
