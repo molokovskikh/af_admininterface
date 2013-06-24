@@ -39,16 +39,9 @@ ${app.Asset("UserScripts.js")}
 			${app.Edit("user.SendRejects")}<br>
 			${app.Edit("user.AllowDownloadUnconfirmedOrders")}<br>
 			${app.Edit("user.ShowSupplierCost")}<br>
-
-			<input type=checkbox name=user.Auditor ${"checked" if user.Auditor} value=true> Аудитор, может просматривать заказы всех пользователей текущего клиента и клиентов которые назначены как показываемые<br>
-			<input type=hidden name=user.Auditor value=false>
-			</p>
-			<select name=user.InheritPricesFrom.Id>
-				<option value=0>Не наследовать</option>
-				<% for parent in user.Client.Users: %>
-					<option value=${parent.Id} ${"selected" if user.InheritPricesFrom and user.InheritPricesFrom.Id == parent.Id}>${parent.Login}</option>
-				<% end %>
-			</select> Наследовать настройки прайс листов <br>
+			${app.Edit("user.Auditor", {@text: "Аудитор, может просматривать заказы всех пользователей текущего клиента и клиентов которые назначены как показываемые"})}<br>
+			${app.Edit("user.InheritPricesFrom", {@items: user.CanInheritPricesFrom, @firstoption: "Не наследовать", @firstoptionvalue: "", @text: @LoginAndName})}
+			${app.Label("user.InheritPricesFrom")}<br>
 		</div>
 	
 		<div class=block>

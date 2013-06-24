@@ -272,7 +272,6 @@ namespace AdminInterface.Models
 		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
 		public virtual Service RootService { get; set; }
 
-		//public virtual RegionSettings[] RegionSettings { get; set; }
 		public virtual IList<int> RegionSettings { get; set; }
 		public virtual string EmailForCard { get; set; }
 
@@ -299,6 +298,14 @@ namespace AdminInterface.Models
 				versions.Add(UserUpdateInfo.AFAppVersion);
 				versions.Sort();
 				return new[] { "Любая версия" }.Concat(versions.Distinct().Select(v => v.ToString())).ToList();
+			}
+		}
+
+		public virtual List<User> CanInheritPricesFrom
+		{
+			get
+			{
+				return Client.Users.Where(u => u.Id != Id).OrderBy(u => u.LoginAndName).ToList();
 			}
 		}
 
@@ -350,16 +357,14 @@ namespace AdminInterface.Models
 			return Name;
 		}
 
-		public virtual string GetLoginWithName()
+		public virtual string LoginAndName
 		{
-			if (String.IsNullOrEmpty(_name))
-				return Login;
-			return String.Format("{0} ({1})", Login, _name);
-		}
-
-		public static User GetByLogin(string login)
-		{
-			return ActiveRecordMediator<User>.FindOne(Restrictions.Eq("Login", login));
+			get
+			{
+				if (String.IsNullOrEmpty(_name))
+					return Login;
+				return String.Format("{0} ({1})", Login, _name);
+			}
 		}
 
 		public virtual void CheckLogin()

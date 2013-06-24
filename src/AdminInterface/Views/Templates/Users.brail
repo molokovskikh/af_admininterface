@@ -4,7 +4,7 @@
 		<% for i, user in enumerate(address.Client.Users): %>
 			<div class="${app.Style(user)}">
 				<input type=checkbox name="address.AvaliableForUsers[${i}].Id" value=${user.Id} ${"checked" if address.AvaliableFor(user)} ${"disabled" if not user.Enabled} />
-				${user.GetLoginWithName()}
+				${user.LoginAndName}
 			</div>
 		<% end %>
 	</div>

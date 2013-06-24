@@ -120,7 +120,7 @@
 								<td>
 									<input id="CheckBoxAddress${address.Id}User${user.Id}" type="checkbox" ${"checked" if address.AvaliableFor(user)}
 										onclick="if (!this.checked) DisconnectAddressFromUser(${user.Id}, ${address.Id})">
-										${user.GetLoginWithName()}
+										${user.LoginAndName}
 									</input>
 								</td>
 							</tr>

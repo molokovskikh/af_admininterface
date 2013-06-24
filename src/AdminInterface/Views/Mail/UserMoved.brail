@@ -1,4 +1,4 @@
-﻿Пользователь ${user.GetLoginWithName()} перемещен
+﻿Пользователь ${user.LoginAndName} перемещен
 Старый клиент ${oldClient.Name} плательщик ${oldPayer.Name}
 Новый клиент ${user.Client.Name} плательщик ${user.Payer.Name}
 Перенес: ${admin.Name}
