@@ -1,9 +1,9 @@
 /* The main calendar widget.  DIV containing a table. */
 
-div.calendar 
+div.calendar
 {
 	border: none;
-	position: relative; 
+	position: relative;
 }
 
 .calendar, .calendar table {

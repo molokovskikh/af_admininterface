@@ -2,9 +2,9 @@
 {
 	padding: 5px;
 	background-color: #d8f1ff;
-	text-align: center; 
+	text-align: center;
 	vertical-align: middle;
-	font-weight:bold; 
+	font-weight:bold;
 	margin-bottom:10px;
 	width: 100%;
 }
@@ -26,7 +26,7 @@
 #breadcrumb
 {
     font: 11px Arial, Helvetica, sans-serif;
-    background-image:url('../images/bc_bg.png');
+    background-image:url('../../images/bc_bg.png');
     background-repeat:repeat-x;
     height:30px;
     line-height:30px;
@@ -48,8 +48,8 @@
 #breadcrumb a
 {
     height:30px;
-    display:block;    
-    background-image:url('../images/bc_separator.png');
+    display:block;
+    background-image:url('../../images/bc_separator.png');
     background-repeat:no-repeat;
     background-position:right;
     padding-right: 15px;
@@ -71,23 +71,23 @@
 }
 
 /*------tabs-------*/
-.tabs 
+.tabs
 {
-	height: 2.6em; 
-	border-bottom: 1px solid #bbbbbb; 
-	margin-bottom: 1.2em; 
+	height: 2.6em;
+	border-bottom: 1px solid #bbbbbb;
+	margin-bottom: 1.2em;
 	position: relative;
 }
-.tabs ul 
+.tabs ul
 {
-	margin:0; 
-	position:absolute; 
-	bottom:-2px; 
+	margin:0;
+	position:absolute;
+	bottom:-2px;
 	padding-left:1em;
 }
-.tabs>ul  
+.tabs>ul
 {
-	bottom:-1px; 
+	bottom:-1px;
 } /* others */
 .tabs ul li {
 	float:left;
@@ -109,7 +109,7 @@
 	font-weight:bold;
 }
 
-.tabs ul li a:hover 
+.tabs ul li a:hover
 {
 	background-color: #ffffdd;
 	text-decoration:none;
@@ -128,7 +128,7 @@
 
 /*------messages---*/
 div.flash.notice {
-    background:#DFFFDF url(../images/true.png) no-repeat scroll 8px 5px;
+    background:#DFFFDF url(../../images/true.png) no-repeat scroll 8px 5px;
     border-color:#9FCF9F;
     color:#005F00;
 }
@@ -140,7 +140,7 @@ div.flash.WarningFlash {
 }
 
 div.flash.err, #errorExplanation {
-    background: url(../images/false.png) 8px 5px no-repeat;
+    background: url(../../images/false.png) 8px 5px no-repeat;
     background-color: #ffe3e3;
     border-color: #dd0000;
     color: #550000;
@@ -199,7 +199,7 @@ table.DataTable tr.update-is-uncommited td.update-date
 
 .waiter
 {
-	background-image: url(../images/loading.gif);
+	background-image: url(../../images/loading.gif);
 	width: 18px;
 	height: 18px;
 }

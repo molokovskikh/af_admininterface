@@ -1,4 +1,4 @@
-﻿.block
+п»ї.block
 {
 	background-color: #F6F6F6;
 	border:1px solid #E4E4E4;
@@ -27,7 +27,7 @@
 }
 
 .block h4
-{	
+{
 	padding:2px 10px 1px 0;
 	margin:0 0 10px;
 	border-bottom:1px solid #BBBBBB;
@@ -79,12 +79,12 @@ h2
 
 .icon-add
 {
-	background-image: url(../images/add.png);
+	background-image: url(../../images/add.png);
 }
 
 .icon-email
 {
-	background-image: url(../images/email.png);
+	background-image: url(../../images/email.png);
 }
 
 .navigation-menu

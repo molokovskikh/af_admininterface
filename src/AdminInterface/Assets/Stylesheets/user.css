@@ -59,11 +59,11 @@ table.DataTable tr.EvenRow.disabled-by-billing,
 table.DataTable tr.OddRow.disabled-by-billing.single-user,
 table.DataTable tr.EvenRow.disabled-by-billing.single-user
 span.disabled,
-/*ссылка на отключенного клиента/поставщика/адрес/пользователя*/
+/*СЃСЃС‹Р»РєР° РЅР° РѕС‚РєР»СЋС‡РµРЅРЅРѕРіРѕ РєР»РёРµРЅС‚Р°/РїРѕСЃС‚Р°РІС‰РёРєР°/Р°РґСЂРµСЃ/РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ*/
 a.disabled,
-/*легенда*/
+/*Р»РµРіРµРЅРґР°*/
 div.LegendMarker.disabled,
-/*что бы избежать конфликтов*/
+/*С‡С‚Рѕ Р±С‹ РёР·Р±РµР¶Р°С‚СЊ РєРѕРЅС„Р»РёРєС‚РѕРІ*/
 table.style td.disabled
 {
 	background-color: #ff9d5b;
@@ -90,7 +90,7 @@ div.LegendMarker.SingleUser
 
 .kfm_home {
 	text-decoration: none;
-	background-image: url(../Images/kfm_home.png);
+	background-image: url(../../Images/kfm_home.png);
 	background-repeat: no-repeat;
 	background-position: 0% 100%;
 	padding-left: 25px;
@@ -235,7 +235,7 @@ table thead.CenterHead th
 }
 
 #loadingDiv {
-	background: url(/Images/ajax-loader.gif) no-repeat 50% 10%;
+	background: url(../../Images/ajax-loader.gif) no-repeat 50% 10%;
 	padding-top: 60px;
 	background-color: #F5F5F5;
 	border: 2px solid #AAA;
@@ -256,7 +256,7 @@ table thead.CenterHead th
 }
 
 .attachment {
-	background: url("/Images/Attachment.png");
+	background: url("../../Images/Attachment.png");
 	background-repeat: no-repeat;
 	height: 16px;
 	display: block;

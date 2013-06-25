@@ -4,13 +4,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 	<title>Административный интерфейс</title>
-	<link rel="stylesheet" type="text/css" href="~/Css/Table.css" />
-	<link rel="stylesheet" type="text/css" href="~/Css/Contacts.css" />
-	<link rel="stylesheet" type="text/css" href="~/Css/Billing.css" />
-	<link rel="stylesheet" type="text/css" href="~/Css/Highlight.css" />
-	<link rel="stylesheet" type="text/css" href="~/Css/ValidationStyles.css" />
-	<link rel="stylesheet" type="text/css" href="~/Css/Form.css" />
-	<link rel="Stylesheet" type="text/css" href="~/Css/Common.css" />
+	<link rel="stylesheet" type="text/css" href="~/Assets/Stylesheets/Table.css" />
+	<link rel="stylesheet" type="text/css" href="~/Assets/Stylesheets/Contacts.css" />
+	<link rel="stylesheet" type="text/css" href="~/Assets/Stylesheets/Billing.css" />
+	<link rel="stylesheet" type="text/css" href="~/Assets/Stylesheets/Highlight.css" />
+	<link rel="stylesheet" type="text/css" href="~/Assets/Stylesheets/ValidationStyles.css" />
+	<link rel="stylesheet" type="text/css" href="~/Assets/Stylesheets/Form.css" />
+	<link rel="Stylesheet" type="text/css" href="~/Assets/Stylesheets/Common.css" />
 </head>
 <body>
 	<div>

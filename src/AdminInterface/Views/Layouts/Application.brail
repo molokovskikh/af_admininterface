@@ -29,9 +29,19 @@
 		${app.Asset("autosubmit.coffee")}
 		${app.Asset("calendar.setup.js")}
 
-		${app.Asset("themes/base/jquery.ui.all.css")}
+		${app.Asset("jquery.ui.all.css")}
 		${app.Asset("filter.css")}
 		${app.Asset("search.editor.css")}
+		${app.Asset("User.css")}
+		${app.Asset("Table.css")}
+		${app.Asset("calendar-blue.css")}
+		${app.Asset("Billing.css")}
+		${app.Asset("ValidationStyles.css")}
+		${app.Asset("Highlight.css")}
+		${app.Asset("Common.css")}
+		${app.Asset("Contacts.css")}
+		${app.Asset("form.css")}
+		${app.Asset("columns.css")}
 
 		${app.JS("calendar.js",
 			"calendar-ru_win_.js",
@@ -42,17 +52,7 @@
 			"jquery.maskedinput-1.2.2.min.js",
 			"Common.js")}
 
-		${app.CSS("/App_Themes/Main/Main.css",
-			"calendar-blue.css",
-			"Billing.css",
-			"Table.css",
-			"ValidationStyles.css",
-			"Highlight.css",
-			"Common.css",
-			"Contacts.css",
-			"form.css",
-			"User.css",
-			"columns.css")}
+		${app.CSS("/App_Themes/Main/Main.css")}
 		<script>
 			$(function () {
 				window.siteroot = "${siteroot}";

@@ -482,8 +482,8 @@
     <Content Include="Assets\Stylesheets\ManagerReport.css" />
     <Content Include="Assets\Stylesheets\PrintRevisionAct.css" />
     <Content Include="Assets\Stylesheets\search.editor.css" />
-    <Content Include="Css\columns.css" />
-    <Content Include="Css\User.css" />
+    <Content Include="Assets\Stylesheets\columns.css" />
+    <Content Include="Assets\Stylesheets\user.css" />
     <Content Include="EditRegionalInfo.aspx" />
     <Content Include="Images\email.png" />
     <Content Include="Images\group.png" />
@@ -492,7 +492,6 @@
     <Content Include="Images\sipphone.png" />
     <Content Include="Images\Sound-icon.png" />
     <Content Include="JavaScript\builder.js" />
-    <Content Include="JavaScript\coffee-script.js" />
     <Content Include="JavaScript\Common.js" />
     <Content Include="Assets\Javascripts\filter.coffee" />
     <Content Include="JavaScript\contact.registrator.js" />
@@ -640,16 +639,14 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Css\Billing.css" />
     <Content Include="Assets\Stylesheets\filter.css" />
-    <Content Include="Css\calendar-blue.css" />
-    <Content Include="Css\Common.css" />
-    <Content Include="Css\Contacts.css" />
-    <Content Include="Css\form.css" />
-    <Content Include="Css\Highlight.css" />
-    <Content Include="Css\Report.css" />
-    <Content Include="Css\Table.css" />
-    <Content Include="Css\ValidationStyles.css" />
+    <Content Include="Assets\Stylesheets\calendar-blue.css" />
+    <Content Include="Assets\Stylesheets\Common.css" />
+    <Content Include="Assets\Stylesheets\Contacts.css" />
+    <Content Include="Assets\Stylesheets\form.css" />
+    <Content Include="Assets\Stylesheets\Highlight.css" />
+    <Content Include="Assets\Stylesheets\table.css" />
+    <Content Include="Assets\Stylesheets\ValidationStyles.css" />
     <Content Include="Images\add.png" />
     <Content Include="Images\ajax-loader.gif" />
     <Content Include="Images\bc_bg.png" />

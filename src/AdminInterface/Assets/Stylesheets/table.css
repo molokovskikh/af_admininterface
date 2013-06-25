@@ -4,8 +4,8 @@ tbody tr.SelectedRow
 }
 
 /*
-вес селектора должен быть больше чем .DataTable tbody tr:nth-child(odd)
-что бы он перекрыл цвет строки
+РІРµСЃ СЃРµР»РµРєС‚РѕСЂР° РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ С‡РµРј .DataTable tbody tr:nth-child(odd)
+С‡С‚Рѕ Р±С‹ РѕРЅ РїРµСЂРµРєСЂС‹Р» С†РІРµС‚ СЃС‚СЂРѕРєРё
 */
 tr.SelectedRow.EvenRow,
 tr.SelectedRow.OddRow,
@@ -57,11 +57,11 @@ th a.sort
 }
 th a.sort.asc
 {
-	background-image: url("../Images/arrow-down-blue.gif");
+	background-image: url("../../Images/arrow-down-blue.gif");
 }
 th a.sort.desc
 {
-	background-image: url("../Images/arrow-down-blue-reversed.gif");
+	background-image: url("../../Images/arrow-down-blue-reversed.gif");
 }
 
 .DataTable tbody tr:nth-child(even)

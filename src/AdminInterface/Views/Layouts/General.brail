@@ -11,16 +11,16 @@
 		<% end %>
 	</title>
 
-	${app.CSS("calendar-blue.css",
-		"/App_Themes/Main/Main.css",
-		"Billing.css",
-		"Table.css",
-		"ValidationStyles.css",
-		"Common.css",
-		"Contacts.css",
-		"Highlight.css",
-		"Contacts.css",
-		"Form.css")}
+	${app.CSS("/App_Themes/Main/Main.css")}
+	${app.Asset("calendar-blue.css")}
+	${app.Asset("Billing.css")}
+	${app.Asset("Table.css")}
+	${app.Asset("ValidationStyles.css")}
+	${app.Asset("Common.css")}
+	${app.Asset("Contacts.css")}
+	${app.Asset("Highlight.css")}
+	${app.Asset("Contacts.css")}
+	${app.Asset("Form.css")}
 
 	${app.JS("calendar.js",
 		"calendar-ru_win_.js",

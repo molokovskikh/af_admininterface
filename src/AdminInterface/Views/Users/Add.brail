@@ -1,6 +1,4 @@
-﻿<link href="${siteroot}/Css/User.css" type="text/css" rel="stylesheet" />
-
-<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), client]} %>
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), client]} %>
 
 <% component CaptureFor, {"id" : "Title"}: %>
 	Новый пользователь
@@ -58,11 +56,11 @@
 				<textarea style="width: 100%" name="mails">${emailForSend}</textarea>
 			</div>
 		</div>
-		
+
 		<div class=block>
 			<% OutputSubView("/SubViews/ContactInfo") %>
 		</div>
-		
+
 		<div class=block>
 			<% OutputSubView("/SubViews/PersonInfo") %>
 		</div>
@@ -90,7 +88,7 @@
 		</div>
 		<%end %>
 		<% OutputSubView("/Templates/Addresses") %>
-		
+
 		<div class=block>
 			<h3>
 				Права доступа
@@ -134,7 +132,7 @@
 			<h3>Региональная настройка</h3>
 			<% OutputSubView("/SubViews/Regions") %>
 		</div>
-		
+
 		<div class=save>
 			<input type=submit value="Создать">
 		</div>

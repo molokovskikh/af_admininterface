@@ -1,7 +1,5 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), user.RootService]} %>
 
-<link href="${siteroot}/Css/User.css" type="text/css" rel="stylesheet" />
-
 <% component CaptureFor, {@id : @Title}: %>
 	<% if (user.Login == user.Id.ToString()): %>
 		Пользователь ${user.Login}
@@ -120,11 +118,11 @@
 			</tr>
 			</table>
 		</div>
-	</div>	
+	</div>
 
 	<form id="UserSettingsForm" method=post action="${siteroot}/users/update">
 		<input name="user.Id" type=hidden value=${user.Id}>
-		
+
 		<div class=block>
 			<h3>Общая информация</h3>
 			${app.Display("user.Registration")}
@@ -134,7 +132,7 @@
 				${app.GetValidationError("user.Name")}<br>
 			</p>
 		</div>
-		
+
 		<div class=block>
 			<% OutputSubView("/SubViews/ContactInfo") %>
 		</div>

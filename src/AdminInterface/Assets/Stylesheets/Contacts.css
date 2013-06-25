@@ -1,0 +1,96 @@
+/*
+В этом файле описаны все стили, которые встречаются в библиотеке Common.Web.Ui
+*/
+
+
+/* Стили, необходимые для компонента ContactViewer */
+
+/* стиль для метки, раньше назывался как  ContactLabel */
+.ContactViewerContactLabel
+{
+	width: 50%;
+	padding: 3px;
+	text-align:right;
+	border-bottom-width: 1px;
+	border-bottom-color: Gray;
+	border-bottom-style: double;
+}
+
+/* стиль для текста, раньше назывался как  ContactText  */
+.ContactViewerContactText
+{
+	width: 50%;
+	padding: 3px;
+	border-bottom-width: 1px;
+	border-bottom-color: Gray;
+	border-bottom-style: double;
+}
+
+/* стиль для пустого блока, раньше был inline-стилем  */
+.ContactViewerEmptyBlock
+{
+	text-align:center;
+	padding: 3px;
+	border-bottom-width: 1px;
+	border-bottom-color: Gray;
+	border-bottom-style: double;
+}
+
+/* стиля для заголовка группы контактов, раньше был InputGroupHeader */
+.ContactViewerGroupHeader
+{
+	padding: 5px;
+	background-color: #d8f1ff;
+	text-align: center;
+	vertical-align: middle;
+}
+
+
+/* стиль для отображения ошибки валидации при вводе контакта, раньше был ValidationErrorMessage*/
+.ContactValidationErrorMessage
+{
+	color: #ff0000;
+	padding: 3px;
+	background-color:#f6f6f6;
+	padding:5px;
+}
+
+
+
+/* классы, которые используются для редактирования группы контактов или контактной информации персоны */
+/* стиль для блочного элемента кнопки "Сохранить", раньше был SubmitDiv */
+.ContactSubmitDiv
+{
+	text-align: right;
+}
+
+/* стиль для блочного элемента с редактируемой контактной информацией для персоны , раньше был BaseDiv */
+.ContactBaseDiv
+{
+	background-color:#dadada;
+	padding: 10px;
+}
+
+/* стиль для блочного элемента с редактируемым контактом для персоны , раньше был ElementsDiv */
+.ContactElementsDiv
+{
+	margin-bottom:10px;
+	margin-top:3px;
+	margin-left:3px;
+	margin-right:3px;
+	background-color:#f6f6f6;
+	padding:5px;
+}
+
+/* стиль для заголовка, раньше был HeaderDiv */
+.ContactHeaderDiv
+{
+	font-weight: bold;
+	margin-bottom:10px;
+	margin-top:3px;
+	margin-left:3px;
+	margin-right:3px;
+	background-color:#f6f6f6;
+	padding:10px;
+	text-align:center;
+}
