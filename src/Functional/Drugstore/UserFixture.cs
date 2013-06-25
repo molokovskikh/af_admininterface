@@ -52,7 +52,7 @@ namespace Functional.Drugstore
 			browser.Link(Find.ByText(user.Login)).Click();
 			Assert.That(browser.Text, Is.StringContaining("Пользователь " + user.Login));
 			browser.Link(Find.ByText("Настройка")).Click();
-			browser.SelectList(Find.ByName("user.InheritPricesFrom.Id")).Select(mainUser.Login);
+			browser.SelectList(Find.ByName("user.InheritPricesFrom.Id")).Select(mainUser.LoginAndName);
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранен"));
 
@@ -77,19 +77,18 @@ namespace Functional.Drugstore
 		{
 			browser.Link(Find.ByText("Новый пользователь")).Click();
 			browser.Button(Find.ByValue("Создать")).Click();
-			using (new SessionScope()) {
-				client = session.Load<Client>(client.Id);
-				Assert.That(client.Users.Count, Is.GreaterThan(0));
-				browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
-				browser.Refresh();
-				var userLink = browser.Link(Find.ByText(client.Users[0].Login));
-				Assert.IsTrue(userLink.Exists);
-				userLink.Click();
-				browser.Link(Find.ByText("Настройка")).Click();
-				Assert.IsFalse(browser.CheckBox(Find.ByName("user.SendWaybills")).Checked);
-				Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendRejects")).Checked);
-				Assert.IsFalse(browser.CheckBox(Find.ByName("user.IgnoreCheckMinOrder")).Checked);
-			}
+
+			client = session.Load<Client>(client.Id);
+			Assert.That(client.Users.Count, Is.GreaterThan(0));
+			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
+			browser.Refresh();
+			var userLink = browser.Link(Find.ByText(client.Users[0].Login));
+			Assert.IsTrue(userLink.Exists);
+			userLink.Click();
+			browser.Link(Find.ByText("Настройка")).Click();
+			Assert.IsFalse(browser.CheckBox(Find.ByName("user.SendWaybills")).Checked);
+			Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendRejects")).Checked);
+			Assert.IsFalse(browser.CheckBox(Find.ByName("user.IgnoreCheckMinOrder")).Checked);
 		}
 
 		private void GoToChangePassword()

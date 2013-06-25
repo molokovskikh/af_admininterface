@@ -109,10 +109,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ADHelperFixture.cs" />
+    <Compile Include="Helpers\ADHelperFixture.cs" />
     <Compile Include="AnalysisOfWorkDrugstoresFixture.cs" />
-    <Compile Include="AppHelperFixture.cs" />
-    <Compile Include="ClientConditionsMonitoringFilterFixture.cs" />
+    <Compile Include="Helpers\AppHelperFixture.cs" />
+    <Compile Include="Queries\ClientConditionsMonitoringFilterFixture.cs" />
     <Compile Include="ClientFixture.cs" />
     <Compile Include="Controllers\AccountControllerFixture.cs" />
     <Compile Include="Controllers\ActsControllerFixture.cs" />
@@ -123,13 +123,13 @@
     <Compile Include="Controllers\PaymentsControllerFixture.cs" />
     <Compile Include="Controllers\RevisionActControllerFixture.cs" />
     <Compile Include="Controllers\SupplierControllerFixture.cs" />
-    <Compile Include="DocumentBuildFilterFixture.cs" />
-    <Compile Include="FormPositionFilterFixture.cs" />
+    <Compile Include="Queries\DocumentBuildFilterFixture.cs" />
+    <Compile Include="Queries\FormPositionFilterFixture.cs" />
     <Compile Include="ForTesting\ModelExtension.cs" />
     <Compile Include="ManagepFixture.cs" />
     <Compile Include="ManagerReportFixture.cs" />
     <Compile Include="Audit\MaskedAuditablePropertyFixture.cs" />
-    <Compile Include="AuditorFixture.cs" />
+    <Compile Include="Audit\AuditorFixture.cs" />
     <Compile Include="ClientCardFixture.cs" />
     <Compile Include="Controllers\AddressesControllerFixture.cs" />
     <Compile Include="Controllers\BillingControllerFixture.cs" />
@@ -138,7 +138,7 @@
     <Compile Include="Controllers\UsersControllerFixture.cs" />
     <Compile Include="ForTesting\DataMother.cs" />
     <Compile Include="ForTesting\ForTest.cs" />
-    <Compile Include="InvoiceFilterFixture.cs" />
+    <Compile Include="Queries\InvoiceFilterFixture.cs" />
     <Compile Include="MailerFixture.cs" />
     <Compile Include="Models\AccountingFixture.cs" />
     <Compile Include="Models\ActFixture.cs" />
@@ -176,13 +176,13 @@
     <Compile Include="Models\OffersFixture.cs" />
     <Compile Include="NHibernateExtentions\StateExtentionFixture.cs" />
     <Compile Include="NotificationServiceFixture.cs" />
-    <Compile Include="PaymentFilterFixture.cs" />
+    <Compile Include="Queries\PaymentFilterFixture.cs" />
     <Compile Include="PrinterFixture.cs" />
     <Compile Include="Queries\ParsedWaybillsFilterFixture.cs" />
     <Compile Include="Queries\ResetReclameDateFixture.cs" />
     <Compile Include="Queries\UpdateOrdersFixture.cs" />
     <Compile Include="RegionalBaseCostsFixture.cs" />
-    <Compile Include="BaseFiltersFixture.cs" />
+    <Compile Include="Queries\BaseFiltersFixture.cs" />
     <Compile Include="Tasks\InvoicePartTaskFixture.cs" />
     <Compile Include="Tasks\SendInvoiceTaskFixture.cs" />
     <Compile Include="Tasks\ReportLogTaskFixture.cs" />
