@@ -2,6 +2,6 @@
 \src\Common.Tools\Common.Tools\ObjectExtentions.cs
 \src\Common.Tools\Common.Tools.Test\DbfFixture.cs
 \src\Common.Tools\Common.Tools.Test\ReleatableCommandFixture.cs
-\src\Integration\ADHelperFixture.cs
+\src\Integration\Helpers\ADHelperFixture.cs
 \src\Test.Support\Test.Support\log4net\EventFilter.cs
 \src\Test.Support\Test.Support.Web\WatinSetup.cs
