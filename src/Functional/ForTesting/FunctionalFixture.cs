@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -34,6 +35,12 @@ namespace Functional.ForTesting
 				searchRoot.Css(".search[type=button]").Click();
 			}
 			Thread.Sleep(1000);
+		}
+
+		public void ConfirmDialog()
+		{
+			var buttons = browser.Buttons.Where(b => !string.IsNullOrEmpty(b.ClassName) && b.ClassName.Contains("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).ToList();
+			buttons.First(b => b.InnerHtml.Contains("Продолжить")).Click();
 		}
 	}
 }

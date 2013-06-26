@@ -21,7 +21,7 @@ using Document = WatiN.Core.Document;
 
 namespace Functional.Billing
 {
-	public class BillingFixture : WatinFixture2
+	public class BillingFixture : FunctionalFixture
 	{
 		private Client client;
 		private Supplier _supplier;
@@ -276,7 +276,7 @@ namespace Functional.Billing
 			clientStatus.Click();
 			((TextField)browser.Css(".ui-dialog-content #AddCommentField")).TypeText("TestComment");
 			browser.Eval("$('input#AddCommentField').trigger($.Event( 'keydown', {which:$.ui.keyCode.ENTER, keyCode:$.ui.keyCode.ENTER}));");
-			Click("Продолжить");
+			ConfirmDialog();
 			Assert.IsFalse(clientStatus.Checked);
 			Thread.Sleep(1000);
 			browser.Refresh();
@@ -798,7 +798,7 @@ namespace Functional.Billing
 
 			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked = false;
 			browser.TextField("AddCommentField").AppendText("testComment");
-			Click("Продолжить");
+			ConfirmDialog();
 			Thread.Sleep(1000);
 
 			Refresh();
@@ -838,7 +838,7 @@ namespace Functional.Billing
 		private void AddCommentInDisableDialig()
 		{
 			browser.Css(".ui-dialog-content #AddCommentField").AppendText("TestComment");
-			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
+			ConfirmDialog();
 		}
 	}
 }

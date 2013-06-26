@@ -10,7 +10,7 @@ using Test.Support.Web;
 
 namespace Functional.Suppliers
 {
-	public class BillingFixture : WatinFixture2
+	public class BillingFixture : FunctionalFixture
 	{
 		[Test]
 		public void Disable_supplier()
@@ -24,7 +24,7 @@ namespace Functional.Suppliers
 			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
 			browser.CheckBox(Find.ByName("status")).Click();
 			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
-			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
+			ConfirmDialog();
 			Thread.Sleep(500);
 
 			session.Refresh(supplier);

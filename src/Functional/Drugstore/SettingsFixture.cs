@@ -31,7 +31,7 @@ namespace Functional.Drugstore
 			Flush();
 			settings = client.Settings;
 
-			browser = Open(client, "Settings");
+			Open(client, "Settings");
 			Assert.That(browser.Text, Is.StringContaining("Конфигурация клиента"));
 		}
 
@@ -173,7 +173,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Try_to_send_email_notification()
 		{
-			browser = Open(client, "Settings");
+			Open(client, "Settings");
 			browser.Button(Find.ByValue("Отправить уведомления о регистрации поставщикам")).Click();
 			Assert.That(browser.ContainsText("Уведомления отправлены"));
 		}

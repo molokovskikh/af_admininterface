@@ -4,6 +4,7 @@ using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
@@ -14,7 +15,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional.Billing
 {
 	[TestFixture]
-	public class EditFixture : WatinFixture2
+	public class EditFixture : FunctionalFixture
 	{
 		private Payer _payer;
 		private Client _client;
@@ -37,7 +38,7 @@ namespace Functional.Billing
 		[Test]
 		public void Set_null_recipient()
 		{
-			browser = Open(string.Format("Billing/Edit?BillingCode={0}#tab-mail", _payer.Id));
+			Open(string.Format("Billing/Edit?BillingCode={0}#tab-mail", _payer.Id));
 			var selectList = browser.SelectList(Find.ByName("Instance.Recipient.Id"));
 			var items = selectList.Options;
 			selectList.SelectByValue(items[0].Value);
@@ -50,12 +51,11 @@ namespace Functional.Billing
 		[Test]
 		public void Check_comment_with_disable_client()
 		{
-			browser = Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
+			Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
 			var checkBox = browser.Css("#clients input[name=\"status\"]");
 			checkBox.Checked = false;
 			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
-			var buttons = browser.Buttons.Where(b => !string.IsNullOrEmpty(b.ClassName) && b.ClassName.Contains("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).ToList();
-			buttons.First(b => b.InnerHtml.Contains("Продолжить")).Click();
+			ConfirmDialog();
 			Thread.Sleep(1000);
 			browser.Refresh();
 			AssertText("TestComment");
@@ -64,13 +64,12 @@ namespace Functional.Billing
 		[Test]
 		public void Check_free_accounting()
 		{
-			browser = Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
+			Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
 			Css("input[name=accounted]").Checked = true;
 			Css("input[name=free]").Checked = true;
 			Css("input[name=FreePeriodEnd]").AppendText(DateTime.Now.AddMonths(1).ToShortDateString());
 			Css("input[name=AddComment]").AppendText("Check_free_accounting");
-			var buttons = browser.Buttons.Where(b => !string.IsNullOrEmpty(b.ClassName) && b.ClassName.Contains("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).ToList();
-			buttons.First(b => b.InnerHtml.Contains("Продолжить")).Click();
+			ConfirmDialog();
 			var accounted = Css("input[name=accounted]");
 			Assert.IsFalse(accounted.Checked);
 			Assert.IsFalse(accounted.Enabled);
@@ -84,12 +83,11 @@ namespace Functional.Billing
 		[Test]
 		public void Check_report_status_test()
 		{
-			browser = Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
+			Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
 			Css("#reports input[name=status]").Checked = true;
 			Css("#reports input[name=status]").Checked = false;
 			Css("input[name=AddComment]").AppendText("Check_report_status_test");
-			var buttons = browser.Buttons.Where(b => !string.IsNullOrEmpty(b.ClassName) && b.ClassName.Contains("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).ToList();
-			buttons.First(b => b.InnerHtml.Contains("Продолжить")).Click();
+			ConfirmDialog();
 			browser.Refresh();
 			AssertText("Check_report_status_test");
 		}
@@ -97,7 +95,7 @@ namespace Functional.Billing
 		[Test]
 		public void Check_audit_record_messages_for_client()
 		{
-			browser = Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
+			Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
 
 			var record = new AuditRecord("test_message_for_client", _client);
 			session.Save(record);

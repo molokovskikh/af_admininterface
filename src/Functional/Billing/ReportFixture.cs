@@ -14,7 +14,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional.Billing
 {
 	[TestFixture]
-	public class ReportFixture : WatinFixture2
+	public class ReportFixture : FunctionalFixture
 	{
 		private Client client;
 		private Report report;
@@ -51,7 +51,7 @@ namespace Functional.Billing
 			var element = (CheckBox)ElementFor(account, r => r.Status);
 			element.Click();
 			Css("input[name=AddComment]").AppendText("Disable_report");
-			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
+			ConfirmDialog();
 			session.Refresh(report);
 			Assert.That(report.Allow, Is.False);
 		}
