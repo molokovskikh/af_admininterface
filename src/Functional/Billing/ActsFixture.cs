@@ -27,17 +27,17 @@ namespace Functional.Billing
 		public void View_acts()
 		{
 			Open();
-			Assert.That(browser.Text, Is.StringContaining("Административный интерфейс"));
-			browser.Link(Find.ByText("Акты")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сформировать акты"));
+			AssertText("Административный интерфейс");
+			ClickLink("Акты");
+			AssertText("Сформировать акты");
 		}
 
 		[Test]
 		public void View_act_print_form()
 		{
 			Open("/acts/");
-			browser.Link(Find.ByText(String.Format("{0}", act.Id))).Click();
-			Assert.That(browser.Text, Is.StringContaining("Акт сдачи-приемки"));
+			ClickLink(String.Format("{0}", act.Id));
+			AssertText("Акт сдачи-приемки");
 		}
 
 		[Test]
@@ -53,16 +53,16 @@ namespace Functional.Billing
 		public void Edit_act()
 		{
 			Open("/acts/");
-			browser.Link(Find.ByText("Редактировать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Редактирование акта"));
+			ClickLink("Редактировать");
+			AssertText("Редактирование акта");
 
 			Open(act, "Edit");
 			var newActDate = DateTime.Today.AddDays(10);
-			var date = browser.Css("input[name='act.ActDate']");
+			var date = Css("input[name='act.ActDate']");
 			date.Clear();
 			date.TypeText(newActDate.ToString("dd.MM.yyyy"));
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 
 			act.Refresh();
 			Assert.That(act.ActDate, Is.EqualTo(newActDate));

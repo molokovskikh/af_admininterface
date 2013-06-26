@@ -55,9 +55,9 @@ namespace Functional
 		{
 			CheckCommonColumnNames(browser);
 			if ((updateType == UpdateType.Accumulative) || (updateType == UpdateType.Cumulative)) {
-				Assert.That(browser.Text, Is.StringContaining("Регион"));
-				Assert.That(browser.Text, Is.StringContaining("Размер приготовленных данных"));
-				Assert.That(browser.Text, Is.StringContaining("Лог"));
+				AssertText("Регион");
+				AssertText("Размер приготовленных данных");
+				AssertText("Лог");
 			}
 		}
 
@@ -66,10 +66,10 @@ namespace Functional
 			var uriFormat = "Logs/UpdateLog?BeginDate=01.09.2009 0:00:00&EndDate=15.01.2010 0:00:00&RegionMask=137438953471&updateType={0}";
 			var uri = String.Format(uriFormat, (int)updateType);
 			var browser = new IE(BuildTestUrl(uri));
-			Assert.That(browser.Text, Is.StringContaining(BindingHelper.GetDescription((StatisticsType)updateType)));
-			Assert.That(browser.Text, Is.StringContaining("Клиентов, отвечающих условиям выборки"));
-			Assert.That(browser.Text, Is.StringContaining("Пользователь"));
-			Assert.That(browser.Text, Is.StringContaining("Клиент"));
+			AssertText(BindingHelper.GetDescription((StatisticsType)updateType));
+			AssertText("Клиентов, отвечающих условиям выборки");
+			AssertText("Пользователь");
+			AssertText("Клиент");
 
 			browser.Links.Where(l => (l.Title != null) && l.Title.Equals("UserSettings")).First().Click();
 			Assert.That(browser.Url, Is.StringContaining("/users/"));
@@ -95,9 +95,9 @@ namespace Functional
 				headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад
 
 				CheckCommonColumnNames(browser);
-				Assert.That(browser.Text, Is.StringContaining("Тип обновления"));
-				Assert.That(browser.Text, Is.StringContaining("Размер приготовленных данных"));
-				Assert.That(browser.Text, Is.StringContaining("Лог"));
+				AssertText("Тип обновления");
+				AssertText("Размер приготовленных данных");
+				AssertText("Лог");
 			}
 		}
 
@@ -113,13 +113,13 @@ namespace Functional
 				headerRow.TableCells[1].MouseDown();
 				headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад
 
-				browser.Button(Find.ByValue("Показать")).Click();
+				ClickButton("Показать");
 
 				CheckCommonColumnNames(browser);
-				Assert.That(browser.Text, Is.StringContaining("Пользователь"));
-				Assert.That(browser.Text, Is.StringContaining("Тип обновления"));
-				Assert.That(browser.Text, Is.StringContaining("Размер приготовленных данных"));
-				Assert.That(browser.Text, Is.StringContaining("Лог"));
+				AssertText("Пользователь");
+				AssertText("Тип обновления");
+				AssertText("Размер приготовленных данных");
+				AssertText("Лог");
 
 				browser.Links.Where(l => (l.Title != null) && l.Title.Equals("UserSettings")).First().Click();
 				Assert.That(browser.Url, Is.StringContaining("/users/"));
@@ -128,9 +128,9 @@ namespace Functional
 
 		private void CheckCommonColumnNames(IE browser)
 		{
-			Assert.That(browser.Text, Is.StringContaining("Дата"));
-			Assert.That(browser.Text, Is.StringContaining("Версия"));
-			Assert.That(browser.Text, Is.StringContaining("Дополнительно"));
+			AssertText("Дата");
+			AssertText("Версия");
+			AssertText("Дополнительно");
 		}
 
 		private uint GetId(Type type)
@@ -167,13 +167,13 @@ where
 				headerRow.TableCells[1].MouseDown();
 				headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад
 
-				browser.Button(Find.ByValue("Показать")).Click();
+				ClickButton("Показать");
 				Assert.That(browser.Text, Is.Not.StringContaining("За указанный период клиент не обновлялся"));
-				browser.Link(Find.ByText("Дата")).Click();
+				ClickLink("Дата");
 				Assert.That(browser.Text, Is.Not.StringContaining("За указанный период клиент не обновлялся"));
-				browser.Link(Find.ByText("Версия")).Click();
+				ClickLink("Версия");
 				Assert.That(browser.Text, Is.Not.StringContaining("За указанный период клиент не обновлялся"));
-				browser.Link(Find.ByText("Пользователь")).Click();
+				ClickLink("Пользователь");
 				Assert.That(browser.Text, Is.Not.StringContaining("За указанный период клиент не обновлялся"));
 				CheckCommonColumnNames(browser);
 			}

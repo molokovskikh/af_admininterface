@@ -35,7 +35,7 @@ namespace Functional.Drugstore
 			Save(updateLog);
 
 			Open("Logs/UpdateLog?userId={0}", user.Id);
-			Assert.That(browser.Text, Is.StringContaining("История обновлений"));
+			AssertText("История обновлений");
 		}
 
 		[Test]
@@ -47,7 +47,7 @@ namespace Functional.Drugstore
 			};
 			Save(updateLog);
 			Open("Logs/UpdateLog?regionMask={0}&updateType={1}", 18446744073709551615ul, UpdateType.AccessError);
-			Assert.That(browser.Text, Is.StringContaining(user.Login));
+			AssertText(user.Login);
 		}
 
 		[Test]
@@ -59,7 +59,7 @@ namespace Functional.Drugstore
 
 			Click("Лог");
 			browser.WaitUntilContainsText("Тестовый лог обновления", 1);
-			Assert.That(browser.Text, Is.StringContaining("Тестовый лог обновления"));
+			AssertText("Тестовый лог обновления");
 		}
 
 		private void Create_loaded_document_logs(out Client client, out Supplier supplier, out DocumentReceiveLog documentLogEntity,
@@ -102,13 +102,13 @@ namespace Functional.Drugstore
 				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
 				Thread.Sleep(2000);
 
-				Assert.That(browser.Text, Is.StringContaining("Дата загрузки"));
-				Assert.That(browser.Text, Is.StringContaining("Тип документа"));
-				Assert.That(browser.Text, Is.StringContaining("Дата разбора"));
-				Assert.That(browser.Text, Is.StringContaining("Имя файла"));
-				Assert.That(browser.Text, Is.StringContaining("Статус"));
-				Assert.That(browser.Text, Is.StringContaining("Разобран"));
-				Assert.That(browser.Text, Is.StringContaining(supplier.Name));
+				AssertText("Дата загрузки");
+				AssertText("Тип документа");
+				AssertText("Дата разбора");
+				AssertText("Имя файла");
+				AssertText("Статус");
+				AssertText("Разобран");
+				AssertText(supplier.Name);
 
 				browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
 				Check_document_view(browser, document);
@@ -134,13 +134,13 @@ namespace Functional.Drugstore
 				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
 
 				Thread.Sleep(2000);
-				Assert.That(browser.Text, Is.StringContaining("Дата загрузки"));
-				Assert.That(browser.Text, Is.StringContaining("Тип документа"));
-				Assert.That(browser.Text, Is.StringContaining("Дата разбора"));
-				Assert.That(browser.Text, Is.StringContaining("Имя файла"));
-				Assert.That(browser.Text, Is.StringContaining("Статус"));
-				Assert.That(browser.Text, Is.StringContaining("Разобран"));
-				Assert.That(browser.Text, Is.StringContaining(supplier.Name));
+				AssertText("Дата загрузки");
+				AssertText("Тип документа");
+				AssertText("Дата разбора");
+				AssertText("Имя файла");
+				AssertText("Статус");
+				AssertText("Разобран");
+				AssertText(supplier.Name);
 
 				browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
 				Check_document_view(browser, document);
@@ -162,15 +162,15 @@ namespace Functional.Drugstore
 			Click("История документов");
 			using (var browser = IE.AttachTo<IE>(Find.ByTitle("История документов"))) {
 				Thread.Sleep(2000);
-				Assert.That(browser.Text, Is.StringContaining(supplier.Name));
+				AssertText(supplier.Name);
 				browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
 				Thread.Sleep(1000);
-				Assert.That(browser.Text, Is.StringContaining("Код товара"));
-				Assert.That(browser.Text, Is.StringContaining("Наименование"));
-				Assert.That(browser.Text, Is.StringContaining("Производитель"));
-				Assert.That(browser.Text, Is.StringContaining("Страна"));
-				Assert.That(browser.Text, Is.StringContaining("Количество"));
-				Assert.That(browser.Text, Is.StringContaining("Срок годности"));
+				AssertText("Код товара");
+				AssertText("Наименование");
+				AssertText("Производитель");
+				AssertText("Страна");
+				AssertText("Количество");
+				AssertText("Срок годности");
 
 				Check_document_view(browser, document);
 			}
@@ -218,8 +218,8 @@ namespace Functional.Drugstore
 				mainWindow.Link(Find.ByText(@"История документов")).Click();
 				using (var browser = IE.AttachTo<IE>(Find.ByTitle("История документов"))) {
 					Thread.Sleep(2000);
-					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
-					Assert.That(browser.Text, Is.StringContaining(documentLogEntity.FileName));
+					AssertText(supplier.Name);
+					AssertText(documentLogEntity.FileName);
 					Assert.IsFalse(browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Exists);
 				}
 			}
@@ -242,19 +242,19 @@ namespace Functional.Drugstore
 				Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
 				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
 				Thread.Sleep(2000);
-				Assert.That(browser.Text, Is.StringContaining("Не разобран"));
+				AssertText("Не разобран");
 			}
 		}
 
 		private void Check_document_view(IE browser, Document document)
 		{
 			Thread.Sleep(2000);
-			Assert.That(browser.Text, Is.StringContaining(document.ProviderDocumentId));
-			Assert.That(browser.Text, Is.StringContaining(document.Lines[0].Producer));
-			Assert.That(browser.Text, Is.StringContaining(document.Lines[0].Country));
-			Assert.That(browser.Text, Is.StringContaining(ViewHelper.CostFormat(document.Lines[0].ProducerCost, 2)));
-			Assert.That(browser.Text, Is.StringContaining(ViewHelper.CostFormat(document.Lines[0].Nds, 2)));
-			Assert.That(browser.Text, Is.StringContaining(document.Lines[0].Certificates));
+			AssertText(document.ProviderDocumentId);
+			AssertText(document.Lines[0].Producer);
+			AssertText(document.Lines[0].Country);
+			AssertText(ViewHelper.CostFormat(document.Lines[0].ProducerCost, 2));
+			AssertText(ViewHelper.CostFormat(document.Lines[0].Nds, 2));
+			AssertText(document.Lines[0].Certificates);
 		}
 
 		[Test]
@@ -269,7 +269,7 @@ namespace Functional.Drugstore
 			Refresh();
 			var logLink = browser.Link(Find.ByText("Лог")).NativeElement as IEElement;
 			int offset = logLink.AsHtmlElement.offsetLeft;
-			var tbl = browser.Css(".DataTable");
+			var tbl = Css(".DataTable");
 			Click("Лог");
 			browser.WaitUntilContainsText("Тестовый лог Тестовый лог", 1);
 			Assert.That(browser.Text, Is.StringContaining("Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог " +
@@ -312,8 +312,8 @@ namespace Functional.Drugstore
 				Assert.That(openedWindow.Text, Is.StringContaining("Срок годности"));
 
 				Thread.Sleep(2000);
-				Assert.That(browser.Text, Is.StringContaining(document.Lines[0].Producer));
-				Assert.That(browser.Text, Is.StringContaining(document.Lines[0].Country));
+				AssertText(document.Lines[0].Producer);
+				AssertText(document.Lines[0].Country);
 			}
 		}
 	}

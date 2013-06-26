@@ -47,11 +47,11 @@ namespace Functional.Billing
 		{
 			Open("Billing/Search");
 
-			browser.Button(Find.ByValue("Найти")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Отключенных копий"));
-			Assert.That(browser.Text, Is.StringContaining("Работающих копий"));
-			Assert.That(browser.Text, Is.StringContaining("Отключенных адресов"));
-			Assert.That(browser.Text, Is.StringContaining("Работающих адресов"));
+			ClickButton("Найти");
+			AssertText("Отключенных копий");
+			AssertText("Работающих копий");
+			AssertText("Отключенных адресов");
+			AssertText("Работающих адресов");
 		}
 
 		[Test]
@@ -59,16 +59,16 @@ namespace Functional.Billing
 		{
 			Open();
 
-			browser.Link(Find.ByText("Биллинг")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Фильтр плательщиков"));
+			ClickLink("Биллинг");
+			AssertText("Фильтр плательщиков");
 			var button = (RadioButton)Css("input[name='filter.SearchBy'][value='3']");
 			button.Click();
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(payer.Id.ToString());
-			browser.Button(Find.ByValue("Найти")).Click();
+			ClickButton("Найти");
 
-			Assert.That(browser.Text, Is.StringContaining(payer.Name));
-			browser.Link(Find.ByText(payer.Id.ToString())).Click();
-			Assert.That(browser.Text, Is.StringContaining("Плательщик " + payer.Name));
+			AssertText(payer.Name);
+			ClickLink(payer.Id.ToString());
+			AssertText("Плательщик " + payer.Name);
 		}
 	}
 }

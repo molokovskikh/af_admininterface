@@ -50,12 +50,12 @@ namespace Functional.Drugstore
 		{
 			Css(String.Format("input[type='radio'][name='filter.SearchBy'][value='{0}']", (int)searchBy)).Checked = true;
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(text);
-			browser.Button(Find.ByValue("Поиск")).Click();
+			ClickButton("Поиск");
 		}
 
 		private void CheckThatIsUserPage(Browser browser, Client client)
 		{
-			Assert.That(browser.Text, Is.StringContaining("Имя клиента"));
+			AssertText("Имя клиента");
 			Assert.That(browser.Element("SearchResults").InnerHtml, Is.StringContaining(client.Name));
 		}
 
@@ -63,7 +63,7 @@ namespace Functional.Drugstore
 		public void Setup()
 		{
 			Open("UserSearch/Search");
-			Assert.That(browser.Text, Is.StringContaining("Поиск пользователей"));
+			AssertText("Поиск пользователей");
 		}
 
 		[Test]
@@ -72,9 +72,9 @@ namespace Functional.Drugstore
 			Open();
 
 			Click("Поиск пользователей");
-			Assert.That(browser.Text, Is.StringContaining("Поиск пользователей"));
-			Assert.That(browser.Text, Is.StringContaining("Введите текст для поиска"));
-			browser.Button(Find.ByValue("Поиск")).Click();
+			AssertText("Поиск пользователей");
+			AssertText("Введите текст для поиска");
+			ClickButton("Поиск");
 			Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 			Assert.That(browser.Text, Is.Not.StringContaining("По вашему запросу ничего не найдено"));
 		}
@@ -82,7 +82,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void SearchByUserId()
 		{
-			Assert.That(browser.Text, Is.StringContaining("Поиск пользователей"));
+			AssertText("Поиск пользователей");
 		}
 
 		[Test]
@@ -148,7 +148,7 @@ namespace Functional.Drugstore
 		public void SearchWithFilterByRegion()
 		{
 			browser.SelectList(Find.ByName("filter.Region.Id")).Select("Воронеж");
-			browser.Button(Find.ByValue("Поиск")).Click();
+			ClickButton("Поиск");
 			Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 		}
 
@@ -156,12 +156,12 @@ namespace Functional.Drugstore
 		public void SearchWithNoResults()
 		{
 			browser.TextField(Find.ById("filter_SearchText")).TypeText("1234567890qweasdzxc][p/.,';l");
-			browser.Button(Find.ByValue("Поиск")).Click();
-			Assert.That(browser.Text, Is.StringContaining("По вашему запросу ничего не найдено"));
+			ClickButton("Поиск");
+			AssertText("По вашему запросу ничего не найдено");
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText("'%test%'");
-			browser.Button(Find.ByValue("Поиск")).Click();
-			Assert.That(browser.Text, Is.StringContaining("По вашему запросу ничего не найдено"));
+			ClickButton("Поиск");
+			AssertText("По вашему запросу ничего не найдено");
 		}
 
 		[Test]
@@ -171,7 +171,7 @@ namespace Functional.Drugstore
 			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Name);
-			browser.Button(Find.ByValue("Поиск")).Click();
+			ClickButton("Поиск");
 
 			var tableBody = browser.TableBody(Find.ById("SearchResults"));
 			Assert.That(tableBody.TableRows.Count, Is.GreaterThan(0));
@@ -190,7 +190,7 @@ namespace Functional.Drugstore
 			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Id.ToString());
-			browser.Button(Find.ByValue("Поиск")).Click();
+			ClickButton("Поиск");
 
 			var tableBody = browser.TableBody(Find.ById("SearchResults"));
 			Assert.That(tableBody.TableRows.Count, Is.GreaterThan(0));
@@ -205,7 +205,7 @@ namespace Functional.Drugstore
 			Search(SearchUserBy.ByClientId, "text");
 
 			Assert.IsFalse(browser.TableBody(Find.ById("SearchResults")).Exists);
-			Assert.That(browser.Text, Is.StringContaining("По вашему запросу ничего не найдено"));
+			AssertText("По вашему запросу ничего не найдено");
 		}
 
 		[Test]
@@ -231,7 +231,7 @@ namespace Functional.Drugstore
 			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Users[0].Id.ToString());
-			browser.Button(Find.ByValue("Поиск")).Click();
+			ClickButton("Поиск");
 
 			CheckThatIsUserPage(browser, client);
 		}
@@ -245,7 +245,7 @@ namespace Functional.Drugstore
 			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(String.Format("{0}-124578", client.Id.ToString().Substring(0, 4)));
-			browser.Button(Find.ByValue("Поиск")).Click();
+			ClickButton("Поиск");
 
 			CheckThatIsUserPage(browser, client);
 		}
@@ -260,7 +260,7 @@ namespace Functional.Drugstore
 			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(mail);
-			browser.Button(Find.ByValue("Поиск")).Click();
+			ClickButton("Поиск");
 
 			CheckThatIsUserPage(browser, client);
 		}
@@ -276,7 +276,7 @@ namespace Functional.Drugstore
 			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(person);
-			browser.Button(Find.ByValue("Поиск")).Click();
+			ClickButton("Поиск");
 
 			CheckThatIsUserPage(browser, client);
 		}
@@ -327,7 +327,7 @@ namespace Functional.Drugstore
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			Open();
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Users[0].Login);
-			browser.Button(Find.ByValue("Найти")).Click();
+			ClickButton("Найти");
 			CheckThatIsUserPage(browser, client);
 		}
 
@@ -344,7 +344,7 @@ namespace Functional.Drugstore
 			session.Save(user2);
 			Open();
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Name);
-			browser.Button(Find.ByValue("Найти")).Click();
+			ClickButton("Найти");
 			var tr = browser.Table(Find.ByClass("DataTable")).TableRows[1];
 			Assert.That(tr.ClassName, Is.StringContaining("first-table"));
 			Assert.That(tr.ClassName, Is.StringContaining("allow-download-unconfirmed-orders"));

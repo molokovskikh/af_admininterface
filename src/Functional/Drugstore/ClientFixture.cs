@@ -19,7 +19,7 @@ namespace Functional.Drugstore
 		{
 			client = DataMother.CreateTestClientWithUser();
 			Open(client);
-			Assert.That(browser.Text, Is.StringContaining("Клиент"));
+			AssertText("Клиент");
 		}
 
 		[Test]
@@ -39,7 +39,7 @@ namespace Functional.Drugstore
 		{
 			var user = client.AddUser("test user");
 			Refresh();
-			Assert.That(browser.Text, Is.StringContaining("клиент"));
+			AssertText("клиент");
 			Assert.IsTrue(browser.Link(Find.ByText("Код пользователя")).Exists);
 			Assert.IsTrue(browser.Link(Find.ByText("Имя пользователя")).Exists);
 			Assert.That(browser.Table("users").Exists);
@@ -54,7 +54,7 @@ namespace Functional.Drugstore
 			login1 = Convert.ToInt64(browser.Table("users").TableRows[1].TableCells[0].Text);
 			login2 = Convert.ToInt64(browser.Table("users").TableRows[2].TableCells[0].Text);
 			Assert.That(login1, Is.GreaterThan(login2));
-			browser.Link(Find.ByText("Имя пользователя")).Click();
+			ClickLink("Имя пользователя");
 			Assert.That(browser.Table("users").Exists);
 		}
 
@@ -66,7 +66,7 @@ namespace Functional.Drugstore
 			session.Save(logs);
 			Refresh();
 
-			Assert.That(browser.Text, Is.StringContaining(logs.AFTime.ToString()));
+			AssertText(logs.AFTime.ToString());
 		}
 
 		[Test]
@@ -76,35 +76,35 @@ namespace Functional.Drugstore
 			Refresh();
 
 			browser.TextField(Find.ByName("message")).TypeText("This message for client");
-			browser.Button(Find.ByValue("Принять")).Click();
+			ClickButton("Принять");
 
-			browser.Link(Find.ByText(client.Users[0].Login)).Click();
-			Assert.That(browser.Text, Is.StringContaining("This message for client"));
+			ClickLink(client.Users[0].Login);
+			AssertText("This message for client");
 			browser.TextField(Find.ByName("message")).TypeText("This message for user1");
-			browser.Button(Find.ByValue("Принять")).Click();
+			ClickButton("Принять");
 
 			browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", client.Users[1].Id)));
 			browser.Refresh();
-			Assert.That(browser.Text, Is.StringContaining("This message for client"));
+			AssertText("This message for client");
 			Assert.That(browser.Text, Is.Not.StringContaining("This message for user1"));
 			browser.TextField(Find.ByName("message")).TypeText("This message for user2");
-			browser.Button(Find.ByValue("Принять")).Click();
+			ClickButton("Принять");
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
 			browser.Refresh();
-			Assert.That(browser.Text, Is.StringContaining("This message for user1"));
-			Assert.That(browser.Text, Is.StringContaining("This message for user2"));
-			Assert.That(browser.Text, Is.StringContaining("This message for client"));
+			AssertText("This message for user1");
+			AssertText("This message for user2");
+			AssertText("This message for client");
 		}
 
 		[Test]
 		public void Sort_messages()
 		{
 			browser.TextField(Find.ByName("message")).TypeText("This message for client");
-			browser.Button(Find.ByValue("Принять")).Click();
-			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			ClickButton("Принять");
+			ClickLink(client.Users[0].Login);
 			browser.TextField(Find.ByName("message")).TypeText("This message for user1");
-			browser.Button(Find.ByValue("Принять")).Click();
+			ClickButton("Принять");
 			Open(client);
 			browser.Refresh();
 
@@ -112,19 +112,19 @@ namespace Functional.Drugstore
 			Assert.IsTrue(browser.Link(Find.ByText("Оператор")).Exists);
 			Assert.IsTrue(browser.Link(Find.ByText("Название")).Exists);
 
-			browser.Link(Find.ByText("Дата")).Click();
-			browser.Link(Find.ByText("Дата")).Click();
-			Assert.That(browser.Text, Is.StringContaining("This message for client"));
+			ClickLink("Дата");
+			ClickLink("Дата");
+			AssertText("This message for client");
 			Assert.IsTrue(browser.Table("messages").Exists);
 
-			browser.Link(Find.ByText("Оператор")).Click();
-			browser.Link(Find.ByText("Оператор")).Click();
-			Assert.That(browser.Text, Is.StringContaining("This message for client"));
+			ClickLink("Оператор");
+			ClickLink("Оператор");
+			AssertText("This message for client");
 			Assert.IsTrue(browser.Table("messages").Exists);
 
-			browser.Link(Find.ByText("Название")).Click();
-			browser.Link(Find.ByText("Название")).Click();
-			Assert.That(browser.Text, Is.StringContaining("This message for client"));
+			ClickLink("Название");
+			ClickLink("Название");
+			AssertText("This message for client");
 			Assert.IsTrue(browser.Table("messages").Exists);
 		}
 
@@ -193,7 +193,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Client_page_must_contains_client_id()
 		{
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Клиент {0}, Код {1}", client.Name, client.Id)));
+			AssertText(String.Format("Клиент {0}, Код {1}", client.Name, client.Id));
 		}
 
 		private Payer Prepare_change_payer()
@@ -223,7 +223,7 @@ namespace Functional.Drugstore
 			session.Refresh(payer);
 
 			Assert.IsFalse(payer.JuridicalOrganizations.Contains(client.Orgs().First()));
-			Assert.That(browser.Text, Is.StringContaining("Изменено"));
+			AssertText("Изменено");
 			AssertText("ИНН: " + payer.INN);
 			session.Refresh(client);
 			Assert.That(client.Payers, Is.EquivalentTo(new[] { payer }));

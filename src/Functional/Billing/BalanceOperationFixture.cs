@@ -27,7 +27,7 @@ namespace Functional.Billing
 
 			Open(payer);
 			browser.WaitUntilContainsText("Плательщик", 2);
-			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
+			AssertText("Плательщик");
 		}
 
 		[Test]

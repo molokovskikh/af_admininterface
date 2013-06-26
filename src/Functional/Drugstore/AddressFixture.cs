@@ -29,7 +29,7 @@ namespace Functional.Drugstore
 			client = DataMother.CreateTestClientWithUser();
 			Flush();
 			Open(client);
-			Assert.That(browser.Text, Is.StringContaining("Клиент"));
+			AssertText("Клиент");
 		}
 
 		[Test]
@@ -60,22 +60,22 @@ namespace Functional.Drugstore
 			var group = client.Addresses[0].ContactGroup;
 			browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
 			Thread.Sleep(500);
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 
 			// Проверка, что контактная запись удалена
 			Thread.Sleep(500);
-			var count = ContactInformationFixture.GetCountContactsInDb(client.Addresses[0].ContactGroup);
+			var count = ContactInformationHelper.GetCountContactsInDb(client.Addresses[0].ContactGroup);
 			Assert.That(count, Is.EqualTo(countContacts - 1));
 		}
 
 		[Test]
 		public void Create_address()
 		{
-			browser.Link(Find.ByText("Новый адрес доставки")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Новый адрес доставки"));
+			ClickLink("Новый адрес доставки");
+			AssertText("Новый адрес доставки");
 			browser.TextField(Find.ByName("address.Value")).TypeText("тестовый адрес");
-			browser.Button(Find.ByValue("Создать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
+			ClickButton("Создать");
+			AssertText("Адрес доставки создан");
 
 			session.Refresh(client);
 			Assert.That(client.Addresses.Count, Is.EqualTo(1), "не создали адресс доставки");
@@ -96,27 +96,27 @@ namespace Functional.Drugstore
 			var client = DataMother.CreateTestClientWithAddress();
 			var address = client.Addresses.First();
 			Open(address);
-			Assert.That(browser.Text, Is.StringContaining("Адрес доставки"));
-			browser.Button(Find.ByValue("Отправить уведомления о регистрации поставщикам")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Уведомления отправлены"));
+			AssertText("Адрес доставки");
+			ClickButton("Отправить уведомления о регистрации поставщикам");
+			AssertText("Уведомления отправлены");
 		}
 
 		// Создает новый адрес доставки и 3 контакта для него (2 email)
 		private int AddContactsToNewDeliveryAddress(uint clientId)
 		{
 			var applyButtonText = "Создать";
-			browser.Link(Find.ByText("Новый адрес доставки")).Click();
+			ClickLink("Новый адрес доставки");
 			browser.TextField(Find.ByName("address.Value")).TypeText("Test address");
-			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, clientId);
-			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
-			browser.Link(Find.ByText("Test address")).Click();
+			ContactInformationHelper.AddContact(browser, ContactType.Email, applyButtonText, clientId);
+			AssertText("Адрес доставки создан");
+			ClickLink("Test address");
 			applyButtonText = "Сохранить";
-			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, clientId);
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			browser.Link(Find.ByText("Test address")).Click();
-			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, clientId);
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			browser.Link(Find.ByText("Test address")).Click();
+			ContactInformationHelper.AddContact(browser, ContactType.Email, applyButtonText, clientId);
+			AssertText("Сохранено");
+			ClickLink("Test address");
+			ContactInformationHelper.AddContact(browser, ContactType.Phone, applyButtonText, clientId);
+			AssertText("Сохранено");
+			ClickLink("Test address");
 			return 3;
 		}
 
@@ -132,18 +132,18 @@ namespace Functional.Drugstore
 			Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
 				"Не совпадают Id владельца группы у клиента и у новой группы");
 
-			ContactInformationFixture.CheckContactGroupInDb(group);
-			countContacts = ContactInformationFixture.GetCountContactsInDb(group);
+			ContactInformationHelper.CheckContactGroupInDb(group);
+			countContacts = ContactInformationHelper.GetCountContactsInDb(group);
 			Assert.That(countContacts, Is.EqualTo(countContacts));
 		}
 
 		[Test]
 		public void Address_must_be_enabled_after_registration()
 		{
-			browser.Link(Find.ByText("Новый адрес доставки")).Click();
+			ClickLink("Новый адрес доставки");
 			browser.TextField(Find.ByName("address.Value")).TypeText("test address");
-			browser.Button(Find.ByValue("Создать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
+			ClickButton("Создать");
+			AssertText("Адрес доставки создан");
 
 			session.Refresh(client);
 			Assert.That(client.Addresses.Count, Is.EqualTo(1));
@@ -161,19 +161,19 @@ namespace Functional.Drugstore
 			Open(address);
 			// Даем доступ пользователю к адресу доставки
 			browser.CheckBox(Find.ByName("address.AvaliableForUsers[0].Id")).Checked = true;
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 			browser.Refresh();
 
-			browser.Link(Find.ByText(address.Value)).Click();
+			ClickLink(address.Value);
 			// Ищем клиента, к которому нужно передвинуть пользователя и двигаем
 			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
 			browser.Button(Find.ById("SearchClientButton")).Click();
 			Thread.Sleep(2000);
 			//перемещение пользователя не опционально
-			//Assert.That(browser.Text, Is.StringContaining(String.Format("Перемещать пользователя {0}", user.Id)));
+			//AssertText(String.Format("Перемещать пользователя {0}", user.Id));
 			//Assert.IsTrue(browser.CheckBox(Find.ByName("moveWithUser")).Checked);
-			browser.Button(Find.ByValue("Переместить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
+			ClickButton("Переместить");
+			AssertText("Адрес доставки успешно перемещен");
 
 			session.Refresh(oldClient);
 			session.Refresh(newClient);
@@ -207,9 +207,9 @@ namespace Functional.Drugstore
 			Assert.IsTrue(browser.Button(Find.ByValue("Отмена")).Exists);
 			Assert.IsTrue(browser.Button(Find.ByValue("Переместить")).Exists);
 
-			browser.Button(Find.ByValue("Переместить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
-			Assert.That(browser.Text, Is.StringContaining(newClient.Name));
+			ClickButton("Переместить");
+			AssertText("Адрес доставки успешно перемещен");
+			AssertText(newClient.Name);
 			Assert.That(browser.Text, Is.Not.StringContaining(oldClient.Name));
 
 			session.Refresh(oldClient);
@@ -233,8 +233,8 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
 			browser.Button(Find.ById("SearchClientButton")).Click();
 			Thread.Sleep(2000);
-			browser.Button(Find.ByValue("Переместить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
+			ClickButton("Переместить");
+			AssertText("Адрес доставки успешно перемещен");
 
 			var newCountAddressInterSectionEntries = address.GetAddressIntersectionCount();
 
@@ -278,13 +278,13 @@ WHERE AddressId = :AddressId
 		[Test]
 		public void CreateAddressWithMaxOrdersSum()
 		{
-			browser.Link(Find.ByText("Новый адрес доставки")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Новый адрес доставки"));
+			ClickLink("Новый адрес доставки");
+			AssertText("Новый адрес доставки");
 			browser.CheckBox("address_CheckDailyOrdersSum").Checked = true;
 			browser.TextField("address_MaxDailyOrdersSum").Value = "100";
 			browser.TextField(Find.ByName("address.Value")).TypeText("тестовый адрес");
-			browser.Button(Find.ByValue("Создать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
+			ClickButton("Создать");
+			AssertText("Адрес доставки создан");
 
 			session.Refresh(client);
 			Assert.That(client.Addresses.Count, Is.EqualTo(1), "не создали адресс доставки");

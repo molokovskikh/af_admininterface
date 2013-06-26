@@ -1,19 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Models;
 using NUnit.Framework;
 using WatiN.Core;
-using Test.Support.Web;
-using Castle.ActiveRecord;
-using Common.Web.Ui.Helpers;
 
 namespace Functional.ForTesting
 {
-	public class ContactInformationFixture
+	public class ContactInformationHelper
 	{
 		public static void AddContact(Browser browser, ContactType contactType, string applyButtonText, uint clientId)
 		{

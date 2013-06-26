@@ -21,7 +21,7 @@ namespace Functional.Suppliers
 			Flush();
 
 			Open(supplier.Payer);
-			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
+			AssertText("Плательщик");
 			browser.CheckBox(Find.ByName("status")).Click();
 			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
 			ConfirmDialog();

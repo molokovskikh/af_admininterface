@@ -16,9 +16,9 @@ namespace Functional
 		public void TestViewCallHistory()
 		{
 			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
-				browser.Link(Find.ByText("История звонков")).Click();
+				ClickLink("История звонков");
 				browser.TextField(Find.ByName("SearchBy.BeginDate")).TypeText("01.01.2009");
-				browser.Button(Find.ByValue("Найти")).Click();
+				ClickButton("Найти");
 
 				Assert.That(browser.ContainsText("Дата звонка"));
 				Assert.That(browser.ContainsText("Куда звонил"));

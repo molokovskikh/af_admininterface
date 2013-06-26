@@ -48,7 +48,7 @@ namespace Functional.Billing
 
 			Open(payer);
 			browser.WaitUntilContainsText("Плательщик", 2);
-			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
+			AssertText("Плательщик");
 		}
 
 		[Test]
@@ -57,7 +57,7 @@ namespace Functional.Billing
 			client.Addresses.Each(a => a.Enabled = false);
 			Refresh();
 
-			Assert.That(browser.Text, Is.StringContaining("Адреса доставки"));
+			AssertText("Адреса доставки");
 			foreach (var address in client.Addresses) {
 				var row = browser.TableRow("AddressRow" + address.Id);
 				Assert.That(row.ClassName, Is.StringContaining("disabled"));
@@ -75,7 +75,7 @@ namespace Functional.Billing
 			client.Users.Each(u => u.Enabled = false);
 			Refresh();
 
-			Assert.That(browser.Text, Is.StringContaining("Пользователи"));
+			AssertText("Пользователи");
 			foreach (var item in client.Users) {
 				var row = browser.TableRow("UserRow" + item.Id);
 				Assert.That(row.ClassName, Is.StringContaining("disabled"));
@@ -90,8 +90,8 @@ namespace Functional.Billing
 			var addressId = "usersForAddress" + address.Id;
 			browser.Link(Find.ById(addressId)).Click();
 			Thread.Sleep(500);
-			Assert.That(browser.Text, Is.StringContaining("Пользователи"));
-			Assert.That(browser.Text, Is.StringContaining("Подключить пользователя"));
+			AssertText("Пользователи");
+			AssertText("Подключить пользователя");
 			// Щелкаем по адресу. Должна быть показана дополнительная информация
 			var additionalInfoDiv = browser.Div(Find.ById("additionalAddressInfo" + address.Id));
 			Assert.That(additionalInfoDiv.Exists, Is.True);
@@ -108,8 +108,8 @@ namespace Functional.Billing
 			var userId = "addressesForUser" + user.Id;
 			browser.Link(Find.ById(userId)).Click();
 			Thread.Sleep(500);
-			Assert.That(browser.Text, Is.StringContaining("Адреса"));
-			Assert.That(browser.Text, Is.StringContaining("Подключить адрес"));
+			AssertText("Адреса");
+			AssertText("Подключить адрес");
 			// Щелкаем по адресу. Должна быть показана дополнительная информация
 			var additionalInfoDiv = browser.Div(Find.ById("additionalUserInfo" + user.Id));
 			Assert.That(additionalInfoDiv.Exists, Is.True);
@@ -126,7 +126,7 @@ namespace Functional.Billing
 			var supplierId = "pricesRegions" + _supplier.Id;
 			browser.Link(Find.ById(supplierId)).Click();
 			Thread.Sleep(500);
-			Assert.That(browser.Text, Is.StringContaining("Регионы размещения прайс-листов"));
+			AssertText("Регионы размещения прайс-листов");
 
 			var additionalInfoDiv = browser.Div(Find.ById("additionalSupplierInfo" + _supplier.Id));
 			Assert.That(additionalInfoDiv.Exists, Is.True);
@@ -215,7 +215,7 @@ namespace Functional.Billing
 		{
 			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 			Thread.Sleep(500);
-			browser.Link(Find.ByText("Подключить адрес")).Click();
+			ClickLink("Подключить адрес");
 			SearchAndSelectAddress(address.Value);
 			Thread.Sleep(500);
 			browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
@@ -274,7 +274,7 @@ namespace Functional.Billing
 			var clientStatus = browser.Css(String.Format("#ClientStatus{0}", client.Id));
 			Assert.IsTrue(clientStatus.Checked);
 			clientStatus.Click();
-			((TextField)browser.Css(".ui-dialog-content #AddCommentField")).TypeText("TestComment");
+			((TextField)Css(".ui-dialog-content #AddCommentField")).TypeText("TestComment");
 			browser.Eval("$('input#AddCommentField').trigger($.Event( 'keydown', {which:$.ui.keyCode.ENTER, keyCode:$.ui.keyCode.ENTER}));");
 			ConfirmDialog();
 			Assert.IsFalse(clientStatus.Checked);
@@ -286,7 +286,7 @@ namespace Functional.Billing
 		[Test]
 		public void Change_client_status()
 		{
-			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
+			AssertText("Плательщик");
 
 			var userRow = browser.TableRow(Find.ById("UserRow" + user.Id));
 			var userStatus = userRow.Css("input[name='status']");
@@ -317,7 +317,7 @@ namespace Functional.Billing
 		public void Test_view_connecting_user_to_address()
 		{
 			browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
-			browser.Link(Find.ByText("Подключить пользователя")).Click();
+			ClickLink("Подключить пользователя");
 			var searchDiv = browser.Div(Find.ById("SearchUserDiv" + address.Id));
 			var selectDiv = browser.Div(Find.ById("SelectUserDiv" + address.Id));
 			Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("block"));
@@ -336,7 +336,7 @@ namespace Functional.Billing
 			Assert.IsTrue(browser.Link(Find.ByText("Подключить пользователя")).Style.Display.ToLower().Equals("block"));
 			Assert.IsTrue(browser.Div(Find.ById("ConnectingUserDiv" + address.Id)).Style.Display.ToLower().Equals("none"));
 			// Жмем "Подключить пользователя" и вводим то, что не сможем найти. Должно быть сообщение что ничего не нашли
-			browser.Link(Find.ByText("Подключить пользователя")).Click();
+			ClickLink("Подключить пользователя");
 			browser.TextField(Find.ById("UserSearchText" + address.Id)).TypeText("1234567890");
 			browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
 			Thread.Sleep(500);
@@ -348,7 +348,7 @@ namespace Functional.Billing
 		{
 			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 			Thread.Sleep(500);
-			browser.Link(Find.ByText("Подключить адрес")).Click();
+			ClickLink("Подключить адрес");
 			Thread.Sleep(500);
 			var searchDiv = browser.Div(Find.ById("SearchAddressDiv" + user.Id));
 			var selectDiv = browser.Div(Find.ById("SelectAddressDiv" + user.Id));
@@ -368,7 +368,7 @@ namespace Functional.Billing
 			Assert.IsTrue(browser.Link(Find.ByText("Подключить адрес")).Style.Display.ToLower().Equals("block"));
 			Assert.IsTrue(browser.Div(Find.ById("ConnectingAddressDiv" + user.Id)).Style.Display.ToLower().Equals("none"));
 			// Жмем "Подключить адрес" и вводим то, что не сможем найти. Должно быть сообщение что ничего не нашли
-			browser.Link(Find.ByText("Подключить адрес")).Click();
+			ClickLink("Подключить адрес");
 			browser.TextField(Find.ById("AddressSearchText" + user.Id)).TypeText("1234567890");
 			browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
 			Thread.Sleep(500);
@@ -511,7 +511,7 @@ namespace Functional.Billing
 			Click("Просмотреть сообщение");
 			browser.WaitUntilContainsText("test message for user", 2);
 
-			Assert.That(browser.Text, Is.StringContaining(messageText));
+			AssertText(messageText);
 			var messages = session.Load<Client>(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 			messages[0].Refresh();
 			Assert.That(messages[0].Message, Is.EqualTo(messageText));
@@ -526,8 +526,8 @@ namespace Functional.Billing
 			browser.SelectList(Find.ByName("userMessage.Id")).Select(username);
 			var messageText = "test message for user " + username;
 			browser.TextField(Find.ByName("userMessage.Message")).TypeText(messageText);
-			browser.Button(Find.ByValue("Отправить сообщение")).Click();
-			browser.Link(Find.ByText("Просмотреть сообщение")).Click();
+			ClickButton("Отправить сообщение");
+			ClickLink("Просмотреть сообщение");
 			Thread.Sleep(500);
 			browser.Button(String.Format("CancelViewMessage{0}", user.Id)).Click();
 			var messages = session.Load<Client>(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
@@ -544,8 +544,8 @@ namespace Functional.Billing
 			browser.SelectList(Find.ByName("userMessage.Id")).Select("Для всех пользователей");
 			var message = "test message for all users";
 			browser.TextField(Find.ByName("userMessage.Message")).TypeText(message);
-			browser.Button(Find.ByValue("Отправить сообщение")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сообщение сохранено"));
+			ClickButton("Отправить сообщение");
+			AssertText("Сообщение сохранено");
 			foreach (var user in client.Users) {
 				Assert.That(browser.Text,
 					Is.StringContaining(String.Format("Остались не показанные сообщения для пользователя {0}", user.GetLoginOrName())));
@@ -559,7 +559,7 @@ namespace Functional.Billing
 				browser.Button(Find.ById("CancelViewMessage" + user.Id)).Click();
 				Thread.Sleep(500);
 				Assert.IsFalse(messageBody.Exists);
-				Assert.That(browser.Text, Is.StringContaining("Сообщение удалено"));
+				AssertText("Сообщение удалено");
 			}
 		}
 
@@ -575,7 +575,7 @@ namespace Functional.Billing
 
 			// Кликаем по логину одного из пользователей
 			var user = client.Users[2];
-			browser.Link(Find.ByText(user.Login)).Click();
+			ClickLink(user.Login);
 			// В таблице статистики вкл./откл. должны остаться видимыми только строки, относящиеся к выбранному пользователю
 			// остальные строки должны быть невидимы
 			var logRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("logRow"));
@@ -596,7 +596,7 @@ namespace Functional.Billing
 			Refresh();
 			// Кликаем по логину одного из пользователей
 			var user = client.Users[2];
-			browser.Link(Find.ByText(user.Login)).Click();
+			ClickLink(user.Login);
 			// Этот пользователь должен стать выделенным в списке "Сообщение для пользователя"
 			Assert.That(browser.SelectList(Find.ByName("userMessage.Id")).SelectedOption.Text, Is.EqualTo(user.GetLoginOrName()));
 		}
@@ -707,7 +707,7 @@ namespace Functional.Billing
 			payer = client.Payers.First();
 
 			Open(payer);
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Плательщик {0}", payer.Name)));
+			AssertText(String.Format("Плательщик {0}", payer.Name));
 		}
 
 		[Test]
@@ -717,7 +717,7 @@ namespace Functional.Billing
 			payer = client.Payers.First();
 
 			Open(payer);
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Плательщик {0}", payer)));
+			AssertText(String.Format("Плательщик {0}", payer));
 		}
 
 		[Test]
@@ -725,7 +725,7 @@ namespace Functional.Billing
 		{
 			var recipient = session.Query<Recipient>().First();
 
-			browser.Link(Find.ByText("Отправка кореспонденции")).Click();
+			ClickLink("Отправка кореспонденции");
 
 			Click("Отправка кореспонденции");
 			var select = browser.SelectList(Find.ByName("Instance.Recipient.Id"));
@@ -837,7 +837,7 @@ namespace Functional.Billing
 
 		private void AddCommentInDisableDialig()
 		{
-			browser.Css(".ui-dialog-content #AddCommentField").AppendText("TestComment");
+			Css(".ui-dialog-content #AddCommentField").AppendText("TestComment");
 			ConfirmDialog();
 		}
 	}

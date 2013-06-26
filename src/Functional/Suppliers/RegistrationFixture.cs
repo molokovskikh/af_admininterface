@@ -17,7 +17,7 @@ namespace Functional.Suppliers
 		{
 			Open();
 			Click("Поставщик");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			AssertText("Регистрация поставщика");
 			var phoneCount = browser.TableCells.Count(l => l.Text == "Номер телефона:");
 			var emailCount = browser.TableCells.Count(l => l.Text == "Email:");
 			browser.Link(Find.ById("supplieraddPhoneLink")).Click();
@@ -31,13 +31,13 @@ namespace Functional.Suppliers
 		{
 			Open();
 			Click("Поставщик");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			AssertText("Регистрация поставщика");
 
 			Prepare();
 			Click("Зарегистрировать");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация плательщика"));
+			AssertText("Регистрация плательщика");
 			Click("Сохранить");
-			Assert.That(browser.Text, Is.StringContaining("Поставщик тестовый"));
+			AssertText("Поставщик тестовый");
 			AssertText("Список E-mail, с которых разрешена отправка писем клиентам АналитФармация");
 		}
 
@@ -45,27 +45,27 @@ namespace Functional.Suppliers
 		public void Register_supplier_show_user_card()
 		{
 			Open("Register/RegisterSupplier");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			AssertText("Регистрация поставщика");
 			Prepare();
 
-			browser.Css("#options_FillBillingInfo").Click();
+			Css("#options_FillBillingInfo").Click();
 			browser.Click("Зарегистрировать");
 
-			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
+			AssertText("Регистрационная карта");
 		}
 
 		[Test]
 		public void Register_supplier_with_additional_contact_info()
 		{
 			Open("Register/RegisterSupplier");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			AssertText("Регистрация поставщика");
 			Prepare();
 			Css("#ClientManagersContactPhone").TypeText("473-2606000");
 			Css("#ClientManagersContactEmail").TypeText("manager1@analit.net");
 			Css("input[name='ClientManagersPersons[0].Name']").TypeText("Родионов Максим Валерьевич");
-			browser.Css("#options_FillBillingInfo").Click();
+			Css("#options_FillBillingInfo").Click();
 			browser.Click("Зарегистрировать");
-			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
+			AssertText("Регистрационная карта");
 
 			var supplier = GetSupplier();
 			var group = supplier.ContactGroupOwner.Group(ContactGroupType.ClientManagers);
@@ -82,9 +82,9 @@ namespace Functional.Suppliers
 		public void Register_supplier_with_order_delivery_info()
 		{
 			Open("Register/RegisterSupplier");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			AssertText("Регистрация поставщика");
 			Prepare();
-			browser.Css("#options_FillBillingInfo").Click();
+			Css("#options_FillBillingInfo").Click();
 
 			Css("#browseRegion4").Click();
 			Css("#browseRegion1").Click();
@@ -98,7 +98,7 @@ namespace Functional.Suppliers
 			Css("input[name='orderDeliveryGroup[1].Contacts[2].ContactText']").TypeText("kvasovtest1@analit.net");
 			Click("Зарегистрировать");
 
-			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
+			AssertText("Регистрационная карта");
 			var supplier = GetSupplier();
 			var contactGroups = supplier.ContactGroupOwner.ContactGroups.OfType<RegionalDeliveryGroup>().ToList();
 			Assert.That(contactGroups.Count, Is.EqualTo(3));
@@ -148,10 +148,10 @@ namespace Functional.Suppliers
 		{
 			Open();
 			Click("Поставщик");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			AssertText("Регистрация поставщика");
 			Css("#supplier_Name").TypeText("тестовый!");
 			Click("Зарегистрировать");
-			Assert.That(browser.Text, Is.StringContaining("Поле может содержать только"));
+			AssertText("Поле может содержать только");
 		}
 	}
 }

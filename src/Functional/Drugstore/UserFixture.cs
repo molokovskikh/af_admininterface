@@ -33,14 +33,14 @@ namespace Functional.Drugstore
 			Flush();
 
 			Open(client);
-			Assert.That(browser.Text, Is.StringContaining("Клиент"));
+			AssertText("Клиент");
 		}
 
 		[Test]
 		public void Edit_user()
 		{
-			browser.Link(Find.ByText(user.Login)).Click();
-			Assert.That(browser.Text, Is.StringContaining(user.Login));
+			ClickLink(user.Login);
+			AssertText(user.Login);
 		}
 
 		[Test]
@@ -49,12 +49,12 @@ namespace Functional.Drugstore
 			var mainUser = client.AddUser("test");
 
 			Open("client/{0}", client.Id);
-			browser.Link(Find.ByText(user.Login)).Click();
-			Assert.That(browser.Text, Is.StringContaining("Пользователь " + user.Login));
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink(user.Login);
+			AssertText("Пользователь " + user.Login);
+			ClickLink("Настройка");
 			browser.SelectList(Find.ByName("user.InheritPricesFrom.Id")).Select(mainUser.LoginAndName);
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранен"));
+			ClickButton("Сохранить");
+			AssertText("Сохранен");
 
 			session.Refresh(user);
 			Assert.That(user.InheritPricesFrom.Id, Is.EqualTo(mainUser.Id));
@@ -63,10 +63,10 @@ namespace Functional.Drugstore
 		[Test]
 		public void View_password_change_statistics()
 		{
-			browser.Link(Find.ByText(user.Login)).Click();
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
+			ClickLink(user.Login);
+			AssertText(String.Format("Пользователь {0}", user.Login));
 
-			browser.Link(Find.ByText("Статистика изменения пароля")).Click();
+			ClickLink("Статистика изменения пароля");
 			using (var stat = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика изменения пароля для пользователя {0}", user.Login)))) {
 				Assert.That(stat.Text, Is.StringContaining(String.Format("Статистика изменения пароля для пользователя {0}", user.Login)));
 			}
@@ -75,8 +75,8 @@ namespace Functional.Drugstore
 		[Test(Description = "Тест для проверки состояния галок 'Получать накладные', 'Получать отказы', 'Игнорировать проверку минимальной суммы заказа у Поставщика' при регистрации нового пользователя")]
 		public void Check_flags_by_adding_user()
 		{
-			browser.Link(Find.ByText("Новый пользователь")).Click();
-			browser.Button(Find.ByValue("Создать")).Click();
+			ClickLink("Новый пользователь");
+			ClickButton("Создать");
 
 			client = session.Load<Client>(client.Id);
 			Assert.That(client.Users.Count, Is.GreaterThan(0));
@@ -85,7 +85,7 @@ namespace Functional.Drugstore
 			var userLink = browser.Link(Find.ByText(client.Users[0].Login));
 			Assert.IsTrue(userLink.Exists);
 			userLink.Click();
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink("Настройка");
 			Assert.IsFalse(browser.CheckBox(Find.ByName("user.SendWaybills")).Checked);
 			Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendRejects")).Checked);
 			Assert.IsFalse(browser.CheckBox(Find.ByName("user.IgnoreCheckMinOrder")).Checked);
@@ -93,9 +93,9 @@ namespace Functional.Drugstore
 
 		private void GoToChangePassword()
 		{
-			browser.Link(Find.ByText(user.Login)).Click();
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
-			browser.Link(Find.ByText("Изменить пароль")).Click();
+			ClickLink(user.Login);
+			AssertText(String.Format("Пользователь {0}", user.Login));
+			ClickLink("Изменить пароль");
 			AssertText("Изменение пароля пользователя");
 		}
 
@@ -106,9 +106,9 @@ namespace Functional.Drugstore
 
 			browser.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 			browser.CheckBox(Find.ByName("isSendClientCard")).Click();
-			browser.Button(Find.ByValue("Изменить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
-			Assert.That(browser.Text, Is.StringContaining("Изменение пароля по инициативе клиента"));
+			ClickButton("Изменить");
+			AssertText("Регистрационная карта");
+			AssertText("Изменение пароля по инициативе клиента");
 		}
 
 		[Test]
@@ -119,8 +119,8 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 			browser.TextField(Find.ByName("emailsForSend")).Clear();
 			browser.TextField(Find.ByName("emailsForSend")).TypeText("KvasovTest@analit.net");
-			browser.Button(Find.ByValue("Изменить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Пароль успешно изменен"));
+			ClickButton("Изменить");
+			AssertText("Пароль успешно изменен");
 		}
 
 		[Test, NUnit.Framework.Description("При изменении пароля, если логин не совпадает с UserId и установлена соотв. опция, то изменить логин на UserId")]
@@ -134,8 +134,8 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 			browser.TextField(Find.ByName("emailsForSend")).TypeText("kvasovtest@analit.net");
 			Assert.That(browser.RadioButton(Find.ById("changeLogin")).Checked, Is.True);
-			browser.Button(Find.ByValue("Изменить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Пароль успешно изменен"));
+			ClickButton("Изменить");
+			AssertText("Пароль успешно изменен");
 
 			session.Refresh(user);
 			Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
@@ -148,8 +148,8 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 			browser.TextField(Find.ByName("emailsForSend")).TypeText("kvasovtest@analit.net");
 			Assert.That(browser.RadioButton(Find.ById("changeLogin")).Exists, Is.False);
-			browser.Button(Find.ByValue("Изменить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Пароль успешно изменен"));
+			ClickButton("Изменить");
+			AssertText("Пароль успешно изменен");
 
 			session.Refresh(user);
 			Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
@@ -158,13 +158,13 @@ namespace Functional.Drugstore
 		[Test]
 		public void Create_user()
 		{
-			Assert.That(browser.Text, Is.StringContaining("Клиент test"));
-			browser.Link(Find.ByText("Новый пользователь")).Click();
+			AssertText("Клиент test");
+			ClickLink("Новый пользователь");
 
-			Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
+			AssertText("Новый пользователь");
 			browser.TextField(Find.ByName("user.Name")).TypeText("test");
-			browser.Button(Find.ByValue("Создать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
+			ClickButton("Создать");
+			AssertText("Регистрационная карта");
 
 			session.Refresh(client);
 			Assert.That(client.Users.Count, Is.EqualTo(2));
@@ -186,13 +186,13 @@ namespace Functional.Drugstore
 			user.UserUpdateInfo.UpdateAndFlush();
 
 			Assert.That(user.HaveUin(), Is.True);
-			browser.Link(Find.ByText(user.Login)).Click();
-			browser.Button(Find.ByValue("Сбросить УИН")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Это поле необходимо заполнить."));
+			ClickLink(user.Login);
+			ClickButton("Сбросить УИН");
+			AssertText("Это поле необходимо заполнить.");
 			browser.TextField(Find.ByName("reason")).TypeText("test reason");
-			browser.Button(Find.ByValue("Сбросить УИН")).Click();
-			Assert.That(browser.Text, Is.StringContaining("УИН сброшен"));
-			Assert.That(browser.Text, Is.StringContaining(String.Format("$$$ Пользователь: {0}", user.Login)));
+			ClickButton("Сбросить УИН");
+			AssertText("УИН сброшен");
+			AssertText(String.Format("$$$ Пользователь: {0}", user.Login));
 
 			user.UserUpdateInfo.Refresh();
 			Assert.That(user.UserUpdateInfo.AFCopyId, Is.Empty);
@@ -203,7 +203,7 @@ namespace Functional.Drugstore
 		{
 			var preparedDataPath = String.Format(@"C:\Windows\Temp\{0}_123456.zip", user.Id);
 
-			browser.Link(Find.ByText(user.Login)).Click();
+			ClickLink(user.Login);
 			Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.False);
 			var directory = Path.GetDirectoryName(preparedDataPath);
 			if (!Directory.Exists(directory))
@@ -213,11 +213,11 @@ namespace Functional.Drugstore
 			browser.Refresh();
 
 			Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.True);
-			browser.Button(Find.ByValue("Удалить подготовленные данные")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Ошибка удаления подготовленных данных, попробуйте позднее."));
+			ClickButton("Удалить подготовленные данные");
+			AssertText("Ошибка удаления подготовленных данных, попробуйте позднее.");
 			file.Close();
-			browser.Button(Find.ByValue("Удалить подготовленные данные")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Подготовленные данные удалены"));
+			ClickButton("Удалить подготовленные данные");
+			AssertText("Подготовленные данные удалены");
 			try {
 				File.Delete(file.Name);
 			}
@@ -234,20 +234,20 @@ namespace Functional.Drugstore
 			for (int i = 0; i < 25; i++)
 				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
 
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 
 			browser.Back();
 			browser.Back();
 			browser.Back();
 
-			browser.Link(Find.ByText("Новый пользователь")).Click();
+			ClickLink("Новый пользователь");
 			browser.TextField(Find.ByName("user.Name")).TypeText("test2");
 
 			for (int i = 0; i < 25; i++)
 				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
 
-			browser.Button(Find.ByValue("Создать")).Click();
+			ClickButton("Создать");
 
 			session.Refresh(client);
 			session.Refresh(user);
@@ -292,10 +292,10 @@ namespace Functional.Drugstore
 		{
 			var applyButtonText = "Сохранить";
 			Open(user, "Edit");
-			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ContactInformationHelper.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
+			AssertText("Сохранено");
+			ContactInformationHelper.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
+			AssertText("Сохранено");
 
 			ContactGroup group;
 			using (new SessionScope()) {
@@ -305,8 +305,8 @@ namespace Functional.Drugstore
 					"Не совпадают Id владельца группы у клиента и у новой группы");
 			}
 			// Проверка, что контактные записи создались в БД
-			ContactInformationFixture.CheckContactGroupInDb(group);
-			var countContacts = ContactInformationFixture.GetCountContactsInDb(group);
+			ContactInformationHelper.CheckContactGroupInDb(group);
+			var countContacts = ContactInformationHelper.GetCountContactsInDb(group);
 			Assert.That(countContacts, Is.EqualTo(2));
 		}
 
@@ -316,10 +316,10 @@ namespace Functional.Drugstore
 			var applyButtonText = "Сохранить";
 			Open(user, "Edit");
 
-			ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ContactInformationHelper.AddPerson(browser, "Test person", applyButtonText, client.Id);
+			AssertText("Сохранено");
+			ContactInformationHelper.AddPerson(browser, "Test person2", applyButtonText, client.Id);
+			AssertText("Сохранено");
 			ContactGroup group;
 			using (new SessionScope()) {
 				client = session.Load<Client>(client.Id);
@@ -328,8 +328,8 @@ namespace Functional.Drugstore
 					"Не совпадают Id владельца группы у клиента и у новой группы");
 			}
 			// Проверка, что контактные записи создались в БД
-			ContactInformationFixture.CheckContactGroupInDb(group);
-			var persons = ContactInformationFixture.GetPersons(group);
+			ContactInformationHelper.CheckContactGroupInDb(group);
+			var persons = ContactInformationHelper.GetPersons(group);
 			Assert.That(persons.Count, Is.EqualTo(2));
 			Assert.That(persons[0], Is.EqualTo("Test person"));
 			Assert.That(persons[1], Is.EqualTo("Test person2"));
@@ -342,16 +342,16 @@ namespace Functional.Drugstore
 			// Удаление контактной записи
 			Open(user, "Edit");
 
-			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
-			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
+			ContactInformationHelper.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
+			ContactInformationHelper.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
 			using (new SessionScope()) {
 				client = session.Load<Client>(client.Id);
 				var group = client.Users[0].ContactGroup;
 				browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
-				browser.Button(Find.ByValue("Сохранить")).Click();
+				ClickButton("Сохранить");
 			}
 			// Проверка, что контактная запись удалена
-			var countContacts = ContactInformationFixture.GetCountContactsInDb(client.Users[0].ContactGroup);
+			var countContacts = ContactInformationHelper.GetCountContactsInDb(client.Users[0].ContactGroup);
 			Assert.That(countContacts, Is.EqualTo(1));
 		}
 
@@ -361,17 +361,17 @@ namespace Functional.Drugstore
 			var applyButtonText = "Сохранить";
 			Open(user, "Edit");
 
-			ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ContactInformationHelper.AddPerson(browser, "Test person", applyButtonText, client.Id);
+			AssertText("Сохранено");
+			ContactInformationHelper.AddPerson(browser, "Test person2", applyButtonText, client.Id);
+			AssertText("Сохранено");
 
 			session.Refresh(user);
 			var group = user.ContactGroup;
 			browser.Button(Find.ByName(String.Format("persons[{0}].Delete", group.Persons[0].Id))).Click();
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 			// Проверка, что контактная запись удалена
-			var persons = ContactInformationFixture.GetPersons(client.Users[0].ContactGroup);
+			var persons = ContactInformationHelper.GetPersons(client.Users[0].ContactGroup);
 			Assert.That(persons.Count, Is.EqualTo(1));
 			Assert.That(persons[0], Is.EqualTo("Test person2"));
 		}
@@ -382,17 +382,17 @@ namespace Functional.Drugstore
 			var applyButtonText = "Сохранить";
 			Open(user, "Edit");
 
-			ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ContactInformationHelper.AddPerson(browser, "Test person", applyButtonText, client.Id);
+			AssertText("Сохранено");
+			ContactInformationHelper.AddPerson(browser, "Test person2", applyButtonText, client.Id);
+			AssertText("Сохранено");
 
 			session.Refresh(user);
 			var group = user.ContactGroup;
 			browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("");
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 			// Проверка, что контактная запись удалена
-			var persons = ContactInformationFixture.GetPersons(client.Users[0].ContactGroup);
+			var persons = ContactInformationHelper.GetPersons(client.Users[0].ContactGroup);
 			Assert.That(persons.Count, Is.EqualTo(1));
 			Assert.That(persons[0], Is.EqualTo("Test person2"));
 		}
@@ -402,15 +402,15 @@ namespace Functional.Drugstore
 		{
 			var applyButtonText = "Сохранить";
 			Open(user, "Edit");
-			ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
+			ContactInformationHelper.AddPerson(browser, "Test person", applyButtonText, client.Id);
 
 			session.Refresh(user);
 			var group = user.ContactGroup;
 			browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("Test person changed");
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 			// Проверка, что контактная запись изменена
-			var persons = ContactInformationFixture.GetPersons(user.ContactGroup);
+			var persons = ContactInformationHelper.GetPersons(user.ContactGroup);
 			Assert.That(persons.Count, Is.EqualTo(1));
 			Assert.That(persons[0], Is.EqualTo("Test person changed"));
 		}
@@ -441,7 +441,7 @@ namespace Functional.Drugstore
 
 			browser.CheckBox("WorkRegions[1]").Checked = true;
 			browser.CheckBox("OrderRegions[0]").Checked = true;
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 			Click("Настройка");
 
 			session.Refresh(user);
@@ -450,7 +450,7 @@ namespace Functional.Drugstore
 
 			browser.CheckBox("WorkRegions[1]").Checked = false;
 			browser.CheckBox("OrderRegions[0]").Checked = false;
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 			Click("Настройка");
 
 			session.Refresh(user);
@@ -488,9 +488,9 @@ namespace Functional.Drugstore
 			session.SaveOrUpdate(settings);
 			Flush();
 
-			browser.Link(Find.ByText("Новый пользователь")).Click();
+			ClickLink("Новый пользователь");
 			Thread.Sleep(2000);
-			Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
+			AssertText("Новый пользователь");
 			// Указанные регионы для обзора и для заказа должны быть выделены
 			foreach (var region in browseRegions)
 				Assert.IsTrue(browser.CheckBox(Find.ById("browseRegion" + region)).Checked);
@@ -504,13 +504,13 @@ namespace Functional.Drugstore
 			// и регистрируем нового пользователя
 			browser.CheckBox(Find.ById("browseRegion" + browseRegions[0])).Checked = false;
 			browser.TextField(Find.ByName("user.Name")).TypeText("User for test regions");
-			browser.Button(Find.ByValue("Создать")).Click();
+			ClickButton("Создать");
 
-			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта "));
+			AssertText("Регистрационная карта ");
 			var login = Helper.GetLoginFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
 			browser.Refresh();
-			browser.Link(Find.ByText(login.ToString())).Click();
+			ClickLink(login.ToString());
 			Click("Настройка");
 			// Проверяем, чтобы были доступны нужные регионы. Берем с первого региона, т.к. галку с нулевого сняли
 			for (var i = 1; i < browseRegions.Length; i++)
@@ -522,9 +522,9 @@ namespace Functional.Drugstore
 		[Test]
 		public void User_must_be_enabled_after_registration()
 		{
-			browser.Link(Find.ByText("Новый пользователь")).Click();
+			ClickLink("Новый пользователь");
 			browser.TextField(Find.ByName("user.Name")).TypeText("test user");
-			browser.Button(Find.ByValue("Создать")).Click();
+			ClickButton("Создать");
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
 			client = session.Load<Client>(client.Id);
 			Assert.That(client.Users.Count, Is.EqualTo(1));
@@ -534,26 +534,26 @@ namespace Functional.Drugstore
 		[Test, NUnit.Framework.Description("Регистрация пользователя. Проверка валидатора списка email-ов для отправки регистрационной карты")]
 		public void Validate_email_list_for_sending_registration_card()
 		{
-			browser.Link(Find.ByText("Новый пользователь")).Click();
+			ClickLink("Новый пользователь");
 			FillRequiredFields();
 			browser.TextField(Find.ByName("mails")).TypeText("asjkdf sdfj34kjl 4 ./4,524,l5; ");
-			browser.Button(Find.ByValue("Создать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Поле содержит некорректный адрес электронной почты"));
+			ClickButton("Создать");
+			AssertText("Поле содержит некорректный адрес электронной почты");
 			browser.TextField(Find.ByName("mails")).TypeText("test1@test.test,test2@test.test,    test3@test.test.");
-			browser.Button(Find.ByValue("Создать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Поле содержит некорректный адрес электронной почты"));
+			ClickButton("Создать");
+			AssertText("Поле содержит некорректный адрес электронной почты");
 			browser.TextField(Find.ByName("mails")).TypeText("test1@test.test,test2@test.test,    test3@test.test");
-			browser.Button(Find.ByValue("Создать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
+			ClickButton("Создать");
+			AssertText("Пользователь создан");
 		}
 
 		[Test, NUnit.Framework.Description("Тест для регистрации адреса при регистрации пользователя")]
 		public void Create_user_with_address()
 		{
 			RegisterUserWithAddress(client, browser);
-			browser.Button(Find.ByValue("Создать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
-			Assert.That(browser.Text, Is.StringContaining("Коометарий Тестовый пользователь"));
+			ClickButton("Создать");
+			AssertText("Пользователь создан");
+			AssertText("Коометарий Тестовый пользователь");
 
 			session.Refresh(client);
 			Assert.That(client.Users.Count, Is.EqualTo(2));
@@ -569,7 +569,7 @@ namespace Functional.Drugstore
 
 		private void RegisterUserWithAddress(Client client, IElementContainer browser)
 		{
-			browser.Link(Find.ByText("Новый пользователь")).Click();
+			ClickLink("Новый пользователь");
 			browser.CheckBox(Find.ByName("sendClientCard")).Checked = true;
 			browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
 			browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
@@ -589,11 +589,11 @@ namespace Functional.Drugstore
 			client.Payers.Add(payer);
 			session.SaveOrUpdate(client);
 			Open(client);
-			browser.Link(Find.ByText("Новый пользователь")).Click();
+			ClickLink("Новый пользователь");
 			FillRequiredFields();
 			Click("Создать");
 			AssertText("Заполнение поля обязательно");
-			browser.Css("#user_Payer_Id").Select("Тестовый плательщик");
+			Css("#user_Payer_Id").Select("Тестовый плательщик");
 			Click("Создать");
 			AssertText("Регистрационная карта");
 			session.Refresh(client);
@@ -612,9 +612,9 @@ namespace Functional.Drugstore
 			payer.JuridicalOrganizations.Add(legalEntity);
 
 			RegisterUserWithAddress(client, browser);
-			browser.Css("#address_LegalEntity_Id").Select("Тестовая организация 2");
-			browser.Button(Find.ByValue("Создать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
+			Css("#address_LegalEntity_Id").Select("Тестовая организация 2");
+			ClickButton("Создать");
+			AssertText("Пользователь создан");
 
 			session.Refresh(client);
 			var createdAddress = client.Addresses.OrderBy(a => a.Id).Last();
@@ -624,14 +624,14 @@ namespace Functional.Drugstore
 		[Test]
 		public void Create_user_with_contact_person_info()
 		{
-			browser.Link(Find.ByText("Новый пользователь")).Click();
+			ClickLink("Новый пользователь");
 			FillRequiredFields();
 			browser.Link("addPersonLink").Click();
 			browser.TextField(Find.ByName(String.Format("persons[-1].Name"))).TypeText("Alice");
 			browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
 			browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
-			browser.Button(Find.ByValue("Создать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
+			ClickButton("Создать");
+			AssertText("Пользователь создан");
 			using (new SessionScope()) {
 				client = session.Load<Client>(client.Id);
 				Assert.That(client.ContactGroupOwner.ContactGroups.Count, Is.EqualTo(1));
@@ -651,20 +651,20 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("persons[-1].Name")).TypeText("Alice");
 			browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
 			browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
-			browser.Button(Find.ByValue("Создать")).Click();
+			ClickButton("Создать");
 			AssertText("Пользователь создан");
 
 			Open(client);
 
 			session.Refresh(client);
 			var user = client.Users[1];
-			browser.Link(Find.ByText(user.Id.ToString())).Click();
+			ClickLink(user.Id.ToString());
 			var group = user.ContactGroup;
 			var person = @group.Persons[0];
 			Assert.That(browser.TextField(Find.ByName(String.Format("persons[{0}].Name", person.Id))).Text, Is.EqualTo("Alice"));
 			browser.TextField(Find.ByName(String.Format("persons[{0}].Name", person.Id))).TypeText("Alice modified");
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 
 			var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
 			Assert.That(persons.Count, Is.EqualTo(1));
@@ -678,13 +678,13 @@ namespace Functional.Drugstore
 			var applyButtonText = "Сохранить";
 
 			Open(user, "Edit");
-			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
-			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
+			ContactInformationHelper.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
+			ContactInformationHelper.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
 			using (new SessionScope()) {
 				client = session.Load<Client>(client.Id);
 				var group = client.Users[0].ContactGroup;
 				browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", group.Contacts[0].Id))).TypeText("some comment");
-				browser.Button(Find.ByValue("Сохранить")).Click();
+				ClickButton("Сохранить");
 			}
 
 			// Проверка, что комментарий записан
@@ -715,8 +715,8 @@ namespace Functional.Drugstore
 				Assert.IsTrue(browser.Button(Find.ByValue("Отмена")).Exists);
 				Assert.IsTrue(browser.Button(Find.ByValue("Переместить")).Exists);
 
-				browser.Button(Find.ByValue("Переместить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
+				ClickButton("Переместить");
+				AssertText("Пользователь успешно перемещен");
 			}
 
 			session.Refresh(oldClient);
@@ -746,8 +746,8 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
 			browser.Button(Find.ById("SearchClientButton")).Click();
 			Thread.Sleep(2000);
-			browser.Button(Find.ByValue("Переместить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
+			ClickButton("Переместить");
+			AssertText("Пользователь успешно перемещен");
 
 			var newCountUserPricesEntries = user.GetUserPriceCount();
 			Assert.That(oldCountUserPrices, Is.LessThan(newCountUserPricesEntries));
@@ -785,17 +785,17 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 			using (var browser = Open(user, "edit")) {
 				// Даем доступ пользователю к адресу доставки
 				browser.CheckBox(Find.ByName("user.AvaliableAddresses[0].Id")).Checked = true;
-				browser.Button(Find.ByValue("Сохранить")).Click();
+				ClickButton("Сохранить");
 				browser.Refresh();
 
 				// Ищем клиента, к которому нужно передвинуть пользователя и двигаем
 				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
 				browser.Button(Find.ById("SearchClientButton")).Click();
 				Thread.Sleep(2000);
-				Assert.That(browser.Text, Is.StringContaining(String.Format("Перемещать адрес доставки {0}", address.Value)));
+				AssertText(String.Format("Перемещать адрес доставки {0}", address.Value));
 				Assert.IsTrue(browser.CheckBox(Find.ByName("moveWithAddress")).Checked);
-				browser.Button(Find.ByValue("Переместить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
+				ClickButton("Переместить");
+				AssertText("Пользователь успешно перемещен");
 			}
 
 			using (new SessionScope()) {
@@ -816,7 +816,7 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 		public void Message_on_forbidden_symbols()
 		{
 			browser.TextField(Find.ByName("message")).TypeText("<Тестовое сообщение с ><запрещенными<> символами");
-			browser.Button(Find.ByValue("Принять")).Click();
+			ClickButton("Принять");
 			Assert.That(browser.ContainsText("Поле содержит запрещенные символы(<, >)."), Is.True);
 		}
 

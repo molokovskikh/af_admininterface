@@ -21,8 +21,8 @@ namespace Functional
 		{
 			Open("Main/Index");
 
-			browser.Link(Find.ByText("Региональные администраторы")).Click();
-			browser.Button(Find.ByValue("Создать")).Click();
+			ClickLink("Региональные администраторы");
+			ClickButton("Создать");
 			var id = UserCommon.GeneratePassword();
 			var login = String.Format("admin{0}", id);
 			var managerName = String.Format("adminName{0}", id);
@@ -32,7 +32,7 @@ namespace Functional
 			browser.TextField(Find.ByName("administrator.InternalPhone")).TypeText("123");
 			browser.TextField(Find.ByName("administrator.Email")).TypeText(String.Format("{0}@admin.net", id));
 			browser.SelectList(Find.ByName("administrator.Department")).Select("IT");
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 
 			CheckRegistrationCard(browser, id, login, managerName);
 
@@ -42,10 +42,10 @@ namespace Functional
 
 		private void CheckRegistrationCard(Browser browser, string id, string login, string managerName)
 		{
-			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
-			Assert.That(browser.Text, Is.StringContaining(login));
-			Assert.That(browser.Text, Is.StringContaining(id));
-			Assert.That(browser.Text, Is.StringContaining(managerName));
+			AssertText("Регистрационная карта");
+			AssertText(login);
+			AssertText(id);
+			AssertText(managerName);
 		}
 
 		[Test]
@@ -53,8 +53,8 @@ namespace Functional
 		{
 			Open("Main/Index");
 
-			browser.Link(Find.ByText("Региональные администраторы")).Click();
-			browser.Button(Find.ByValue("Создать")).Click();
+			ClickLink("Региональные администраторы");
+			ClickButton("Создать");
 			var id = UserCommon.GeneratePassword();
 			var login = String.Format("admin{0}", id);
 			var managerName = String.Format("adminName{0}", id);
@@ -65,14 +65,14 @@ namespace Functional
 			ClickSaveAndCheckRequired(browser);
 			browser.TextField(Find.ByName("administrator.PhoneSupport")).TypeText("123-123123");
 			browser.TextField(Find.ByName("administrator.Email")).TypeText("kvasovtest@analit.net");
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 			CheckRegistrationCard(browser, id, login, managerName);
 		}
 
 		private void ClickSaveAndCheckRequired(Browser browser)
 		{
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Заполнение поля обязательно"));
+			ClickButton("Сохранить");
+			AssertText("Заполнение поля обязательно");
 		}
 
 		[Test]
@@ -87,11 +87,11 @@ namespace Functional
 			var department = (Department)Enum.ToObject(typeof(Department), departmentId);
 			browser.SelectList(Find.ByName("administrator.Department")).Select(department.GetDescription());
 
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 
 			browser.GoTo(BuildTestUrl("ViewAdministrators.aspx"));
-			browser.Link(Find.ByText(admin.UserName)).Click();
+			ClickLink(admin.UserName);
 			Assert.That(browser.TextField(Find.ByName("administrator.InternalPhone")).Text, Is.EqualTo(phone.ToString()));
 
 			session.Refresh(admin);
@@ -105,16 +105,16 @@ namespace Functional
 			var admin = OpenAdmin();
 			var regionId = Convert.ToUInt32(browser.Element(Find.ByName("accessibleRegions[0].Id")).GetValue("value"));
 			browser.CheckBox(Find.ByName("accessibleRegions[0].IsAvaliableForBrowse")).Checked = false;
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 			Assert.IsFalse(browser.CheckBox(Find.ByName("accessibleRegions[0].IsAvaliableForBrowse")).Checked);
 
 			session.Refresh(admin);
 			Assert.That(admin.RegionMask & regionId, Is.EqualTo(0));
 
 			browser.CheckBox(Find.ByName("accessibleRegions[0].IsAvaliableForBrowse")).Checked = true;
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 			Assert.IsTrue(browser.CheckBox(Find.ByName("accessibleRegions[0].IsAvaliableForBrowse")).Checked);
 
 			session.Refresh(admin);
@@ -131,16 +131,16 @@ namespace Functional
 			var permissionType = (PermissionType)Enum.ToObject(typeof(PermissionType), id);
 
 			browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).Checked = true;
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 			Assert.IsTrue(browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).Checked);
 
 			session.Refresh(admin);
 			Assert.IsTrue(admin.HavePermision(permissionType));
 
 			browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).Checked = false;
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 			Assert.IsFalse(browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).Checked);
 
 			session.Refresh(admin);
@@ -152,9 +152,9 @@ namespace Functional
 			var admin = CreateAdmin();
 
 			Open("Main/Index");
-			browser.Link(Find.ByText("Региональные администраторы")).Click();
-			browser.Link(Find.ByText(admin.UserName)).Click();
-			Assert.That(browser.Text, Is.StringContaining("Личные данные"));
+			ClickLink("Региональные администраторы");
+			ClickLink(admin.UserName);
+			AssertText("Личные данные");
 			return admin;
 		}
 

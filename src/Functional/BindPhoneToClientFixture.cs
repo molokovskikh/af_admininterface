@@ -34,7 +34,7 @@ namespace Functional
 		[Test, Ignore("Функционал отключен")]
 		public void Client_page_should_contains_not_detected_phones()
 		{
-			Assert.That(browser.Text, Is.StringContaining("Неопознанные звонки"));
+			AssertText("Неопознанные звонки");
 			Assert.That(GetUnknownPhones(browser), Is.EqualTo(new[] { "4732606000", "4732299224", "4732299223", "4732605000", "4732299222" }));
 		}
 
@@ -51,8 +51,8 @@ namespace Functional
 
 			Open(client);
 
-			Assert.That(browser.Text, Is.StringContaining("Известные телефоны"));
-			Assert.That(browser.Text, Is.StringContaining("4732-606000"));
+			AssertText("Известные телефоны");
+			AssertText("4732-606000");
 
 			var count = session.Query<UnresolvedCall>().Count(c => c.PhoneNumber == "4732606000");
 			Assert.That(count, Is.EqualTo(0));

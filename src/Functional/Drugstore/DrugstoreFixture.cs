@@ -26,7 +26,7 @@ namespace Functional.Drugstore
 			testClient = DataMother.CreateTestClientWithUser();
 
 			Open(testClient);
-			Assert.That(browser.Text, Is.StringContaining("Клиент"));
+			AssertText("Клиент");
 		}
 
 		[Test]
@@ -60,18 +60,18 @@ namespace Functional.Drugstore
 		public void Try_to_send_message()
 		{
 			browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
-			browser.Button(Find.ByValue("Принять")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Клиент {0}, Код {1}", testClient.Name, testClient.Id)));
+			ClickButton("Принять");
+			AssertText("Сохранено");
+			AssertText(String.Format("Клиент {0}, Код {1}", testClient.Name, testClient.Id));
 		}
 
 		[Test]
 		public void Try_to_search_offers()
 		{
 			var user = testClient.Users[0];
-			browser.Link(Find.ByText(user.Login)).Click();
-			Assert.That(browser.Text, Is.StringContaining("Пользователь"));
-			browser.Link(Find.ByText("Поиск предложений")).Click();
+			ClickLink(user.Login);
+			AssertText("Пользователь");
+			ClickLink("Поиск предложений");
 			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("Поиск предложений для пользователя " + user.GetLoginOrName()))) {
 				Assert.That(openedWindow.Text, Is.StringContaining("Введите наименование или форму выпуска"));
 			}
@@ -82,16 +82,16 @@ namespace Functional.Drugstore
 		{
 			AuditRecord.DeleteAuditRecords(testClient);
 
-			browser.Link(Find.ByText(testClient.Users[0].Login)).Click();
-			browser.Link(Find.ByText("Изменить пароль")).Click();
+			ClickLink(testClient.Users[0].Login);
+			ClickLink("Изменить пароль");
 			AssertText("Изменение пароля");
-			browser.Css("#emailsForSend").TypeText("kvasovtest@analit.net");
+			Css("#emailsForSend").TypeText("kvasovtest@analit.net");
 			browser.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-			browser.Button(Find.ByValue("Изменить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Пароль успешно изменен"));
+			ClickButton("Изменить");
+			AssertText("Пароль успешно изменен");
 
 			var checkText = String.Format("$$$Пользователь {0}. Бесплатное изменение пароля: Тестовое изменение пароля", testClient.Users[0].Login);
-			Assert.That(browser.Text, Is.StringContaining(checkText));
+			AssertText(checkText);
 		}
 
 		[Test]
@@ -99,16 +99,16 @@ namespace Functional.Drugstore
 		{
 			browser.Input<Client>(client => client.FullName, testClient.FullName);
 			browser.Input<Client>(client => client.Name, testClient.Name + testClient);
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Клиент {0}, Код {1}", testClient.Name + testClient, testClient.Id)));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
+			AssertText(String.Format("Клиент {0}, Код {1}", testClient.Name + testClient, testClient.Id));
 		}
 
 		[Test]
 		public void Open_settings()
 		{
-			browser.Link(Find.ByText("Настройка")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Конфигурация клиента"));
+			ClickLink("Настройка");
+			AssertText("Конфигурация клиента");
 		}
 
 		[Test]

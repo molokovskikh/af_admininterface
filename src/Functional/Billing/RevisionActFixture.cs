@@ -25,16 +25,16 @@ namespace Functional.Billing
 		public void Show_revision_act()
 		{
 			Open(payer);
-			browser.Link(Find.ByText("Акт сверки")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Акт сверки"));
+			ClickLink("Акт сверки");
+			AssertText("Акт сверки");
 		}
 
 		[Test]
 		public void Print()
 		{
 			Open("RevisionActs/{0}", payer.Id);
-			browser.Link(Find.ByText("Печать")).Click();
-			Assert.That(browser.Text, Is.StringContaining("взаимных расчетов по состоянию"));
+			ClickLink("Печать");
+			AssertText("взаимных расчетов по состоянию");
 		}
 
 		[Test, Ignore("Зависает")]
@@ -47,7 +47,7 @@ namespace Functional.Billing
 			Open("RevisionActs/{0}", payer.Id);
 			var handler = new FileDownloadHandler(file);
 			browser.AddDialogHandler(handler);
-			browser.Link(Find.ByText("Excel")).Click();
+			ClickLink("Excel");
 
 			Assert.That(File.Exists("Акт сверки.xls"), Is.True);
 		}
@@ -57,8 +57,8 @@ namespace Functional.Billing
 		{
 			Open("RevisionActs/{0}", payer.Id);
 			browser.TextField(Find.ByName("emails")).TypeText("kvasovtest@analit.net");
-			browser.Button(Find.ByValue("Отправить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Отправлено"));
+			ClickButton("Отправить");
+			AssertText("Отправлено");
 		}
 	}
 }

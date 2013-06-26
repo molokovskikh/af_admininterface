@@ -24,11 +24,11 @@ namespace Functional.Billing
 			new Payment { Payer = payer, Recipient = payer.Recipient, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800 }.Save();
 
 			Open(payer);
-			Assert.That(browser.Text, Is.StringContaining("плательщик"));
+			AssertText("плательщик");
 			Click(String.Format(@"Платежи/Счета {0}", invoice.Period.Year));
 			Thread.Sleep(1000);
-			Assert.That(browser.Text, Is.StringContaining("11.01.2011"));
-			Assert.That(browser.Text, Is.StringContaining("15.01.2011"));
+			AssertText("11.01.2011");
+			AssertText("15.01.2011");
 		}
 
 		[Test]
@@ -38,9 +38,9 @@ namespace Functional.Billing
 			payer.Save();
 
 			Open(payer);
-			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
+			AssertText("Плательщик");
 			Click("Акт сверки");
-			Assert.That(browser.Text, Is.StringContaining("У плательщика не указан получатель платежей, выберете получателя платежей"));
+			AssertText("У плательщика не указан получатель платежей, выберете получателя платежей");
 		}
 
 		[Test]
@@ -89,10 +89,10 @@ namespace Functional.Billing
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			Open(payer);
-			browser.Button(Find.ByValue("Принять")).Click();
+			ClickButton("Принять");
 			AssertText("Это поле необходимо заполнить.");
 			browser.TextField(Find.ByName("messageText")).TypeText("Тестовое сообщение");
-			browser.Button(Find.ByValue("Принять")).Click();
+			ClickButton("Принять");
 			AssertText("Тестовое сообщение");
 		}
 	}

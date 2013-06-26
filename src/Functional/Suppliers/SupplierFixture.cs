@@ -50,13 +50,13 @@ namespace Functional.Suppliers
 		public void Search_supplier_user()
 		{
 			Open("/users/search");
-			browser.Css("#filter_SearchText").TypeText(user.Id.ToString());
+			Css("#filter_SearchText").TypeText(user.Id.ToString());
 			Click("Поиск");
-			Assert.That(browser.Text, Is.StringContaining(user.Login));
+			AssertText(user.Login);
 /*
  *			срабатывает автоматичский вход в пользователя
-			browser.Link(Find.ByText(user.Login)).Click();
-			Assert.That(browser.Text, Is.StringContaining("Поставщик"));
+			ClickLink(user.Login);
+			AssertText("Поставщик");
 */
 		}
 
@@ -64,14 +64,14 @@ namespace Functional.Suppliers
 		public void Change_user_permissions()
 		{
 			Open(user, "Edit");
-			Assert.That(browser.Text, Is.StringContaining("Настройка"));
+			AssertText("Настройка");
 			Click("Настройка");
-			Assert.That(browser.Text, Is.StringContaining("Настройки пользователя"));
+			AssertText("Настройки пользователя");
 			var permission = GetPermission("Статистика заказов");
 			Assert.That(permission.Checked, Is.True);
 			permission.Click();
 			Click("Сохранить");
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			AssertText("Сохранено");
 			Click("Настройка");
 			permission = GetPermission("Статистика заказов");
 			Assert.That(permission.Checked, Is.False);
@@ -87,22 +87,22 @@ namespace Functional.Suppliers
 		public void Search_supplier()
 		{
 			Open("/users/search");
-			browser.Css("#filter_SearchText").TypeText("Тестовый поставщик");
+			Css("#filter_SearchText").TypeText("Тестовый поставщик");
 			Click("Поиск");
-			Assert.That(browser.Text, Is.StringContaining("Тестовый поставщик"));
+			AssertText("Тестовый поставщик");
 
-			browser.Link(Find.ByText("Тестовый поставщик")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Поставщик"));
+			ClickLink("Тестовый поставщик");
+			AssertText("Поставщик");
 		}
 
 		[Test]
 		public void Update_supplier_name()
 		{
 			Open(supplier);
-			browser.Css("#supplier_Name").TypeText("Тестовый_поставщик_обновленный");
+			Css("#supplier_Name").TypeText("Тестовый_поставщик_обновленный");
 			browser.Click("Сохранить");
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			Assert.That(browser.Css("#supplier_Name").Text, Is.EqualTo("Тестовый_поставщик_обновленный"));
+			AssertText("Сохранено");
+			Assert.That(Css("#supplier_Name").Text, Is.EqualTo("Тестовый_поставщик_обновленный"));
 			session.Refresh(supplier);
 			Assert.That(supplier.Name, Is.EqualTo("Тестовый_поставщик_обновленный"));
 		}
@@ -112,9 +112,9 @@ namespace Functional.Suppliers
 		{
 			Open(supplier);
 			browser.Click("Новый пользователь");
-			Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
+			AssertText("Новый пользователь");
 			browser.Click("Сохранить");
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			AssertText("Сохранено");
 		}
 
 		[Test]

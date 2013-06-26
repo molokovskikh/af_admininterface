@@ -31,11 +31,11 @@ namespace Functional.Billing
 		public void Set_payment_for_advertising()
 		{
 			Open(payment, "Edit");
-			Assert.That(browser.Text, Is.StringContaining("Редактирование платежа"));
+			AssertText("Редактирование платежа");
 			browser.CheckBox(Find.ByName("payment.ForAd")).Checked = true;
 			browser.TextField(Find.ByName("payment.AdSum")).TypeText(payment.Sum.ToString());
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 		}
 
 		[Test]

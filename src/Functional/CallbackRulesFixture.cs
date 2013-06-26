@@ -46,7 +46,7 @@ namespace Functional
 			callback2.SaveAndFlush();
 
 			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
-				browser.Link(Find.ByText(CallbackLinkText)).Click();
+				ClickLink(CallbackLinkText);
 				browser.AssertThatTableContains(callback2, callback1);
 			}
 		}
@@ -60,7 +60,7 @@ namespace Functional
 			callback2.SaveAndFlush();
 
 			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
-				browser.Link(Find.ByText(CallbackLinkText)).Click();
+				ClickLink(CallbackLinkText);
 				browser.FindRow(callback1).Link(Find.ByText("Удалить")).Click();
 				browser.AssertThatTableContains(callback2);
 			}
@@ -73,10 +73,10 @@ namespace Functional
 			callback1.Save();
 
 			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
-				browser.Link(Find.ByText(CallbackLinkText)).Click();
+				ClickLink(CallbackLinkText);
 				browser.FindRow(callback1).Link(Find.ByText("Редактировать")).Click();
 				browser.Input<Callback>(callback => callback.DueDate, DateTime.Today.AddMonths(-1));
-				browser.Button(Find.ByValue("Сохранить")).Click();
+				ClickButton("Сохранить");
 
 				callback1.Refresh();
 				Assert.That(callback1.DueDate, Is.EqualTo(DateTime.Today.AddMonths(-1)));
@@ -93,10 +93,10 @@ namespace Functional
 			callback2.SaveAndFlush();
 
 			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
-				browser.Link(Find.ByText(CallbackLinkText)).Click();
+				ClickLink(CallbackLinkText);
 				browser.FindRow(callback1).Input<Callback[]>(callbacks => callbacks[1].CheckDate, true);
 				browser.FindRow(callback2).Input<Callback[]>(callbacks => callbacks[0].Enabled, true);
-				browser.Button(Find.ByValue("Сохранить")).Click();
+				ClickButton("Сохранить");
 
 				callback1.Refresh();
 				callback2.Refresh();
@@ -118,9 +118,9 @@ namespace Functional
 			callback.Save();
 
 			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
-				browser.Link(Find.ByText(CallbackLinkText)).Click();
+				ClickLink(CallbackLinkText);
 				browser.FindRow(callback).Input<Callback[]>(callbacks => callbacks[0].CheckDate, true);
-				browser.Button(Find.ByValue("Сохранить")).Click();
+				ClickButton("Сохранить");
 
 				Assert.That(browser.ContainsText("Обновление успешно завершено."), Is.True, "Нет сообщения об успешном сохранении");
 			}

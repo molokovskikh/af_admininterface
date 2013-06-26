@@ -19,23 +19,23 @@ namespace Functional
 		{
 			Open("Main/Index");
 
-			browser.Link(Find.ByText("Регионы")).Click();
+			ClickLink("Регионы");
 			AssertText("Регионы");
 			AssertText("Телефон по умолчанию");
 			AssertText("Регионы работы по умолчанию");
 			AssertText("Стоимость копии для поставщика");
 			AssertText("Регион для справки");
 
-			browser.Link(Find.ByText("Воронеж")).Click();
+			ClickLink("Воронеж");
 			AssertText("Телефон по умолчанию");
 			AssertText("Временной сдвиг относительно Москвы");
 			browser.Link(Find.ById("ShowRegionsLink")).Click();
 			AssertText(@"Регионы работы
  по умолчанию");
 			browser.TextField(Find.ById("region_DefaultPhone")).Value = "123-1233210";
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 			AssertText("Сохранено");
-			browser.Link(Find.ByText("Регионы")).Click();
+			ClickLink("Регионы");
 			AssertText("123-1233210");
 		}
 
@@ -53,7 +53,7 @@ namespace Functional
 			session.Flush();
 			Open("Main/Index");
 
-			browser.Link(Find.ByText("Регионы")).Click();
+			ClickLink("Регионы");
 			AssertText("Регионы");
 			Click("Воронеж");
 			var field = browser.TextField(Find.ByValue("111,00"));

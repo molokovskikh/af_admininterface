@@ -21,7 +21,7 @@ namespace Functional.Billing
 			browser.TextField(Find.ByName("SearchBy.BeginDate")).TypeText("01.01.2009");
 			browser.RadioButton(radioButtonId).Checked = true;
 			browser.TextField(Find.ById("SearchText")).TypeText(searchText);
-			browser.Button(Find.ByValue("Найти")).Click();
+			ClickButton("Найти");
 
 			Assert.That(browser.Text, Is.Not.Contains("За указанный период ничего не найдено"));
 			Assert.That(browser.Table(Find.ById("MainTable")).TableRows.Count(), Is.GreaterThan(1));
@@ -97,7 +97,7 @@ namespace Functional.Billing
 			}
 			using (var browser = Open("Billing/Accounting")) {
 				Assert.That(browser.Text, Is.Not.StringContaining(client.Addresses[0].Value));
-				Assert.That(browser.Text, Is.StringContaining(client.Addresses[1].Value));
+				AssertText(client.Addresses[1].Value);
 			}
 		}
 
@@ -109,8 +109,8 @@ namespace Functional.Billing
 			session.SaveOrUpdate(client.Users[0]);
 
 			Open("Billing/Accounting");
-			Assert.That(browser.Text, Is.StringContaining("Учет адресов и пользователей"));
-			Assert.That(browser.Text, Is.StringContaining(client.Users[0].Name));
+			AssertText("Учет адресов и пользователей");
+			AssertText(client.Users[0].Name);
 		}
 
 		[Test]
@@ -121,8 +121,8 @@ namespace Functional.Billing
 			user.Accounting.Accounted();
 			Open("Accounts/Index?tab=AccountingHistory");
 			browser.WaitUntilContainsText("Поиск", 2);
-			Assert.That(browser.Text, Is.StringContaining("Поиск"));
-			Assert.That(browser.Text, Is.StringContaining(user.Login));
+			AssertText("Поиск");
+			AssertText(user.Login);
 		}
 	}
 }

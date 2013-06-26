@@ -52,7 +52,7 @@ namespace Functional.Billing
 		public void Check_comment_with_disable_client()
 		{
 			Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
-			var checkBox = browser.Css("#clients input[name=\"status\"]");
+			var checkBox = Css("#clients input[name=\"status\"]");
 			checkBox.Checked = false;
 			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
 			ConfirmDialog();

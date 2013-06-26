@@ -32,7 +32,7 @@ namespace Functional.Drugstore
 			settings = client.Settings;
 
 			Open(client, "Settings");
-			Assert.That(browser.Text, Is.StringContaining("Конфигурация клиента"));
+			AssertText("Конфигурация клиента");
 		}
 
 		[Test]
@@ -48,11 +48,11 @@ namespace Functional.Drugstore
 			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixAction")).SelectedItem, Is.EqualTo("Запретить заказ"));
 
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 			browser.Click("Настройка");
 
-			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
+			AssertText("Фармаимпекс - Матрица");
 			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixAction")).SelectedItem, Is.EqualTo("Запретить заказ"));
 
@@ -76,11 +76,11 @@ namespace Functional.Drugstore
 			Assert.That(Css("div.search select").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.OfferMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
 
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 			browser.Click("Настройка");
 
-			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
+			AssertText("Фармаимпекс - Матрица");
 			Assert.That(browser.SelectList(Find.ByName("drugstore.OfferMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
 
 			session.Refresh(client);
@@ -111,10 +111,10 @@ namespace Functional.Drugstore
 			Assert.That(excludes.Css("div.search select").SelectedItem, Is.StringEnding("Фармаимпекс"));
 
 			Click("Сохранить");
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			AssertText("Сохранено");
 			Click("Настройка");
 
-			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
+			AssertText("Фармаимпекс - Матрица");
 			Assert.That(browser.SelectList(Find.ByName("drugstore.OfferMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
 			excludes = ((Table)Css("#excludes"));
 			Assert.That(excludes.Text, Is.StringContaining("Фармаимпекс"));
@@ -157,10 +157,10 @@ namespace Functional.Drugstore
 				.Css("select").SelectedItem, Is.EqualTo("testParse"));
 
 			Click("Сохранить");
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			AssertText("Сохранено");
 			Click("Настройка");
-			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
-			Assert.That(browser.Text, Is.StringContaining("testParse"));
+			AssertText("Фармаимпекс - Матрица");
+			AssertText("testParse");
 
 			var rule = client.Settings.SmartOrderRules;
 			session.Refresh(rule);
@@ -174,7 +174,7 @@ namespace Functional.Drugstore
 		public void Try_to_send_email_notification()
 		{
 			Open(client, "Settings");
-			browser.Button(Find.ByValue("Отправить уведомления о регистрации поставщикам")).Click();
+			ClickButton("Отправить уведомления о регистрации поставщикам");
 			Assert.That(browser.ContainsText("Уведомления отправлены"));
 		}
 
@@ -186,7 +186,7 @@ namespace Functional.Drugstore
 			homeRegionSelect.Select(changeTo);
 			browser.Button(b => b.Value.Equals("Сохранить")).Click();
 			Assert.That(browser.ContainsText("Сохранено"), Is.True);
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink("Настройка");
 			var selectedText = GetHomeRegionSelect(browser).SelectedOption.Text;
 			Assert.That(selectedText, Is.EqualTo(changeTo));
 		}
@@ -206,7 +206,7 @@ namespace Functional.Drugstore
 
 			browser.Button(b => b.Value == "Сохранить").Click();
 			Assert.That(browser.ContainsText("Сохранено"), Is.True);
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink("Настройка");
 
 			Assert.That(GetWorkRegion(browser, "Воронеж").Checked, Is.True);
 			Assert.That(GetWorkRegion(browser, "Курск").Checked, Is.True);
@@ -222,7 +222,7 @@ namespace Functional.Drugstore
 			var workRegion = GetWorkRegion(browser, "Курск");
 			workRegion.Checked = true;
 			browser.Button(b => b.Value == "Сохранить").Click();
-			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			ClickLink(client.Users[0].Login);
 			Click("Настройка");
 
 			Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
@@ -245,18 +245,18 @@ namespace Functional.Drugstore
 			var workRegion = GetWorkRegion(browser, "Курск");
 			workRegion.Checked = true;
 			browser.Button(b => b.Value == "Сохранить").Click();
-			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			ClickLink(client.Users[0].Login);
 			Click("Настройка");
 			Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
 			Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
 
 			browser.Back();
 			browser.Back();
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink("Настройка");
 			workRegion = GetWorkRegion(browser, "Воронеж");
 			workRegion.Checked = false;
 			browser.Button(b => b.Value == "Сохранить").Click();
-			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			ClickLink(client.Users[0].Login);
 			Click("Настройка");
 
 			Assert.IsFalse(UserWorkRegionExists(browser, "Воронеж"));
@@ -278,7 +278,7 @@ namespace Functional.Drugstore
 			var workRegion = GetOrderRegion(browser, "Липецк");
 			workRegion.Checked = true;
 			browser.Button(b => b.Value == "Сохранить").Click();
-			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			ClickLink(client.Users[0].Login);
 			Click("Настройка");
 			Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
 			Assert.IsTrue(UserOrderRegionExists(browser, "Воронеж"));
@@ -301,7 +301,7 @@ namespace Functional.Drugstore
 			var workRegion = GetOrderRegion(browser, "Курск");
 			workRegion.Checked = true;
 			browser.Button(b => b.Value == "Сохранить").Click();
-			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			ClickLink(client.Users[0].Login);
 			Click("Настройка");
 
 			Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
@@ -310,11 +310,11 @@ namespace Functional.Drugstore
 
 			browser.Back();
 			browser.Back();
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink("Настройка");
 			workRegion = GetOrderRegion(browser, "Курск");
 			workRegion.Checked = false;
 			browser.Button(b => b.Value == "Сохранить").Click();
-			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			ClickLink(client.Users[0].Login);
 			Click("Настройка");
 
 			Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
@@ -336,11 +336,11 @@ namespace Functional.Drugstore
 		{
 			var countVisibleRegions = browser.Table("RegionsTable").TableRows.Count();
 
-			browser.Link(Find.ByText("Показать все регионы")).Click();
+			ClickLink("Показать все регионы");
 			var countAllRegions = browser.Table("RegionsTable").TableRows.Count();
 			Assert.That(countVisibleRegions, Is.LessThan(countAllRegions));
 
-			browser.Link(Find.ByText("Показать только регионы по умолчанию")).Click();
+			ClickLink("Показать только регионы по умолчанию");
 			Thread.Sleep(500);
 			var count = browser.Table("RegionsTable").TableRows.Count();
 			Assert.That(count, Is.EqualTo(countVisibleRegions));
@@ -351,7 +351,7 @@ namespace Functional.Drugstore
 		{
 			var browseCheckboxes = browser.CheckBoxes.Where(element => (element.Id != null) && element.Id.Contains("browseRegion"));
 			var orderCheckboxes = browser.CheckBoxes.Where(element => (element.Id != null) && element.Id.Contains("orderRegion"));
-			browser.Link(Find.ByText("Показать все регионы")).Click();
+			ClickLink("Показать все регионы");
 			var allBrowseCheckboxes = browser.CheckBoxes.Where(element => (element.Id != null) && element.Id.Contains("browseRegion"));
 			var allOrderCheckboxes = browser.CheckBoxes.Where(element => (element.Id != null) && element.Id.Contains("orderRegion"));
 			foreach (var box in browseCheckboxes)
@@ -374,7 +374,7 @@ namespace Functional.Drugstore
 			browser.Button(b => b.Value == "Сохранить").Click();
 			Assert.That(browser.ContainsText("Сохранено"), Is.True);
 
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink("Настройка");
 			checkBoxHide = browser.Div(Find.ById("commonSettings")).CheckBoxes[0];
 			Assert.That(checkBoxHide.Checked, Is.True);
 			// "Сотрудник АК Инфорум"
@@ -383,7 +383,7 @@ namespace Functional.Drugstore
 			browser.Button(b => b.Value == "Сохранить").Click();
 			Assert.That(browser.ContainsText("Сохранено"), Is.True);
 
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink("Настройка");
 			checkBoxHide = browser.Div(Find.ById("commonSettings")).CheckBoxes[0];
 			Assert.That(checkBoxHide.Checked, Is.True);
 			checkBoxInforoomEmployee = browser.Div(Find.ById("commonSettings")).CheckBoxes[1];
@@ -407,20 +407,20 @@ namespace Functional.Drugstore
 			var controlName = "drugstore.IgnoreNewPrices";
 			Assert.IsFalse(browser.CheckBox(Find.ByName(controlName)).Checked);
 			browser.CheckBox(Find.ByName(controlName)).Checked = true;
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 
 			session.Refresh(client);
 			Assert.IsTrue(settings.IgnoreNewPrices);
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink("Настройка");
 			Assert.IsTrue(browser.CheckBox(Find.ByName(controlName)).Checked);
 			browser.CheckBox(Find.ByName(controlName)).Checked = false;
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink("Настройка");
 			Assert.IsFalse(browser.CheckBox(Find.ByName(controlName)).Checked);
 		}
 
@@ -430,20 +430,20 @@ namespace Functional.Drugstore
 			var controlName = "drugstore.MaxWeeklyOrdersSum";
 			Assert.That(browser.TextField(Find.ByName(controlName)).Text, Is.EqualTo("0"));
 			browser.TextField(Find.ByName(controlName)).TypeText("123456");
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 
 			session.Refresh(settings);
 			Assert.That(settings.MaxWeeklyOrdersSum, Is.EqualTo(123456));
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink("Настройка");
 			Assert.That(browser.TextField(Find.ByName(controlName)).Text, Is.EqualTo("123456"));
 			browser.TextField(Find.ByName(controlName)).Clear();
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
-			browser.Link(Find.ByText("Настройка")).Click();
+			ClickLink("Настройка");
 			Assert.That(browser.TextField(Find.ByName(controlName)).Text, Is.EqualTo("0"));
 		}
 
@@ -461,8 +461,8 @@ namespace Functional.Drugstore
 			Thread.Sleep(10000);
 			Assert.That(Css("div.search select").SelectedItem, Is.StringEnding(supplier.Name));
 
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 
 			session.Refresh(settings);
 			Assert.That(settings.FirmCodeOnly, Is.EqualTo(supplier.Id));
@@ -472,8 +472,8 @@ namespace Functional.Drugstore
 		public void Set_costs_noising_for_all_suppliers()
 		{
 			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 
 			session.Refresh(settings);
 			Assert.That(settings.FirmCodeOnly, Is.EqualTo(0));
@@ -487,15 +487,15 @@ namespace Functional.Drugstore
 			Save(supplier);
 			Flush();
 
-			browser.Link(Find.ByText("Показать все регионы")).Click();
+			ClickLink("Показать все регионы");
 			Thread.Sleep(500);
 			Assert.IsFalse(GetWorkRegion(browser, "Челябинск").Checked);
 			GetWorkRegion(browser, "Челябинск").Checked = true;
 			Assert.IsFalse(GetWorkRegion(browser, "Чебоксары").Checked);
 			GetWorkRegion(browser, "Чебоксары").Checked = true;
 
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 			var sql = @"
 select
 count(*) 
@@ -530,8 +530,8 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			Assert.IsTrue(browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked);
 			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = false;
 			Thread.Sleep(1000);
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
 
 			session.Refresh(settings);
 			Assert.That(settings.FirmCodeOnly, Is.Null);

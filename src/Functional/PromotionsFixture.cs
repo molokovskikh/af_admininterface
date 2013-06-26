@@ -83,9 +83,9 @@ limit 1")
 		[Test(Description = "проверяем отображение основной страницы с акциями")]
 		public void OpenIndexPage()
 		{
-			Assert.That(browser.Text, Is.StringContaining("Список акций"));
-			Assert.That(browser.Text, Is.StringContaining("Введите текст для поиска"));
-			Assert.That(browser.Text, Is.StringContaining("Статус:"));
+			AssertText("Список акций");
+			AssertText("Введите текст для поиска");
+			AssertText("Статус:");
 			var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
 			Assert.That(list.Exists, Is.True);
 			Assert.That(list.SelectedItem, Is.EqualTo("Включенные"));
@@ -119,14 +119,14 @@ limit 1")
 			//ее не должно быть в списке отключенных
 			var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
 			list.Select("Отключенные");
-			browser.Button(Find.ByValue("Показать")).Click();
+			ClickButton("Показать");
 
 			RowPromotionNotExists(_promotion);
 
 			//она должна быть в списке "Все"
 			list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
 			list.Select("Все");
-			browser.Button(Find.ByValue("Показать")).Click();
+			ClickButton("Показать");
 
 			RowPromotionExists(_promotion);
 		}
@@ -147,7 +147,7 @@ limit 1")
 			//находим ее в списке отключенных
 			var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
 			list.Select("Отключенные");
-			browser.Button(Find.ByValue("Показать")).Click();
+			ClickButton("Показать");
 			row = RowPromotionExists(_promotion);
 
 			//включаем обратно
@@ -174,7 +174,7 @@ limit 1")
 			//находим ее в списке отключенных
 			var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
 			list.Select("Отключенные");
-			browser.Button(Find.ByValue("Показать")).Click();
+			ClickButton("Показать");
 			row = RowPromotionExists(_promotion);
 
 			//включаем обратно
@@ -206,17 +206,17 @@ limit 1")
 
 			row.Link(Find.ByText("Редактировать")).Click();
 
-			Assert.That(browser.Text, Is.StringContaining("Редактирование акции №" + _promotion.Id));
-			Assert.That(browser.Text, Is.StringContaining(_promotion.Name));
-			Assert.That(browser.Text, Is.StringContaining(_promotion.PromotionOwnerSupplier.Name));
+			AssertText("Редактирование акции №" + _promotion.Id);
+			AssertText(_promotion.Name);
+			AssertText(_promotion.PromotionOwnerSupplier.Name);
 
 			browser.CheckBox(Find.ByName("promotion.Enabled")).Click();
 			browser.CheckBox(Find.ByName("promotion.AgencyDisabled")).Click();
 			browser.TextField(Find.ByName("promotion.Annotation")).TypeText("новое крутое описание");
 
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			ClickButton("Сохранить");
 
-			Assert.That(browser.Text, Is.StringContaining("Список акций"));
+			AssertText("Список акций");
 			RowPromotionNotExists(_promotion);
 
 			RefreshPromotion(_promotion);
@@ -239,14 +239,14 @@ limit 1")
 
 			row.Link(Find.ByText("Редактировать")).Click();
 
-			Assert.That(browser.Text, Is.StringContaining("Редактирование акции №" + _promotion.Id));
-			Assert.That(browser.Text, Is.StringContaining(_promotion.Name));
-			Assert.That(browser.Text, Is.StringContaining(_promotion.PromotionOwnerSupplier.Name));
+			AssertText("Редактирование акции №" + _promotion.Id);
+			AssertText(_promotion.Name);
+			AssertText(_promotion.PromotionOwnerSupplier.Name);
 
 			//Переходим на форму редактирования списка
-			browser.Link(Find.ByText("Редактировать список препаратов")).Click();
+			ClickLink("Редактировать список препаратов");
 
-			Assert.That(browser.Text, Is.StringContaining("Редактирование списка препаратов акции №" + _promotion.Id));
+			AssertText("Редактирование списка препаратов акции №" + _promotion.Id);
 
 			//Выбираем наименования и отмечаем их в таблице
 			var chaBoxes = browser.CheckBoxes.Where(cb => cb.Name.StartsWith("cha")).ToList();
@@ -259,8 +259,8 @@ limit 1")
 			var addBtn = browser.Button(Find.ById("addBtn"));
 			Assert.That(addBtn.Exists, Is.True, "Не найдена кнопка добавления наименований к списку выбранных прератов");
 			addBtn.Click();
-			Assert.That(browser.Text, Is.StringContaining("Редактирование списка препаратов акции №" + _promotion.Id));
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			AssertText("Редактирование списка препаратов акции №" + _promotion.Id);
+			AssertText("Сохранено");
 
 			RefreshPromotion(_promotion);
 			var promoBoxes = browser.CheckBoxes.Where(cb => cb.Name.StartsWith("chd")).ToList();
@@ -272,7 +272,7 @@ limit 1")
 			Assert.That(parentPromo.Exists, "Не найдена ссылка на родительскую промо-акцию");
 			parentPromo.Click();
 
-			Assert.That(browser.Text, Is.StringContaining("Редактирование акции №" + _promotion.Id));
+			AssertText("Редактирование акции №" + _promotion.Id);
 			Assert.That(browser.Text, Is.Not.StringContaining("Сохранено"));
 		}
 	}

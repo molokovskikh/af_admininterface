@@ -21,9 +21,9 @@ namespace Functional
 			AssertText("Сохранено");
 			AssertText("Тестовая новость");
 			Click("Скрыть");
-			Assert.IsNotNull(browser.Css(".DataTable tbody tr.hidden-news"));
+			Assert.IsNotNull(Css(".DataTable tbody tr.hidden-news"));
 			Click("Восстановить");
-			Assert.IsNull(browser.Css(".DataTable tbody tr.hidden-news"));
+			Assert.IsNull(Css(".DataTable tbody tr.hidden-news"));
 		}
 	}
 }

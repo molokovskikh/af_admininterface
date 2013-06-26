@@ -35,14 +35,14 @@ namespace Functional.Billing
 			payer.Reports.Add(report);
 
 			Open(payer);
-			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
+			AssertText("Плательщик");
 		}
 
 		[Test]
 		public void Short_report_for_payer()
 		{
-			Assert.That(browser.Text, Is.StringContaining("Отчеты"));
-			Assert.That(browser.Text, Is.StringContaining("тестовый отчет"));
+			AssertText("Отчеты");
+			AssertText("тестовый отчет");
 		}
 
 		[Test]

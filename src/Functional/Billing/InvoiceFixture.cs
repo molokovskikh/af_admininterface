@@ -32,10 +32,10 @@ namespace Functional.Billing
 		public void Cancel_invoice()
 		{
 			Open("Invoices/");
-			Assert.That(browser.Text, Is.StringContaining("Реестр счетов"));
+			AssertText("Реестр счетов");
 			Css(String.Format("input[value='{0}']", invoice.Id)).Click();
 			Css("input[name='delete']").Click();
-			Assert.That(browser.Text, Is.StringContaining("Удалено"));
+			AssertText("Удалено");
 
 			Reopen();
 			invoice = Invoice.TryFind(invoice.Id);

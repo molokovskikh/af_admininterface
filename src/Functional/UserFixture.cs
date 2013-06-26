@@ -47,11 +47,11 @@ namespace Functional
 			Save(user1);
 			Open(user);
 			Click("Настройка");
-			Assert.That(browser.Text, Is.StringContaining("Логины в видимости пользователя"));
+			AssertText("Логины в видимости пользователя");
 			Click("Добавить");
-			browser.Css(".search input.term").AppendText("Про");
+			Css(".search input.term").AppendText("Про");
 			Click("Найти");
-			var selectList = (SelectList)browser.Css(".search select");
+			var selectList = (SelectList)Css(".search select");
 			var val = selectList.Options.First(o => o.Text.Contains("Про")).Value;
 			selectList.SelectByValue(val);
 			Click("Сохранить");

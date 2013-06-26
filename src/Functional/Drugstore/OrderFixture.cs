@@ -61,29 +61,29 @@ namespace Functional.Drugstore
 		public void Check_address_links_when_user_orders_history_show()
 		{
 			Open(user);
-			browser.Link(Find.ByText("История заказов")).Click();
+			ClickLink("История заказов");
 
 			OpenedWindow(@"История заказов");
 			SetCalendarDates(browser);
-			browser.Button(Find.ByValue("Показать")).Click();
+			ClickButton("Показать");
 			Assert.IsTrue(browser.TableBody(Find.ById("SearchResults")).Exists);
 			Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 			var addressLinks = browser.TableBody(Find.ById("SearchResults")).TableRows[0].TableCells[5].Links;
 			Assert.That(addressLinks.Count, Is.EqualTo(1));
 			var text = addressLinks[0].Text;
 			addressLinks[0].Click();
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Адрес доставки {0}", text)));
+			AssertText(String.Format("Адрес доставки {0}", text));
 		}
 
 		[Test]
 		public void Check_users_links_when_client_orders_history_show()
 		{
 			Open(client);
-			browser.Link(Find.ByText("История заказов")).Click();
+			ClickLink("История заказов");
 
 			OpenedWindow(@"История заказов");
 			SetCalendarDates(browser);
-			browser.Button(Find.ByValue("Показать")).Click();
+			ClickButton("Показать");
 			Assert.IsTrue(browser.TableBody(Find.ById("SearchResults")).Exists);
 			Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 			var userLinks = browser.TableBody(Find.ById("SearchResults")).TableRows[0].TableCells[6].Links;
@@ -91,7 +91,7 @@ namespace Functional.Drugstore
 			var text = userLinks[0].Text;
 			userLinks[0].Click();
 			if (String.IsNullOrEmpty(text))
-				Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", text)));
+				AssertText(String.Format("Пользователь {0}", text));
 			else
 				Assert.That(browser.TextField(Find.ByName("user.Name")).Text, Is.EqualTo(text));
 		}
@@ -100,10 +100,10 @@ namespace Functional.Drugstore
 		public void Check_Region_Column()
 		{
 			Open(client);
-			browser.Link(Find.ByText("История заказов")).Click();
+			ClickLink("История заказов");
 			OpenedWindow(@"История заказов");
 			SetCalendarDates(browser);
-			browser.Button(Find.ByValue("Показать")).Click();
+			ClickButton("Показать");
 			Assert.IsTrue(browser.TableBody(Find.ById("SearchResults")).Exists);
 			//Смотрим, соотв. ли регион тестового клиента колонке в 1 строке таблицы - там должно быть Воронеж
 			Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows[0].TableCells[7].Text, Is.EqualTo(client.HomeRegion.Name));
