@@ -29,7 +29,7 @@
 		${app.Asset("autosubmit.coffee")}
 		${app.Asset("calendar.setup.js")}
 
-		${app.Asset("jquery.ui.all.css")}
+		${app.Asset("themes/base/jquery.ui.all.css")}
 		${app.Asset("filter.css")}
 		${app.Asset("search.editor.css")}
 		${app.Asset("User.css")}
