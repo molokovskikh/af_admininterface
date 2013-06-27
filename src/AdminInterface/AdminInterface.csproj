@@ -750,7 +750,7 @@
     <Content Include="Images\icon_minus.gif" />
     <Content Include="Images\icon_plus.gif" />
     <Content Include="Images\calendar.gif" />
-    <Content Include="Images\menuarrow.gif" />
+    <Content Include="Assets\Images\menuarrow.gif" />
     <Content Include="JavaScript\calendar-ru_win_.js" />
     <Content Include="JavaScript\calendar-setup.js" />
     <Content Include="JavaScript\calendar.js" />

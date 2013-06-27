@@ -6,7 +6,6 @@
 		var id = editorData.id;
 		if (!id)
 			return;
-		console.log("cancel");
 		cancel(id);
 		if ($("#" + id).attr("checked")) {
 			$("#" + id).attr("checked", false);
@@ -118,9 +117,10 @@ function activateSearch() {
 
 	var items = $("input[type=checkbox].activate");
 	items.each(function () {
-		if (!this.checked) {
+		if (this.checked)
+			search(this.id);
+		else
 			cancel(this.id);
-		}
 	});
 	items.click(function () {
 		if (this.checked)
