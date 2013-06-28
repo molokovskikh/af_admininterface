@@ -117,9 +117,7 @@ function activateSearch() {
 
 	var items = $("input[type=checkbox].activate");
 	items.each(function () {
-		if (this.checked)
-			search(this.id);
-		else
+		if (!this.checked)
 			cancel(this.id);
 	});
 	items.click(function () {

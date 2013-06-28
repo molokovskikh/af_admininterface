@@ -131,6 +131,10 @@ form.vertical label {
 	display: block;
 }
 
+form.vertical label.inline {
+	display: inline;
+}
+
 .innspan {
 	font-size: 13px;
 	margin-left: 4px;
