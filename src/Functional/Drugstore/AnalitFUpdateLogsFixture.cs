@@ -62,27 +62,6 @@ namespace Functional.Drugstore
 			AssertText("Тестовый лог обновления");
 		}
 
-		private void Create_loaded_document_logs(out Client client, out Supplier supplier, out DocumentReceiveLog documentLogEntity,
-			out Document document, out UpdateLogEntity updateLogEntity)
-		{
-			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateLogEntity);
-			document = DataMother.CreateTestDocument(supplier, client, documentLogEntity);
-		}
-
-		private void Create_loaded_document_logs_unparsed_document(out Client client, out Supplier supplier,
-			out DocumentReceiveLog documentLogEntity, out UpdateLogEntity updateLogEntity)
-		{
-			client = DataMother.CreateTestClientWithAddressAndUser();
-			supplier = DataMother.CreateSupplier();
-			Save(supplier);
-			documentLogEntity = DataMother.CreateTestDocumentLog(supplier, client);
-			updateLogEntity = DataMother.CreateTestUpdateLogEntity(client);
-
-			session.SaveOrUpdate(updateLogEntity);
-			documentLogEntity.SendUpdateLogEntity = updateLogEntity;
-			Save(documentLogEntity);
-		}
-
 		[Test]
 		public void View_loaded_documents_details_from_client_update_history()
 		{
@@ -96,23 +75,22 @@ namespace Functional.Drugstore
 
 			Open(client);
 			Click("История обновлений");
-			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений клиента {0}", client.Name)))) {
-				Thread.Sleep(2000);
-				Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
-				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
-				Thread.Sleep(2000);
+			OpenedWindow(String.Format("История обновлений клиента {0}", client.Name));
+			Thread.Sleep(2000);
+			Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
+			browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
+			Thread.Sleep(2000);
 
-				AssertText("Дата загрузки");
-				AssertText("Тип документа");
-				AssertText("Дата разбора");
-				AssertText("Имя файла");
-				AssertText("Статус");
-				AssertText("Разобран");
-				AssertText(supplier.Name);
+			AssertText("Дата загрузки");
+			AssertText("Тип документа");
+			AssertText("Дата разбора");
+			AssertText("Имя файла");
+			AssertText("Статус");
+			AssertText("Разобран");
+			AssertText(supplier.Name);
 
-				browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
-				Check_document_view(browser, document);
-			}
+			browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+			Check_document_view(document);
 		}
 
 		[Test]
@@ -129,22 +107,21 @@ namespace Functional.Drugstore
 			var user = client.Users[0];
 			Open(user);
 			Click("История обновлений");
-			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений пользователя {0}", user.Login)))) {
-				Thread.Sleep(2000);
-				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
+			OpenedWindow(String.Format("История обновлений пользователя {0}", user.Login));
+			Thread.Sleep(2000);
+			browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
 
-				Thread.Sleep(2000);
-				AssertText("Дата загрузки");
-				AssertText("Тип документа");
-				AssertText("Дата разбора");
-				AssertText("Имя файла");
-				AssertText("Статус");
-				AssertText("Разобран");
-				AssertText(supplier.Name);
+			Thread.Sleep(2000);
+			AssertText("Дата загрузки");
+			AssertText("Тип документа");
+			AssertText("Дата разбора");
+			AssertText("Имя файла");
+			AssertText("Статус");
+			AssertText("Разобран");
+			AssertText(supplier.Name);
 
-				browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
-				Check_document_view(browser, document);
-			}
+			browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+			Check_document_view(document);
 		}
 
 		[Test]
@@ -160,20 +137,19 @@ namespace Functional.Drugstore
 
 			Open(client);
 			Click("История документов");
-			using (var browser = IE.AttachTo<IE>(Find.ByTitle("История документов"))) {
-				Thread.Sleep(2000);
-				AssertText(supplier.Name);
-				browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
-				Thread.Sleep(1000);
-				AssertText("Код товара");
-				AssertText("Наименование");
-				AssertText("Производитель");
-				AssertText("Страна");
-				AssertText("Количество");
-				AssertText("Срок годности");
+			OpenedWindow("История документов");
+			Thread.Sleep(2000);
+			AssertText(supplier.Name);
+			browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+			Thread.Sleep(1000);
+			AssertText("Код товара");
+			AssertText("Наименование");
+			AssertText("Производитель");
+			AssertText("Страна");
+			AssertText("Количество");
+			AssertText("Срок годности");
 
-				Check_document_view(browser, document);
-			}
+			Check_document_view(document);
 		}
 
 		[Test]
@@ -189,20 +165,19 @@ namespace Functional.Drugstore
 
 			Open(client);
 			Click("История документов");
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("История документов"))) {
-				Thread.Sleep(2000);
-				Assert.That(openedWindow.Text, Is.StringContaining(supplier.Name));
-				openedWindow.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
-				Thread.Sleep(1000);
-				Assert.That(openedWindow.Text, Is.StringContaining("Код товара"));
-				Assert.That(openedWindow.Text, Is.StringContaining("Наименование"));
-				Assert.That(openedWindow.Text, Is.StringContaining("Производитель"));
-				Assert.That(openedWindow.Text, Is.StringContaining("Страна"));
-				Assert.That(openedWindow.Text, Is.StringContaining("Количество"));
-				Assert.That(openedWindow.Text, Is.StringContaining("Срок годности"));
+			OpenedWindow("История документов");
+			Thread.Sleep(2000);
+			AssertText(supplier.Name);
+			browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+			Thread.Sleep(1000);
+			AssertText("Код товара");
+			AssertText("Наименование");
+			AssertText("Производитель");
+			AssertText("Страна");
+			AssertText("Количество");
+			AssertText("Срок годности");
 
-				Check_document_view(openedWindow, document);
-			}
+			Check_document_view(document);
 		}
 
 		[Test]
@@ -214,15 +189,13 @@ namespace Functional.Drugstore
 			UpdateLogEntity updateEntity = null;
 
 			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateEntity);
-			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Id)) {
-				mainWindow.Link(Find.ByText(@"История документов")).Click();
-				using (var browser = IE.AttachTo<IE>(Find.ByTitle("История документов"))) {
-					Thread.Sleep(2000);
-					AssertText(supplier.Name);
-					AssertText(documentLogEntity.FileName);
-					Assert.IsFalse(browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Exists);
-				}
-			}
+			Open("Users/{0}/edit", client.Users[0].Id);
+			ClickLink("История документов");
+			OpenedWindow("История документов");
+			Thread.Sleep(2000);
+			AssertText(supplier.Name);
+			AssertText(documentLogEntity.FileName);
+			Assert.IsFalse(browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Exists);
 		}
 
 		[Test]
@@ -237,24 +210,12 @@ namespace Functional.Drugstore
 			var user = client.Users[0];
 			Open(user);
 			Click(@"История обновлений");
-			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений пользователя {0}", user.Login)))) {
-				Thread.Sleep(2000);
-				Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
-				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
-				Thread.Sleep(2000);
-				AssertText("Не разобран");
-			}
-		}
-
-		private void Check_document_view(IE browser, Document document)
-		{
+			OpenedWindow(String.Format("История обновлений пользователя {0}", user.Login));
 			Thread.Sleep(2000);
-			AssertText(document.ProviderDocumentId);
-			AssertText(document.Lines[0].Producer);
-			AssertText(document.Lines[0].Country);
-			AssertText(ViewHelper.CostFormat(document.Lines[0].ProducerCost, 2));
-			AssertText(ViewHelper.CostFormat(document.Lines[0].Nds, 2));
-			AssertText(document.Lines[0].Certificates);
+			Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
+			browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
+			Thread.Sleep(2000);
+			AssertText("Не разобран");
 		}
 
 		[Test]
@@ -299,22 +260,52 @@ namespace Functional.Drugstore
 			Open("Main/Stat");
 			Css("#StatisticsTD a").Click();
 			AssertText("Статистика по сертификатам");
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("Статистика по сертификатам"))) {
-				Thread.Sleep(2000);
-				Assert.That(openedWindow.Text, Is.StringContaining(supplier.Name));
-				openedWindow.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
-				Thread.Sleep(1000);
-				Assert.That(openedWindow.Text, Is.StringContaining("Код товара"));
-				Assert.That(openedWindow.Text, Is.StringContaining("Наименование"));
-				Assert.That(openedWindow.Text, Is.StringContaining("Производитель"));
-				Assert.That(openedWindow.Text, Is.StringContaining("Страна"));
-				Assert.That(openedWindow.Text, Is.StringContaining("Количество"));
-				Assert.That(openedWindow.Text, Is.StringContaining("Срок годности"));
+			Thread.Sleep(2000);
+			AssertText(supplier.Name);
+			browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+			Thread.Sleep(1000);
+			AssertText("Код товара");
+			AssertText("Наименование");
+			AssertText("Производитель");
+			AssertText("Страна");
+			AssertText("Количество");
+			AssertText("Срок годности");
 
-				Thread.Sleep(2000);
-				AssertText(document.Lines[0].Producer);
-				AssertText(document.Lines[0].Country);
-			}
+			Thread.Sleep(2000);
+			AssertText(document.Lines[0].Producer);
+			AssertText(document.Lines[0].Country);
+		}
+
+		private void Check_document_view(Document document)
+		{
+			Thread.Sleep(2000);
+			AssertText(document.ProviderDocumentId);
+			AssertText(document.Lines[0].Producer);
+			AssertText(document.Lines[0].Country);
+			AssertText(ViewHelper.CostFormat(document.Lines[0].ProducerCost, 2));
+			AssertText(ViewHelper.CostFormat(document.Lines[0].Nds, 2));
+			AssertText(document.Lines[0].Certificates);
+		}
+
+		private void Create_loaded_document_logs(out Client client, out Supplier supplier, out DocumentReceiveLog documentLogEntity,
+			out Document document, out UpdateLogEntity updateLogEntity)
+		{
+			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateLogEntity);
+			document = DataMother.CreateTestDocument(supplier, client, documentLogEntity);
+		}
+
+		private void Create_loaded_document_logs_unparsed_document(out Client client, out Supplier supplier,
+			out DocumentReceiveLog documentLogEntity, out UpdateLogEntity updateLogEntity)
+		{
+			client = DataMother.CreateTestClientWithAddressAndUser();
+			supplier = DataMother.CreateSupplier();
+			Save(supplier);
+			documentLogEntity = DataMother.CreateTestDocumentLog(supplier, client);
+			updateLogEntity = DataMother.CreateTestUpdateLogEntity(client);
+
+			session.SaveOrUpdate(updateLogEntity);
+			documentLogEntity.SendUpdateLogEntity = updateLogEntity;
+			Save(documentLogEntity);
 		}
 	}
 }
