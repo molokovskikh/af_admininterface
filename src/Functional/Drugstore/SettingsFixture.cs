@@ -131,13 +131,13 @@ namespace Functional.Drugstore
 			});
 			Save(supplier);
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
-			session.Save(new ParseAlgorithm { Name = "TextParser" });
+			session.Save(new ParseAlgorithm("TextParser"));
 			Flush();
 
 			Css("#drugstore_EnableSmartOrder").Click();
 			Css("#drugstore_SmartOrderRules_ColumnSeparator").TypeText("\t");
 			Css("#drugstore_SmartOrderRules_CodePage").Select("windows-1251");
-			Css("#drugstore_SmartOrderRules_CodeColumn").TypeText("0");
+			Css("#drugstore_SmartOrderRules_ProductColumn").TypeText("0");
 			Css("#drugstore_SmartOrderRules_QuantityColumn").TypeText("1");
 
 			var price = SearchV2(Css("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Фармаимпекс");
@@ -156,8 +156,8 @@ namespace Functional.Drugstore
 			session.Refresh(rule);
 			Assert.AreEqual(@"\t", rule.ColumnSeparator);
 			Assert.AreEqual(1251, rule.CodePage);
-			Assert.AreEqual(@"0", rule.CodeColumn);
-			Assert.AreEqual(@"1", rule.QuantityColumn);
+			Assert.AreEqual("0", rule.CodeColumn);
+			Assert.AreEqual("1", rule.QuantityColumn);
 		}
 
 		[Test]
@@ -583,15 +583,15 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			Click("Сохранить");
 			Assert.AreEqual(Error("#drugstore_SmartOrderRules_QuantityColumn"), "Это поле необходимо заполнить.");
 			Assert.AreEqual(Error("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Это поле необходимо заполнить.");
-			Assert.AreEqual(Error("#drugstore_SmartOrderRules_CodeColumn"), "Это поле необходимо заполнить.");
+			Assert.AreEqual(Error("#drugstore_SmartOrderRules_ProductColumn"), "Это поле необходимо заполнить.");
 			SearchV2(Css("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Поставщик для тестирования");
-			Css("#drugstore_SmartOrderRules_CodeColumn").TypeText("F1");
+			Css("#drugstore_SmartOrderRules_ProductColumn").TypeText("F1");
 			Css("#drugstore_SmartOrderRules_QuantityColumn").TypeText("F2");
 			Click("Сохранить");
 			AssertText("Сохранено");
 
 			session.Refresh(settings.SmartOrderRules);
-			Assert.AreEqual(settings.SmartOrderRules.CodeColumn, "F1");
+			Assert.AreEqual(settings.SmartOrderRules.ProductColumn, "F1");
 		}
 
 		private string IsVisible(string selector)
