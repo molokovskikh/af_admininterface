@@ -191,13 +191,14 @@ namespace Functional.Billing
 		[Test]
 		public void DisconnectUserFromAddress()
 		{
-			browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
-			Thread.Sleep(500);
-			var connectUserLink = browser.Link(Find.ByText("Подключить пользователя"));
-			connectUserLink.Click();
-			browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
-			Thread.Sleep(500);
-			browser.Button(Find.ById("ConnectAddressToUserButton" + address.Id)).Click();
+			Css("#usersForAddress" + address.Id).Click();
+			WaitForText("Подключить пользователя");
+			Click("Подключить пользователя");
+			Css("#SearchUserButton" + address.Id).Click();
+			var select = (SelectList)Css("#UsersComboBox" + address.Id);
+			Wait(() => select.Options.Count > 0, "не удалось найти ни одного пользователя для подключения");
+			Css("#ConnectAddressToUserButton" + address.Id).Click();
+
 			Thread.Sleep(2000);
 			var row = browser.TableRow(Find.ById("RowAddress" + address.Id + "User" + user.Id));
 			Assert.That(row.Exists, Is.True);
@@ -213,8 +214,8 @@ namespace Functional.Billing
 		[Test]
 		public void DisconnectAddressFromUser()
 		{
-			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
-			Thread.Sleep(500);
+			Css("#addressesForUser" + user.Id).Click();
+			WaitForText("Подключить адрес");
 			ClickLink("Подключить адрес");
 			SearchAndSelectAddress(address.Value);
 			Thread.Sleep(500);
@@ -808,8 +809,11 @@ namespace Functional.Billing
 
 		private void SearchAndSelectAddress(string value)
 		{
-			browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
-			var comboBox = browser.SelectList(Find.ById("AddressesComboBox" + user.Id));
+			Css("#SearchAddressButton" + user.Id).Click();
+			var id = "AddressesComboBox" + user.Id;
+			var comboBox = browser.SelectList(Find.ById(id));
+			Wait(() => comboBox.Options.Count > 0, "не удалось дождаться списка адресов");
+
 			Assert.That(comboBox.Options.Count, Is.GreaterThan(0));
 			Assert.That(comboBox.HasSelectedItems, Is.True);
 			comboBox.Select(value + " ");
