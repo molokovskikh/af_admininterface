@@ -19,9 +19,9 @@ namespace AdminInterface.Models
 {
 	public enum LoaderType
 	{
-		[Description("Наименованию товара")] Product = 2,
 		[Description("Коду")] Code = 0,
 		[Description("Коду товара и производителя")] CodeAndCodeCr = 1,
+		[Description("Наименованию товара")] Product = 2,
 		[Description("Наименованию товара и производителя")] ProductAndProducer = 3
 	}
 
@@ -33,6 +33,7 @@ namespace AdminInterface.Models
 		public SmartOrderRules()
 		{
 			ParseAlgorithm = "TestSource";
+			Loader = LoaderType.Product;
 		}
 
 		[PrimaryKey("Id")]
