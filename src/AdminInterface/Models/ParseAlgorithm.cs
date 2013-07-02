@@ -9,6 +9,15 @@ namespace AdminInterface.Models
 	[ActiveRecord("ParseAlgorithm", Schema = "ordersendrules", Lazy = true)]
 	public class ParseAlgorithm
 	{
+		public ParseAlgorithm()
+		{
+		}
+
+		public ParseAlgorithm(string name)
+		{
+			Name = name;
+		}
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 

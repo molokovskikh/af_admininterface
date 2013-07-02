@@ -3,31 +3,14 @@
 <% component CaptureFor, {@id : @Title}: %>
 	Конфигурация клиента ${client.Name}
 <% end %>
+
 ${app.Asset("Documents.css")}
 ${app.Asset("alt.form.css")}
+${app.Asset("client.settings.js")}
+${app.Asset("search.editor.v2.js")}
+${app.Asset("smart.order.settings.js")}
 
-<script>
-	$(function () {
-		activateSearch();
-
-		window.searchEditors["parser"] = {
-			title: "Выберите парсер",
-			url: "/clients/SerachParseAlgorithm"
-		}
-
-		$("#excludes").data("template", function() {
-			return $("<tr>")
-				.append($("<td>").append($("<input type=button value=Удалить>").addClass("delete")))
-				.append($("<td>")
-					.append(searchTemplate("Выберете поставщика", "/clients/${client.Id}/SearchSuppliers"))
-					.append("<input type=hidden name=drugstore.OfferMatrixExcludes[0].Id>"));
-		});
-	});
-
-	function NotifySuppliers() {
-		$('#NotifySuppliers').submit();
-	}
-</script>
+<% OutputSubView("/Shared/JsTemplates/search.editor.v2") %>
 
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
 
@@ -37,7 +20,7 @@ ${app.Asset("alt.form.css")}
 		</div>
 	<% end %>
 	
-	<div style="width: 800px;">
+	<div style="width: 900px;">
 	
 		<form id="NotifySuppliers" method="post" action="NotifySuppliers?clientId=${client.Id}"></form>
 		
@@ -45,144 +28,144 @@ ${app.Asset("alt.form.css")}
 			${FormHelper.HiddenField("client.Id")}
 			${FormHelper.HiddenField("drugstore.Id")}
 			${FormHelper.HiddenField("drugstore.SmartOrderRules.Id")}
-			<div class="block" id="commonSettings">
+			<div class="block">
 				<h3>Общая настройка</h3>
 				<table border="0" style="width: 100%; height: 100%;">
-				<tr>
-					<td style="width: 50%;">
-						${app.Edit("drugstore.NoiseCosts", {@class: @activate})}
-					</td>
-					<td>
-						${app.SearchEdit("drugstore.NoiseCostExceptSupplier",
-							{"data-search-title":"Кроме",
-								"data-search-url": "/clients/${client.Id}/SearchSuppliers",
-								"data-depend-on": "drugstore_NoiseCosts"})}
-						${app.GetValidationError("drugstore.NoiseCostExceptSupplier")}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						${app.Edit("drugstore.IsConvertFormat", {@class: @activate})}
-						<% if drugstore.IsConvertFormat and drugstore.AssortimentPrice is null: %>
-						<div class="redText">
-							* не указан ассортиментный прайс-лист для конвертации
-						</div>
-						<% end %>
-					</td>
-					<td>
-						${app.SearchEdit("drugstore.AssortimentPrice",
-							{"data-search-editor": "assortmentPrice",
-								"data-depend-on": "drugstore_IsConvertFormat"})}
-						${app.GetValidationError("drugstore.AssortimentPrice")}
+					<tr>
+						<td style="width: 50%;">
+							${app.Edit("drugstore.NoiseCosts", {@class: @activate})}
+						</td>
+						<td>
+							${app.SearchEdit("drugstore.NoiseCostExceptSupplier",
+								{"data-search-title":"Кроме",
+									"data-search-url": "/clients/${client.Id}/SearchSuppliers",
+									"data-depend-on": "drugstore_NoiseCosts"})}
+							${app.GetValidationError("drugstore.NoiseCostExceptSupplier")}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							${app.Edit("drugstore.IsConvertFormat", {@class: @activate})}
+							<% if drugstore.IsConvertFormat and drugstore.AssortimentPrice is null: %>
+							<div class="redText">
+								* не указан ассортиментный прайс-лист для конвертации
+							</div>
+							<% end %>
+						</td>
+						<td>
+							${app.SearchEdit("drugstore.AssortimentPrice",
+								{"data-search-editor": "assortmentPrice",
+									"data-depend-on": "drugstore_IsConvertFormat"})}
+							${app.GetValidationError("drugstore.AssortimentPrice")}
 
-						<div class="settings" data-depend-on="drugstore_IsConvertFormat">
-							${app.Label("drugstore.WaybillConvertFormat")}
-							${app.Edit("drugstore.WaybillConvertFormat")}
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2">
-						${app.Edit("drugstore.IsHiddenFromSupplier")}<br>
-						${app.Edit("drugstore.AllowDelayOfPayment")}<br>
-						${app.Edit("drugstore.ServiceClient")}<br>
-						${app.Edit("drugstore.IgnoreNewPrices")}<br>
-						${app.Edit("drugstore.IgnoreNewPriceForUser")}<br>
-						${app.Edit("drugstore.CalculateLeader")}<br>
-						${app.Edit("drugstore.AllowAnalitFSchedule")}<br>
-						${app.Edit("drugstore.DebugOrders")}<br>
-						${app.Label("drugstore.ProtekWaybillSavingType")}
-						${app.Edit("drugstore.ProtekWaybillSavingType")}<br>
+							<div class="settings" data-depend-on="drugstore_IsConvertFormat">
+								${app.Label("drugstore.WaybillConvertFormat")}
+								${app.Edit("drugstore.WaybillConvertFormat")}
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							${app.Edit("drugstore.IsHiddenFromSupplier")}<br>
+							${app.Edit("drugstore.AllowDelayOfPayment")}<br>
+							${app.Edit("drugstore.ServiceClient")}<br>
+							${app.Edit("drugstore.IgnoreNewPrices")}<br>
+							${app.Edit("drugstore.IgnoreNewPriceForUser")}<br>
+							${app.Edit("drugstore.CalculateLeader")}<br>
+							${app.Edit("drugstore.AllowAnalitFSchedule")}<br>
+							${app.Edit("drugstore.DebugOrders")}<br>
+							${app.Label("drugstore.ProtekWaybillSavingType")}
+							${app.Edit("drugstore.ProtekWaybillSavingType")}<br>
 
-						<h4>AnalitF</h4>
-						${app.Edit("drugstore.SendWaybillsFromClient")}<br>
-						${app.Edit("drugstore.ShowAdvertising")}<br>
-						${app.Edit("drugstore.SendRetailMarkup")}<br>
-						${app.Edit("drugstore.EnableImpersonalPrice")}<br>
-						${app.Edit("drugstore.ShowCertificatesWithoutRefSupplier")}<br>
+							<h4>AnalitF</h4>
+							${app.Edit("drugstore.SendWaybillsFromClient")}<br>
+							${app.Edit("drugstore.ShowAdvertising")}<br>
+							${app.Edit("drugstore.SendRetailMarkup")}<br>
+							${app.Edit("drugstore.EnableImpersonalPrice")}<br>
+							${app.Edit("drugstore.ShowCertificatesWithoutRefSupplier")}<br>
 
-						<h4>Недельный заказ</h4>
-						${app.Edit("drugstore.CheckWeeklyOrdersSum")}<br>
-						${app.Label("drugstore.MaxWeeklyOrdersSum")}
-						${app.Edit("drugstore.MaxWeeklyOrdersSum")}
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2">
-						${app.Edit("drugstore.EnableSmartOrder", {@class : @activate})}
-						<div>
-							${app.SearchEdit("drugstore.SmartOrderRules.AssortimentPriceCode", {
-								"data-search-editor": @assortmentPrice,
-								"data-depend-on": "drugstore_EnableSmartOrder",
-								"data-search-title": "Выберите ассортиментный прайс лист"})}
-							${app.GetValidationError("drugstore.SmartOrderRules.AssortimentPriceCode")}
-						</div>
-						<div>
-							${app.SearchEdit("drugstore.SmartOrderRules.ParseAlgorithm", {
-								"data-search-editor": @parser,
-								"data-depend-on": "drugstore_EnableSmartOrder",
-								"data-search-title": "Выберите парсер"})}
-							${app.GetValidationError("drugstore.SmartOrderRules.ParseAlgorithm")}
-						</div>
-						<div class=settings data-depend-on="drugstore_EnableSmartOrder">
-							<h4>Настройка разбора файла</h4>
-							<div class="desc">
-								Настройка правил разбора производится для источников DbfSource, ExcelSource, TextSource. <br>
-								Для всех остальных источников правила разбора игнорируются
-							</div>
-							<div class="form-block">
-								${app.Label("drugstore.SmartOrderRules.Loader")}
-								${app.Edit("drugstore.SmartOrderRules.Loader")}
-							</div>
-							<div class="form-block">
-								${app.Label("drugstore.SmartOrderRules.ColumnSeparator")}
-								${app.Edit("drugstore.SmartOrderRules.ColumnSeparator")}
-								<div class="desc">
-									для обозначение табулятора используется последовательноть символов "\t"
-								</div>
-							</div>
-							<div class="form-block">
-								${app.Label("drugstore.SmartOrderRules.StartLine")}
-								${app.Edit("drugstore.SmartOrderRules.StartLine")}
-								<div class="desc">
-									нумерация начинается с "0"
-								</div>
-							</div>
-							<div class="form-block">
-								${app.Label("drugstore.SmartOrderRules.CodePage")}
-								${FormHelper.Select("drugstore.SmartOrderRules.CodePage", encodings, {
-									@firstoption: "Определить автоматически",
-									@firstoptionvalue: "",
-									@text: "HeaderName",
-									@value: "CodePage"})}
-							</div>
+							<h4>Недельный заказ</h4>
+							${app.Edit("drugstore.CheckWeeklyOrdersSum")}<br>
+							${app.Label("drugstore.MaxWeeklyOrdersSum")}
+							${app.Edit("drugstore.MaxWeeklyOrdersSum")}
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="block">
+				${app.Edit("drugstore.EnableSmartOrder", {"data-bind" : "checked: enableSmartOrder"})}
+				<div data-bind="allowBindings: false, visible: enableSmartOrder">
+					${app.SearchEditV2("drugstore.SmartOrderRules.AssortimentPriceCode", {
+						"data-search-editor": @assortmentPrice,
+						"data-search-title": "Выберите ассортиментный прайс лист"})}
+					${app.GetValidationError("drugstore.SmartOrderRules.AssortimentPriceCode")}
+				</div>
+				<div data-bind="allowBindings: false, visible: enableSmartOrder">
+					${app.SearchEditV2("drugstore.SmartOrderRules.ParseAlgorithm", {
+						"data-search-editor": @parser,
+						"data-search-title": "Выберите парсер"})}
+					${app.GetValidationError("drugstore.SmartOrderRules.ParseAlgorithm")}
+					<div class="desc">
+						Настройка правил разбора производится для источников DbfSource, ExcelSource, TextSource. <br>
+						Для всех остальных источников правила разбора игнорируются
+					</div>
+				</div>
+				<div data-bind="visible: isConfigurable">
+					<h4>Настройка разбора файла</h4>
+					<div class="form-block">
+						${app.Label("drugstore.SmartOrderRules.Loader")}
+						${app.Edit("drugstore.SmartOrderRules.Loader", {"data-bind": "value: loader"})}
+					</div>
+					<div class="form-block" data-bind="visible: isColumnSeparatorAvailable">
+						${app.Label("drugstore.SmartOrderRules.ColumnSeparator", " (для обозначение табулятора используется последовательноть символов \"\\t\")")}
+						${app.Edit("drugstore.SmartOrderRules.ColumnSeparator")}
+					</div>
+					<div class="form-block" data-bind="visible: isStartLineAvailable">
+						${app.Label("drugstore.SmartOrderRules.StartLine", " (нумерация начинается с \"0\")")}
+						${app.Edit("drugstore.SmartOrderRules.StartLine")}
+					</div>
+					<div class="form-block" data-bind="visible: isCodePageAvailable">
+						${app.Label("drugstore.SmartOrderRules.CodePage")}
+						${FormHelper.Select("drugstore.SmartOrderRules.CodePage", encodings, {
+							@firstoption: "Определить автоматически",
+							@firstoptionvalue: "",
+							@text: "HeaderName",
+							@value: "CodePage"})}
+					</div>
+					<div class="form-block">
+						<table class="tablelike-editor">
+							<tr>
+								<td>${app.Label("drugstore.SmartOrderRules.CodeColumn",
+									" (для текстовых и excel файлов колонки задаются с помощью номера, начиная с \"0\", а для dbf-файлов вписываются имена соответствующих полей)")}</td>
+								<td>${app.Label("drugstore.SmartOrderRules.CodeCrColumn")}</td>
+								<td>${app.Label("drugstore.SmartOrderRules.ProductColumn")}</td>
+								<td>${app.Label("drugstore.SmartOrderRules.ProducerColumn")}</td>
+								<td>${app.Label("drugstore.SmartOrderRules.QuantityColumn")}</td>
+							</tr>
+							<tr>
+								<td>
+									${app.Edit("drugstore.SmartOrderRules.CodeColumn")}
+								</td>
+								<td>
+									${app.Edit("drugstore.SmartOrderRules.CodeCrColumn")}
+								</td>
+								<td>
+									${app.Edit("drugstore.SmartOrderRules.ProductColumn")}
+								</td>
+								<td>
+									${app.Edit("drugstore.SmartOrderRules.ProducerColumn")}
+								</td>
+								<td>
+									${app.Edit("drugstore.SmartOrderRules.QuantityColumn")}
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
 
-							<div class="form-block">
-								${app.Label("drugstore.SmartOrderRules.CodeColumn")}
-								${app.Edit("drugstore.SmartOrderRules.CodeColumn")}
-								<div class="desc">
-									для текстовых и excel файлов колонки задаются с помощью номера, начиная с "0"
-								</div>
-							</div>
-							<div class="form-block">
-								${app.Label("drugstore.SmartOrderRules.CodeCrColumn")}
-								${app.Edit("drugstore.SmartOrderRules.CodeCrColumn")}
-							</div>
-							<div class="form-block">
-								${app.Label("drugstore.SmartOrderRules.ProductColumn")}
-								${app.Edit("drugstore.SmartOrderRules.ProductColumn")}
-							</div>
-							<div class="form-block">
-								${app.Label("drugstore.SmartOrderRules.ProducerColumn")}
-								${app.Edit("drugstore.SmartOrderRules.ProducerColumn")}
-							</div>
-							<div class="form-block">
-								${app.Label("drugstore.SmartOrderRules.QuantityColumn")}
-								${app.Edit("drugstore.SmartOrderRules.QuantityColumn")}
-							</div>
-						</div>
-					</td>
-				</tr>
+			<div class="block">
+				<table>
 				<tr>
 					<td>
 						${app.Edit("drugstore.EnableBuyingMatrix", {@class : @activate})}

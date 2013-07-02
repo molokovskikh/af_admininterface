@@ -1,22 +1,22 @@
 (function() {
   $(function() {
+    var ajaxData;
+    ajaxData = [
+      {
+        id: 1,
+        name: "1"
+      }, {
+        id: 2,
+        name: "2"
+      }
+    ];
+    $.extend({
+      ajax: function(data) {
+        return data.success(ajaxData);
+      }
+    });
     test("search without item", function() {
-      var ajaxData;
       $("input[type=button].search").data("url", "test");
-      ajaxData = [
-        {
-          id: 1,
-          name: "1"
-        }, {
-          id: 2,
-          name: "2"
-        }
-      ];
-      $.extend({
-        ajax: function(data) {
-          return data.success(ajaxData);
-        }
-      });
       $(".search").click();
       return equal($("select option").length, 2);
     });

@@ -167,3 +167,10 @@ form.vertical label.inline {
 .width50px {
 	width: 50px !important;
 }
+
+/*набор полей редактирования где поля размещаются в виде таблицы*/
+table.tablelike-editor tr
+{
+	/*выравнивать нужно по верху что бы при отображении ошибки валидации поля не "уезжали" со своего места*/
+	vertical-align: top;
+}

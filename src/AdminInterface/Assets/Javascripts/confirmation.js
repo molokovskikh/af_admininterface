@@ -1,5 +1,5 @@
 (function() {
-  $(function() {
+  window.registerConfirm = function() {
     window.confirmed = false;
     return $("form.confirm").submit(function(event) {
       var confirmInput, form, processConfirm, showConfirm, validator, value;
@@ -44,5 +44,10 @@
         }
       }
     });
-  });
+  };
+  if (typeof require === "undefined" || require === null) {
+    $(function() {
+      return registerConfirm();
+    });
+  }
 }).call(this);

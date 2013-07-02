@@ -456,6 +456,7 @@
     <Content Include="Assets\Javascripts\billing.js" />
     <Content Include="Assets\Javascripts\billing.search.js" />
     <Content Include="Assets\Javascripts\Client.js" />
+    <Content Include="Assets\Javascripts\client.settings.js" />
     <Content Include="Assets\Javascripts\confirmation.coffee" />
     <Content Include="Assets\Javascripts\EditPayment.js" />
     <Content Include="Assets\Javascripts\input.dependency.coffee" />
@@ -468,6 +469,8 @@
     <Content Include="Assets\Javascripts\RegisterPayer.js" />
     <Content Include="Assets\Javascripts\registration.js" />
     <Content Include="Assets\Javascripts\request.coffee" />
+    <Content Include="Assets\Javascripts\search.editor.v2.js" />
+    <Content Include="Assets\Javascripts\smart.order.settings.js" />
     <Content Include="Assets\Javascripts\table.editor.js" />
     <Content Include="Assets\Javascripts\UserCommon.js" />
     <Content Include="Assets\Javascripts\UserRegionsEditor.js" />
@@ -555,6 +558,7 @@
     <None Include="Views\Shared\DisplayTemplates\RegistrationInfo.brail" />
     <Content Include="Views\Shared\EditorTemplates\TableFormBlock.brail" />
     <None Include="Views\Shared\EditorTemplates\TimeSpan.brail" />
+    <Content Include="Views\Shared\JsTemplates\search.editor.v2.brail" />
     <None Include="Views\SpecialHandlers\Index.brail" />
     <None Include="Views\SpecialHandlers\New.brail" />
     <None Include="Views\SpecialHandlers\Edit.brail" />

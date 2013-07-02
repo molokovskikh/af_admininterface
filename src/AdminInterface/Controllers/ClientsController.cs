@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -301,7 +302,7 @@ where Phone like :phone")
 			if (drugstore.EnableSmartOrder) {
 				if (drugstore.SmartOrderRules == null && smartOrderRules == null) {
 					drugstore.SmartOrderRules = SmartOrderRules.TestSmartOrder();
-					BindObjectInstance(drugstore.SmartOrderRules, "drugstore.SmartOrderRules");
+					BindObjectInstance(drugstore.SmartOrderRules, "drugstore.SmartOrderRules", AutoLoadBehavior.NewRootInstanceIfInvalidKey);
 				}
 				else {
 					drugstore.SmartOrderRules = smartOrderRules;
@@ -423,7 +424,7 @@ where Phone like :phone")
 		}
 
 		[return: JSONReturnBinder]
-		public object[] SerachParseAlgorithm(string text)
+		public object[] SearchParseAlgorithm(string text)
 		{
 			return DbSession.QueryOver<ParseAlgorithm>().Where(
 				Restrictions.On<ParseAlgorithm>(l => l.Name).IsLike(text, MatchMode.Anywhere))

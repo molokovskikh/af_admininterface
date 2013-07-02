@@ -42,9 +42,8 @@ namespace Functional.Drugstore
 
 			Css("#drugstore_EnableBuyingMatrix").Click();
 
-			Search("Фармаимпекс");
-
-			Assert.That(Css("div.search select").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
+			var select = Search("Фармаимпекс", "Ассортиментный прайс для матрицы предложений");
+			Assert.That(select.SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixAction")).SelectedItem, Is.EqualTo("Запретить заказ"));
 
@@ -69,11 +68,8 @@ namespace Functional.Drugstore
 			dataMother.CreateMatrix();
 
 			Css("#drugstore_EnableOfferMatrix").Click();
-
-			Css(".term").TypeText("Фармаимпекс");
-			Css(".search[type=button]").Click();
-			Thread.Sleep(1000);
-			Assert.That(Css("div.search select").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
+			var select = Search("Фармаимпекс", "Ассортиментный прайс для матрицы закупок");
+			Assert.That(select.SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.OfferMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
 
 			ClickButton("Сохранить");
@@ -97,11 +93,8 @@ namespace Functional.Drugstore
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
 
 			Css("#drugstore_EnableOfferMatrix").Click();
-
-			Css(".term").TypeText("Фармаимпекс");
-			Css(".search[type=button]").Click();
-			Thread.Sleep(1000);
-			Assert.That(Css("div.search select").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
+			var select = Search("Фармаимпекс", "Ассортиментный прайс для матрицы закупок");
+			Assert.That(select.SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
 
 			var excludes = ((Table)Css("#excludes"));
 			excludes.Css("input[value='Добавить']").Click();
@@ -138,29 +131,26 @@ namespace Functional.Drugstore
 			});
 			Save(supplier);
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
-			session.Save(new ParseAlgorithm { Name = "testParse" });
+			session.Save(new ParseAlgorithm { Name = "TextParser" });
 			Flush();
 
-			Css("#drugstore_EnableSmartOrder").Click();
 			Css("#drugstore_EnableSmartOrder").Click();
 			Css("#drugstore_SmartOrderRules_ColumnSeparator").TypeText("\t");
 			Css("#drugstore_SmartOrderRules_CodePage").Select("windows-1251");
 			Css("#drugstore_SmartOrderRules_CodeColumn").TypeText("0");
 			Css("#drugstore_SmartOrderRules_QuantityColumn").TypeText("1");
 
-			Search("Фармаимпекс", "Выберите ассортиментный прайс лист");
-			Assert.That(SearchRoot("Выберите ассортиментный прайс лист")
-				.Css("select").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
+			var price = SearchV2(Css("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Фармаимпекс");
+			Assert.That(price.SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
 
-			Search("testParse", "Выберите парсер");
-			Assert.That(SearchRoot("Выберите парсер")
-				.Css("select").SelectedItem, Is.EqualTo("testParse"));
+			var parser = SearchV2(Css("#drugstore_SmartOrderRules_ParseAlgorithm"), "TextParser");
+			Assert.That(parser.SelectedItem, Is.EqualTo("TextParser"));
 
 			Click("Сохранить");
 			AssertText("Сохранено");
 			Click("Настройка");
 			AssertText("Фармаимпекс - Матрица");
-			AssertText("testParse");
+			AssertText("TextParser");
 
 			var rule = client.Settings.SmartOrderRules;
 			session.Refresh(rule);
@@ -368,26 +358,21 @@ namespace Functional.Drugstore
 		public void Change_common_settings()
 		{
 			// "Скрывать клиента в интерфейсе поставщика"
-			var checkBoxHide = browser.Div(Find.ById("commonSettings")).CheckBoxes[0];
+			var checkBoxHide = Css("#drugstore_IsHiddenFromSupplier");
 			Assert.That(checkBoxHide.Checked, Is.False);
 			checkBoxHide.Checked = true;
-			browser.Button(b => b.Value == "Сохранить").Click();
-			Assert.That(browser.ContainsText("Сохранено"), Is.True);
-
+			Click("Сохранить");
+			AssertText("Сохранено");
 			ClickLink("Настройка");
-			checkBoxHide = browser.Div(Find.ById("commonSettings")).CheckBoxes[0];
-			Assert.That(checkBoxHide.Checked, Is.True);
+			Assert.That(Css("#drugstore_IsHiddenFromSupplier").Checked, Is.True);
+
 			// "Сотрудник АК Инфорум"
-			var checkBoxInforoomEmployee = browser.Div(Find.ById("commonSettings")).CheckBoxes[1];
-			checkBoxInforoomEmployee.Checked = true;
-			browser.Button(b => b.Value == "Сохранить").Click();
-			Assert.That(browser.ContainsText("Сохранено"), Is.True);
-
+			Css("#drugstore_ServiceClient").Checked = true;
+			Click("Сохранить");
+			AssertText("Сохранено");
 			ClickLink("Настройка");
-			checkBoxHide = browser.Div(Find.ById("commonSettings")).CheckBoxes[0];
-			Assert.That(checkBoxHide.Checked, Is.True);
-			checkBoxInforoomEmployee = browser.Div(Find.ById("commonSettings")).CheckBoxes[1];
-			Assert.That(checkBoxInforoomEmployee.Checked, Is.True);
+			Assert.That(Css("#drugstore_IsHiddenFromSupplier").Checked, Is.True);
+			Assert.That(Css("#drugstore_ServiceClient").Checked, Is.True);
 		}
 
 		[Test]
@@ -578,6 +563,48 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			AssertText("Сохранено");
 			Click("Настройка");
 			AssertText("* не указан ассортиментный прайс-лист для конвертации");
+		}
+
+		[Test]
+		public void Show_smart_order_rule_parser_configuration()
+		{
+			var supplier = DataMother.CreateSupplier(s => {
+				s.Name = "Поставщик для тестирования";
+				s.FullName = "Поставщик для тестирования";
+				s.AddPrice("Ассортиментный прайс", PriceType.Assortment);
+			});
+			session.Save(new ParseAlgorithm("DbfSource"));
+			Save(supplier);
+
+			Css("#drugstore_EnableSmartOrder").Checked = true;
+			SearchV2(Css("#drugstore_SmartOrderRules_ParseAlgorithm"), "DbfSource");
+			Assert.AreEqual("true", IsVisible("#drugstore_SmartOrderRules_CodeColumn"));
+			Assert.AreEqual("false", IsVisible("#drugstore_SmartOrderRules_StartLine"));
+			Click("Сохранить");
+			Assert.AreEqual(Error("#drugstore_SmartOrderRules_QuantityColumn"), "Это поле необходимо заполнить.");
+			Assert.AreEqual(Error("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Это поле необходимо заполнить.");
+			Assert.AreEqual(Error("#drugstore_SmartOrderRules_CodeColumn"), "Это поле необходимо заполнить.");
+			SearchV2(Css("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Поставщик для тестирования");
+			Css("#drugstore_SmartOrderRules_CodeColumn").TypeText("F1");
+			Css("#drugstore_SmartOrderRules_QuantityColumn").TypeText("F2");
+			Click("Сохранить");
+			AssertText("Сохранено");
+
+			session.Refresh(settings.SmartOrderRules);
+			Assert.AreEqual(settings.SmartOrderRules.CodeColumn, "F1");
+		}
+
+		private string IsVisible(string selector)
+		{
+			return browser.Eval(String.Format("$(\"{0}\").is(\":visible\");", selector));
+		}
+
+		private string Error(string selector)
+		{
+			var label = browser.CssSelect(selector).Parent.CssSelect("label.error");
+			if (label == null)
+				return "";
+			return label.Text;
 		}
 
 		private SelectList GetHomeRegionSelect(Browser browser)

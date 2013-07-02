@@ -1,6 +1,4 @@
-﻿${app.Asset("search.editor.js")}
-
-<script>
+﻿<script>
 	$(function () {
 		$("#payers").data("template", function () {
 			return $("<tr>")

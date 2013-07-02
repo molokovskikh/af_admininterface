@@ -19,16 +19,21 @@ namespace AdminInterface.Models
 {
 	public enum LoaderType
 	{
-		[Description("Коду")] Code,
-		[Description("Коду товара и производителя")] CodeAndCodeCr,
-		[Description("Наименованию товара")] Product,
-		[Description("Наименованию товара и производителя")] ProductAndProducer
+		[Description("Наименованию товара")] Product = 2,
+		[Description("Коду")] Code = 0,
+		[Description("Коду товара и производителя")] CodeAndCodeCr = 1,
+		[Description("Наименованию товара и производителя")] ProductAndProducer = 3
 	}
 
 	[ActiveRecord("smart_order_rules", Schema = "ordersendrules", Lazy = true), Auditable]
 	public class SmartOrderRules : ActiveRecordLinqBase<SmartOrderRules>, IMultiAuditable
 	{
 		private string _columnSeparator;
+
+		public SmartOrderRules()
+		{
+			ParseAlgorithm = "TestSource";
+		}
 
 		[PrimaryKey("Id")]
 		public virtual uint Id { get; set; }

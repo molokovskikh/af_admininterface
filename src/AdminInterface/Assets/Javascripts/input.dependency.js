@@ -1,7 +1,7 @@
 (function() {
   var setAttribute;
   setAttribute = function(parent, element) {
-    if (!parent.prop('checked')) {
+    if (!parent.attr("checked")) {
       return element.attr("disabled", "disabled");
     } else {
       return element.removeAttr("disabled");

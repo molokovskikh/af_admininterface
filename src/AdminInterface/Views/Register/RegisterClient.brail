@@ -28,6 +28,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 	$(function () {
 
 		viewModel = new RegistrationViewModel();
+		viewModel = new RegistrationViewModel();
 		ko.applyBindings(viewModel);
 
 		$("#PayerExists").attr({ checked: null, disabled: null });

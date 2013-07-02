@@ -1,4 +1,4 @@
-﻿$ ->
+﻿window.registerConfirm = ->
 	window.confirmed = false
 	$("form.confirm").submit (event) ->
 		showConfirm = false
@@ -33,3 +33,6 @@
 			else
 				processConfirm()
 				return false
+
+unless require?
+	$ -> registerConfirm()

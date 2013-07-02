@@ -1,10 +1,11 @@
 $ ->
+	ajaxData = [{id: 1, name: "1"}, {id: 2, name: "2"}]
+	$.extend
+		ajax: (data) ->
+			data.success(ajaxData)
+
 	test "search without item", ->
 		$("input[type=button].search").data("url", "test")
-		ajaxData = [{id: 1, name: "1"}, {id: 2, name: "2"}]
-		$.extend
-			ajax: (data) ->
-				data.success(ajaxData)
 
 		$(".search").click()
 		equal $("select option").length, 2

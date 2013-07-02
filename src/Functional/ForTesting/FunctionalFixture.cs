@@ -1,10 +1,13 @@
 using System;
 using System.Linq;
 using System.Threading;
+using Common.Tools.Calendar;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
+using WatiN.Core.UtilityClasses;
+using WatiN.CssSelectorExtensions;
 
 namespace Functional.ForTesting
 {
@@ -23,18 +26,43 @@ namespace Functional.ForTesting
 			return browser.Element(Find.ByText(title).And(Find.ByClass("search-title"))).Parent;
 		}
 
-		protected void Search(string term, string title = null)
+		protected SelectList SearchV2(Element element, string term)
 		{
+			element = element.Parent;
+			var searchInput = element.Css(".term");
+			//значит у нас есть значение и его нужно перевыбрать
+			if (searchInput == null) {
+				element.Css("[type=button]").Click();
+				WaitForCss(".term", element);
+				searchInput = element.Css(".term");
+			}
+			searchInput.TypeText(term);
+			//иногда javascript на странице не замечает введенного текста, принудительно обновлеям
+			browser.Eval("$(\".term\").change();");
+			Click((IElementContainer)element, "Найти");
+			new TryFuncUntilTimeOut(3.Second()) {
+				SleepTime = 50.Millisecond(),
+				ExceptionMessage = () => String.Format("не удалось ничего найти '{0}'", term)
+			}.Try(() => element.CssSelect("select") != null);
+			return (SelectList)element.CssSelect("select");
+		}
+
+		protected SelectList Search(string term, string title = null)
+		{
+			Element root = null;
 			if (String.IsNullOrEmpty(title)) {
 				Css(".term").TypeText(term);
 				Css(".search[type=button]").Click();
 			}
 			else {
-				var searchRoot = SearchRoot(title);
-				searchRoot.Css(".term").TypeText(term);
-				searchRoot.Css(".search[type=button]").Click();
+				root = SearchRoot(title);
+				root.Css(".term").TypeText(term);
+				root.Css(".search[type=button]").Click();
 			}
 			Thread.Sleep(1000);
+			if (root != null)
+				return root.Css("select");
+			return null;
 		}
 
 		public void ConfirmDialog()

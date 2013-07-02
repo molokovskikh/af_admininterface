@@ -95,6 +95,11 @@ namespace AdminInterface.Helpers
 
 		public string SearchEdit(string target, IDictionary attributes)
 		{
+			return SearchEditV1(target, attributes);
+		}
+
+		public string SearchEditV1(string target, IDictionary attributes)
+		{
 			string dependOn = "";
 			if (attributes != null && attributes.Contains("data-depend-on")) {
 				dependOn = "data-depend-on=\"" + attributes["data-depend-on"] + "\"";
@@ -124,6 +129,32 @@ namespace AdminInterface.Helpers
 				result.AppendFormat("<div class=\"value\" {2}>{0} {1}</div>", labelTag, SafeHtmlEncode(value.ToString()), dependOn);
 			}
 			return result.ToString();
+		}
+
+		public string SearchEditV2(string target, IDictionary attributes)
+		{
+			var result = new StringBuilder();
+
+			var property = FindProperty(target);
+			var hiddenTarget = target;
+			if (property != null) {
+				var primaryKey = GetPrimaryKey(property.PropertyType);
+				if (primaryKey != null) {
+					hiddenTarget = target + "." + primaryKey.Property.Name;
+				}
+			}
+			return result
+				.Append("<div class=\"search-editor-v2\" ")
+				.Append(GetAttributes(attributes))
+				.Append(">")
+				.Append("<div data-bind=\"template: template\"></div>")
+				.Append(helper.HiddenField(hiddenTarget, new Dictionary<string, string> {
+					{ "data-bind", "value: value" },
+					{ "data-text", SafeHtmlEncode((ObtainValue(target) ?? "").ToString()) },
+					{ "data-label", GetLabel(target) },
+				}))
+				.Append("</div>")
+				.ToString();
 		}
 
 		private static PrimaryKeyModel GetPrimaryKey(Type type)
