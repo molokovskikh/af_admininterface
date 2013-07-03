@@ -28,15 +28,19 @@
 			$(elPrefix + "ParseAlgorithm").rules("remove", "required");
 		}
 	});
+	self.isConfigurable = ko.computed(function () {
+		return self.enableSmartOrder() && configurableParsers.indexOf(self.parser()) >= 0;
+	}, self);
+
 	self.loader = ko.observable();
 	self.updateLoaderValidation = function () {
 		self.updateRules(self.lastLoaderValue, "remove");
-		if (self.enableSmartOrder())
+		if (self.isConfigurable())
 			self.updateRules(self.loader(), "add");
-		lastLoaderValue = self.loader();
+		self.lastLoaderValue = self.loader();
 	};
 	self.loader.subscribe(self.updateLoaderValidation);
-	self.enableSmartOrder.subscribe(self.updateLoaderValidation);
+	self.isConfigurable.subscribe(self.updateLoaderValidation);
 	self.updateRules = function(value, action) {
 		var rules = requiredFields[value];
 		if (rules) {
@@ -45,9 +49,7 @@
 			});
 		}
 	};
-	self.isConfigurable = ko.computed(function () {
-		return self.enableSmartOrder() && configurableParsers.indexOf(self.parser()) >= 0;
-	}, self);
+
 	self.isConfigurable.subscribe(function () {
 		if (self.isConfigurable())
 			$(elPrefix + "QuantityColumn").rules("add", "required");
@@ -55,6 +57,8 @@
 			$(elPrefix + "QuantityColumn").rules("remove", "required");
 	});
 	self.canConfigure = function (name) {
+		if (!self.isConfigurable())
+			return false;
 		var parsers = propertyMap[name];
 		if (parsers)
 			return parsers.indexOf(self.parser()) >= 0;
@@ -86,6 +90,24 @@ if (!(typeof require === 'function')) {
 			init: function (elem, valueAccessor) {
 				var shouldAllowBindings = ko.utils.unwrapObservable(valueAccessor());
 				return { controlsDescendantBindings: !shouldAllowBindings };
+			}
+		};
+
+		//knockout игнорирует значения в элементе когда он производит биндинг
+		//это и правильно и не правильно
+		//не правильно это для полей которые получены из моделей
+		//правильно это для шаблонов и всего остального
+		//добавляем специальный биндинг который умеет читать значение
+		//пример использования
+		//${app.Edit("drugstore.SmartOrderRules.Loader", {"data-bind": "read: loader, value: loader"})}
+		ko.bindingHandlers.read = {
+			init: function (elem, valueAccessor) {
+				var value;
+				if (elem.type == 'checkbox')
+					value = elem.checked;
+				else
+					value = elem.value;
+				valueAccessor()(value);
 			}
 		};
 

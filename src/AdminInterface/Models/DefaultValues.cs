@@ -35,6 +35,9 @@ namespace AdminInterface.Models
 		[Property]
 		public string Phones { get; set; }
 
+		[BelongsTo(NotFoundBehaviour = NotFoundBehaviour.Ignore)]
+		public Price SmartOrderAssortmentPrice { get; set; }
+
 		[BelongsTo("FormaterId")]
 		public OrderHandler Formater { get; set; }
 
@@ -103,6 +106,11 @@ namespace AdminInterface.Models
 		public string AppendFooter(string body)
 		{
 			return body + "\r\n\r\n" + EmailFooter;
+		}
+
+		public void Apply(Client client)
+		{
+			client.Settings.SmartOrderRules.AssortimentPriceCode = SmartOrderAssortmentPrice;
 		}
 	}
 

@@ -234,6 +234,7 @@ namespace AdminInterface.Controllers
 				Registration = new RegistrationInfo(Admin),
 				ContactGroupOwner = new ContactGroupOwner()
 			};
+			Defaults.Apply(client);
 			client.Settings.WorkRegionMask = client.MaskRegion;
 			client.Settings.OrderRegionMask = regionSettings.GetOrderMask();
 			var user = new User(client);
@@ -359,8 +360,6 @@ namespace AdminInterface.Controllers
 
 		private void CreateDrugstore(Client client, AdditionalSettings additionalSettings, Supplier supplier)
 		{
-			client.Settings.SmartOrderRules = SmartOrderRules.TestSmartOrder();
-
 			if (additionalSettings.ShowForOneSupplier) {
 				client.Settings.InvisibleOnFirm = DrugstoreType.Hidden;
 				client.Settings.NoiseCosts = true;

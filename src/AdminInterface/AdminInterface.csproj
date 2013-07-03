@@ -173,6 +173,7 @@
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
+    <Compile Include="Initializers\Seed.cs" />
     <Compile Include="Models\Core.cs" />
     <Compile Include="Models\Markup.cs" />
     <Compile Include="Models\ProducerSynonym.cs" />

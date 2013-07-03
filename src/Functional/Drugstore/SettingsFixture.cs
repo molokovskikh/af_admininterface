@@ -27,7 +27,6 @@ namespace Functional.Drugstore
 		public new void Setup()
 		{
 			client = DataMother.CreateTestClientWithUser();
-			client.Settings.SmartOrderRules = SmartOrderRules.TestSmartOrder();
 			Flush();
 			settings = client.Settings;
 
@@ -122,6 +121,25 @@ namespace Functional.Drugstore
 		}
 
 		[Test]
+		public void Check_default_smart_order_settings()
+		{
+			var supplier = DataMother.CreateSupplier(s => {
+				s.Name = "Фармаимпекс";
+				s.FullName = "Фармаимпекс";
+				s.AddPrice("Матрица", PriceType.Assortment);
+			});
+			Save(supplier);
+			session.Save(new ParseAlgorithm("TextSource"));
+			Flush();
+
+			var price = SearchV2(Css("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Фармаимпекс");
+			Assert.That(price.SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
+
+			Click("Сохранить");
+			AssertText("Сохранено");
+		}
+
+		[Test]
 		public void Add_parser_and_assortiment_price()
 		{
 			var supplier = DataMother.CreateSupplier(s => {
@@ -130,33 +148,33 @@ namespace Functional.Drugstore
 				s.AddPrice("Матрица", PriceType.Assortment);
 			});
 			Save(supplier);
-			Maintainer.MaintainIntersection(client, client.Orgs().First());
-			session.Save(new ParseAlgorithm("TextParser"));
+			session.Save(new ParseAlgorithm("TextSource"));
 			Flush();
 
-			Css("#drugstore_EnableSmartOrder").Click();
-			Css("#drugstore_SmartOrderRules_ColumnSeparator").TypeText("\t");
-			Css("#drugstore_SmartOrderRules_CodePage").Select("windows-1251");
-			Css("#drugstore_SmartOrderRules_ProductColumn").TypeText("0");
-			Css("#drugstore_SmartOrderRules_QuantityColumn").TypeText("1");
+			var parser = SearchV2(Css("#drugstore_SmartOrderRules_ParseAlgorithm"), "TextSource");
+			Assert.That(parser.SelectedItem, Is.EqualTo("TextSource"));
 
 			var price = SearchV2(Css("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Фармаимпекс");
 			Assert.That(price.SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
 
-			var parser = SearchV2(Css("#drugstore_SmartOrderRules_ParseAlgorithm"), "TextParser");
-			Assert.That(parser.SelectedItem, Is.EqualTo("TextParser"));
+			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
+			Css("#drugstore_SmartOrderRules_ColumnSeparator").TypeText(@"\t");
+			Css("#drugstore_SmartOrderRules_CodePage").Select("windows-1251");
+			Css("#drugstore_SmartOrderRules_ProductColumn").TypeText("0");
+			Css("#drugstore_SmartOrderRules_QuantityColumn").TypeText("1");
 
 			Click("Сохранить");
 			AssertText("Сохранено");
 			Click("Настройка");
+			Assert.IsTrue(Css("#drugstore_EnableSmartOrder").Checked);
 			AssertText("Фармаимпекс - Матрица");
-			AssertText("TextParser");
+			AssertText("TextSource");
 
 			var rule = client.Settings.SmartOrderRules;
 			session.Refresh(rule);
 			Assert.AreEqual(@"\t", rule.ColumnSeparator);
 			Assert.AreEqual(1251, rule.CodePage);
-			Assert.AreEqual("0", rule.CodeColumn);
+			Assert.AreEqual("0", rule.ProductColumn);
 			Assert.AreEqual("1", rule.QuantityColumn);
 		}
 
@@ -582,7 +600,6 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			Assert.AreEqual("false", IsVisible("#drugstore_SmartOrderRules_StartLine"));
 			Click("Сохранить");
 			Assert.AreEqual(Error("#drugstore_SmartOrderRules_QuantityColumn"), "Это поле необходимо заполнить.");
-			Assert.AreEqual(Error("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Это поле необходимо заполнить.");
 			Assert.AreEqual(Error("#drugstore_SmartOrderRules_ProductColumn"), "Это поле необходимо заполнить.");
 			SearchV2(Css("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Поставщик для тестирования");
 			Css("#drugstore_SmartOrderRules_ProductColumn").TypeText("F1");

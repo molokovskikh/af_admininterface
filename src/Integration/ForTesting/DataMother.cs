@@ -43,6 +43,8 @@ namespace Integration.ForTesting
 
 			client.Settings.WorkRegionMask = homeRegion.Id;
 			client.Settings.OrderRegionMask = homeRegion.Id;
+			var values = (DefaultValues)ActiveRecordMediator.FindFirst(typeof(DefaultValues));
+			values.Apply(client);
 
 			payer.Clients = new List<Client> { client };
 			if (action != null)

@@ -31,6 +31,7 @@ namespace Integration.ForTesting
 				var activeRecord = new ActiveRecord();
 				activeRecord.Assemblies = activeRecord.Assemblies.Concat(new[] { "Test.Support" }).ToArray();
 				activeRecord.Initialize(ActiveRecordSectionHandler.Instance);
+				new Seed().Run();
 			}
 		}
 

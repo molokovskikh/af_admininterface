@@ -301,7 +301,7 @@ where Phone like :phone")
 
 			if (drugstore.EnableSmartOrder) {
 				if (drugstore.SmartOrderRules == null && smartOrderRules == null) {
-					drugstore.SmartOrderRules = SmartOrderRules.TestSmartOrder();
+					drugstore.SmartOrderRules = new SmartOrderRules();
 					BindObjectInstance(drugstore.SmartOrderRules, "drugstore.SmartOrderRules", AutoLoadBehavior.NewRootInstanceIfInvalidKey);
 				}
 				else {

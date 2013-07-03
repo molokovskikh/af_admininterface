@@ -34,10 +34,7 @@ namespace AdminInterface.Initializers
 				config.CertificatesPath,
 				config.PromotionsPath);
 
-			using (new SessionScope()) {
-				if (Administrator.GetByName(Environment.UserName) == null)
-					ActiveRecordMediator.Save(Administrator.CreateLocalAdministrator());
-			}
+			new Seed().Run();
 		}
 
 		public void InitDirs(params string[] dirs)

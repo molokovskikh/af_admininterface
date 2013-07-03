@@ -101,17 +101,6 @@ namespace AdminInterface.Models
 			}
 		}
 
-		public static SmartOrderRules TestSmartOrder()
-		{
-			var testOrder = new SmartOrderRules {
-#if !DEBUG
-				AssortimentPriceCode = ActiveRecordMediator<Price>.FindByPrimaryKey(4662u),
-#endif
-				ParseAlgorithm = "TestSource",
-			};
-			return testOrder;
-		}
-
 		public virtual IEnumerable<IAuditRecord> GetAuditRecords(IEnumerable<AuditableProperty> properties = null)
 		{
 			return Settings.Where(s => s.Client != null).Select(s => new AuditRecord(s));

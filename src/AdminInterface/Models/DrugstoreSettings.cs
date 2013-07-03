@@ -54,6 +54,7 @@ namespace AdminInterface.Models
 			: this()
 		{
 			Client = client;
+			SmartOrderRules = new SmartOrderRules();
 		}
 
 		[PrimaryKey("ClientCode", Generator = PrimaryKeyType.Foreign)]

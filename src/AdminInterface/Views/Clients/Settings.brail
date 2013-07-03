@@ -93,7 +93,7 @@ ${app.Asset("smart.order.settings.js")}
 				</table>
 			</div>
 			<div class="block">
-				${app.Edit("drugstore.EnableSmartOrder", {"data-bind" : "checked: enableSmartOrder"})}
+				${app.Edit("drugstore.EnableSmartOrder", {"data-bind" : "read: enableSmartOrder, checked: enableSmartOrder"})}
 				<div data-bind="allowBindings: false, visible: enableSmartOrder">
 					${app.SearchEditV2("drugstore.SmartOrderRules.AssortimentPriceCode", {
 						"data-search-editor": @assortmentPrice,
@@ -114,7 +114,7 @@ ${app.Asset("smart.order.settings.js")}
 					<h4>Настройка разбора файла</h4>
 					<div class="form-block">
 						${app.Label("drugstore.SmartOrderRules.Loader")}
-						${app.Edit("drugstore.SmartOrderRules.Loader", {"data-bind": "value: loader"})}
+						${app.Edit("drugstore.SmartOrderRules.Loader", {"data-bind": "read: loader, value: loader"})}
 					</div>
 					<div class="form-block" data-bind="visible: isColumnSeparatorAvailable">
 						${app.Label("drugstore.SmartOrderRules.ColumnSeparator", " (для обозначение табулятора используется последовательноть символов \"\\t\")")}
