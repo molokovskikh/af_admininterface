@@ -157,7 +157,6 @@ namespace Functional.Drugstore
 			var price = SearchV2(Css("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Фармаимпекс");
 			Assert.That(price.SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
 
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			Css("#drugstore_SmartOrderRules_ColumnSeparator").TypeText(@"\t");
 			Css("#drugstore_SmartOrderRules_CodePage").Select("windows-1251");
 			Css("#drugstore_SmartOrderRules_ProductColumn").TypeText("0");
