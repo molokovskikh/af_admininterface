@@ -64,7 +64,7 @@ namespace Functional.Billing
 			ClickButton("Сохранить");
 			AssertText("Сохранено");
 
-			act.Refresh();
+			session.Refresh(act);
 			Assert.That(act.ActDate, Is.EqualTo(newActDate));
 		}
 	}

@@ -18,7 +18,7 @@ namespace Integration.Models
 		public void Load_updates_by_filter()
 		{
 			var user1 = DataMother.CreateTestClientWithUser().Users[0];
-			var user2 = DataMother.CreateTestClientWithUser(Region.Find(16ul)).Users[0];
+			var user2 = DataMother.CreateTestClientWithUser(session.Load<Region>(16ul)).Users[0];
 			Flush();
 			var update1 = new UpdateLogEntity(user1);
 			Save(update1);

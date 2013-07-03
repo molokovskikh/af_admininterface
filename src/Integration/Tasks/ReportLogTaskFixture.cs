@@ -24,7 +24,7 @@ namespace Integration.Tasks
 
 			payer.Reports.Add(report);
 			account.Payment = 5000;
-			payer.Save();
+			session.Save(payer);
 		}
 
 		[Test]
@@ -39,7 +39,7 @@ namespace Integration.Tasks
 			new ReportLogsTask().Execute();
 
 			Reopen();
-			payer = Payer.Find(payer.Id);
+			payer = session.Load<Payer>(payer.Id);
 			Assert.That(payer.PaymentSum, Is.EqualTo(0));
 		}
 
@@ -47,7 +47,7 @@ namespace Integration.Tasks
 		public void Update_payment_sum_on_payer_change()
 		{
 			var newPayer = DataMother.CreatePayer();
-			newPayer.Save();
+			session.Save(newPayer);
 			report.Payer = newPayer;
 			session.Save(report);
 			Flush();
@@ -56,9 +56,9 @@ namespace Integration.Tasks
 			new ReportLogsTask().Execute();
 
 			Reopen();
-			payer = Payer.Find(payer.Id);
+			payer = session.Load<Payer>(payer.Id);
 			Assert.That(payer.PaymentSum, Is.EqualTo(0));
-			newPayer = Payer.Find(newPayer.Id);
+			newPayer = session.Load<Payer>(newPayer.Id);
 			Assert.That(newPayer.PaymentSum, Is.EqualTo(5000));
 		}
 	}

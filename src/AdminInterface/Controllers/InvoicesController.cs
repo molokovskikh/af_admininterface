@@ -13,6 +13,7 @@ using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -41,7 +42,7 @@ namespace AdminInterface.Controllers
 
 			if (Form["delete"] != null) {
 				foreach (var act in invoices)
-					act.Delete();
+					DbSession.Delete(act);
 
 				Notify("Удалено");
 				RedirectToReferrer();
@@ -73,8 +74,8 @@ namespace AdminInterface.Controllers
 
 		public void Cancel(uint id)
 		{
-			var invoice = Invoice.Find(id);
-			invoice.Delete();
+			var invoice = DbSession.Load<Invoice>(id);
+			DbSession.Delete(invoice);
 			Notify("Сохранено");
 			RedirectToReferrer();
 		}
@@ -82,7 +83,7 @@ namespace AdminInterface.Controllers
 		public void Print(uint id)
 		{
 			LayoutName = "Print";
-			PropertyBag["invoice"] = Invoice.Find(id);
+			PropertyBag["invoice"] = DbSession.Load<Invoice>(id);
 			PropertyBag["doc"] = PropertyBag["invoice"];
 		}
 
@@ -90,9 +91,9 @@ namespace AdminInterface.Controllers
 		{
 			RenderView("/Payers/NewInvoice");
 
-			var invoice = Invoice.Find(id);
+			var invoice = DbSession.Load<Invoice>(id);
 			PropertyBag["invoice"] = invoice;
-			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
+			PropertyBag["references"] = DbSession.Query<Nomenclature>().OrderBy(n => n.Name).ToList();
 
 			if (IsPost) {
 				RecreateOnlyIfNullBinder.Prepare(this, "invoice.Parts");
@@ -100,7 +101,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(invoice, "invoice");
 				if (!HasValidationError(invoice)) {
 					invoice.CalculateSum();
-					invoice.Save();
+					DbSession.Save(invoice);
 					Notify("Сохранено");
 					Redirect("Invoices", "Edit", new { invoice.Id });
 				}

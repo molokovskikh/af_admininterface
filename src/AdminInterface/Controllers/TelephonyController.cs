@@ -1,11 +1,14 @@
-﻿using AdminInterface.Helpers;
+﻿using System.Linq;
+using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using NHibernate.Criterion;
+using NHibernate.Linq;
 using ViewHelper = Common.Web.Ui.Helpers.ViewHelper;
 
 namespace AdminInterface.Controllers
@@ -14,17 +17,22 @@ namespace AdminInterface.Controllers
 		Secure(PermissionType.ManageCallbacks),
 		Helper(typeof(ViewHelper)),
 	]
-	public class TelephonyController : ARSmartDispatcherController
+	public class TelephonyController : AdminInterfaceController
 	{
+		public TelephonyController()
+		{
+			SetARDataBinder();
+		}
+
 		public void Show()
 		{
-			PropertyBag["callbacks"] = Callback.FindAll(Order.Asc("Comment"));
+			PropertyBag["callbacks"] = DbSession.Query<Callback>().OrderBy(c => c.Comment).ToArray();
 		}
 
 		public void UpdateCallbacks([ARDataBind("callbacks", AutoLoad = AutoLoadBehavior.Always)] Callback[] callbacks)
 		{
 			foreach (var callback in callbacks)
-				callback.Save();
+				DbSession.Save(callback);
 
 			Flash["isUpdated"] = true;
 			RedirectToAction("Show");
@@ -32,14 +40,14 @@ namespace AdminInterface.Controllers
 
 		public void Update([DataBind("callback")] Callback callback)
 		{
-			callback.Save();
+			DbSession.Save(callback);
 			Flash["isUpdated"] = true;
 			RedirectToAction("Show");
 		}
 
 		public void Edit(uint id)
 		{
-			PropertyBag["callback"] = Callback.Find(id);
+			PropertyBag["callback"] = DbSession.Load<Callback>(id);
 		}
 
 		public void New()
@@ -50,7 +58,7 @@ namespace AdminInterface.Controllers
 
 		public void Delete(uint id)
 		{
-			Callback.Find(id).Delete();
+			DbSession.Delete(DbSession.Load<Callback>(id));
 			RedirectToAction("Show");
 		}
 	}

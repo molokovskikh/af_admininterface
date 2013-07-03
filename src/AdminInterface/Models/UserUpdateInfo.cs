@@ -6,7 +6,7 @@ using Castle.ActiveRecord.Linq;
 namespace AdminInterface.Models
 {
 	[ActiveRecord("UserUpdateInfo", Schema = "usersettings")]
-	public class UserUpdateInfo : ActiveRecordLinqBase<UserUpdateInfo>
+	public class UserUpdateInfo
 	{
 		public UserUpdateInfo(User user)
 		{

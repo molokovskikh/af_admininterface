@@ -262,8 +262,8 @@ namespace AdminInterface.Controllers
 
 		public void Delete(uint id)
 		{
-			var promotion = SupplierPromotion.Find(id);
-			promotion.Delete();
+			var promotion = DbSession.Load<SupplierPromotion>(id);
+			DbSession.Delete(promotion);
 			Flash["Message"] = "Удалено";
 
 			RedirectToReferrer();
@@ -276,7 +276,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["allowedExtentions"] = GetAllowedExtentions();
 			Binder.Validator = Validator;
 
-			var promotion = SupplierPromotion.Find(id);
+			var promotion = DbSession.Load<SupplierPromotion>(id);
 			PropertyBag["promotion"] = promotion;
 			ActiveRecordMediator.Evict(promotion);
 			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.PromotionOwnerSupplier.MaskRegion).OrderBy(reg => reg.Name);
@@ -307,7 +307,7 @@ namespace AdminInterface.Controllers
 						}
 					}
 
-					promotion.Save();
+					DbSession.Save(promotion);
 
 					RedirectToAction("Index");
 				}
@@ -320,19 +320,19 @@ namespace AdminInterface.Controllers
 
 		public void ChangeState(uint id, [DataBind("filter")] PromotionFilter filter)
 		{
-			var promotion = SupplierPromotion.Find(id);
+			var promotion = DbSession.Load<SupplierPromotion>(id);
 			promotion.Enabled = !promotion.Enabled;
 			Flash["Message"] = "Сохранено";
-			promotion.Save();
+			DbSession.Save(promotion);
 			RedirectToAction("Index", filter.ToUrl());
 		}
 
 		public void ChangeDisabled(uint id, [DataBind("filter")] PromotionFilter filter)
 		{
-			var promotion = SupplierPromotion.Find(id);
+			var promotion = DbSession.Load<SupplierPromotion>(id);
 			promotion.AgencyDisabled = !promotion.AgencyDisabled;
 			Flash["Message"] = "Сохранено";
-			promotion.Save();
+			DbSession.Save(promotion);
 			RedirectToAction("Index", filter.ToUrl());
 		}
 
@@ -343,7 +343,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["allowedExtentions"] = GetAllowedExtentions();
 			Binder.Validator = Validator;
 
-			var client = PromotionOwnerSupplier.Find(supplierId);
+			var client = DbSession.Load<PromotionOwnerSupplier>(supplierId);
 
 			var promotion = new SupplierPromotion {
 				Enabled = true,
@@ -374,7 +374,7 @@ namespace AdminInterface.Controllers
 						promotion.PromoFile = file.FileName;
 					}
 
-					promotion.Save();
+					DbSession.Save(promotion);
 
 					if (file != null && file.ContentLength > 0) {
 						var newLocalPromoFile = GetPromoFile(promotion);
@@ -402,7 +402,7 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 			CancelView();
 
-			var promotion = SupplierPromotion.Find(id);
+			var promotion = DbSession.Load<SupplierPromotion>(id);
 			var fileName = GetPromoFile(promotion);
 
 			if (File.Exists(fileName) && !String.IsNullOrEmpty(promotion.PromoFile))
@@ -445,7 +445,7 @@ namespace AdminInterface.Controllers
 			uint id,
 			[DataBind("filter")] CatalogFilter filter)
 		{
-			var promotion = SupplierPromotion.Find(id);
+			var promotion = DbSession.Load<SupplierPromotion>(id);
 			PropertyBag["promotion"] = promotion;
 
 			filter.Promotion = promotion;
@@ -456,7 +456,7 @@ namespace AdminInterface.Controllers
 				if (Request.Params["delBtn"] != null) {
 					foreach (string key in Request.Params.AllKeys)
 						if (key.StartsWith("chd")) {
-							var catalog = Catalog.Find(Convert.ToUInt32(Request.Params[key]));
+							var catalog = DbSession.Load<Catalog>(Convert.ToUInt32(Request.Params[key]));
 							var index = promotion.Catalogs.IndexOf(c => c.Id == catalog.Id);
 							if (index >= 0)
 								promotion.Catalogs.RemoveAt(index);
@@ -466,7 +466,7 @@ namespace AdminInterface.Controllers
 				if (Request.Params["addBtn"] != null) {
 					foreach (string key in Request.Params.AllKeys)
 						if (key.StartsWith("cha")) {
-							var catalog = Catalog.Find(Convert.ToUInt32(Request.Params[key]));
+							var catalog = DbSession.Load<Catalog>(Convert.ToUInt32(Request.Params[key]));
 
 							if (promotion.Catalogs.FirstOrDefault(c => c.Id == catalog.Id) == null)
 								promotion.Catalogs.Add(catalog);
@@ -476,7 +476,7 @@ namespace AdminInterface.Controllers
 				ActiveRecordMediator.Evict(promotion);
 				if (Validator.IsValid(promotion) && promotion.Catalogs.Count > 0) {
 					Flash["Message"] = "Сохранено";
-					promotion.Save();
+					DbSession.Save(promotion);
 					RedirectToAction("EditCatalogs", filter.ToUrl());
 				}
 				else {
@@ -489,7 +489,7 @@ namespace AdminInterface.Controllers
 
 					Flash["Message"] = Message.Error(summary);
 					ActiveRecordMediator.Evict(promotion);
-					var discardedPromotion = SupplierPromotion.Find(id);
+					var discardedPromotion = DbSession.Load<SupplierPromotion>(id);
 					PropertyBag["promotion"] = discardedPromotion;
 				}
 			}

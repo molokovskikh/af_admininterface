@@ -25,13 +25,13 @@ namespace AdminInterface.Controllers
 			[DataBind("SuppliersMarkup")] Markup[] suppliersMarkup,
 			[DataBind("DrugstoreMarkup")] Markup[] drugstoreMarkup)
 		{
-			var region = Region.Find(id);
+			var region = DbSession.Load<Region>(id);
 			if (IsPost) {
 				BindObjectInstance(region, "region");
 				region.DefaultRegionMask = defaultRegions.Aggregate(0UL, (v, a) => a + v);
 				region.DefaultShowRegionMask = defaultShowRegion.Aggregate(0UL, (v, a) => a + v);
 				if (IsValid(region)) {
-					region.Save();
+					DbSession.Save(region);
 					foreach (var markup in drugstoreMarkup) {
 						DbSession.Update(markup);
 					}
@@ -59,12 +59,12 @@ namespace AdminInterface.Controllers
 		{
 			var allRegions = Region.FindAll();
 			if (homeRegionId.HasValue) {
-				var homeRegion = Region.Find(homeRegionId.Value);
+				var homeRegion = DbSession.Load<Region>(homeRegionId.Value);
 				if (showDefaultRegions)
 					PropertyBag["defaultRegions"] = allRegions.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0);
 				if (showNonDefaultRegions)
 					PropertyBag["nonDefaultRegions"] = allRegions.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) <= 0);
-				PropertyBag["homeRegion"] = Region.Find(homeRegionId);
+				PropertyBag["homeRegion"] = DbSession.Load<Region>(homeRegionId);
 			}
 			else if (clientId.HasValue) {
 				var client = DbSession.Load<Client>(clientId.Value);
@@ -86,7 +86,7 @@ namespace AdminInterface.Controllers
 
 		public void DefaultRegions(ulong homeRegionId, bool singleRegions)
 		{
-			var homeRegion = Region.Find(homeRegionId);
+			var homeRegion = DbSession.Load<Region>(homeRegionId);
 			var regions = Region.FindAll()
 				.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0)
 				.OrderBy(region => region.Name)
@@ -99,7 +99,7 @@ namespace AdminInterface.Controllers
 
 		public void DefaultRegions(ulong homeRegionId, uint clientId)
 		{
-			var homeRegion = Region.Find(homeRegionId);
+			var homeRegion = DbSession.Load<Region>(homeRegionId);
 			var client = DbSession.Load<Client>(clientId);
 			var drugstore = client.Settings;
 			var regions = Region.FindAll()

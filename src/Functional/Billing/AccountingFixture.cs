@@ -76,7 +76,7 @@ namespace Functional.Billing
 
 			var address = new Address { Value = "address", };
 			client.AddAddress(address);
-			address.Save();
+			session.Save(address);
 			client = session.Load<Client>(client.Id);
 
 			client.Users[0].Enabled = true;
@@ -85,15 +85,15 @@ namespace Functional.Billing
 			client.Addresses[0].Enabled = true;
 			client.Addresses[0].Accounting.BeAccounted = false;
 			client.Addresses[0].Value = String.Format("Test address for accounting [{0}]", client.Addresses[0].Id);
-			client.Addresses[0].Save();
+			session.Save(client.Addresses[0]);
 
 			client.Addresses[1].Enabled = true;
 			client.Addresses[1].Accounting.BeAccounted = true;
 			client.Addresses[1].Value = String.Format("Test address for accounting [{0}]", client.Addresses[1].Id);
-			client.Addresses[1].Save();
+			session.Save(client.Addresses[1]);
 			foreach (var addr in client.Addresses) {
 				addr.AvaliableForUsers = new List<User> { client.Users[0] };
-				addr.Save();
+				session.Save(addr);
 			}
 			using (var browser = Open("Billing/Accounting")) {
 				Assert.That(browser.Text, Is.Not.StringContaining(client.Addresses[0].Value));

@@ -19,7 +19,7 @@ namespace AdminInterface.Controllers
 	{
 		public void NewContactGroup(uint billingCode)
 		{
-			var payer = Payer.Find(billingCode);
+			var payer = DbSession.Load<Payer>(billingCode);
 
 			PropertyBag["billingCode"] = billingCode;
 			PropertyBag["groupTypes"] = payer.NewGroupTypes;
@@ -34,7 +34,7 @@ namespace AdminInterface.Controllers
 			if (ValidationHelper.IsInstanceHasValidationError(contactGroup)
 				|| ValidationHelper.IsCollectionHasNotValideObject(contacts)) {
 				contactGroup.Contacts = CleanUp(contacts);
-				var payer = Payer.Find(billingCode);
+				var payer = DbSession.Load<Payer>(billingCode);
 				PropertyBag["billingCode"] = payer.Id;
 				PropertyBag["groupTypes"] = payer.NewGroupTypes;
 				PropertyBag["Invalid"] = true;
@@ -42,12 +42,10 @@ namespace AdminInterface.Controllers
 				RenderView("NewContactGroup");
 				return;
 			}
-			var billingInstance = Payer.Find(billingCode);
+			var billingInstance = DbSession.Load<Payer>(billingCode);
 			contactGroup.ContactGroupOwner = billingInstance.ContactGroupOwner;
-			using (new TransactionScope()) {
-				UpdateContactForContactOwner(contacts, contactGroup);
-				contactGroup.Save();
-			}
+			UpdateContactForContactOwner(contacts, contactGroup);
+			DbSession.Save(contactGroup);
 
 			RenderView(@"..\Common\CloseWindow");
 		}

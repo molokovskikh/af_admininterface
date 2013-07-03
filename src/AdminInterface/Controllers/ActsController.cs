@@ -22,8 +22,13 @@ namespace AdminInterface.Controllers
 		Helper(typeof(BindingHelper)),
 		Helper(typeof(PaginatorHelper), "paginator"),
 	]
-	public class ActsController : ARSmartDispatcherController
+	public class ActsController : AdminInterfaceController
 	{
+		public ActsController()
+		{
+			SetARDataBinder();
+		}
+
 		public void Index([SmartBinder] PayerDocumentFilter filter)
 		{
 			PropertyBag["filter"] = filter;
@@ -47,7 +52,7 @@ namespace AdminInterface.Controllers
 				.Where(i => !s.Query<Act>().Any(a => a.Payer == i.Payer && a.Period == i.Period)).ToList());
 			var createdTime = DateTime.Now;
 			foreach (var act in Act.Build(invoices, actDate)) {
-				act.Save();
+				DbSession.Save(act);
 			}
 			var destinationFilter = filter.ToDocumentFilter();
 			destinationFilter.CreatedOn = createdTime;
@@ -59,7 +64,7 @@ namespace AdminInterface.Controllers
 			var filter = (PayerDocumentFilter)BindObject(ParamStore.Form, typeof(PayerDocumentFilter), "filter");
 			if (Form["delete"] != null) {
 				foreach (var act in acts) {
-					act.Delete();
+					DbSession.Delete(act);
 					new MonorailMailer().DeleteOrEditAct(act, "billing@analit.net", "Удален акт", true).Send();
 				}
 
@@ -80,9 +85,9 @@ namespace AdminInterface.Controllers
 		{
 			Binder.Validator = Validator;
 
-			var act = Act.Find(id);
+			var act = DbSession.Load<Act>(id);
 			PropertyBag["act"] = act;
-			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
+			PropertyBag["references"] = DbSession.Query<Nomenclature>().OrderBy(n => n.Name).ToList();
 
 			if (IsPost) {
 				RecreateOnlyIfNullBinder.Prepare(this, "act.Parts");
@@ -90,7 +95,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(act, "act");
 				if (!HasValidationError(act)) {
 					act.CalculateSum();
-					act.Save();
+					DbSession.Save(act);
 					new MonorailMailer().DeleteOrEditAct(act, "billing@analit.net", "Изменен акт", false).Send();
 					Flash["Message"] = "Сохранено";
 					RedirectUsingRoute("Acts", "Edit", new { act.Id });
@@ -101,7 +106,7 @@ namespace AdminInterface.Controllers
 		public void Print(uint id)
 		{
 			LayoutName = "Print";
-			PropertyBag["act"] = Act.Find(id);
+			PropertyBag["act"] = DbSession.Load<Act>(id);
 			PropertyBag["doc"] = PropertyBag["act"];
 		}
 	}

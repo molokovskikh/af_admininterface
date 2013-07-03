@@ -92,77 +92,72 @@ namespace AdminInterface.Controllers
 			BindObjectInstance(supplier, "supplier");
 			SetBinder(new DataBinder());
 
-			using (var scope = new TransactionScope(OnDispose.Rollback)) {
-				DbLogHelper.SetupParametersForTriggerLogging();
-				var currentPayer = RegisterPayer(options, payer, existingPayerId, supplier.Name, supplier.FullName);
+			var currentPayer = RegisterPayer(options, payer, existingPayerId, supplier.Name, supplier.FullName);
 
-				supplier.HomeRegion = Region.Find(homeRegion);
-				supplier.Payer = currentPayer;
-				supplier.Account = new SupplierAccount(supplier);
-				supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
-				supplier.Registration = new RegistrationInfo(Admin);
+			supplier.HomeRegion = DbSession.Load<Region>(homeRegion);
+			supplier.Payer = currentPayer;
+			supplier.Account = new SupplierAccount(supplier);
+			supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
+			supplier.Registration = new RegistrationInfo(Admin);
 
-				user = new User(supplier.Payer, supplier);
-				BindObjectInstance(user, "user");
+			user = new User(supplier.Payer, supplier);
+			BindObjectInstance(user, "user");
 
-				if (!IsValid(supplier, user)) {
-					RegisterSupplier();
-					PropertyBag["options"] = options;
-					PropertyBag["supplier"] = supplier;
-					PropertyBag["user"] = user;
-					return;
-				}
-				supplier.ContactGroupOwner.AddContactGroup(new ContactGroup(ContactGroupType.MiniMails));
-				currentPayer.Suppliers.Add(supplier);
-				currentPayer.UpdatePaymentSum();
-				AddContacts(supplier.ContactGroupOwner, supplierContacts);
-				supplier.OrderRules.Add(new OrderSendRules(Defaults, supplier));
-				DbSession.Save(supplier);
-
-				foreach (var group in supplier.ContactGroupOwner.ContactGroups) {
-					var persons = BindObject<List<Person>>(group.Type + "Persons");
-					var contacts = BindObject<List<Contact>>(group.Type + "Contacts");
-
-					group.Persons = persons;
-					group.Contacts = contacts;
-				}
-
-				var groups = BindObject<RegionalDeliveryGroup[]>("orderDeliveryGroup");
-
-				foreach (var group in groups) {
-					group.Region = Region.Find(group.Region.Id);
-					group.Name = "Доставка заказов " + group.Region.Name;
-					group.ContactGroupOwner = supplier.ContactGroupOwner;
-					supplier.ContactGroupOwner.ContactGroups.Add(group);
-
-					//повторная валидация, тк когда производился binding валидация не прошла
-					//тк не было заполнено поле Name
-					Validator.IsValid(group);
-				}
-
-				foreach (var group in supplier.ContactGroupOwner.ContactGroups) {
-					group.Adopt();
-					group.Save();
-					group.Persons.Each(p => p.Save());
-				}
-
-				scope.Flush();
-
-				CreateSupplier(supplier);
-				Maintainer.MaintainIntersection(supplier, DbSession);
-
-				user.UpdateContacts(userContacts);
-				foreach (var person in userPersons)
-					user.AddContactPerson(person.Name);
-				user.AssignDefaultPermission(DbSession);
-				user.Setup();
-
-				password = user.CreateInAd();
-
-				supplier.AddBillingComment(comment);
-
-				scope.VoteCommit();
+			if (!IsValid(supplier, user)) {
+				RegisterSupplier();
+				PropertyBag["options"] = options;
+				PropertyBag["supplier"] = supplier;
+				PropertyBag["user"] = user;
+				return;
 			}
+			supplier.ContactGroupOwner.AddContactGroup(new ContactGroup(ContactGroupType.MiniMails));
+			currentPayer.Suppliers.Add(supplier);
+			currentPayer.UpdatePaymentSum();
+			AddContacts(supplier.ContactGroupOwner, supplierContacts);
+			supplier.OrderRules.Add(new OrderSendRules(Defaults, supplier));
+			DbSession.Save(supplier);
+
+			foreach (var group in supplier.ContactGroupOwner.ContactGroups) {
+				var persons = BindObject<List<Person>>(group.Type + "Persons");
+				var contacts = BindObject<List<Contact>>(group.Type + "Contacts");
+
+				group.Persons = persons;
+				group.Contacts = contacts;
+			}
+
+			var groups = BindObject<RegionalDeliveryGroup[]>("orderDeliveryGroup");
+
+			foreach (var group in groups) {
+				group.Region = DbSession.Load<Region>(group.Region.Id);
+				group.Name = "Доставка заказов " + group.Region.Name;
+				group.ContactGroupOwner = supplier.ContactGroupOwner;
+				supplier.ContactGroupOwner.ContactGroups.Add(group);
+
+				//повторная валидация, тк когда производился binding валидация не прошла
+				//тк не было заполнено поле Name
+				Validator.IsValid(group);
+			}
+
+			foreach (var group in supplier.ContactGroupOwner.ContactGroups) {
+				group.Adopt();
+				DbSession.Save(group);
+				group.Persons.Each(p => DbSession.Save(p));
+			}
+
+			DbSession.Flush();
+
+			CreateSupplier(supplier);
+			Maintainer.MaintainIntersection(supplier, DbSession);
+
+			user.UpdateContacts(userContacts);
+			foreach (var person in userPersons)
+				user.AddContactPerson(person.Name);
+			user.AssignDefaultPermission(DbSession);
+			user.Setup();
+
+			password = user.CreateInAd();
+
+			supplier.AddBillingComment(comment);
 
 			Mailer.SupplierRegistred(supplier, comment);
 			supplier.CreateDirs();
@@ -188,7 +183,6 @@ namespace AdminInterface.Controllers
 				Redirect("Suppliers", "Show", new { id = supplier.Id });
 			}
 		}
-
 
 		[AccessibleThrough(Verb.Get)]
 		public void RegisterClient()
@@ -227,7 +221,7 @@ namespace AdminInterface.Controllers
 			var name = client.Name.Replace("№", "N").Trim();
 			var currentPayer = RegisterPayer(options, payer, existingPayerId, name, fullName);
 
-			client = new Client(currentPayer, Region.Find(homeRegion)) {
+			client = new Client(currentPayer, DbSession.Load<Region>(homeRegion)) {
 				FullName = fullName,
 				Name = name,
 				MaskRegion = regionSettings.GetBrowseMask(),
@@ -320,27 +314,27 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		private static Payer RegisterPayer(AdditionalSettings additionalSettings, Payer payer, uint? existingPayerId, string name, string fullname)
+		private Payer RegisterPayer(AdditionalSettings additionalSettings, Payer payer, uint? existingPayerId, string name, string fullname)
 		{
 			Payer currentPayer = null;
 			if (additionalSettings.PayerExists) {
 				if ((payer != null && payer.Id != 0) || existingPayerId.HasValue) {
 					var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
-					currentPayer = Payer.Find(id);
+					currentPayer = DbSession.Load<Payer>(id);
 					if (currentPayer.JuridicalOrganizations.Count == 0) {
 						var organization = new LegalEntity();
 						organization.Payer = currentPayer;
 						organization.Name = currentPayer.Name;
 						organization.FullName = currentPayer.JuridicalName;
 						currentPayer.JuridicalOrganizations = new List<LegalEntity> { organization };
-						organization.Save();
+						DbSession.Save(organization);
 					}
 				}
 			}
 			if (currentPayer == null) {
 				currentPayer = new Payer(name, fullname);
 				currentPayer.BeforeNamePrefix = "Аптека";
-				currentPayer.Save();
+				DbSession.Save(currentPayer);
 			}
 			return currentPayer;
 		}
@@ -363,7 +357,7 @@ namespace AdminInterface.Controllers
 			if (additionalSettings.ShowForOneSupplier) {
 				client.Settings.InvisibleOnFirm = DrugstoreType.Hidden;
 				client.Settings.NoiseCosts = true;
-				client.Settings.NoiseCostExceptSupplier = Supplier.Find(supplier.Id);
+				client.Settings.NoiseCostExceptSupplier = DbSession.Load<Supplier>(supplier.Id);
 			}
 			DbSession.Save(client);
 			DbSession.Flush();
@@ -436,7 +430,7 @@ WHERE   pricesdata.firmcode = s.Id
 			foreach (var contact in clientContacts)
 				if (contact.ContactText != null)
 					generalGroup.AddContact(contact);
-			owner.Save();
+			DbSession.Save(owner);
 		}
 
 		public void RegisterPayer(uint id, bool showRegistrationCard)

@@ -66,7 +66,7 @@ namespace AdminInterface.Controllers
 			get
 			{
 				if (payer == null)
-					payer = Payer.Find(PayerId);
+					payer = ActiveRecordMediator<Payer>.FindByPrimaryKey(PayerId);
 				return payer;
 			}
 		}
@@ -148,12 +148,12 @@ namespace AdminInterface.Controllers
 			var payer = filter.Payer;
 
 			var userIds = payer.Users.Select(u => u.Id).ToArray();
-			PropertyBag["UsersMessages"] = ActiveRecordLinqBase<UserMessage>.Queryable
+			PropertyBag["UsersMessages"] = DbSession.Query<UserMessage>()
 				.Where(m => userIds.Contains(m.Id) && m.ShowMessageCount > 0)
 				.ToList();
 
 			PropertyBag["filter"] = filter;
-			PropertyBag["LogRecords"] = AuditLogRecord.GetLogs(payer, filter.Types.Contains(LogMessageType.System));
+			PropertyBag["LogRecords"] = AuditLogRecord.GetLogs(DbSession, payer, filter.Types.Contains(LogMessageType.System));
 			PropertyBag["Instance"] = payer;
 			PropertyBag["payer"] = payer;
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer);
@@ -186,7 +186,7 @@ namespace AdminInterface.Controllers
 			string tab)
 		{
 			payer.CheckCommentChangesAndLog(this.Mailer());
-			payer.Update();
+			DbSession.Save(payer);
 			Notify("Изменения сохранены");
 			RedirectToReferrer();
 		}
@@ -202,7 +202,7 @@ namespace AdminInterface.Controllers
 					SendMessageToUser(user, message);
 				}
 				else {
-					var payer = Payer.Find(billingCode);
+					var payer = DbSession.Load<Payer>(billingCode);
 					foreach (var user in payer.Users)
 						SendMessageToUser(user, message);
 				}
@@ -224,7 +224,7 @@ namespace AdminInterface.Controllers
 				return;
 			message.Message = clientMessage.Message;
 			message.ShowMessageCount = clientMessage.ShowMessageCount;
-			message.Update();
+			DbSession.Save(message);
 
 			DbSession.Save(new UserMessageSendLog(message));
 		}
@@ -269,8 +269,8 @@ namespace AdminInterface.Controllers
 
 		public void DeleteMail(uint id)
 		{
-			var mailSend = MailSentEntity.Find(id);
-			mailSend.Delete();
+			var mailSend = DbSession.Load<MailSentEntity>(id);
+			DbSession.Delete(mailSend);
 			CancelView();
 		}
 
@@ -284,9 +284,9 @@ namespace AdminInterface.Controllers
 
 		public void CancelMessage(uint userId)
 		{
-			var message = UserMessage.Find(userId);
+			var message = DbSession.Load<UserMessage>(userId);
 			message.ShowMessageCount = 0;
-			message.Update();
+			DbSession.Save(message);
 			CancelView();
 		}
 
@@ -309,14 +309,14 @@ namespace AdminInterface.Controllers
 		public void AdditionalAddressInfo(uint addressId, string cssClassName)
 		{
 			CancelLayout();
-			PropertyBag["address"] = Address.Find(addressId);
+			PropertyBag["address"] = DbSession.Load<Address>(addressId);
 		}
 
 		public void SearchUsersForAddress(uint addressId, string searchText)
 		{
 			if (String.IsNullOrEmpty(searchText))
 				searchText = String.Empty;
-			var address = Address.Find(addressId);
+			var address = DbSession.Load<Address>(addressId);
 			var users = address.Client.Users.Where(user =>
 				((!String.IsNullOrEmpty(user.Name) && user.Name.ToLower().Contains(searchText.ToLower())) || (user.Login.ToLower().Contains(searchText.ToLower()))) &&
 					(!address.AvaliableFor(user)));
@@ -339,7 +339,7 @@ namespace AdminInterface.Controllers
 		public void ConnectUserToAddress(uint userId, uint addressId)
 		{
 			var user = DbSession.Load<User>(userId);
-			var address = Address.Find(addressId);
+			var address = DbSession.Load<Address>(addressId);
 			address.AvaliableForUsers.Add(user);
 			DbSession.SaveOrUpdate(address.Client);
 
@@ -349,7 +349,7 @@ namespace AdminInterface.Controllers
 		public void DisconnectUserFromAddress(uint userId, uint addressId)
 		{
 			var user = DbSession.Load<User>(userId);
-			var address = Address.Find(addressId);
+			var address = DbSession.Load<Address>(addressId);
 			var client = user.Client;
 
 			address.AvaliableForUsers.Remove(user);
@@ -361,25 +361,25 @@ namespace AdminInterface.Controllers
 		[return: JSONReturnBinder]
 		public string TotalSum(uint payerId)
 		{
-			return Payer.Find(payerId).PaymentSum.ToString("C");
+			return DbSession.Load<Payer>(payerId).PaymentSum.ToString("C");
 		}
 
 		public void JuridicalOrganizations(uint payerId, uint currentJuridicalOrganizationId)
 		{
-			var payer = Payer.Find(payerId);
+			var payer = DbSession.Load<Payer>(payerId);
 			PropertyBag["Payer"] = payer;
 			PropertyBag["tab"] = "juridicalOrganization";
 			PropertyBag["Addresses"] = payer.Addresses;
 			if (currentJuridicalOrganizationId > 0)
-				PropertyBag["currentJuridicalOrganization"] = LegalEntity.Find(currentJuridicalOrganizationId);
+				PropertyBag["currentJuridicalOrganization"] = DbSession.Load<LegalEntity>(currentJuridicalOrganizationId);
 		}
 
 		public void UpdateJuridicalOrganizationInfo([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] LegalEntity juridicalOrganization)
 		{
-			var organization = LegalEntity.Find(juridicalOrganization.Id);
+			var organization = DbSession.Load<LegalEntity>(juridicalOrganization.Id);
 			organization.Name = juridicalOrganization.Name;
 			organization.FullName = juridicalOrganization.FullName;
-			organization.Update();
+			DbSession.Save(organization);
 
 			Notify("Сохранено");
 			RedirectToReferrer();
@@ -388,9 +388,9 @@ namespace AdminInterface.Controllers
 		public void AddJuridicalOrganization([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NewRootInstanceIfInvalidKey)] LegalEntity legalEntity, uint payerId)
 		{
 			if(IsValid(legalEntity)) {
-				var payer = Payer.Find(payerId);
+				var payer = DbSession.Load<Payer>(payerId);
 				legalEntity.Payer = payer;
-				legalEntity.CreateAndFlush();
+				DbSession.Save(legalEntity);
 				Maintainer.LegalEntityCreated(legalEntity);
 
 				Notify("Юридическое лицо создано");

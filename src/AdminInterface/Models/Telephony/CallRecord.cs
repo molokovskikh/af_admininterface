@@ -15,7 +15,7 @@ namespace AdminInterface.Models.Telephony
 	}
 
 	[ActiveRecord("RecordCalls", Schema = "logs")]
-	public class CallRecord : ActiveRecordBase<CallRecord>
+	public class CallRecord
 	{
 		private IList<CallRecordFile> _files = null;
 

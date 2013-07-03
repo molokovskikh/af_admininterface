@@ -29,7 +29,7 @@ namespace Functional.Suppliers
 			user = DataMother.CreateSupplierUser();
 			supplier = (Supplier)user.RootService;
 			payer = DataMother.CreatePayer();
-			payer.Save();
+			session.Save(payer);
 		}
 
 		[Test]
@@ -152,7 +152,7 @@ namespace Functional.Suppliers
 				Name = "Test_Source",
 				SourceClassName = "Test_class_Name"
 			};
-			newCertificate.Save();
+			session.Save(newCertificate);
 			Flush();
 			browser.Button("editChangerButton").Click();
 			browser.SelectList(Find.ByName("sertificateSourceId")).SelectByValue(newCertificate.Id.ToString());
@@ -160,7 +160,7 @@ namespace Functional.Suppliers
 			AssertText("Сохранено");
 			session.Refresh(supplier);
 			Assert.That(supplier.GetSertificateSource().Name, Is.StringContaining("Test_Source"));
-			newCertificate.Delete();
+			session.Delete(newCertificate);
 		}
 
 		[Test]

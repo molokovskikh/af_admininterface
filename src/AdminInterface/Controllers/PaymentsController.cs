@@ -55,12 +55,12 @@ namespace AdminInterface.Controllers
 				var payment = new Payment();
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.OnlyNested);
 				payment.RegisterPayment();
-				payment.Save();
+				DbSession.Save(payment);
 				RedirectToReferrer();
 			}
 			else {
 				PropertyBag["recipients"] = DbSession.Query<Recipient>().OrderBy(r => r.Name).ToList();
-				PropertyBag["payments"] = Payment.Queryable
+				PropertyBag["payments"] = DbSession.Query<Payment>()
 					.Where(p => p.RegistredOn >= DateTime.Today)
 					.OrderBy(p => p.RegistredOn).ToList();
 			}
@@ -75,10 +75,10 @@ namespace AdminInterface.Controllers
 				//то получим двух плательщиков из разных сесей
 				//правим это
 				if (payment.Payer != null)
-					payment.Payer = Payer.Find(payment.Payer.Id);
+					payment.Payer = DbSession.Load<Payer>(payment.Payer.Id);
 
 				payment.RegisterPayment();
-				payment.Save();
+				DbSession.Save(payment);
 			}
 
 			RedirectToAction("Index",
@@ -148,8 +148,8 @@ namespace AdminInterface.Controllers
 
 		public void Delete(uint id)
 		{
-			var payment = Payment.Find(id);
-			payment.Delete();
+			var payment = DbSession.Load<Payment>(id);
+			DbSession.Delete(payment);
 			RedirectToReferrer();
 		}
 
@@ -162,7 +162,7 @@ namespace AdminInterface.Controllers
 
 		public void Edit(uint id)
 		{
-			var payment = Payment.TryFind(id);
+			var payment = DbSession.Load<Payment>(id);
 			if (IsPost) {
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
 				payment.DoUpdate();

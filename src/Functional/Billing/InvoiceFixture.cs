@@ -5,8 +5,10 @@ using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
+using Common.Web.Ui.NHibernateExtentions;
 using Functional.ForTesting;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
@@ -25,7 +27,7 @@ namespace Functional.Billing
 		{
 			payer = DataMother.CreatePayerForBillingDocumentTest();
 			invoice = new Invoice(payer, new Period(2011, Interval.January), new DateTime(2010, 12, 27));
-			invoice.Save();
+			session.Save(invoice);
 		}
 
 		[Test]
@@ -54,7 +56,7 @@ namespace Functional.Billing
 		[Test]
 		public void Show_predefine_invoice_positions()
 		{
-			Nomenclature.DeleteAll();
+			session.DeleteMany(session.Query<Nomenclature>().ToArray());
 			Save(new Nomenclature("Мониторинг оптового фармрынка за июль"));
 
 			Open(invoice, "Edit");
@@ -77,7 +79,7 @@ namespace Functional.Billing
 			Click("Сохранить");
 			AssertText("Сохранено");
 
-			invoice.Refresh();
+			session.Refresh(invoice);
 			Assert.That(invoice.Parts.Count, Is.EqualTo(2));
 			Assert.That(invoice.Parts[1].Name, Is.EqualTo("Статистические услуги"));
 			Assert.That(invoice.Parts[1].Cost, Is.EqualTo(1500));

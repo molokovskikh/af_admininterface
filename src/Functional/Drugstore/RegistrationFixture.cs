@@ -179,7 +179,7 @@ namespace Functional.Drugstore
 
 			var client = GetRegistredClient();
 			var user = client.Users.First();
-			var updateInfo = UserUpdateInfo.Find(user.Id);
+			var updateInfo = session.Load<UserUpdateInfo>(user.Id);
 			Assert.That(updateInfo.AFAppVersion, Is.EqualTo(705u));
 
 			Assert.That(client.Status, Is.EqualTo(ClientStatus.On));
@@ -210,7 +210,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void After_registration_prices_avaliable()
 		{
-			var supplier = DataMother.CreateSupplier(s => s.AddRegion(Region.Find(524288ul)));
+			var supplier = DataMother.CreateSupplier(s => s.AddRegion(session.Load<Region>(524288ul)));
 			Save(supplier);
 			Flush();
 

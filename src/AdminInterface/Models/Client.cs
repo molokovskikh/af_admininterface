@@ -562,7 +562,7 @@ where ClientId = :clientId")
 				//какая то фигня с загрузкой объектов
 				payer.Clients.Remove(payer.Clients.First(c => c.Id == Id));
 				if (payer.CanDelete(session))
-					payer.Delete();
+					session.Delete(payer);
 				else
 					payer.UpdatePaymentSum();
 			}
@@ -573,11 +573,11 @@ where ClientId = :clientId")
 				var overHaveSameSettins = ActiveRecordLinqBase<DrugstoreSettings>.Queryable.Any(s => s.Id != Id && s.SmartOrderRules == rule);
 				if (!overHaveSameSettins) {
 					Settings.SmartOrderRules = null;
-					rule.Delete();
+					session.Delete(rule);
 				}
 			}
 			AuditRecord.DeleteAuditRecords(this);
-			ActiveRecordMediator.Delete(this);
+			session.Delete(this);
 		}
 
 		public virtual IEnumerable<ModelAction> Actions

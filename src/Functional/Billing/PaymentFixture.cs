@@ -24,7 +24,7 @@ namespace Functional.Billing
 			payment = new Payment(payer);
 			payment.Sum = 800;
 			payment.RegisterPayment();
-			payment.Save();
+			session.Save(payment);
 		}
 
 		[Test]

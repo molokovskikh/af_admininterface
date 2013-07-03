@@ -128,7 +128,7 @@ namespace Functional.Drugstore
 			var client = DataMother.CreateTestClientWithUser();
 			var payer = client.Payers[0];
 			payer.JuridicalName = payer.JuridicalOrganizations[0].Name;
-			payer.Update();
+			session.Save(payer);
 			Flush();
 			var name = payer.JuridicalName;
 			AssetSearch(SearchUserBy.ByJuridicalName, name, client);
@@ -271,7 +271,7 @@ namespace Functional.Drugstore
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			var person = String.Format("testPerson{0}", client.Id);
 			client.Users[0].AddContactGroup();
-			client.Users[0].ContactGroup.Save();
+			session.Save(client.Users[0].ContactGroup);
 			client.Users[0].ContactGroup.AddPerson(person);
 			Flush();
 
@@ -313,7 +313,7 @@ namespace Functional.Drugstore
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			var person = String.Format("testPerson{0}", client.Id);
 			client.Users[0].AddContactGroup();
-			client.Users[0].ContactGroup.SaveAndFlush();
+			session.Save(client.Users[0].ContactGroup);
 			client.Users[0].ContactGroup.AddPerson(person);
 			Flush();
 

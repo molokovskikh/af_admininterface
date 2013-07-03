@@ -6,7 +6,7 @@ using Castle.Components.Validator;
 namespace AdminInterface.Models.Billing
 {
 	[ActiveRecord(Schema = "Billing"), Description("Номенклатура")]
-	public class Nomenclature : ActiveRecordLinqBase<Nomenclature>
+	public class Nomenclature
 	{
 		public Nomenclature()
 		{

@@ -45,9 +45,9 @@ namespace Integration.Controllers
 			user1 = client.Users[0];
 			user2 = client.Users[1];
 			user1.UserUpdateInfo.AFCopyId = "qwerty";
-			user1.UserUpdateInfo.Save();
+			session.Save(user1.UserUpdateInfo);
 			user2.UserUpdateInfo.AFCopyId = "12345";
-			user2.UserUpdateInfo.Save();
+			session.Save(user2.UserUpdateInfo);
 
 			controller.DoPasswordChange(user1.Id, "", false, true, false, "");
 
@@ -107,7 +107,7 @@ namespace Integration.Controllers
 		{
 			client = DataMother.CreateTestClientWithUser();
 			var payer = new Payer("Тестовый плательщик");
-			payer.Save();
+			session.Save(payer);
 			client.Payers.Add(payer);
 			session.SaveOrUpdate(client);
 			Request.Params.Add("user.Payer.Id", payer.Id.ToString());
@@ -126,7 +126,7 @@ namespace Integration.Controllers
 		{
 			client = DataMother.CreateTestClientWithUser();
 			var payer = new Payer("Тестовый плательщик");
-			payer.Save();
+			session.Save(payer);
 			client.Payers.Add(payer);
 			session.SaveOrUpdate(client);
 
@@ -148,7 +148,7 @@ namespace Integration.Controllers
 		{
 			client = DataMother.CreateTestClientWithUser();
 			var payer = new Payer("Тестовый плательщик");
-			payer.Save();
+			session.Save(payer);
 			client.Payers.Add(payer);
 			session.SaveOrUpdate(client);
 

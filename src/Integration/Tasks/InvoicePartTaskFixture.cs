@@ -27,10 +27,10 @@ namespace Integration.Tasks
 
 			processor.Execute();
 
-			payer.Refresh();
+			session.Refresh(payer);
 
 			Assert.That(payer.Balance, Is.EqualTo(-800));
-			invoice.Refresh();
+			session.Refresh(invoice);
 			Assert.That(invoice.Parts[0].Processed, Is.True);
 		}
 
@@ -42,7 +42,7 @@ namespace Integration.Tasks
 			processor.Execute();
 
 			Assert.That(payer.Balance, Is.EqualTo(0));
-			invoice.Refresh();
+			session.Refresh(invoice);
 			Assert.That(invoice.Parts[0].Processed, Is.False);
 		}
 
@@ -54,7 +54,7 @@ namespace Integration.Tasks
 			var invoice = invoices.Single();
 			Assert.That(invoice.Sum, Is.EqualTo(800));
 
-			invoice.Save();
+			session.Save(invoice);
 
 			return invoice;
 		}

@@ -30,7 +30,6 @@ namespace AdminInterface.Models.Logs
 		public static RejectedEmail[] Find(string pattern, DateTime fromDate, DateTime toDate)
 		{
 			return FindAll(Order.Asc("LogTime"),
-				//Expression.Between("LogTime", fromDate, toDate.Add(new TimeSpan(23, 59, 59)))
 				(Expression.Ge("LogTime", fromDate)
 					&& Expression.Le("LogTime", toDate.Add(new TimeSpan(23, 59, 59)))
 					&& (Expression.Like("From", pattern, MatchMode.Anywhere)

@@ -21,7 +21,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(operation, "operation");
 				if (IsValid(operation)) {
 					Notify("Сохранено");
-					operation.Save();
+					DbSession.Save(operation);
 					RedirectToReferrer();
 				}
 			}
@@ -30,7 +30,7 @@ namespace AdminInterface.Controllers
 		public void Delete(uint id)
 		{
 			var operation = DbSession.Load<BalanceOperation>(id);
-			operation.Delete();
+			DbSession.Delete(operation);
 
 			Notify("Удалено");
 			RedirectTo(operation.Payer);

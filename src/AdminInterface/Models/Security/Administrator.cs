@@ -97,11 +97,6 @@ namespace AdminInterface.Models.Security
 
 		public void Delete()
 		{
-			var user = ActiveRecordLinqBase<RedmineUser>.Queryable.Where(r => r.Login == UserName).FirstOrDefault();
-			if (user != null) {
-				user.Status = 3;
-				user.Update();
-			}
 			ActiveRecordMediator<Administrator>.Delete(this);
 		}
 

@@ -92,7 +92,7 @@ namespace Integration.Controllers
 			payer.Name = "Фарм-друган";
 			payer.JuridicalOrganizations[0].Name = "ООО Фарм-друган";
 			client.Payers.Add(payer);
-			payer.Save();
+			session.Save(payer);
 			session.SaveOrUpdate(client);
 			Flush();
 

@@ -24,7 +24,7 @@ namespace Integration.Models
 				Name = "тараканов и сыновья",
 				Payer = client.Payers.First()
 			};
-			org.Save();
+			session.Save(org);
 			Maintainer.LegalEntityCreated(org);
 			var count = ArHelper.WithSession(s =>
 				s.CreateSQLQuery(@"select count(*) from Customers.Intersection where LegalEntityId = :LegalEntityId")

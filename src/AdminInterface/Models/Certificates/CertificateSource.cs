@@ -16,7 +16,7 @@ using NHibernate.Linq;
 namespace AdminInterface.Models.Certificates
 {
 	[ActiveRecord(Schema = "documents", Lazy = true), Auditable]
-	public class CertificateSource : ActiveRecordLinqBase<CertificateSource>
+	public class CertificateSource
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }

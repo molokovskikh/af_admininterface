@@ -76,7 +76,7 @@ namespace Integration.Models
 			var payer = client.Payers.First();
 			var recipient = session.Query<Recipient>().First();
 			payer.Recipient = recipient;
-			payer.SaveAndFlush();
+			session.Save(payer);
 
 			var items = new PayerFilter {
 				SearchBy = SearchBy.PayerId,
@@ -130,7 +130,7 @@ namespace Integration.Models
 			var payer = client.Payers.First();
 			var recipient = session.Query<Recipient>().First();
 			payer.Recipient = recipient;
-			payer.Save();
+			session.Save(payer);
 
 			var items = new PayerFilter {
 				Recipient = session.Query<Recipient>().First()
@@ -144,7 +144,7 @@ namespace Integration.Models
 			var client = DataMother.CreateTestClientWithUser();
 			var payer = client.Payers.First();
 			payer.AutoInvoice = InvoiceType.Auto;
-			payer.SaveAndFlush();
+			session.Save(payer);
 
 			var items = new PayerFilter { InvoiceType = InvoiceType.Manual }.Find();
 			Assert.That(items.Any(i => i.PayerId == payer.Id), Is.False,
@@ -157,7 +157,7 @@ namespace Integration.Models
 			var client = DataMother.CreateTestClientWithUser();
 			var payer = client.Payers.First();
 			payer.INN = DataMother.RandomInn();
-			payer.SaveAndFlush();
+			session.Save(payer);
 
 			var items = new PayerFilter { SearchText = payer.INN, SearchBy = SearchBy.Inn, ClientStatus = SearchClientStatus.All }.Find();
 			Assert.That(items.Count, Is.EqualTo(1));
@@ -171,7 +171,7 @@ namespace Integration.Models
 			var payer = client.Payers.First();
 			var address = client.Addresses.First();
 			address.Value = address.Value + " " + address.Id;
-			address.SaveAndFlush();
+			session.Save(address);
 			session.SaveOrUpdate(client);
 
 			var items = new PayerFilter { SearchText = address.Value, SearchBy = SearchBy.Address }.Find();

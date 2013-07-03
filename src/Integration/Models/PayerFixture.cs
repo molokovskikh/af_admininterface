@@ -88,7 +88,7 @@ namespace Integration.Models
 			session.Save(payer);
 			session.Save(report);
 
-			payer.Refresh();
+			session.Refresh(payer);
 			Assert.That(payer.TotalSum, Is.EqualTo(1500));
 		}
 

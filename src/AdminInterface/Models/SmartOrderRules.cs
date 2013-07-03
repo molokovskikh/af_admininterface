@@ -26,7 +26,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord("smart_order_rules", Schema = "ordersendrules", Lazy = true), Auditable]
-	public class SmartOrderRules : ActiveRecordLinqBase<SmartOrderRules>, IMultiAuditable
+	public class SmartOrderRules : IMultiAuditable
 	{
 		private string _columnSeparator;
 

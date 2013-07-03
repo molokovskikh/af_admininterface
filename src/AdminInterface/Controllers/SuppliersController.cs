@@ -24,6 +24,7 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -98,13 +99,13 @@ namespace AdminInterface.Controllers
 
 		public void ChangePayer(uint supplierId, uint payerId)
 		{
-			var suplier = Supplier.Find(supplierId);
+			var suplier = DbSession.Load<Supplier>(supplierId);
 
 			SecurityContext.Administrator.CheckRegion(suplier.HomeRegion.Id);
 			if (!SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers))
 				throw new NotHavePermissionException();
 
-			var payer = Payer.Find(payerId);
+			var payer = DbSession.Load<Payer>(payerId);
 			suplier.ChangePayer(payer);
 
 			Notify("Изменено");
@@ -124,19 +125,19 @@ namespace AdminInterface.Controllers
 		[ManualAuditable]
 		public void ChangeSertificateSource(uint supplierId, uint sertificateSourceId)
 		{
-			var supplier = Supplier.Find(supplierId);
-			var oldSource = CertificateSource.Queryable.Where(c => c.Suppliers.Contains(supplier)).ToList();
+			var supplier = DbSession.Load<Supplier>(supplierId);
+			var oldSource = DbSession.Query<CertificateSource>().Where(c => c.Suppliers.Contains(supplier)).ToList();
 			var logMessage = new StringBuilder();
 			oldSource.ForEach(s => {
 				s.Suppliers.Remove(supplier);
 				logMessage.AppendLine(string.Format("Удален источник сертификатов {0}", s.GetName()));
-				s.Save();
+				DbSession.Save(s);
 			});
 			if (sertificateSourceId > 0) {
-				var sertSource = CertificateSource.Find(sertificateSourceId);
+				var sertSource = DbSession.Load<CertificateSource>(sertificateSourceId);
 				sertSource.Suppliers.Add(supplier);
 				logMessage.AppendLine(string.Format("Установлен источник сертификатов {0}", sertSource.GetName()));
-				sertSource.Save();
+				DbSession.Save(sertSource);
 			}
 			Notify("Сохранено");
 
@@ -149,7 +150,7 @@ namespace AdminInterface.Controllers
 		public object[] GetCertificateSourses()
 		{
 			Func<CertificateSource, string> predicate = c => !string.IsNullOrEmpty(c.Name) ? c.Name : c.SourceClassName;
-			return CertificateSource.Queryable.ToList()
+			return DbSession.Query<CertificateSource>().ToList()
 				.OrderBy(predicate)
 				.Select(c => new { c.Id, Name = predicate(c) })
 				.ToArray();

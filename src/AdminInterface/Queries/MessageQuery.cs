@@ -38,7 +38,7 @@ namespace AdminInterface.Queries
 				.Fetch(l => l.Administrator)
 				.ToList();
 			return userAudit.Concat(
-				ForPayer(user.Payer)
+				ForPayer(user.Payer, session)
 					.Where(u => !(u.ShowOnlyPayer && u.Type == LogObjectType.User && u.ObjectId == user.Id)))
 				.OrderByDescending(o => o.WriteTime)
 				.ToList();
@@ -53,7 +53,7 @@ namespace AdminInterface.Queries
 				.Fetch(l => l.Administrator)
 				.ToList();
 			return userAudit.Concat(
-				ForPayer(user.Payer)
+				ForPayer(user.Payer, session)
 					.Where(u => !(u.ShowOnlyPayer && u.Type == LogObjectType.User && u.ObjectId == user.Id)))
 				.OrderByDescending(o => o.WriteTime).ToList();
 		}
@@ -68,24 +68,24 @@ namespace AdminInterface.Queries
 				.ToList();
 			if (service.IsClient()) {
 				return serviceAudit.Concat(
-					((Client)service).Payers.SelectMany(p => ForPayer(p)
+					((Client)service).Payers.SelectMany(p => ForPayer(p, session)
 						.Where(u => !(u.ShowOnlyPayer && u.Type == LogObjectType.Client && u.ObjectId == service.Id))))
 					.OrderByDescending(o => o.WriteTime)
 					.ToList();
 			}
 			else {
 				return serviceAudit.Concat(
-					ForPayer(((Supplier)service).Payer)
+					ForPayer(((Supplier)service).Payer, session)
 						.Where(u => !(u.ShowOnlyPayer && u.Type == LogObjectType.Supplier && u.ObjectId == service.Id)))
 					.OrderByDescending(o => o.WriteTime)
 					.ToList();
 			}
 		}
 
-		public IList<AuditRecord> ForPayer(Payer payer)
+		public IList<AuditRecord> ForPayer(Payer payer, ISession session)
 		{
 			if (payer != null && Types.Contains(LogMessageType.Payer)) {
-				var payerMessages = AuditLogRecord.GetLogs(payer, false);
+				var payerMessages = AuditLogRecord.GetLogs(session, payer, false);
 				return payerMessages.Select(m => new AuditRecord {
 					Message = m.Message,
 					ObjectId = m.ObjectId,

@@ -18,7 +18,7 @@ namespace Integration
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			payer.Name = "Тестовый плательщик " + payer.Id;
 			var payment = new Payment(payer, DateTime.Now, 800);
-			payment.SaveAndFlush();
+			session.Save(payment);
 			var filter = new PaymentFilter {
 				SearchText = "Тестовый плательщик " + payer.Id
 			};

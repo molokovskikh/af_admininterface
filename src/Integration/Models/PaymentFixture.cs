@@ -87,7 +87,7 @@ namespace Integration.Models
 			payment.Sum = 800;
 			payment.ForAd = true;
 			payment.AdSum = 800;
-			payment.SaveAndFlush();
+			session.Save(payment);
 
 			Assert.That(payment.Ad, Is.Not.Null);
 			Assert.That(payment.Ad.Payer, Is.EqualTo(payer));
@@ -101,13 +101,13 @@ namespace Integration.Models
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var payment = new Payment(payer);
 			payment.Sum = 800;
-			payment.SaveAndFlush();
+			session.Save(payment);
 			var ad = new Advertising(payer, 600);
 			payer.Ads.Add(ad);
-			payer.SaveAndFlush();
+			session.Save(payer);
 			payment.ForAd = true;
 			payment.AdSum = 800;
-			payment.SaveAndFlush();
+			session.Save(payment);
 			Assert.That(payment.Ad.Id, Is.EqualTo(ad.Id));
 
 			//хак для борьбы с хаком, строчка ниже что бы избежать ошибки
@@ -122,7 +122,7 @@ namespace Integration.Models
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var payment = new Payment(payer);
 			payment.Sum = 800;
-			payment.SaveAndFlush();
+			session.Save(payment);
 			Assert.That(payer.Balance, Is.EqualTo(800));
 		}
 
@@ -140,7 +140,7 @@ namespace Integration.Models
 			var recipient = session.Query<Recipient>().First();
 			payer.INN = DataMother.RandomInn();
 			new IgnoredInn(payer.INN).Save();
-			payer.SaveAndFlush();
+			session.Save(payer);
 
 			var payments = new List<Payment> {
 				new Payment {
@@ -160,7 +160,7 @@ namespace Integration.Models
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var recipient = session.Query<Recipient>().First();
 			payer.INN = DataMother.RandomInn();
-			payer.SaveAndFlush();
+			session.Save(payer);
 
 			var payments = new List<Payment> {
 				new Payment {

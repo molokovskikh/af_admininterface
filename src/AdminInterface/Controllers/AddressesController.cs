@@ -79,7 +79,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void Edit(uint id)
 		{
-			var address = Address.Find(id);
+			var address = DbSession.Load<Address>(id);
 			PropertyBag["address"] = address;
 			PropertyBag["client"] = address.Client;
 			PropertyBag["EmailContactType"] = ContactType.Email;
@@ -101,7 +101,7 @@ namespace AdminInterface.Controllers
 				this.Mailer().AddressMoved(address, address.Client, oldLegalEntity).Send();
 			}
 
-			address.Update();
+			DbSession.Save(address);
 			if (address.IsChanged(a => a.LegalEntity)) {
 				address.MoveAddressIntersection(address.Client, address.LegalEntity,
 					address.Client, oldLegalEntity);
@@ -114,7 +114,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void Notify(uint id)
 		{
-			var address = Address.Find(id);
+			var address = DbSession.Load<Address>(id);
 			new Mailer(DbSession).NotifySupplierAboutAddressRegistration(address, Defaults);
 			Mailer.AddressRegistrationResened(address);
 			DbSession.Save(new AuditRecord(string.Format("Разослано повторное уведомление о регистрации адреса {0}", address.Name), address));

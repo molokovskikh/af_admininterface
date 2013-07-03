@@ -15,12 +15,12 @@ namespace Integration.Models
 			operation.Type = OperationType.DebtRelief;
 			operation.Description = "Возврат средств";
 			operation.Sum = 1000;
-			operation.Save();
+			session.Save(operation);
 
 			Flush();
 			Reopen();
 
-			payer = Payer.Find(payer.Id);
+			payer = session.Load<Payer>(payer.Id);
 			Assert.That(payer.Balance, Is.EqualTo(1000));
 		}
 	}

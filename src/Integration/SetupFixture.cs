@@ -4,6 +4,7 @@ using AddUser;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support;
@@ -27,13 +28,17 @@ namespace Integration
 				RegionMask = ulong.MaxValue,
 				ManagerName = "test",
 			};
-			admin.AllowedPermissions = Enum.GetValues(typeof(PermissionType))
-				.Cast<PermissionType>()
-				.Select(t => Permission.Find(t))
-				.ToList();
-			ActiveRecordMediator.Save(admin);
-			SecurityContext.GetAdministrator = () => admin;
-			Administrator.GetHost = () => "localhost";
+			using(new SessionScope()) {
+				ArHelper.WithSession(session => {
+					admin.AllowedPermissions = Enum.GetValues(typeof(PermissionType))
+						.Cast<PermissionType>()
+						.Select(t => session.Load<Permission>(t))
+						.ToList();
+					ActiveRecordMediator.Save(admin);
+					SecurityContext.GetAdministrator = () => admin;
+					Administrator.GetHost = () => "localhost";
+				});
+			}
 		}
 	}
 }

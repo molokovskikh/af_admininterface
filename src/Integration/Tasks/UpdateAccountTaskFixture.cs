@@ -34,7 +34,7 @@ namespace Integration.Tasks
 			MakeUpdates(user, 11);
 			Check();
 			session.Refresh(user);
-			user.Payer.Refresh();
+			session.Refresh(user.Payer);
 			Assert.That(user.Accounting.ReadyForAccounting, Is.True);
 			Assert.That(user.Payer.PaymentSum, Is.EqualTo(800));
 		}
@@ -72,18 +72,18 @@ namespace Integration.Tasks
 		public void Do_check_for_newly_join_addresses()
 		{
 			var address = user.Client.AddAddress("Тестовый адрес доставки");
-			address.Save();
+			session.Save(address);
 			MakeUpdates(user, 10);
 			Check();
-			address.Refresh();
+			session.Refresh(address);
 			Assert.That(address.Accounting.ReadyForAccounting, Is.False);
 
-			address.Refresh();
+			session.Refresh(address);
 			user.AvaliableAddresses.Add(address);
 			session.SaveOrUpdate(user);
 
 			Check();
-			address.Refresh();
+			session.Refresh(address);
 			Assert.That(address.Accounting.ReadyForAccounting, Is.True);
 		}
 

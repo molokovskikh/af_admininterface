@@ -584,7 +584,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 						var rule = GetExistRule(supplier, row);
 						if (rule == null)
 							continue;
-						rule.Delete();
+						DbSession.Delete(rule);
 						supplier.OrderRules.Remove(rule);
 						break;
 					}

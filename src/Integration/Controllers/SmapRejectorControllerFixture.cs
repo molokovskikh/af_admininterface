@@ -22,22 +22,22 @@ namespace Integration.Controllers
 			PrepareController(controller);
 			RejectedEmail.Queryable
 				.Where(r => r.LogTime >= DateTime.Today.AddDays(-1))
-				.Each(r => r.Delete());
+				.Each(r => session.Delete(r));
 
 			RejectedEmail.Queryable
 				.Where(r => r.LogTime >= new DateTime(2008, 10, 1) && r.LogTime <= new DateTime(2008, 10, 4))
-				.Each(r => r.Delete());
+				.Each(r => session.Delete(r));
 		}
 
 		[Test]
 		public void Show_method_should_return_rejected_messages_for_current_day()
 		{
 			var mail1 = new RejectedEmail { SmtpId = 64789, Comment = "нафиг", LogTime = DateTime.Now, From = "tech@analit.net", Subject = "test" };
-			mail1.SaveAndFlush();
+			session.Save(mail1);
 			var mail2 = new RejectedEmail { SmtpId = 65469, Comment = "еще нафиг", LogTime = DateTime.Now, From = "tech@analit.net", Subject = "test" };
-			mail2.SaveAndFlush();
+			session.Save(mail2);
 			var mail3 = new RejectedEmail { SmtpId = 64619, Comment = "снова нафиг", LogTime = DateTime.Now.AddDays(-1), From = "tech@analit.net", Subject = "test" };
-			mail3.SaveAndFlush();
+			session.Save(mail3);
 
 			controller.Show();
 
@@ -53,15 +53,15 @@ namespace Integration.Controllers
 		public void Search_should_find_rejects_with_given_text_in_from_and_subject_for_given_period()
 		{
 			var mail1 = new RejectedEmail { SmtpId = 64789, Comment = "нафиг", LogTime = new DateTime(2008, 10, 1, 12, 10, 00), From = "test@analit.net", Subject = "Самоучитель Windows Vista" };
-			mail1.SaveAndFlush();
+			session.Save(mail1);
 			var mail2 = new RejectedEmail { SmtpId = 65469, Comment = "нафиг", LogTime = new DateTime(2008, 10, 3, 15, 40, 00), From = "tech@analit.net", Subject = "Увеличение объемов продаж test" };
-			mail2.SaveAndFlush();
+			session.Save(mail2);
 			var mail3 = new RejectedEmail { SmtpId = 4613, Comment = "нафиг", LogTime = new DateTime(2008, 10, 2, 13, 1, 00), From = "tech@analit.net", Subject = "Увеличение объемов продаж" };
-			mail3.SaveAndFlush();
+			session.Save(mail3);
 			var mail4 = new RejectedEmail { SmtpId = 4634, Comment = "нафиг", LogTime = new DateTime(2008, 9, 30, 12, 10, 0), From = "test@analit.net", Subject = "Увеличение объемов продаж" };
-			mail4.SaveAndFlush();
+			session.Save(mail4);
 			var mail5 = new RejectedEmail { SmtpId = 4497, Comment = "нафиг", LogTime = new DateTime(2008, 10, 4, 8, 10, 0), From = "test@analit.net", Subject = "Увеличение объемов продаж" };
-			mail5.SaveAndFlush();
+			session.Save(mail5);
 
 			controller.Search("test", new DateTime(2008, 10, 1), new DateTime(2008, 10, 3));
 

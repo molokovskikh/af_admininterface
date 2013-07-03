@@ -9,6 +9,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models.Audit;
+using NHibernate;
 
 namespace AdminInterface.Models.Billing
 {
@@ -31,34 +32,6 @@ namespace AdminInterface.Models.Billing
 
 		public bool ShowOnlyPayer { get; set; }
 
-		private static AuditLogRecord GetLogRecord(ClientLogRecord clientLogRecord)
-		{
-			var log = new AuditLogRecord {
-				ObjectId = clientLogRecord.Client.Id,
-				LogTime = clientLogRecord.LogTime,
-				LogType = LogObjectType.Client,
-				OperatorName = clientLogRecord.OperatorName,
-				Message = ViewHelper.HumanReadableStatus(clientLogRecord.ClientStatus.HasValue && clientLogRecord.ClientStatus.Value.Equals(ClientStatus.On)),
-				Name = clientLogRecord.Client.Name,
-				Comment = clientLogRecord.Comment
-			};
-			return log;
-		}
-
-		private static AuditLogRecord GetLogRecord(SupplierLog supplierLog)
-		{
-			var log = new AuditLogRecord {
-				ObjectId = supplierLog.Supplier.Id,
-				LogTime = supplierLog.LogTime,
-				LogType = LogObjectType.Supplier,
-				OperatorName = supplierLog.OperatorName,
-				Message = ViewHelper.HumanReadableStatus(!supplierLog.Disabled.Value),
-				Name = supplierLog.Supplier.Name,
-				Comment = supplierLog.Comment
-			};
-			return log;
-		}
-
 		private static AuditLogRecord GetLogRecord(AddressLogRecord addressLogRecord)
 		{
 			var log = new AuditLogRecord {
@@ -73,23 +46,9 @@ namespace AdminInterface.Models.Billing
 			return log;
 		}
 
-		private static AuditLogRecord GetLogRecord(UserLogRecord userLogRecord)
+		public static IList<AuditLogRecord> GetLogs(ISession session, Payer payer, bool showOtherRecords)
 		{
-			var log = new AuditLogRecord {
-				ObjectId = userLogRecord.User.Id,
-				LogTime = userLogRecord.LogTime,
-				LogType = LogObjectType.User,
-				OperatorName = userLogRecord.OperatorName,
-				Message = ViewHelper.HumanReadableStatus(userLogRecord.Enabled.HasValue && userLogRecord.Enabled.Value),
-				Name = userLogRecord.User.GetLoginOrName(),
-				Comment = userLogRecord.Comment
-			};
-			return log;
-		}
-
-		public static IList<AuditLogRecord> GetLogs(Payer payer, bool showOtherRecords)
-		{
-			var addressLogs = AddressLogRecord.GetLogs(payer.Addresses);
+			var addressLogs = AddressLogRecord.GetLogs(session, payer.Addresses);
 			var auditLogs = PayerAuditRecord.Find(payer);
 
 			var logs = addressLogs.Select(log => GetLogRecord(log));

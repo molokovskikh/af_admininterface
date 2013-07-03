@@ -7,7 +7,7 @@ using Castle.Components.Validator;
 namespace AdminInterface.Models.Billing
 {
 	[ActiveRecord(Schema = "Billing", Lazy = true)]
-	public class LegalEntity : ActiveRecordLinqBase<LegalEntity>
+	public class LegalEntity
 	{
 		public LegalEntity()
 		{

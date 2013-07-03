@@ -42,7 +42,7 @@ namespace Integration.Models
 			session.Save(ad);
 
 			Reopen();
-			payer = Payer.Find(payer.Id);
+			payer = session.Load<Payer>(payer.Id);
 			var invoices = payer.BuildInvoices(DateTime.Now, DateTime.Now.ToPeriod());
 			var invoice = invoices.First();
 			Close();

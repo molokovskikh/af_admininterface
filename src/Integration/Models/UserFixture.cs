@@ -114,7 +114,7 @@ namespace Integration.Models
 			user.Enabled = false;
 			Assert.That(user.CanDelete(session), Is.True);
 			Flush();
-			user.Delete();
+			session.Delete(user);
 			Flush();
 		}
 
@@ -129,7 +129,7 @@ namespace Integration.Models
 
 			Assert.That(user.CanDelete(session), Is.True);
 			Flush();
-			user.Delete();
+			session.Delete(user);
 			Flush();
 		}
 

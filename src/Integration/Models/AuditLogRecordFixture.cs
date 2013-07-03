@@ -35,7 +35,7 @@ namespace Integration.Models
 			session.SaveOrUpdate(user);
 			Flush();
 
-			var logs = AuditLogRecord.GetLogs(user.Payer, false);
+			var logs = AuditLogRecord.GetLogs(session, user.Payer, false);
 			Assert.That(logs.Count, Is.GreaterThan(0), logs.Implode(l => l.Message));
 			Assert.AreEqual("Изменено 'Платеж' было '800' стало '1000'", logs[0].Message, logs.Implode());
 		}
@@ -47,7 +47,7 @@ namespace Integration.Models
 
 			payer.Comment += "\r\nтестовое сообщение";
 			payer.CheckCommentChangesAndLog(mailer);
-			payer.Save();
+			session.Save(payer);
 			Flush();
 
 			var logs = new MessageQuery(LogMessageType.Stat).Execute(_client, session);
@@ -69,7 +69,7 @@ namespace Integration.Models
 			payer.Clients.Add(client1);
 			payer.Comment += "\r\nтестовое сообщение";
 			payer.CheckCommentChangesAndLog(mailer);
-			payer.Save();
+			session.Save(payer);
 			Flush();
 
 			var logs = new MessageQuery(LogMessageType.Stat).Execute(_client, session);

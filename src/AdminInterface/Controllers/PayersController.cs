@@ -56,7 +56,7 @@ namespace AdminInterface.Controllers
 			if (!HasValidationError(payment)) {
 				Notify("Сохранено");
 				payment.RegisterPayment();
-				payment.Save();
+				DbSession.Save(payment);
 			}
 			else {
 				Error(GetFirstErrorWithProperty(payment));
@@ -117,14 +117,14 @@ namespace AdminInterface.Controllers
 			var payer = DbSession.Load<Payer>(id);
 			var invoice = new Invoice(payer);
 			PropertyBag["invoice"] = invoice;
-			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
+			PropertyBag["references"] = DbSession.Query<Nomenclature>().OrderBy(n => n.Name).ToList();
 
 			if (IsPost) {
 				BindObjectInstance(invoice, "invoice");
 				if (!HasValidationError(invoice)) {
 					invoice.SetPayer(payer);
 					invoice.CalculateSum();
-					invoice.Save();
+					DbSession.Save(invoice);
 					Notify("Счет сформирован");
 					Redirect("Billing", "Edit", new { BillingCode = payer.Id });
 				}
@@ -139,14 +139,14 @@ namespace AdminInterface.Controllers
 			var payer = DbSession.Load<Payer>(id);
 			var act = new Act(payer, DateTime.Now);
 			PropertyBag["act"] = act;
-			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
+			PropertyBag["references"] = DbSession.Query<Nomenclature>().OrderBy(n => n.Name).ToList();
 
 			if (IsPost) {
 				BindObjectInstance(act, "act");
 				if (IsValid(act)) {
 					act.SetPayer(payer);
 					act.CalculateSum();
-					act.Save();
+					DbSession.Save(act);
 					Notify("Акт сформирован");
 					Redirect("Billing", "Edit", new { BillingCode = payer.Id });
 				}

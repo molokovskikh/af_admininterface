@@ -9,7 +9,7 @@ namespace AdminInterface.Background
 	{
 		protected override void Process()
 		{
-			var state = ReportLogProcessorState.Queryable.FirstOrDefault();
+			var state = Session.Query<ReportLogProcessorState>().FirstOrDefault();
 			if (state == null)
 				state = new ReportLogProcessorState();
 
@@ -38,7 +38,7 @@ where l.LogTime >= :begin and l.PayerId is not null")
 				payer.UpdatePaymentSum();
 				payer.Save();
 			}
-			state.Save();
+			Session.Save(state);
 		}
 	}
 }

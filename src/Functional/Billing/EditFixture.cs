@@ -44,7 +44,7 @@ namespace Functional.Billing
 			selectList.SelectByValue(items[0].Value);
 			browser.TableCell("savePayer").Buttons.First().Click();
 			Flush();
-			_payer.Refresh();
+			session.Refresh(_payer);
 			Assert.IsNull(_payer.Recipient);
 		}
 
@@ -57,7 +57,7 @@ namespace Functional.Billing
 			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
 			ConfirmDialog();
 			Thread.Sleep(1000);
-			browser.Refresh();
+			session.Refresh(browser);
 			AssertText("TestComment");
 		}
 
@@ -75,7 +75,7 @@ namespace Functional.Billing
 			Assert.IsFalse(accounted.Enabled);
 			Assert.That(browser.Text, !Is.StringContaining("Это поле необходимо заполнить."));
 			AssertText(DateTime.Now.AddMonths(1).ToShortDateString());
-			browser.Refresh();
+			session.Refresh(browser);
 			AssertText("Check_free_accounting");
 			AssertText(DateTime.Now.AddMonths(1).ToShortDateString());
 		}
@@ -88,7 +88,7 @@ namespace Functional.Billing
 			Css("#reports input[name=status]").Checked = false;
 			Css("input[name=AddComment]").AppendText("Check_report_status_test");
 			ConfirmDialog();
-			browser.Refresh();
+			session.Refresh(browser);
 			AssertText("Check_report_status_test");
 		}
 

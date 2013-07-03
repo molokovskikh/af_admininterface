@@ -20,7 +20,7 @@ namespace Functional.Billing
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, new Period(2011, Interval.January), new DateTime(2011, 1, 11));
-			invoice.Save();
+			session.Save(invoice);
 			new Payment { Payer = payer, Recipient = payer.Recipient, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800 }.Save();
 
 			Open(payer);
@@ -35,7 +35,7 @@ namespace Functional.Billing
 		public void Show_error_on_revision_act_in_not_configured_payer()
 		{
 			var payer = DataMother.CreatePayer();
-			payer.Save();
+			session.Save(payer);
 
 			Open(payer);
 			AssertText("Плательщик");

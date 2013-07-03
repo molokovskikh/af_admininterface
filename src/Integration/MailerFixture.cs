@@ -68,7 +68,7 @@ namespace Integration
 		public void Enable_changed()
 		{
 			//просто сконструированный клиент больше не подходит
-			//тк в методе есть хак var client = Client.Find(((Service)item).Id); //(Client) item;
+			//тк в методе есть хак var client = session.Load<Client>(((Service)item).Id); //(Client) item;
 			//хибер конструирует прокси для item наследуя ее от Service тк он не знает кто это будет Client или Supplier
 			//что бы обойти это и нужен хак, возможно есть какой то правильный способ что бы
 			//хибер конструировал правельные прокми но я его не знаю
@@ -353,7 +353,7 @@ namespace Integration
 			var invoice = new Invoice(payer, new Period(2011, Interval.January), new DateTime(2010, 12, 27));
 			var group = invoice.Payer.ContactGroupOwner.AddContactGroup(ContactGroupType.Invoice);
 			group.AddContact(ContactType.Email, "kvasovtest@analit.net");
-			invoice.Save();
+			session.Save(invoice);
 			return invoice;
 		}
 	}

@@ -78,7 +78,6 @@ namespace AdminInterface.Controllers
 			if (countAccessibleRegions == accessibleRegions.Count())
 				admin.RegionMask = UInt64.MaxValue;
 			DbSession.Save(admin);
-			DbSession.Save(new RedmineUser(admin));
 			var isLoginCreated = CreateUserInAD(admin);
 
 			UpdateAd(administrator, weekLogonHours);

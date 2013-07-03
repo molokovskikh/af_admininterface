@@ -17,7 +17,7 @@ namespace Integration
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, new Period(2010, Interval.December), DateTime.Now);
-			invoice.Save();
+			session.Save(invoice);
 			var filter = new PayerDocumentFilter { Region = payer.Clients.First().HomeRegion };
 			var invoices = filter.Find<Invoice>();
 
@@ -31,9 +31,9 @@ namespace Integration
 			var payer1 = DataMother.CreatePayerForBillingDocumentTest();
 			var payer2 = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice1 = new Invoice(payer1, new Period(2010, Interval.December), DateTime.Now);
-			invoice1.Save();
+			session.Save(invoice1);
 			var invoice2 = new Invoice(payer2, new Period(2010, Interval.December), DateTime.Now);
-			invoice2.Save();
+			session.Save(invoice2);
 
 			var filter = new PayerDocumentFilter {
 				SearchText = new[] { payer1, payer2 }.Implode(p => p.PayerID)

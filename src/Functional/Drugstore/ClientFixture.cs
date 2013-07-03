@@ -84,14 +84,14 @@ namespace Functional.Drugstore
 			ClickButton("Принять");
 
 			browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", client.Users[1].Id)));
-			browser.Refresh();
+			session.Refresh(browser);
 			AssertText("This message for client");
 			Assert.That(browser.Text, Is.Not.StringContaining("This message for user1"));
 			browser.TextField(Find.ByName("message")).TypeText("This message for user2");
 			ClickButton("Принять");
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
-			browser.Refresh();
+			session.Refresh(browser);
 			AssertText("This message for user1");
 			AssertText("This message for user2");
 			AssertText("This message for client");
@@ -106,7 +106,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("message")).TypeText("This message for user1");
 			ClickButton("Принять");
 			Open(client);
-			browser.Refresh();
+			session.Refresh(browser);
 
 			Assert.IsTrue(browser.Link(Find.ByText("Дата")).Exists);
 			Assert.IsTrue(browser.Link(Find.ByText("Оператор")).Exists);
@@ -164,7 +164,7 @@ namespace Functional.Drugstore
 			organizaion.Name = "JuridicalOrganization";
 			session.Save(organizaion);
 			Flush();
-			browser.Refresh();
+			session.Refresh(browser);
 			Click(organizaion.Name);
 			AssertText("Краткое наименование");
 			AssertText(organizaion.Name);
@@ -182,7 +182,7 @@ namespace Functional.Drugstore
 			browser.TextField("JuridicalOrganization_FullName").AppendText("new_JuridicalOrganization_FullName");
 			Click("Создать");
 			AssertText("Юридическое лицо создано");
-			browser.Refresh();
+			session.Refresh(browser);
 			Open(client);
 			session.Refresh(client);
 			var organ = session.QueryOver<LegalEntity>().Where(e => e.Name == "new_JuridicalOrganization_name").List().Last();
@@ -200,7 +200,7 @@ namespace Functional.Drugstore
 		{
 			var payer = DataMother.CreatePayer();
 			payer.INN = "123321123";
-			payer.Save();
+			session.Save(payer);
 			payer.Name = "Тестовый плательщик " + payer.Id;
 			Flush();
 

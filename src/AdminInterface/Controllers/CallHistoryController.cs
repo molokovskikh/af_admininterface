@@ -40,7 +40,7 @@ namespace AdminInterface.Controllers
 			var files = Directory.GetFiles(Config.CallRecordsDirectory, searchPattern);
 			PropertyBag["recordId"] = recordId;
 			if (files.Length > 0)
-				PropertyBag["call"] = CallRecord.Find(recordId);
+				PropertyBag["call"] = DbSession.Load<CallRecord>(recordId);
 			CancelLayout();
 		}
 

@@ -21,7 +21,7 @@ namespace Integration.Controllers
 			Prepare(controller);
 
 			payer = DataMother.CreatePayer();
-			payer.Save();
+			session.Save(payer);
 		}
 
 		[Test]

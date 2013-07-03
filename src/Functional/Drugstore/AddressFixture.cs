@@ -162,7 +162,7 @@ namespace Functional.Drugstore
 			// Даем доступ пользователю к адресу доставки
 			browser.CheckBox(Find.ByName("address.AvaliableForUsers[0].Id")).Checked = true;
 			ClickButton("Сохранить");
-			browser.Refresh();
+			session.Refresh(browser);
 
 			ClickLink(address.Value);
 			// Ищем клиента, к которому нужно передвинуть пользователя и двигаем
@@ -177,7 +177,7 @@ namespace Functional.Drugstore
 
 			session.Refresh(oldClient);
 			session.Refresh(newClient);
-			address.Refresh();
+			session.Refresh(address);
 			Assert.That(address.Client.Id, Is.EqualTo(newClient.Id));
 
 			//перемещение пользователя не опционально
@@ -214,7 +214,7 @@ namespace Functional.Drugstore
 
 			session.Refresh(oldClient);
 			session.Refresh(newClient);
-			address = Address.Find(addressIdForMove);
+			address = session.Load<Address>(addressIdForMove);
 			Assert.That(address.Client.Id, Is.EqualTo(newClient.Id));
 			Assert.That(newClient.Addresses.Count, Is.EqualTo(2));
 			Assert.That(oldClient.Addresses.Count, Is.EqualTo(0));

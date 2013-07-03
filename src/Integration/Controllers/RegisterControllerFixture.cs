@@ -75,7 +75,7 @@ namespace Integration.Controllers
 			payer = client.Payers.First();
 
 			payer.Comment = "ata";
-			payer.Update();
+			session.Save(payer);
 
 			Context.Session["ShortName"] = "Test";
 
@@ -83,7 +83,7 @@ namespace Integration.Controllers
 
 			controller.Registered(payer, paymentOptions, false);
 
-			Assert.That(Payer.Find(payer.Id).Comment, Is.EqualTo("ata\r\nКлиент обслуживается бесплатно"));
+			Assert.That(session.Load<Payer>(payer.Id).Comment, Is.EqualTo("ata\r\nКлиент обслуживается бесплатно"));
 		}
 
 		[Test]

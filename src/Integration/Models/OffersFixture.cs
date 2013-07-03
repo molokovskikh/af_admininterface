@@ -10,7 +10,7 @@ namespace Integration.Models
 		public void Search_should_return_offers()
 		{
 			var client = DataMother.CreateTestClientWithUser();
-			var offers = Offer.Search(client.Users[0], "папа");
+			var offers = Offer.Search(session, client.Users[0], "папа");
 			Assert.That(offers.Count, Is.GreaterThan(0));
 		}
 
@@ -18,7 +18,7 @@ namespace Integration.Models
 		public void Request_for_not_exist_name_should_return_zero_elements()
 		{
 			var client = DataMother.CreateTestClientWithUser();
-			var offers = Offer.Search(client.Users[0], "sdfaefawefsdf");
+			var offers = Offer.Search(session, client.Users[0], "sdfaefawefsdf");
 			Assert.That(offers.Count, Is.EqualTo(0));
 		}
 	}

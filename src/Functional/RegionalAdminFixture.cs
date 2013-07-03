@@ -169,7 +169,7 @@ namespace Functional
 			admin.RegionMask = ulong.MaxValue;
 			admin.AllowedPermissions = Enum.GetValues(typeof(PermissionType))
 				.Cast<PermissionType>()
-				.Select(p => Permission.Find(p))
+				.Select(p => session.Load<Permission>(p))
 				.ToList();
 			Save(admin);
 			return admin;

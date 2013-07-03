@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
+using Common.Web.Ui.NHibernateExtentions;
 using Functional.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
@@ -18,7 +21,7 @@ namespace Functional
 		{
 			var adm = Administrator.GetByName("kvasov");
 			if (!adm.HavePermision(PermissionType.ManageCallbacks)) {
-				adm.AllowedPermissions.Add(Permission.Find(PermissionType.ManageCallbacks));
+				adm.AllowedPermissions.Add(session.Load<Permission>(PermissionType.ManageCallbacks));
 				session.Save(adm);
 			}
 
@@ -34,16 +37,16 @@ namespace Functional
 		[SetUp]
 		public void Setup()
 		{
-			Callback.DeleteAll();
+			session.DeleteMany(session.Query<Callback>().ToArray());
 		}
 
 		[Test]
 		public void Main_form_should_have_link_to_rejected_emails_where_should_be_emails_for_current_day()
 		{
 			var callback1 = new Callback { CallerPhone = "4732606000", Comment = "Офис", Enabled = false };
-			callback1.Save();
+			session.Save(callback1);
 			var callback2 = new Callback { CallerPhone = "9202299222", Comment = "Епихин" };
-			callback2.SaveAndFlush();
+			session.Save(callback2);
 
 			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
 				ClickLink(CallbackLinkText);
@@ -55,9 +58,9 @@ namespace Functional
 		public void On_delete_button_click_call_back_rule_should_be_deleted()
 		{
 			var callback1 = new Callback { CallerPhone = "4732606000", Comment = "Офис" };
-			callback1.Save();
+			session.Save(callback1);
 			var callback2 = new Callback { CallerPhone = "9202299222", Comment = "Епихин" };
-			callback2.SaveAndFlush();
+			session.Save(callback2);
 
 			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
 				ClickLink(CallbackLinkText);
@@ -70,7 +73,7 @@ namespace Functional
 		public void Update_link_should_enter_to_edit_page()
 		{
 			var callback1 = new Callback { CallerPhone = "4732606000", Comment = "Офис" };
-			callback1.Save();
+			session.Save(callback1);
 
 			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
 				ClickLink(CallbackLinkText);
@@ -78,7 +81,7 @@ namespace Functional
 				browser.Input<Callback>(callback => callback.DueDate, DateTime.Today.AddMonths(-1));
 				ClickButton("Сохранить");
 
-				callback1.Refresh();
+				session.Refresh(callback1);
 				Assert.That(callback1.DueDate, Is.EqualTo(DateTime.Today.AddMonths(-1)));
 				browser.AssertThatTableContains(callback1);
 			}
@@ -88,9 +91,9 @@ namespace Functional
 		public void Enabled_and_check_date_can_ne_updated_in_summary_table()
 		{
 			var callback1 = new Callback { CallerPhone = "4732606000", Comment = "Офис" };
-			callback1.Save();
+			session.Save(callback1);
 			var callback2 = new Callback { CallerPhone = "9202299222", Comment = "Епихин" };
-			callback2.SaveAndFlush();
+			session.Save(callback2);
 
 			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
 				ClickLink(CallbackLinkText);
@@ -98,8 +101,8 @@ namespace Functional
 				browser.FindRow(callback2).Input<Callback[]>(callbacks => callbacks[0].Enabled, true);
 				ClickButton("Сохранить");
 
-				callback1.Refresh();
-				callback2.Refresh();
+				session.Refresh(callback1);
+				session.Refresh(callback2);
 				Assert.That(callback1.Comment, Is.EqualTo("Офис"));
 				Assert.That(callback1.CheckDate, Is.True);
 				Assert.That(callback1.Enabled, Is.False);
@@ -115,7 +118,7 @@ namespace Functional
 		public void After_update_should_show_confirm_message()
 		{
 			var callback = new Callback { CallerPhone = "4732606000", Comment = "Офис" };
-			callback.Save();
+			session.Save(callback);
 
 			using (var browser = new IE(BuildTestUrl("default.aspx"))) {
 				ClickLink(CallbackLinkText);

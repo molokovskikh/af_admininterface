@@ -29,7 +29,7 @@ namespace Functional.Suppliers
 			user = DataMother.CreateSupplierUser();
 			supplier = (Supplier)user.RootService;
 			payer = DataMother.CreatePayer();
-			payer.Save();
+			session.Save(payer);
 		}
 
 		[Test]

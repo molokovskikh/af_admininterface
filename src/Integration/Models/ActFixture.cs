@@ -18,10 +18,10 @@ namespace Integration.Models
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, new Period(2010, Interval.December), DateTime.Now);
-			invoice.Save();
+			session.Save(invoice);
 
 			var acts = Act.Build(new List<Invoice> { invoice }, DateTime.Now);
-			acts.Each(a => a.Save());
+			acts.Each(a => session.Save(a));
 
 			Assert.That(acts.Count(), Is.EqualTo(1));
 

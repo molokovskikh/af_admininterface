@@ -81,7 +81,7 @@ namespace Functional.Drugstore
 			client = session.Load<Client>(client.Id);
 			Assert.That(client.Users.Count, Is.GreaterThan(0));
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
-			browser.Refresh();
+			session.Refresh(browser);
 			var userLink = browser.Link(Find.ByText(client.Users[0].Login));
 			Assert.IsTrue(userLink.Exists);
 			userLink.Click();
@@ -183,7 +183,7 @@ namespace Functional.Drugstore
 		public void Reset_user_uin()
 		{
 			user.UserUpdateInfo.AFCopyId = "123";
-			user.UserUpdateInfo.UpdateAndFlush();
+			session.Save(user.UserUpdateInfo);
 
 			Assert.That(user.HaveUin(), Is.True);
 			ClickLink(user.Login);
@@ -194,7 +194,7 @@ namespace Functional.Drugstore
 			AssertText("УИН сброшен");
 			AssertText(String.Format("$$$ Пользователь: {0}", user.Login));
 
-			user.UserUpdateInfo.Refresh();
+			session.Refresh(user.UserUpdateInfo);
 			Assert.That(user.UserUpdateInfo.AFCopyId, Is.Empty);
 		}
 
@@ -210,7 +210,7 @@ namespace Functional.Drugstore
 				Directory.CreateDirectory(directory);
 			var file = File.Create(preparedDataPath);
 
-			browser.Refresh();
+			session.Refresh(browser);
 
 			Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.True);
 			ClickButton("Удалить подготовленные данные");
@@ -509,7 +509,7 @@ namespace Functional.Drugstore
 			AssertText("Регистрационная карта ");
 			var login = Helper.GetLoginFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
-			browser.Refresh();
+			session.Refresh(browser);
 			ClickLink(login.ToString());
 			Click("Настройка");
 			// Проверяем, чтобы были доступны нужные регионы. Берем с первого региона, т.к. галку с нулевого сняли
@@ -585,7 +585,7 @@ namespace Functional.Drugstore
 		public void RegisterUserForMultiPayerClient()
 		{
 			var payer = new Payer("Тестовый плательщик");
-			payer.Save();
+			session.Save(payer);
 			client.Payers.Add(payer);
 			session.SaveOrUpdate(client);
 			Open(client);
@@ -608,7 +608,7 @@ namespace Functional.Drugstore
 				Name = "Тестовая организация 2",
 				Payer = payer
 			};
-			legalEntity.Save();
+			session.Save(legalEntity);
 			payer.JuridicalOrganizations.Add(legalEntity);
 
 			RegisterUserWithAddress(client, browser);
@@ -668,7 +668,7 @@ namespace Functional.Drugstore
 
 			var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
 			Assert.That(persons.Count, Is.EqualTo(1));
-			person.Refresh();
+			session.Refresh(person);
 			Assert.That(persons[0].Name, Is.EqualTo("Alice modified"));
 		}
 
@@ -688,7 +688,7 @@ namespace Functional.Drugstore
 			}
 
 			// Проверка, что комментарий записан
-			var contact = Contact.Find(client.Users[0].ContactGroup.Contacts[0].Id);
+			var contact = session.Load<Contact>(client.Users[0].ContactGroup.Contacts[0].Id);
 			Assert.That(contact.Comment, Is.EqualTo("some comment"));
 		}
 
@@ -735,7 +735,7 @@ namespace Functional.Drugstore
 		]
 		public void After_user_moving_must_be_entries_in_UserPrices()
 		{
-			var supplier = DataMother.CreateSupplier(s => { s.AddRegion(Region.Find(16UL)); });
+			var supplier = DataMother.CreateSupplier(s => { s.AddRegion(session.Load<Region>(16UL)); });
 			Save(supplier);
 			var maskRegion = 1UL | 16UL;
 			var newClient = DataMother.CreateTestClientWithAddressAndUser(maskRegion);
@@ -786,7 +786,7 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 				// Даем доступ пользователю к адресу доставки
 				browser.CheckBox(Find.ByName("user.AvaliableAddresses[0].Id")).Checked = true;
 				ClickButton("Сохранить");
-				browser.Refresh();
+				session.Refresh(browser);
 
 				// Ищем клиента, к которому нужно передвинуть пользователя и двигаем
 				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());

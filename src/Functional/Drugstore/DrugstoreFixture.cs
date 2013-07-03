@@ -129,7 +129,7 @@ namespace Functional.Drugstore
 			clientNameEdit.Value = "testTest" + client.Id;
 			Click("Сохранить");
 			AssertText("Сохранено");
-			Assert.That(TestClient.Find(client.Id).Name, Is.EqualTo("testTest" + client.Id));
+			Assert.That(session.Load<TestClient>(client.Id).Name, Is.EqualTo("testTest" + client.Id));
 		}
 	}
 }

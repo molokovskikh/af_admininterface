@@ -33,12 +33,12 @@ namespace Integration.Controllers
 			var payers = ActiveRecordLinqBase<Payer>.Queryable.Where(p => p.INN == "361911638854").ToList();
 			payers.Each(p => {
 				p.INN = null;
-				p.Save();
+				session.Save(p);
 			});
 
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			payer.INN = "361911638854";
-			payer.SaveAndFlush();
+			session.Save(payer);
 
 			var file = "../../../TestData/1c.txt";
 			using (var stream = File.OpenRead(file))
@@ -55,7 +55,7 @@ namespace Integration.Controllers
 			}
 
 			Reopen();
-			payer = Payer.Find(payer.Id);
+			payer = session.Load<Payer>(payer.Id);
 			Assert.That(payer.Balance, Is.EqualTo(3000));
 		}
 	}

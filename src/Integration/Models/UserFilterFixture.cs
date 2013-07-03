@@ -155,7 +155,7 @@ namespace Integration.Models
 			var supplier = (Supplier)user.RootService;
 
 			var phone = RandomPhone();
-			var orderGroup = new RegionalDeliveryGroup(Region.Find(2ul));
+			var orderGroup = new RegionalDeliveryGroup(session.Load<Region>(2ul));
 			orderGroup.AddContact(ContactType.Phone, phone);
 			supplier.ContactGroupOwner.AddContactGroup(orderGroup, true);
 			Save(supplier);
@@ -179,7 +179,7 @@ namespace Integration.Models
 				Name = "testGroup",
 				ContactGroupOwner = supplier.ContactGroupOwner
 			};
-			contactGroup.Save();
+			session.Save(contactGroup);
 			user.ContactGroup = contactGroup;
 			user.ContactGroup.AddContact(ContactType.Email, email);
 			session.SaveOrUpdate(user);
@@ -205,8 +205,8 @@ namespace Integration.Models
 			result = filter.Find();
 			Assert.That(result.Count, Is.EqualTo(2));
 
-			user.Delete();
-			user2.Delete();
+			session.Delete(user);
+			session.Delete(user2);
 			Flush();
 		}
 

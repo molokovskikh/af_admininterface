@@ -24,7 +24,7 @@ namespace Functional
 			supplier.Name += " " + supplier.Id;
 			Save(supplier);
 			Flush();
-			return PromotionOwnerSupplier.Find(supplier.Id);
+			return session.Load<PromotionOwnerSupplier>(supplier.Id);
 		}
 
 		private Catalog FindFirstFreeCatalog()
@@ -43,7 +43,7 @@ where
 and s.Id is null
 limit 1")
 				.UniqueResult<uint>();
-			return Catalog.Find(catalogId);
+			return session.Load<Catalog>(catalogId);
 		}
 
 		private SupplierPromotion CreatePromotion(PromotionOwnerSupplier supplier, Catalog catalog)
@@ -57,13 +57,13 @@ limit 1")
 				End = DateTime.Now.Date,
 				Catalogs = new List<Catalog> { catalog }
 			};
-			supplierPromotion.Save();
+			session.Save(supplierPromotion);
 			return supplierPromotion;
 		}
 
 		private void RefreshPromotion(SupplierPromotion promotion)
 		{
-			promotion.Refresh();
+			session.Refresh(promotion);
 		}
 
 		[SetUp]

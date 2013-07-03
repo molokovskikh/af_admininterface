@@ -28,7 +28,7 @@ namespace Functional.Billing
 			payer.Recipient = session.Query<Recipient>().First();
 			payer.Users.Each(u => u.Accounting.ReadyForAccounting = true);
 			session.SaveOrUpdate(client);
-			payer.Save();
+			session.Save(payer);
 		}
 
 		[Test]
@@ -63,7 +63,7 @@ namespace Functional.Billing
 		public void Show_error_if_recipient_not_set()
 		{
 			payer.Recipient = null;
-			payer.SaveAndFlush();
+			session.Save(payer);
 
 			Open(payer, "InvoiceGroups");
 			AssertText("Настройка счетов");

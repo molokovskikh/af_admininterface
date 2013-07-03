@@ -115,7 +115,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord(Table = "order_send_rules", Schema = "OrderSendRules"), Auditable]
-	public class OrderSendRules : ActiveRecordBase<OrderHandler>, IAuditable
+	public class OrderSendRules : IAuditable
 	{
 		public OrderSendRules()
 		{

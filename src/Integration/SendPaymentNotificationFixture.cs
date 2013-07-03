@@ -18,12 +18,12 @@ namespace Integration
 			var payer = client.Payers.First();
 			payer.Balance = -1000;
 			payer.SendPaymentNotification = true;
-			payer.Save();
+			session.Save(payer);
 			Flush();
 			SystemTime.Now = () => new DateTime(2011, 7, 27, 1, 2, 1);
 
 			new SendPaymentNotification().Process();
-			var message = UserMessage.Find(client.Users.First().Id);
+			var message = session.Load<UserMessage>(client.Users.First().Id);
 			Assert.That(message.Message, Is.StringContaining("обслуживание будет приостановлено"));
 			Assert.That(message.ShowMessageCount, Is.EqualTo(1));
 		}

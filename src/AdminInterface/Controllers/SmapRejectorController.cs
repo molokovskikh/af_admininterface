@@ -1,5 +1,6 @@
 ﻿using System;
 using AdminInterface.Models.Logs;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
@@ -10,7 +11,7 @@ namespace AdminInterface.Controllers
 		Secure,
 		Helper(typeof(ViewHelper)),
 	]
-	public class SmapRejectorController : SmartDispatcherController
+	public class SmapRejectorController : AdminInterfaceController
 	{
 		public void Show()
 		{

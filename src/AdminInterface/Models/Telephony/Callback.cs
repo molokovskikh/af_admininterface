@@ -4,7 +4,7 @@ using Castle.ActiveRecord;
 namespace AdminInterface.Models.Telephony
 {
 	[ActiveRecord("CallbackPhones", Schema = "telephony")]
-	public class Callback : ActiveRecordBase<Callback>
+	public class Callback
 	{
 		[PrimaryKey]
 		public uint Id { get; set; }

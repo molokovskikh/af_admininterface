@@ -26,14 +26,14 @@ namespace Integration.Models
 
 			var info = user.UserUpdateInfo;
 			info.AFCopyId = "123";
-			info.Update();
+			session.Save(info);
 			Flush();
 
 			Assert.That(client.HaveUin(), Is.True);
 
 			client.ResetUin();
 
-			user.UserUpdateInfo.Refresh();
+			session.Refresh(user.UserUpdateInfo);
 			Assert.That(user.UserUpdateInfo.AFCopyId, Is.Empty);
 			Assert.That(client.HaveUin(), Is.False);
 		}

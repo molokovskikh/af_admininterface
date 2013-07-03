@@ -168,7 +168,7 @@ namespace AdminInterface.Controllers
 						legalEntity.Name = client.Name;
 					if (changeFullName)
 						legalEntity.FullName = client.FullName;
-					legalEntity.Update();
+					DbSession.Save(legalEntity);
 				}
 				else {
 					var changePartMessage = string.Empty;
@@ -204,7 +204,7 @@ where Phone like :phone")
 				.SetParameter("phone", phone.Replace("-", ""))
 				.ExecuteUpdate();
 
-			group.Save();
+			DbSession.Save(group);
 			RedirectToReferrer();
 		}
 
@@ -289,7 +289,7 @@ where Phone like :phone")
 			}
 
 			var oldMaskRegion = client.MaskRegion;
-			client.HomeRegion = Region.Find(homeRegion);
+			client.HomeRegion = DbSession.Load<Region>(homeRegion);
 			client.UpdateRegionSettings(regionSettings);
 
 			if (!IsValid(client)) {
@@ -350,7 +350,7 @@ where Phone like :phone")
 		public void ChangePayer(uint clientId, uint payerId, uint orgId, bool andJurdicalOrganization)
 		{
 			var client = Client.FindAndCheck<Client>(clientId);
-			var payer = Payer.Find(payerId);
+			var payer = DbSession.Load<Payer>(payerId);
 			var org = payer.JuridicalOrganizations.FirstOrDefault(j => j.Id == orgId);
 			if (!andJurdicalOrganization)
 				client.ChangePayer(DbSession, payer, org);
@@ -416,7 +416,7 @@ where Phone like :phone")
 		[return: JSONReturnBinder]
 		public object[] GetPayerOrgs(uint id)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			return payer.JuridicalOrganizations.Select(o => new {
 				id = o.Id,
 				name = o.Name
@@ -470,7 +470,7 @@ group by s.Id")
 			if (address != null)
 				oldClient = address.Client;
 
-			var legalEntity = LegalEntity.TryFind(legalEntityId);
+			var legalEntity = DbSession.Get<LegalEntity>(legalEntityId);
 			if (legalEntity == null)
 				legalEntity = newClient.Orgs().Single();
 

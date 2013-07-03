@@ -160,7 +160,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Changer\HelpSupplierContact.cs" />
     <Compile Include="Components\Bredcrumbs.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\ActsController.cs" />
@@ -316,7 +315,6 @@
     <Compile Include="Models\Maintainer.cs" />
     <Compile Include="Models\Offer.cs" />
     <Compile Include="Models\Suppliers\Price.cs" />
-    <Compile Include="Models\RedmineUser.cs" />
     <Compile Include="Models\Security\ISecurityAware.cs" />
     <Compile Include="Models\Logs\AuthorizationLogEntity.cs" />
     <Compile Include="Models\Billing\Payer.cs" />

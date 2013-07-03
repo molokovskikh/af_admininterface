@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -9,7 +10,7 @@ namespace AdminInterface.Controllers
 	{
 		public void Show(uint id, DateTime? begin, DateTime? end)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			if (payer.Recipient == null) {
 				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
@@ -29,7 +30,7 @@ namespace AdminInterface.Controllers
 
 		public void Print(uint id, DateTime? begin, DateTime? end)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			if (payer.Recipient == null) {
 				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
@@ -48,7 +49,7 @@ namespace AdminInterface.Controllers
 
 		public void Mail(uint id, DateTime? begin, DateTime? end, string emails, string message)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			if (payer.Recipient == null) {
 				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
@@ -69,7 +70,7 @@ namespace AdminInterface.Controllers
 
 		public void Excel(uint id, DateTime? begin, DateTime? end)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			if (payer.Recipient == null) {
 				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
@@ -87,14 +88,14 @@ namespace AdminInterface.Controllers
 			CancelView();
 		}
 
-		private static RevisionAct BuildRevisionAct(DateTime begin, DateTime end, Payer payer)
+		private RevisionAct BuildRevisionAct(DateTime begin, DateTime end, Payer payer)
 		{
 			return new RevisionAct(payer,
 				begin,
 				end,
-				Act.Queryable.Where(i => i.Payer == payer).ToList(),
-				Payment.Queryable.Where(p => p.Payer == payer).ToList(),
-				BalanceOperation.Queryable.Where(o => o.Payer == payer).ToList());
+				DbSession.Query<Act>().Where(i => i.Payer == payer).ToList(),
+				DbSession.Query<Payment>().Where(p => p.Payer == payer).ToList(),
+				DbSession.Query<BalanceOperation>().Where(o => o.Payer == payer).ToList());
 		}
 	}
 }

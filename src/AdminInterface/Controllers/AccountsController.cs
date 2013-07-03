@@ -101,7 +101,7 @@ namespace AdminInterface.Controllers
 					if (address.AvaliableForEnabledUsers)
 						continue;
 					address.Enabled = false;
-					address.Update();
+					DbSession.Save(address);
 				}
 			}
 		}
@@ -163,7 +163,7 @@ namespace AdminInterface.Controllers
 
 		public void SetAddressStatus(uint addressId, bool? enabled, string comment)
 		{
-			var address = Address.Find(addressId);
+			var address = DbSession.Load<Address>(addressId);
 			var oldStatus = address.Enabled;
 			if (enabled.HasValue)
 				address.Enabled = enabled.Value;

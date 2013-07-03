@@ -102,7 +102,7 @@ namespace AdminInterface.Controllers
 			if (service.IsClient())
 				payers = ((Client)service).Payers;
 			else
-				payers = new List<Payer> { Supplier.Find(service.Id).Payer };
+				payers = new List<Payer> { DbSession.Load<Supplier>(service.Id).Payer };
 
 			if(payers.Count == 1) {
 				user.Payer = payers.First();
@@ -214,7 +214,7 @@ namespace AdminInterface.Controllers
 
 			service.AddUser(user);
 
-			user.Payer = Payer.Find(user.Payer.Id);
+			user.Payer = DbSession.Load<Payer>(user.Payer.Id);
 			user.Setup(string.IsNullOrEmpty(jsonSource));
 			var password = user.CreateInAd();
 			if (string.IsNullOrEmpty(jsonSource)) {
@@ -474,7 +474,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["user"] = user;
 			PropertyBag["maxRegion"] = UInt64.MaxValue;
 			if (user.Client == null) {
-				var supplier = Supplier.Find(user.RootService.Id);
+				var supplier = DbSession.Load<Supplier>(user.RootService.Id);
 				if (supplier != null) {
 					PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(supplier.RegionMask);
 				}
@@ -528,7 +528,7 @@ namespace AdminInterface.Controllers
 		{
 			var user = DbSession.Load<User>(id);
 			if (!String.IsNullOrEmpty(searchText))
-				PropertyBag["Offers"] = Offer.Search(user, searchText);
+				PropertyBag["Offers"] = Offer.Search(DbSession, user, searchText);
 			PropertyBag["user"] = user;
 		}
 
@@ -538,7 +538,7 @@ namespace AdminInterface.Controllers
 
 			if (user.CanDelete(DbSession)) {
 				var payer = user.Payer;
-				user.Delete();
+				DbSession.Delete(user);
 				payer.UpdatePaymentSum();
 				Notify("Удалено");
 				RedirectTo(user.RootService);

@@ -117,7 +117,7 @@ namespace Integration
 			Assert.That(rule.Id, Is.Not.EqualTo(0));
 			var newFormat = OrderHandler.Formaters().Skip(1).First();
 			rule.Formater = newFormat;
-			rule.Save();
+			session.Save(rule);
 
 			Flush();
 			Reopen();

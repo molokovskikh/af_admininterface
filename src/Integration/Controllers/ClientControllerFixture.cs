@@ -194,7 +194,7 @@ namespace Integration.Controllers
 			var legalEntity = client.GetLegalEntity()[0];
 			legalEntity.Name = "Name";
 			legalEntity.FullName = "FullName";
-			legalEntity.Save();
+			session.Save(legalEntity);
 			Flush();
 
 			client.Name = "TestName";

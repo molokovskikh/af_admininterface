@@ -280,7 +280,7 @@ namespace Functional.Billing
 			ConfirmDialog();
 			Assert.IsFalse(clientStatus.Checked);
 			Thread.Sleep(1000);
-			browser.Refresh();
+			session.Refresh(browser);
 			AssertText("TestComment");
 		}
 
@@ -381,7 +381,7 @@ namespace Functional.Billing
 			for (var i = 0; i < countUsers; i++) {
 				client.AddUser("user");
 				var address = client.AddAddress("address");
-				address.Save();
+				session.Save(address);
 			}
 		}
 
@@ -430,7 +430,7 @@ namespace Functional.Billing
 			foreach (var a in client.Addresses) {
 				a.Accounting.ReadyForAccounting = true;
 				a.AvaliableForUsers = new List<User> { client.Users[0], client.Users[1] };
-				a.Save();
+				session.Save(a);
 			}
 
 			Refresh();
@@ -481,8 +481,8 @@ namespace Functional.Billing
 			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 
 			// Удаляем адрес и пользователя, чтобы произошла ошибка на сервере
-			user.Delete();
-			address.Delete();
+			session.Delete(user);
+			session.Delete(address);
 			Flush();
 
 			var errorMessageDiv = browser.Div(Find.ById("ErrorMessageDiv"));
@@ -513,8 +513,8 @@ namespace Functional.Billing
 			browser.WaitUntilContainsText("test message for user", 2);
 
 			AssertText(messageText);
-			var messages = session.Load<Client>(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
-			messages[0].Refresh();
+			var messages = session.Load<Client>(client.Id).Users.Select(u => session.Load<UserMessage>(u.Id)).ToList();
+			session.Refresh(messages[0]);
 			Assert.That(messages[0].Message, Is.EqualTo(messageText));
 			Assert.That(messages[0].ShowMessageCount, Is.EqualTo(1));
 		}
@@ -531,10 +531,10 @@ namespace Functional.Billing
 			ClickLink("Просмотреть сообщение");
 			Thread.Sleep(500);
 			browser.Button(String.Format("CancelViewMessage{0}", user.Id)).Click();
-			var messages = session.Load<Client>(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
+			var messages = session.Load<Client>(client.Id).Users.Select(u => session.Load<UserMessage>(u.Id)).ToList();
 			var message = messages[0];
 
-			message.Refresh();
+			session.Refresh(message);
 			Assert.That(message.Message, Is.EqualTo(messageText));
 			Assert.That(message.ShowMessageCount, Is.EqualTo(0));
 		}
