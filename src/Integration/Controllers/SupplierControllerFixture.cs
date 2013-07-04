@@ -5,6 +5,7 @@ using System.Text;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
+using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -13,29 +14,52 @@ namespace Integration.Controllers
 	[TestFixture]
 	public class SupplierControllerFixture : ControllerFixture
 	{
-		private SuppliersController _controller;
-		private Supplier _supplier;
+		private SuppliersController controller;
+		private Supplier supplier;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_controller = new SuppliersController();
-			_controller.DbSession = session;
-			_supplier = DataMother.CreateSupplier();
-			session.Save(_supplier);
-			PrepareController(_controller);
+			controller = new SuppliersController();
+			controller.DbSession = session;
+			supplier = DataMother.CreateSupplier();
+			session.Save(supplier);
+			Prepare(controller);
 		}
 
 		[Test]
 		public void Delete_waybill_exclude_file_test()
 		{
-			var waybillExcludeFile = new WaybillExcludeFile("1234", _supplier);
+			var waybillExcludeFile = new WaybillExcludeFile("1234", supplier);
 			session.Save(waybillExcludeFile);
 
 			Flush();
 
-			var result = _controller.DeleteMask(waybillExcludeFile.Id);
-			Assert.AreEqual(result, _supplier.Id);
+			var result = controller.DeleteMask(waybillExcludeFile.Id);
+			Assert.AreEqual(result, supplier.Id);
+		}
+
+		[Test]
+		public void Do_not_register_duplicate_emails()
+		{
+			var supplier1 = DataMother.CreateSupplier();
+			supplier1.WaybillSource = new WaybillSource(supplier1);
+			supplier1.WaybillSource.EMailFrom = "test@analit.net";
+			session.Save(supplier1);
+			session.Flush();
+
+			controller.Params["source.Emails[0]"] = "test@analit.net";
+			Request.HttpMethod = "POST";
+			controller.WaybillSourceSettings(supplier.Id);
+			Assert.IsFalse(Response.WasRedirected);
+			Assert.AreEqual("Ошибка сохранения", (controller.PropertyBag["message"] ?? "").ToString());
+			Errors(supplier.WaybillSource);
+			session.Clear();
+		}
+
+		protected void Errors(object source)
+		{
+			controller.Validator.GetErrorSummary(source).ErrorMessages.Implode();
 		}
 	}
 }

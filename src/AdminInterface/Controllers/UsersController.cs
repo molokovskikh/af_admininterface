@@ -290,7 +290,6 @@ namespace AdminInterface.Controllers
 				}
 			}
 			else if (string.IsNullOrEmpty(jsonSource)) {
-				Flash["newUser"] = true;
 				Flash["password"] = password;
 				Redirect("main", "report", new { id = user.Id });
 			}

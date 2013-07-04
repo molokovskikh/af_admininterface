@@ -174,8 +174,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["user"] = DbSession.Load<User>(id);
 			PropertyBag["IsPasswordChange"] = isPasswordChange;
 			PropertyBag["defaults"] = Defaults;
-			if (Session["password"] != null && Flash["newUser"] == null)
-				PropertyBag["password"] = Session["password"];
+			PropertyBag["password"] = Flash["password"] ?? Session["password"];
 		}
 
 		public void Stat(DateTime? from, DateTime? to)

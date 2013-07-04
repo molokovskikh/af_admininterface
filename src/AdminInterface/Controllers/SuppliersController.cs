@@ -20,11 +20,13 @@ using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
+using Common.Web.Ui.Controllers;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate.Linq;
+using Newtonsoft.Json;
 
 namespace AdminInterface.Controllers
 {
@@ -171,46 +173,30 @@ namespace AdminInterface.Controllers
 			Redirect("Users", "Search");
 		}
 
-		private void CommonBag()
-		{
-			var sourceTypes = BindingHelper.GetDescriptionsDictionary(typeof(WaybillSourceType));
-			sourceTypes.Remove((int)WaybillSourceType.Http);
-			PropertyBag["sourceTypes"] = sourceTypes;
-		}
-
 		public void WaybillSourceSettings(uint supplierId)
 		{
-			CommonBag();
-			var supplier = DbSession.Get<Supplier>(supplierId);
+			var supplier = DbSession.Load<Supplier>(supplierId);
+			var source = supplier.WaybillSource ?? new WaybillSource(supplier);
+			if (IsPost) {
+				source.session = DbSession;
+				Bind(source, "source");
+				if (supplier.WaybillSource == null)
+					supplier.WaybillSource = source;
+				source.EMailFrom = source.Emails.Implode();
+				if (IsValid(source)) {
+					DbSession.Save(source);
+					Notify("Сохранено");
+					RedirectToAction("WaybillSourceSettings", new { supplierId = source.Id });
+				}
+				else {
+					Error("Ошибка сохранения", PropertyBag);
+				}
+			}
+			var sourceTypes = BindingHelper.GetDescriptionsDictionary(typeof(WaybillSourceType));
+			sourceTypes.Remove((int)WaybillSourceType.Http);
 			PropertyBag["supplier"] = supplier;
-			PropertyBag["source"] = supplier.WaybillSource ?? new WaybillSource();
-			if (supplier.WaybillSource == null) {
-				Error("Для данного поставщика ещё не заданы параметры передачи документов");
-			}
-		}
-
-		[AccessibleThrough(Verb.Post)]
-		public void WaybillSourceSettings([ARDataBind("source", AutoLoadBehavior.NullIfInvalidKey)]WaybillSource source, uint supplierId, [DataBind("Emails")]string[] emails)
-		{
-			var supplier = DbSession.Get<Supplier>(supplierId);
-			if (source == null) {
-				source = (WaybillSource)BindObject(ParamStore.Form, typeof(WaybillSource), "source");
-				source.Id = supplierId;
-				source.Supplier = supplier;
-			}
-			if (IsValid(source)) {
-				source.EMailFrom = emails.Implode();
-				DbSession.Save(source);
-				Notify("Сохранено");
-				RedirectToAction("WaybillSourceSettings", new Dictionary<string, string> { { "supplierId", source.Id.ToString() } });
-				PropertyBag["supplier"] = supplier;
-				PropertyBag["source"] = source;
-				return;
-			}
-			Notify("Ошибка сохранения");
-			PropertyBag["supplier"] = DbSession.Get<Supplier>(source.Id);
 			PropertyBag["source"] = source;
-			CommonBag();
+			PropertyBag["sourceTypes"] = sourceTypes;
 		}
 	}
 }

@@ -12,7 +12,7 @@ using Test.Support;
 namespace Integration.MonoRailExtentions
 {
 	[TestFixture]
-	public class ValidatorToNHibernateIntegrationFixture : Test.Support.IntegrationFixture
+	public class ValidatorToNHibernateIntegrationFixture : IntegrationFixture
 	{
 		private StaticValidatorAccessor accessor;
 		private ValidatorRunner validator;
@@ -24,6 +24,12 @@ namespace Integration.MonoRailExtentions
 			accessor = new StaticValidatorAccessor();
 			accessor.Validator = validator;
 			ValidEventListner.ValidatorAccessor = accessor;
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			ValidEventListner.ValidatorAccessor = null;
 		}
 
 		[Test]

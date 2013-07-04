@@ -6,6 +6,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -13,7 +14,6 @@ using WatiN.Core;
 using Test.Support.Web;
 using Test.Support;
 using WatiN.Core.Native.Windows;
-using WaybillSourceType = AdminInterface.Models.WaybillSourceType;
 
 namespace Functional.Suppliers
 {

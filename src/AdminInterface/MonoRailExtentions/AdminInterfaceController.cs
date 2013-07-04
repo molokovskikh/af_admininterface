@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.ManagerReportsFilters;
