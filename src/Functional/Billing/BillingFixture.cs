@@ -280,7 +280,7 @@ namespace Functional.Billing
 			ConfirmDialog();
 			Assert.IsFalse(clientStatus.Checked);
 			Thread.Sleep(1000);
-			session.Refresh(browser);
+			browser.Refresh();
 			AssertText("TestComment");
 		}
 

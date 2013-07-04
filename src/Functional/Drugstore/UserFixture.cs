@@ -81,7 +81,7 @@ namespace Functional.Drugstore
 			client = session.Load<Client>(client.Id);
 			Assert.That(client.Users.Count, Is.GreaterThan(0));
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
-			session.Refresh(browser);
+			browser.Refresh();
 			var userLink = browser.Link(Find.ByText(client.Users[0].Login));
 			Assert.IsTrue(userLink.Exists);
 			userLink.Click();
@@ -210,7 +210,7 @@ namespace Functional.Drugstore
 				Directory.CreateDirectory(directory);
 			var file = File.Create(preparedDataPath);
 
-			session.Refresh(browser);
+			browser.Refresh();
 
 			Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.True);
 			ClickButton("Удалить подготовленные данные");
@@ -509,7 +509,7 @@ namespace Functional.Drugstore
 			AssertText("Регистрационная карта ");
 			var login = Helper.GetLoginFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
-			session.Refresh(browser);
+			browser.Refresh();
 			ClickLink(login.ToString());
 			Click("Настройка");
 			// Проверяем, чтобы были доступны нужные регионы. Берем с первого региона, т.к. галку с нулевого сняли
@@ -786,7 +786,7 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 				// Даем доступ пользователю к адресу доставки
 				browser.CheckBox(Find.ByName("user.AvaliableAddresses[0].Id")).Checked = true;
 				ClickButton("Сохранить");
-				session.Refresh(browser);
+				browser.Refresh();
 
 				// Ищем клиента, к которому нужно передвинуть пользователя и двигаем
 				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());

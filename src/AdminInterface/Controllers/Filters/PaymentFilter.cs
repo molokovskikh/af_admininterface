@@ -27,8 +27,13 @@ namespace AdminInterface.Controllers.Filters
 		public int Count { get; private set; }
 
 		public PaymentFilter(ISession session)
+			: this()
 		{
 			Session = session;
+		}
+
+		public PaymentFilter()
+		{
 			Period = new DatePeriod {
 				Begin = DateTime.Today,
 				End = DateTime.Today
