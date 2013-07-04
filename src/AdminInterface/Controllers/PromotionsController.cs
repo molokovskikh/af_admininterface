@@ -307,7 +307,7 @@ namespace AdminInterface.Controllers
 						}
 					}
 
-					DbSession.Save(promotion);
+					DbSession.Update(promotion);
 
 					RedirectToAction("Index");
 				}
@@ -374,7 +374,7 @@ namespace AdminInterface.Controllers
 						promotion.PromoFile = file.FileName;
 					}
 
-					DbSession.Save(promotion);
+					DbSession.Update(promotion);
 
 					if (file != null && file.ContentLength > 0) {
 						var newLocalPromoFile = GetPromoFile(promotion);
@@ -476,7 +476,7 @@ namespace AdminInterface.Controllers
 				ActiveRecordMediator.Evict(promotion);
 				if (Validator.IsValid(promotion) && promotion.Catalogs.Count > 0) {
 					Flash["Message"] = "Сохранено";
-					DbSession.Save(promotion);
+					DbSession.Update(promotion);
 					RedirectToAction("EditCatalogs", filter.ToUrl());
 				}
 				else {

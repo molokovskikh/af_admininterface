@@ -7,6 +7,7 @@ using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 
 namespace Functional
 {
@@ -74,6 +75,7 @@ limit 1")
 			_supplier = CreateSupplier();
 			_catalog = FindFirstFreeCatalog();
 			_promotion = CreatePromotion(_supplier, _catalog);
+			session.Flush();
 
 			Open();
 			Click("Промо-акции");
@@ -236,7 +238,6 @@ limit 1")
 		public void EditPromotionCatalogs()
 		{
 			var row = RowPromotionExists(_promotion);
-
 			row.Link(Find.ByText("Редактировать")).Click();
 
 			AssertText("Редактирование акции №" + _promotion.Id);

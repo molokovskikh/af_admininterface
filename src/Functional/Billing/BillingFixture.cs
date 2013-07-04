@@ -481,7 +481,11 @@ namespace Functional.Billing
 			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 
 			// Удаляем адрес и пользователя, чтобы произошла ошибка на сервере
+			client.Users.Remove(user);
+			payer.Users.Remove(user);
 			session.Delete(user);
+			client.Addresses.Remove(address);
+			payer.Addresses.Remove(address);
 			session.Delete(address);
 			Flush();
 

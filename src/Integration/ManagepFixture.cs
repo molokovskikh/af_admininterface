@@ -30,7 +30,7 @@ namespace Integration
 			var handler = session.Query<TestHandler>().First(t => t.ClassName.Contains("Formater") && !t.ClassName.Contains("Default"));
 			var supplier = session.Query<Supplier>().First(t => t.Id == _supplier.Id);
 			var managep = new managep();
-			managep.DbSession = ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof(ActiveRecordBase));
+			managep.DbSession = session;
 			managep.CreateNewSpecialOrders(supplier, handler.Id, "Специальный формат", HandlerTypes.Formatter);
 			var specHandler = session.Query<SpecialHandler>().First(t => t.Supplier == supplier && t.Handler.Id == handler.Id);
 			Assert.That(specHandler.Name, Is.EqualTo("Специальный формат"));
@@ -47,7 +47,7 @@ namespace Integration
 			var handler = session.Query<TestHandler>().First(t => t.ClassName.Contains("EmailSender"));
 			var supplier = session.Query<Supplier>().First(t => t.Id == _supplier.Id);
 			var managep = new managep();
-			managep.DbSession = ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof(ActiveRecordBase));
+			managep.DbSession = session;
 			managep.CreateNewSpecialOrders(supplier, handler.Id, "Специальная доставка", HandlerTypes.Sender);
 			var specHandler = session.Query<SpecialHandler>().FirstOrDefault(t => t.Supplier == supplier && t.Handler.Id == handler.Id);
 			Assert.That(specHandler, Is.Null);

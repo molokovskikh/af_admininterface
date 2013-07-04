@@ -184,8 +184,10 @@ namespace Functional.Drugstore
 		{
 			user.UserUpdateInfo.AFCopyId = "123";
 			session.Save(user.UserUpdateInfo);
-
 			Assert.That(user.HaveUin(), Is.True);
+			session.Flush();
+
+			browser.Refresh();
 			ClickLink(user.Login);
 			ClickButton("Сбросить УИН");
 			AssertText("Это поле необходимо заполнить.");
@@ -680,15 +682,14 @@ namespace Functional.Drugstore
 			Open(user, "Edit");
 			ContactInformationHelper.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
 			ContactInformationHelper.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
-			using (new SessionScope()) {
-				client = session.Load<Client>(client.Id);
-				var group = client.Users[0].ContactGroup;
-				browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", group.Contacts[0].Id))).TypeText("some comment");
-				ClickButton("Сохранить");
-			}
+			session.Refresh(client.Users[0]);
+			var group = client.Users[0].ContactGroup;
+			var contact = @group.Contacts[0];
+			browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", contact.Id))).TypeText("some comment");
+			ClickButton("Сохранить");
 
 			// Проверка, что комментарий записан
-			var contact = session.Load<Contact>(client.Users[0].ContactGroup.Contacts[0].Id);
+			session.Refresh(contact);
 			Assert.That(contact.Comment, Is.EqualTo("some comment"));
 		}
 
@@ -766,50 +767,6 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 				.SetParameter("UserId", userId)
 				.SetParameter("RegionId", regionId)
 				.UniqueResult()));
-		}
-
-		[Test, NUnit.Framework.Description("Перемещение пользователя с адресом доставки к другому клиенту"), Ignore("Нет больше флага о переносе адреса")]
-		public void Move_user_with_address_to_another_client()
-		{
-			Client oldClient;
-			Client newClient;
-			Address address;
-			User user;
-
-			using (new SessionScope()) {
-				oldClient = DataMother.CreateTestClientWithAddressAndUser();
-				user = oldClient.Users[0];
-				address = oldClient.Addresses[0];
-				newClient = DataMother.CreateTestClientWithAddressAndUser();
-			}
-			using (var browser = Open(user, "edit")) {
-				// Даем доступ пользователю к адресу доставки
-				browser.CheckBox(Find.ByName("user.AvaliableAddresses[0].Id")).Checked = true;
-				ClickButton("Сохранить");
-				browser.Refresh();
-
-				// Ищем клиента, к которому нужно передвинуть пользователя и двигаем
-				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
-				browser.Button(Find.ById("SearchClientButton")).Click();
-				Thread.Sleep(2000);
-				AssertText(String.Format("Перемещать адрес доставки {0}", address.Value));
-				Assert.IsTrue(browser.CheckBox(Find.ByName("moveWithAddress")).Checked);
-				ClickButton("Переместить");
-				AssertText("Пользователь успешно перемещен");
-			}
-
-			using (new SessionScope()) {
-				session.Refresh(oldClient);
-				session.Refresh(newClient);
-				session.Refresh(user);
-				Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
-
-				Assert.That(newClient.Users.Count, Is.EqualTo(2));
-				Assert.That(oldClient.Users.Count, Is.EqualTo(0));
-
-				Assert.That(newClient.Addresses.Count, Is.EqualTo(2));
-				Assert.That(oldClient.Addresses.Count, Is.EqualTo(0));
-			}
 		}
 
 		[Test]
