@@ -56,7 +56,6 @@ namespace Integration.Controllers
 			catch (SessionExpiredException) {
 			}
 
-			Console.WriteLine(payer.Id);
 			session.Refresh(payer);
 			Assert.That(payer.Balance, Is.EqualTo(3000));
 		}
