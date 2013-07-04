@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using NHibernate;
 
 namespace AdminInterface.Background
 {

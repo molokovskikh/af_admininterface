@@ -245,7 +245,7 @@ namespace AdminInterface.Controllers
 
 		public void Search()
 		{
-			var filter = new PayerFilter();
+			var filter = new PayerFilter(DbSession);
 			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter."))) {
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.NullIfInvalidKey;
 				BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter");

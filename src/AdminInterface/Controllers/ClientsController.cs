@@ -401,8 +401,7 @@ where Phone like :phone")
 		[return: JSONReturnBinder]
 		public object[] SearchPayer(string text)
 		{
-			return ActiveRecordLinqBase<Payer>
-				.Queryable
+			return DbSession.Query<Payer>()
 				.Where(p => p.Name.Contains(text))
 				.Take(50)
 				.ToList()

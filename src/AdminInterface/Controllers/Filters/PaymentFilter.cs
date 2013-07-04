@@ -7,12 +7,15 @@ using AdminInterface.Models.Billing;
 using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
+using NHibernate;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Controllers.Filters
 {
 	public class PaymentFilter : PaginableSortable
 	{
+		public ISession Session;
+
 		public Recipient Recipient { get; set; }
 		public DatePeriod Period { get; set; }
 		public string SearchText { get; set; }
@@ -23,8 +26,9 @@ namespace AdminInterface.Controllers.Filters
 		public decimal Sum { get; private set; }
 		public int Count { get; private set; }
 
-		public PaymentFilter()
+		public PaymentFilter(ISession session)
 		{
+			Session = session;
 			Period = new DatePeriod {
 				Begin = DateTime.Today,
 				End = DateTime.Today
@@ -57,10 +61,9 @@ namespace AdminInterface.Controllers.Filters
 
 			var payments = Find<Payment>(criteria);
 
-			Sum = ArHelper.WithSession(s =>
-				criteria.GetExecutableCriteria(s)
-					.SetProjection(Projections.Sum("Sum"))
-					.UniqueResult<decimal>());
+			Sum = criteria.GetExecutableCriteria(Session)
+				.SetProjection(Projections.Sum("Sum"))
+				.UniqueResult<decimal>();
 			Count = RowsCount;
 
 			return payments;

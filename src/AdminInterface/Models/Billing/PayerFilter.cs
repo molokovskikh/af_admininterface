@@ -8,6 +8,7 @@ using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate;
 
 namespace AdminInterface.Models.Billing
 {
@@ -51,6 +52,8 @@ namespace AdminInterface.Models.Billing
 
 	public class PayerFilter : Sortable
 	{
+		private ISession session;
+
 		public string SearchText { get; set; }
 
 		[Description("Игнорировать плательщиков, содержащих Поставщиков, кроме Справки")]
@@ -85,8 +88,9 @@ namespace AdminInterface.Models.Billing
 		[Description("Тип документа:")]
 		public DocumentType DocumentType { get; set; }
 
-		public PayerFilter()
+		public PayerFilter(ISession session)
 		{
+			this.session = session;
 			WithoutSuppliers = true;
 			Period = new Period();
 			ClientStatus = SearchClientStatus.Enabled;
@@ -235,17 +239,10 @@ having {1}
 order by p.ShortName
 ", where, having);
 
-			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
-			var session = sessionHolder.CreateSession(typeof(BillingSearchItem));
-			try {
-				query.Sql = sql;
-				var result = query.GetSqlQuery(session).ToList<BillingSearchItem>().ToList();
-				result.Sort(new PropertyComparer<BillingSearchItem>(GetSortDirection(), GetSortProperty()));
-				return result;
-			}
-			finally {
-				sessionHolder.ReleaseSession(session);
-			}
+			query.Sql = sql;
+			var result = query.GetSqlQuery(session).ToList<BillingSearchItem>().ToList();
+			result.Sort(new PropertyComparer<BillingSearchItem>(GetSortDirection(), GetSortProperty()));
+			return result;
 		}
 
 		private static string GetDocumentSubQuery(DocumentType documentType)

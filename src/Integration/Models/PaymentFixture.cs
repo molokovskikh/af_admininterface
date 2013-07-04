@@ -108,6 +108,7 @@ namespace Integration.Models
 			payment.ForAd = true;
 			payment.AdSum = 800;
 			session.Save(payment);
+			session.Flush();
 			Assert.That(payment.Ad.Id, Is.EqualTo(ad.Id));
 
 			//хак для борьбы с хаком, строчка ниже что бы избежать ошибки
@@ -169,6 +170,7 @@ namespace Integration.Models
 					PayerClient = new Payment.BankClient(payer.Name, payer.INN, "")
 				}
 			};
+			session.Flush();
 
 			var identifyPayments = Payment.Identify(payments);
 			Assert.That(identifyPayments.First().Payer, Is.EqualTo(payer));

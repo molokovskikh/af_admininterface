@@ -25,6 +25,7 @@ namespace AdminInterface.Models.Billing
 
 		protected override void OnSave()
 		{
+			Console.WriteLine("OnSave");
 			UpdateBalance();
 		}
 
@@ -63,6 +64,7 @@ namespace AdminInterface.Models.Billing
 				return;
 
 			payer.Balance += sum;
+			Console.WriteLine("{1} - {0}", sum, payer.Id);
 		}
 
 		private void ResetBalance()

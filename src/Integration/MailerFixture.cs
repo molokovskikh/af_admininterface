@@ -152,12 +152,9 @@ namespace Integration
 		[Test]
 		public void Send_invoice()
 		{
-			using (new SessionScope()) {
-				var invoice = CreateInvoice();
-
-				mailer.InvoiceToEmail(invoice, false);
-				mailer.Send();
-			}
+			var invoice = CreateInvoice();
+			mailer.InvoiceToEmail(invoice, false);
+			mailer.Send();
 
 			Assert.That(message.Body, Is.StringContaining("Примите счет за информационное обслуживание в ИС АналитФармация."));
 		}
@@ -165,12 +162,10 @@ namespace Integration
 		[Test]
 		public void Send_invoice_to_minimail_as_attachment()
 		{
-			using (new SessionScope()) {
-				var invoice = CreateInvoice();
+			var invoice = CreateInvoice();
+			mailer.SendInvoiceToMinimail(invoice);
+			mailer.Send();
 
-				mailer.SendInvoiceToMinimail(invoice);
-				mailer.Send();
-			}
 			Assert.That(message.Body, Is.StringContaining("Примите счет за информационное обслуживание в ИС АналитФармация."));
 			Assert.That(message.Attachments.Count, Is.EqualTo(1));
 			Assert.That(message.Attachments[0].Name, Is.EqualTo("Счет.html"));
@@ -179,14 +174,11 @@ namespace Integration
 		[Test]
 		public void Broken_invoice()
 		{
-			using (new SessionScope()) {
-				var invoice = CreateInvoice();
+			var invoice = CreateInvoice();
+			mailer.DoNotHaveInvoiceContactGroup(invoice);
+			mailer.Send();
 
-				mailer.DoNotHaveInvoiceContactGroup(invoice);
-				mailer.Send();
-
-				Assert.That(message.Body, Is.StringContaining(String.Format("Не удалось отправить счет № {0}", invoice.Id)));
-			}
+			Assert.That(message.Body, Is.StringContaining(String.Format("Не удалось отправить счет № {0}", invoice.Id)));
 		}
 
 		[Test]

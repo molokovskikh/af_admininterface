@@ -9,6 +9,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 
 namespace Integration.Controllers
@@ -30,7 +31,7 @@ namespace Integration.Controllers
 		[Test]
 		public void Double_saved_payments_processing()
 		{
-			var payers = ActiveRecordLinqBase<Payer>.Queryable.Where(p => p.INN == "361911638854").ToList();
+			var payers = session.Query<Payer>().Where(p => p.INN == "361911638854").ToList();
 			payers.Each(p => {
 				p.INN = null;
 				session.Save(p);
@@ -39,6 +40,7 @@ namespace Integration.Controllers
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			payer.INN = "361911638854";
 			session.Save(payer);
+			session.Flush();
 
 			var file = "../../../TestData/1c.txt";
 			using (var stream = File.OpenRead(file))
@@ -54,8 +56,8 @@ namespace Integration.Controllers
 			catch (SessionExpiredException) {
 			}
 
-			Reopen();
-			payer = session.Load<Payer>(payer.Id);
+			Console.WriteLine(payer.Id);
+			session.Refresh(payer);
 			Assert.That(payer.Balance, Is.EqualTo(3000));
 		}
 	}

@@ -55,7 +55,6 @@ namespace Integration.Tasks
 			Assert.That(invoice.Sum, Is.EqualTo(800));
 
 			session.Save(invoice);
-
 			return invoice;
 		}
 	}

@@ -44,6 +44,7 @@ namespace AdminInterface.Controllers
 
 		public void Index([SmartBinder] PaymentFilter filter)
 		{
+			filter.Session = DbSession;
 			var payments = filter.Find();
 			PropertyBag["filter"] = filter;
 			PropertyBag["payments"] = payments;

@@ -32,7 +32,7 @@ namespace Integration
 				ArHelper.WithSession(session => {
 					admin.AllowedPermissions = Enum.GetValues(typeof(PermissionType))
 						.Cast<PermissionType>()
-						.Select(t => session.Load<Permission>(t))
+						.Select(t => Permission.Find(t))
 						.ToList();
 					ActiveRecordMediator.Save(admin);
 					SecurityContext.GetAdministrator = () => admin;

@@ -19,9 +19,10 @@ namespace Integration
 			payer.Name = "Тестовый плательщик " + payer.Id;
 			var payment = new Payment(payer, DateTime.Now, 800);
 			session.Save(payment);
-			var filter = new PaymentFilter {
+			var filter = new PaymentFilter(session) {
 				SearchText = "Тестовый плательщик " + payer.Id
 			};
+			session.Flush();
 			var payments = filter.Find();
 			Assert.That(payments.Count, Is.EqualTo(1));
 			Assert.That(payments[0].Id, Is.EqualTo(payment.Id));

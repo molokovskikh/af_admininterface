@@ -26,10 +26,12 @@ namespace Integration.ForTesting
 		protected string referer;
 		protected ValidatorRunner validator;
 		protected ISession session;
+		private BaseController appController;
 
 		[SetUp]
 		public void Setup()
 		{
+			appController = null;
 			validator = new ValidatorRunner(new CachedValidationRegistry());
 
 			notifications = new List<MailMessage>();
@@ -57,6 +59,8 @@ namespace Integration.ForTesting
 		{
 			Close();
 			Open();
+			if (appController != null)
+				appController.DbSession = session;
 		}
 
 		private void Open()
@@ -79,15 +83,15 @@ namespace Integration.ForTesting
 			}
 		}
 
-		public void Prepare(SmartDispatcherController controller)
+		public void Prepare(SmartDispatcherController controller, string name = "Controller", string action = "Action")
 		{
 			controller.Validator = validator;
 			controller.Binder.Validator = validator;
-			var appController = controller as BaseController;
+			appController = controller as BaseController;
 			if (appController != null)
 				appController.DbSession = session;
 
-			PrepareController(controller);
+			PrepareController(controller, name, action);
 		}
 
 		public void Flush()

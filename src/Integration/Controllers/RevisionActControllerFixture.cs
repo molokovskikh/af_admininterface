@@ -25,7 +25,7 @@ namespace Integration.Controllers
 
 			controller = new RevisionActsController();
 			referer = "https://stat.analit.net/Adm/";
-			PrepareController(controller, "RevisionActs", "Mail");
+			Prepare(controller, "RevisionActs", "Mail");
 		}
 
 		[Test]
