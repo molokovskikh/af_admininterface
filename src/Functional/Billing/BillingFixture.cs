@@ -452,7 +452,6 @@ namespace Functional.Billing
 			Thread.Sleep(500);
 			currentSum = GetTotalSum();
 			Assert.That(currentSum, Is.LessThan(sum));
-			sum = currentSum;
 
 			// Выключаем клиента. Сумма должна стать равной нулю
 			Css(String.Format("#ClientStatus{0}", client.Id)).Click();

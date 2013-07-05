@@ -20,6 +20,7 @@ namespace Functional.Billing
 			var admin = Administrator.GetByName(Environment.UserName);
 			admin.RemovePermission();
 			Save(admin);
+			session.Flush();
 
 			Open(payer);
 			AssertText("Плательщик");
