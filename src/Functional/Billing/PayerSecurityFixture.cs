@@ -40,7 +40,6 @@ namespace Functional.Billing
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
 			var payer = user.Payer;
-			session.Flush();
 
 			Open(payer);
 			AssertText("Плательщик");
