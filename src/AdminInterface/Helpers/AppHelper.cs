@@ -131,44 +131,6 @@ namespace AdminInterface.Helpers
 			return result.ToString();
 		}
 
-		public string SearchEditV2(string target, IDictionary attributes)
-		{
-			var result = new StringBuilder();
-
-			var property = FindProperty(target);
-			var hiddenTarget = target;
-			if (property != null) {
-				var primaryKey = GetPrimaryKey(property.PropertyType);
-				if (primaryKey != null) {
-					hiddenTarget = target + "." + primaryKey.Property.Name;
-				}
-			}
-			return result
-				.Append("<div class=\"search-editor-v2\" ")
-				.Append(GetAttributes(attributes))
-				.Append(">")
-				.Append("<div data-bind=\"template: template\"></div>")
-				.Append(helper.HiddenField(hiddenTarget, new Dictionary<string, string> {
-					{ "data-bind", "value: value" },
-					{ "data-text", SafeHtmlEncode((ObtainValue(target) ?? "").ToString()) },
-					{ "data-label", GetLabel(target) },
-				}))
-				.Append("</div>")
-				.ToString();
-		}
-
-		private static PrimaryKeyModel GetPrimaryKey(Type type)
-		{
-			var model = ActiveRecordModel.GetModel(type);
-			if (model == null)
-				return null;
-			var primaryKey = model.PrimaryKey;
-			if (primaryKey == null) {
-				return GetPrimaryKey(model.Type.BaseType);
-			}
-			return primaryKey;
-		}
-
 		public string ExportLink(string name, string action, object filter, IDictionary querystring)
 		{
 			if (filter is Sortable) {
