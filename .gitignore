@@ -14,3 +14,4 @@ lib/Chrome.Printer/Chrome.Printer/GeneratedFiles
 packages/
 *.Cache
 src/*.properties
+bower_components
