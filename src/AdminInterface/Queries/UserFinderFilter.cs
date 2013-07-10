@@ -175,7 +175,7 @@ namespace AdminInterface.ManagerReportsFilters
 					.CreateAlias("Payer", "p", JoinType.InnerJoin)
 					.CreateAlias("Client", "c", JoinType.LeftOuterJoin)
 					.CreateAlias("c.Settings", "set", JoinType.LeftOuterJoin)
-					.Add(Expression.Or(Expression.Gt("p.PayerID", 921u), Expression.Lt("p.PayerID", 921u)))
+					.Add(Expression.Or(Expression.Gt("p.Id", 921u), Expression.Lt("p.Id", 921u)))
 					.Add(Expression.Eq("s.Type", ServiceType.Drugstore));
 
 				if (ExcludeType == ExcludesTypes.Hidden)

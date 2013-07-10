@@ -35,7 +35,7 @@ end
 
 <div class="left">
 	${app.Form("update")}
-		${FormHelper.HiddenField("Instance.PayerId")}
+		${FormHelper.HiddenField("Instance.Id")}
 	<table>
 		${WriteInputGroupHeader("Общая информация")}
 
@@ -73,7 +73,7 @@ end
 
 		<% if payer.ContactGroupOwner.ContactGroups.Count == 0: %>
 			<td class="InputGroupHeader" colspan="2">
-				<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
+				<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.Id}" target="_blank">Добавить группу контактной информации</a>
 			</td>
 		<% end %>
 
@@ -85,7 +85,7 @@ end
 			<tr>
 				<% if contactGroupIndex == 0: %>
 					<td class="InputGroupHeader">
-						<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
+						<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.Id}" target="_blank">Добавить группу контактной информации</a>
 					</td>
 					<td class="InputGroupHeader">
 						${ContactGroupName}
@@ -194,7 +194,7 @@ end
 			Отправка корреспонденции
 		</div>
 		${app.Form("SentMail")}
-			${FormHelper.HiddenField("MailSentEntity.PayerId", Instance.Id)}
+			${FormHelper.HiddenField("MailSentEntity.Id", Instance.Id)}
 			${FormHelper.LabelFor("MailSentEntity.SentDate", "Дата отправки:")}
 			<br>
 			${FormHelper.TextFieldValue("MailSentEntity.SentDate", Today.ToShortDateString(), { "class" : "CheckDate DateInFuture" })}

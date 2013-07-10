@@ -183,11 +183,11 @@ namespace AdminInterface.Controllers
 			uint.TryParse(term, out id);
 			return ActiveRecordLinq
 				.AsQueryable<Payer>()
-				.Where(p => p.Name.Contains(term) || p.PayerID == id)
+				.Where(p => p.Name.Contains(term) || p.Id == id)
 				.Take(20)
 				.ToList()
 				.Select(p => new {
-					id = p.PayerID,
+					id = p.Id,
 					label = String.Format("[{0}]. {1} ИНН {2}", p.Id, p.Name, p.INN),
 					recipient = p.Recipient != null ? p.Recipient.Id : 0
 				});

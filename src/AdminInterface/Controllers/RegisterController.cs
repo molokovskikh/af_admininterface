@@ -319,7 +319,7 @@ namespace AdminInterface.Controllers
 			Payer currentPayer = null;
 			if (additionalSettings.PayerExists) {
 				if ((payer != null && payer.Id != 0) || existingPayerId.HasValue) {
-					var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
+					var id = existingPayerId.HasValue ? existingPayerId.Value : payer.Id;
 					currentPayer = DbSession.Load<Payer>(id);
 					if (currentPayer.JuridicalOrganizations.Count == 0) {
 						var organization = new LegalEntity();
@@ -512,7 +512,7 @@ WHERE   pricesdata.firmcode = s.Id
 			var suppliers = DbSession.Query<Supplier>()
 				.Where(s => !s.Disabled && s.Name.Contains(searchPattern));
 			if (payerId.HasValue && payerId.Value > 0)
-				suppliers = suppliers.Where(item => item.Payer.PayerID == payerId.Value);
+				suppliers = suppliers.Where(item => item.Payer.Id == payerId.Value);
 
 			PropertyBag["suppliers"] = suppliers.Take(50).ToArray();
 			CancelLayout();

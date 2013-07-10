@@ -7,7 +7,7 @@
 	${app.Asset("EditPayment.js")}
 <form class="accountant-friendly" method="post">
 	${FormHelper.HiddenField("payment.Id")}
-	${FormHelper.HiddenField("payment.Payer.PayerId")}
+	${FormHelper.HiddenField("payment.Payer.Id")}
 
 	<p>
 		<% if payment.PayerClient: %>

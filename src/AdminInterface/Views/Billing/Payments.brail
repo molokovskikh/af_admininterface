@@ -19,7 +19,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 ${app.Asset("Payments.js")}
 <script type="text/javascript">
 function RefreshTotalSum() {
-	var link = "${siteroot}/Billing/TotalSum.rails?payerId=${Instance.PayerID}";
+	var link = "${siteroot}/Billing/TotalSum.rails?payerId=${Instance.Id}";
 	AjaxRequest(link,
 		function (html) { $("#TotalSum").html(html); },
 		function (xhr, textStatus, error) { $("#TotalSum").html(""); });
@@ -417,7 +417,7 @@ function RefreshTotalSum() {
 	<div>
 		${app.Form("update", {"id" : "PayerInfo"})}
 
-		${FormHelper.HiddenField("Instance.PayerID")}
+		${FormHelper.HiddenField("Instance.Id")}
 		<table style="width: 100%">
 
 			${WriteInputGroupHeader("Опции выставки счета")}

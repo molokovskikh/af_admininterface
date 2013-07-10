@@ -47,7 +47,7 @@ namespace Integration
 			ForTest.InitializeMailer();
 			mailer = ForTest.TestMailer(m => message = m);
 
-			payer = new Payer("Тестовый плательщик") { PayerID = 10, JuridicalName = "FullTestPayerName" };
+			payer = new Payer("Тестовый плательщик") { Id = 10, JuridicalName = "FullTestPayerName" };
 			client = new Client(payer, Data.DefaultRegion) {
 				Id = 58,
 				Name = "Тестовый клиент",

@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Configuration;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web.Script.Serialization;
 using AddUser;
-using AdminInterface.Extentions;
 using AdminInterface.Helpers;
 using AdminInterface.Mailers;
 using AdminInterface.Models;
@@ -20,20 +16,15 @@ using AdminInterface.Models.Telephony;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
-using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
-using AdminInterface.Properties;
 using System.Web;
-using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using System.Linq;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
-using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Linq;
 using Newtonsoft.Json;
@@ -58,9 +49,25 @@ namespace AdminInterface.Controllers
 		{
 			var encode = Encoding.GetEncoding("utf-8");
 			var responseStream = new StreamReader(Request.InputStream, encode);
-			var jsonText = responseStream.ReadLine();
+			//что бы сохранить обратную совместимость, раньше первичный ключ в Payer назывался PayerId теперь Id
+			//правим PayerId -> Id
+			var jsonText = PatchJson(responseStream.ReadLine());
 			var deserializedObj = JsonConvert.DeserializeObject<User>(jsonText);
 			Add(new Contact[0], null, new Person[0], "Пользователь создан из интерфейса поставщика", true, deserializedObj.RootService.Id, string.Empty, jsonText);
+		}
+
+		public static string PatchJson(string request)
+		{
+			var json = JObject.Parse(request);
+			var payer = json.GetValue("Payer") as JObject;
+			if (payer == null)
+				return request;
+			var id = payer.GetValue("PayerID") as JValue;
+			if (id == null)
+				return request;
+			payer.Remove("PayerID");
+			payer.Add("Id", id);
+			return json.ToString();
 		}
 
 		[AccessibleThrough(Verb.Get)]
@@ -182,7 +189,10 @@ namespace AdminInterface.Controllers
 
 			var service = Service.FindAndCheck<Service>(clientId);
 			var user = new User(service);
+			var address = new Address();
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstanceForUser(user, "user", jsonSource);
+			BindObjectInstance(address, "address", AutoLoadBehavior.NewInstanceIfInvalidKey);
 
 			if (!IsValid(user)) {
 				Add(service.Id);
@@ -190,18 +200,11 @@ namespace AdminInterface.Controllers
 				return;
 			}
 
-			var address = new Address();
-			SetBinder(new ARDataBinder());
-			BindObjectInstance(address, "address", AutoLoadBehavior.NewInstanceIfInvalidKey);
-
-
 			if (String.IsNullOrEmpty(address.Value))
 				address = null;
+
 			if (service.IsClient()
 				&& ((Client)service).Payers.Count > 1) {
-				if (user.AvaliableAddresses.Any()) {
-					user.AvaliableAddresses.Each(a => DbSession.Refresh(a));
-				}
 				if ((user.AvaliableAddresses.Any() && user.AvaliableAddresses.Select(s => s.LegalEntity).All(l => l.Payer.Id != user.Payer.Id))
 					|| (address != null && address.LegalEntity.Payer.Id != user.Payer.Id)) {
 					Add(service.Id);
@@ -213,8 +216,6 @@ namespace AdminInterface.Controllers
 			}
 
 			service.AddUser(user);
-
-			user.Payer = DbSession.Load<Payer>(user.Payer.Id);
 			user.Setup(string.IsNullOrEmpty(jsonSource));
 			var password = user.CreateInAd();
 			if (string.IsNullOrEmpty(jsonSource)) {
@@ -222,7 +223,7 @@ namespace AdminInterface.Controllers
 				user.OrderRegionMask = regionSettings.GetOrderMask();
 			}
 			else {
-				user.WorkRegionMask = BitConverter.ToUInt64(user.RegionSettings.Select(r => Convert.ToByte(r)).ToArray(), 0);
+				user.WorkRegionMask = BitConverter.ToUInt64(user.RegionSettings.Select(Convert.ToByte).ToArray(), 0);
 				mails = user.EmailForCard;
 			}
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
@@ -238,7 +239,6 @@ namespace AdminInterface.Controllers
 			}
 			DbSession.SaveOrUpdate(service);
 
-
 			if (address != null)
 				address.CreateFtpDirectory();
 
@@ -252,7 +252,7 @@ namespace AdminInterface.Controllers
 				var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены следующие адреса доставки: \r\n {2}",
 					user.Id,
 					user.Name,
-					user.AvaliableAddresses.Select(a => Address.TryFind(a.Id)).Where(a => a != null).Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
+					user.AvaliableAddresses.Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
 				new AuditRecord(message, user.Client) { MessageType = LogMessageType.System }.Save();
 			}
 

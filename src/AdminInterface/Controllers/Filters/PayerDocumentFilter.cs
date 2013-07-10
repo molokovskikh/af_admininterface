@@ -81,7 +81,7 @@ namespace AdminInterface.Controllers.Filters
 					.ToArray();
 
 				if (ids.Length == parts.Length)
-					criteria.Add(FindActInvoiceIfIds ? Expression.In("Id", ids) : Expression.In("p.PayerID", ids));
+					criteria.Add(FindActInvoiceIfIds ? Expression.In("Id", ids) : Expression.In("p.Id", ids));
 				else
 					criteria.Add(Expression.Like("p.Name", SearchText, MatchMode.Anywhere));
 			}
