@@ -221,9 +221,9 @@ namespace Integration.Controllers
 		public void Search_user_for_show_user_test()
 		{
 			var client = DataMother.CreateClientAndUsers();
-			client.Name = "testClientForShowUserFindTest";
+			client.Name = Generator.Name();
 			var user = client.Users.First();
-			user.Login = Guid.NewGuid().ToString().Replace("-", string.Empty);
+			user.Login = Generator.Name();
 			session.Save(user);
 			session.Save(client);
 
@@ -231,7 +231,7 @@ namespace Integration.Controllers
 			var loginObj = controller.SearchForShowUser(user.Login.Substring(0, 5));
 			Assert.AreEqual(loginObj.Count(), 1);
 
-			var clientObj = controller.SearchForShowUser("ForShowUserFind");
+			var clientObj = controller.SearchForShowUser(client.Name.Substring(0, 5));
 			Assert.AreEqual(clientObj.Count(), 2);
 		}
 
