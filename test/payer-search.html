@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<script data-main="test" src="../packages/RequireJS.2.1.6/content/Scripts/require.js"></script>
+		<script src="../bower_components/qunit/qunit.js"></script>
+		<link rel="stylesheet" href="../bower_components/qunit/qunit.css">
+		<link rel="stylesheet" href="../packages/jQuery.UI.Combined.1.8.16/Content/Content/themes/base/jquery.ui.all.css">
+	</head>
+	<script>
+		QUnit.config.autostart = false;
+	</script>
+	<body>
+		<h1 id="qunit-header">QUnit example</h1>
+		<h2 id="qunit-banner"></h2>
+		<div id="qunit-testrunner-toolbar"></div>
+		<h2 id="qunit-userAgent"></h2>
+		<ol id="qunit-tests"></ol>
+		<div id="qunit-fixture">
+			<table>
+				<tr>
+					<td width="50%">
+						<input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
+						<input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
+					</td>
+					<td>
+						<div id="SearchPayerDiv" style="width: 100%; display: none">
+							<input type="text" id="SearchPayerTextPattern" name="SearchPayerTextPattern" style="width: 75%" />
+							<input type="button" id="SearchPayerButton" name="SearchPayerButton" value="Найти" onclick="ShowSelectPayerDiv()" />
+						</div>
+						<div id="SelectPayerDiv" style="width: 100%; display: none">
+							<select id="PayerComboBox" name="payer.PayerID" style="width: 75%"></select>
+							<input type="button" id="ResetPayerButton" name="ResetPayerButton" value="Сброс" onclick="ShowSearchPayerDiv()" />
+						</div>
+						<div id="MessageForPayer"></div>
+						<input type="hidden" id="PayerIdValue" name="existingPayerId" />
+					</td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>

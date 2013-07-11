@@ -1,4 +1,4 @@
-﻿$ ->
+﻿registerFilter = ->
 	allLabel = "Показать для всех"
 	currentLabel = "Показать только для текущего"
 
@@ -12,7 +12,7 @@
 		$(".filter-checker").text(allLabel).show()
 		filter()
 
-	$(".filter-checker").click -> 
+	$(".filter-checker").click ->
 		if $(this).text() == allLabel
 			unfilter()
 			$(this).text(currentLabel)
@@ -26,3 +26,8 @@
 
 	unfilter = () ->
 		$(".filtrable tr").show()
+
+window.registerFilter = registerFilter
+
+if typeof require != 'function'
+	$ -> registerFilter()
