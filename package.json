@@ -1,0 +1,19 @@
+{
+  "name": "AdminInterface",
+  "main": "Gruntfile.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-qunit": "~0.2.2",
+    "grunt-contrib-watch": "~0.4.4",
+    "grunt-qunit-junit": "~0.1.0-alpha2"
+  },
+  "scripts": {
+    "test": "test"
+  }
+}

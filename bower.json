@@ -1,0 +1,5 @@
+{
+	"dependencies" : {
+		"qunit": "1.11"
+	}
+}

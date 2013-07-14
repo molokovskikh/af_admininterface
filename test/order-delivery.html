@@ -2,14 +2,18 @@
 	<head>
 			<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 			<script src="../packages/jQuery.1.6.2/Content/Scripts/jQuery-1.6.2.js"></script>
-			<script src="http://code.jquery.com/qunit/git/qunit.js"></script>
+			<script src="../bower_components/qunit/qunit.js"></script>
+			<script src="../src/AdminInterface/JavaScript/jquery.tmpl.js"></script>
 			<script src="../packages/Underscore.js.1.1.7/Content/Scripts/underscore.js"></script>
 			<script src="../packages/Backbone.js.0.5.3/Content/Scripts/backbone.js"></script>
-			<script src="../src/AdminInterface/Assets/Javascripts/payer.send.message.js"></script>
-			<script src="payer.send.message.js"></script>
+			<script src="../src/AdminInterface/Assets/Javascripts/order.delivery.group.editor.js"></script>
+			<script src="order-delivery.js"></script>
 
-			<link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css"></link>
+			<link rel="stylesheet" href="../bower_components/qunit/qunit.css"></link>
 	</head>
+	<script id="orderDeliveryGroup" type="text/x-jquery-tmpl">
+		<div>${attributes.name}</div>
+	</script>
 	<body>
 		<h1 id="qunit-header">QUnit example</h1>
 		<h2 id="qunit-banner"></h2>
@@ -18,13 +22,6 @@
 		<ol id="qunit-tests"></ol>
 		<div id="qunit-fixture">test markup, will be hidden</div>
 	</body>
-	<div id=users>
-		<a data-id=1 href="javascript:">1</a>
+	<div id="groups">
 	</div>
-	<input type=checkbox id="userMessage_SendToMinimail">
-	<select id=messageReceiverComboBox>
-		<option value=1>1</option>
-		<option>Все</option>
-	</select>
-
 </html>

@@ -1,5 +1,6 @@
 (function() {
-  $(function() {
+  var registerFilter;
+  registerFilter = function() {
     var allLabel, currentLabel, filter, unfilter;
     allLabel = "Показать для всех";
     currentLabel = "Показать только для текущего";
@@ -31,5 +32,11 @@
     return unfilter = function() {
       return $(".filtrable tr").show();
     };
-  });
+  };
+  window.registerFilter = registerFilter;
+  if (typeof require !== 'function') {
+    $(function() {
+      return registerFilter();
+    });
+  }
 }).call(this);

@@ -7,4 +7,3 @@ $ ->
 		equal $("input[type=textbox]").attr("disabled"), null
 		$("#on-box").click() #un checked
 		equal $("input[type=textbox]").attr("disabled"), "disabled"
-
