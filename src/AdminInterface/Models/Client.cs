@@ -366,7 +366,7 @@ group by u.ClientId")
 
 		public virtual bool ShouldNotify()
 		{
-			return Payers.All(p => p.PayerID != 921);
+			return Payers.All(p => p.Id != 921);
 		}
 
 		public virtual void UpdatePricesForClient(ISession session)

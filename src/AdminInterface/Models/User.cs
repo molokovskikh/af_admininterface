@@ -110,11 +110,14 @@ namespace AdminInterface.Models
 			RootService = service;
 			if (service is Client) {
 				Client = (Client)RootService;
+				if (Client.Payers.Count == 1)
+					Payer = Client.Payers.First();
 				WorkRegionMask = Client.MaskRegion;
 				OrderRegionMask = Client.Settings.OrderRegionMask;
 			}
 			else if (service is Supplier) {
 				WorkRegionMask = ulong.MaxValue;
+				Payer = ((Supplier)service).Payer;
 			}
 			UserUpdateInfo = new UserUpdateInfo(this);
 			Logs = new AuthorizationLogEntity(this);
@@ -214,7 +217,7 @@ namespace AdminInterface.Models
 		 Description("Наследовать настройки прайс листов"), Auditable, SetForceReplication]
 		public virtual User InheritPricesFrom { get; set; }
 
-		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke), Description("Плательщик"), Auditable, PayerNotNullValidator("Заполнение поля обязательно")]
+		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke), Description("Плательщик"), Auditable, ValidateNonEmpty]
 		public virtual Payer Payer { get; set; }
 
 		//не работает какая то фигня в хибере

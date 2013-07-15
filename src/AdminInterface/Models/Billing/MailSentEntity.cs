@@ -27,7 +27,7 @@ namespace AdminInterface.Models.Billing
 		public static MailSentEntity[] GetHistory(Payer payer)
 		{
 			return ActiveRecordLinqBase<MailSentEntity>.Queryable
-				.Where(m => m.PayerId == payer.PayerID)
+				.Where(m => m.PayerId == payer.Id)
 				.OrderByDescending(m => m.SentDate)
 				.ToArray();
 		}

@@ -86,14 +86,8 @@ namespace AdminInterface.Models.Billing
 			Reports = new List<Report>();
 		}
 
-		[PrimaryKey, Description("Договор")]
-		public virtual uint PayerID { get; set; }
-
-		public virtual uint Id
-		{
-			get { return PayerID; }
-			set { PayerID = value; }
-		}
+		[PrimaryKey("PayerId"), Description("Договор")]
+		public virtual uint Id { get; set; }
 
 		[Property("ShortName")]
 		public virtual string Name { get; set; }
@@ -111,11 +105,9 @@ namespace AdminInterface.Models.Billing
 		public virtual string ReceiverAddress { get; set; }
 
 		[Property]
-		[ValidateRegExp("", "КПП должен содержать 9 цифр")]
 		public virtual string KPP { get; set; }
 
 		[Property]
-		[ValidateRegExp("", "ИНН может содержать 10 или 12 цифр")]
 		public virtual string INN { get; set; }
 
 		[BelongsTo(Column = "ContactGroupOwnerId", Lazy = FetchWhen.OnInvoke, Cascade = CascadeEnum.SaveUpdate)]

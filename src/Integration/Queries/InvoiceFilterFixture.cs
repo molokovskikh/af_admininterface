@@ -36,7 +36,7 @@ namespace Integration
 			session.Save(invoice2);
 
 			var filter = new PayerDocumentFilter {
-				SearchText = new[] { payer1, payer2 }.Implode(p => p.PayerID)
+				SearchText = new[] { payer1, payer2 }.Implode(p => p.Id)
 			};
 			var invoices = filter.Find<Invoice>();
 			Assert.That(invoices, Is.EquivalentTo(new[] { invoice1, invoice2 }));

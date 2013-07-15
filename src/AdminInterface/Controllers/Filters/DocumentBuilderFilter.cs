@@ -33,7 +33,7 @@ namespace AdminInterface.Controllers.Filters
 			criteria.Add(Restrictions.Eq("Period", Period));
 
 			if (PayerId != null && PayerId.Length > 0) {
-				criteria.Add(Restrictions.In("p.PayerID", PayerId));
+				criteria.Add(Restrictions.In("p.Id", PayerId));
 			}
 			else {
 				if (Region != null)
@@ -95,7 +95,7 @@ namespace AdminInterface.Controllers.Filters
 				}
 				else {
 					payers = session.Query<Payer>()
-						.Where(p => PayerId.Contains(p.PayerID)
+						.Where(p => PayerId.Contains(p.Id)
 							&& p.Registration.RegistrationDate <= periodEnd
 								&& p.Recipient != null)
 						.OrderBy(p => p.Name)

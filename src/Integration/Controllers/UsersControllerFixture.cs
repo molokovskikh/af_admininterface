@@ -110,6 +110,8 @@ namespace Integration.Controllers
 			session.Save(payer);
 			client.Payers.Add(payer);
 			session.SaveOrUpdate(client);
+
+			Prepare();
 			Request.Params.Add("user.Payer.Id", payer.Id.ToString());
 			controller.Add(new Contact[0], new[] {
 				new RegionSettings {
@@ -117,8 +119,9 @@ namespace Integration.Controllers
 				},
 			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
 
+			Assert.IsTrue(Response.WasRedirected);
 			var user = Registred();
-			Assert.That(user.Payer, Is.EqualTo(payer));
+			Assert.That(user.Payer.Id, Is.EqualTo(payer.Id));
 		}
 
 		[Test]
@@ -131,6 +134,7 @@ namespace Integration.Controllers
 			session.SaveOrUpdate(client);
 
 			var legalEntity = client.Orgs().First();
+			Prepare();
 			Request.Params.Add("user.Payer.Id", payer.Id.ToString());
 			Request.Params.Add("address.LegalEntity.Id", legalEntity.Id.ToString());
 			Request.Params.Add("address.Value", "новый адрес");
@@ -152,6 +156,7 @@ namespace Integration.Controllers
 			client.Payers.Add(payer);
 			session.SaveOrUpdate(client);
 
+			Prepare();
 			var legalEntity = client.Orgs().First(entity => entity.Payer.Id == payer.Id);
 			Request.Params.Add("user.Payer.Id", payer.Id.ToString());
 			Request.Params.Add("address.LegalEntity.Id", legalEntity.Id.ToString());
@@ -162,6 +167,7 @@ namespace Integration.Controllers
 				},
 			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
 
+			Assert.IsTrue(Response.WasRedirected);
 			var user = Registred();
 			Assert.That(user.Payer, Is.EqualTo(payer));
 		}
@@ -261,6 +267,13 @@ namespace Integration.Controllers
 			Assert.AreEqual(user.RootService.Id, 5);
 			Assert.AreEqual(user.RootService.Name, "Протек-15");
 			Assert.IsNull(user.InheritPricesFrom);
+		}
+
+		[Test]
+		public void Patch_json()
+		{
+			var result = UsersController.PatchJson(json);
+			Assert.That(result, Is.Not.StringContaining("PayerID"));
 		}
 
 		[Test, Ignore("Чтобы выяснить с этим ли тестом связана поломка")]

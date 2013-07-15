@@ -214,7 +214,7 @@ namespace AdminInterface.Models.Suppliers
 
 		public virtual bool ShouldNotify()
 		{
-			return Payer.PayerID != 921;
+			return Payer.Id != 921;
 		}
 
 		public virtual string GetEmailsForBilling()

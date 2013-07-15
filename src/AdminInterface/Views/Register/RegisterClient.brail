@@ -338,7 +338,7 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 						<input type="button" id="SearchPayerButton" name="SearchPayerButton" value="Найти" onclick="ShowSelectPayerDiv()" />
 					</div>
 					<div id="SelectPayerDiv" style="width: 100%; display: none">
-						<select id="PayerComboBox" name="payer.PayerID" style="width: 75%" data-bind="value: payerId"></select>
+						<select id="PayerComboBox" name="payer.Id" style="width: 75%" data-bind="value: payerId"></select>
 						<input type="button" id="ResetPayerButton" name="ResetPayerButton" value="Сброс" onclick="ShowSearchPayerDiv()" />
 					</div>
 					<div id="MessageForPayer"></div>

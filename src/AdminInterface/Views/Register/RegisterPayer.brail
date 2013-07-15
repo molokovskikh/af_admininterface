@@ -36,7 +36,7 @@ end
 
 <form id="PayerInfo" action="registered" method="post">
 	<input type="hidden" name="showRegistrationCard" value="${showRegistrationCard}" />
-	${FormHelper.HiddenField("Instance.PayerID")}
+	${FormHelper.HiddenField("Instance.Id")}
 
 <table style="width:800px;">
 	${WriteInputGroupHeader("Юридическое лицо")}
@@ -69,7 +69,7 @@ end
 			<tr>
 				<% if contactGroupIndex == 0: %>
 					<td class="InputGroupHeader">
-						<a href="../Contact/NewContactGroup?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
+						<a href="../Contact/NewContactGroup?billingCode=${Instance.Id}" target="_blank">Добавить группу контактной информации</a>
 					</td>
 					<td class="InputGroupHeader">
 						${ContactGroupName}

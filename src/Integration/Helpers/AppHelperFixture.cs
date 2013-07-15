@@ -268,11 +268,11 @@ namespace Integration
 		public void Not_empty_search_editor()
 		{
 			var supplier = new Supplier(new Region("Тестовый регион"), new Payer("Плательшик") {
-				PayerID = 1
+				Id = 1
 			});
 			propertyBag["supplier"] = supplier;
 			var html = helper.SearchEdit("supplier.Payer", null);
-			Assert.That(html, Is.EqualTo("<input type=\"hidden\" id=\"supplier_Payer_PayerID\" name=\"supplier.Payer.PayerID\" value=\"1\" />"
+			Assert.That(html, Is.EqualTo("<input type=\"hidden\" id=\"supplier_Payer_Id\" name=\"supplier.Payer.Id\" value=\"1\" />"
 				+ "<div class=\"value\" > Плательшик</div>"));
 		}
 

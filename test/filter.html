@@ -1,71 +1,42 @@
 ﻿<html>
 	<head>
-			<script src="../packages/jQuery.1.6.2/Content/Scripts/jQuery-1.6.2.js"></script>
-			<script src="http://code.jquery.com/qunit/git/qunit.js"></script>
-			<script src="../lib/coffeescript.js.1.1.2/coffee-script.js"></script>
-			<script src="../src/AdminInterface/Assets/Javascripts/filter.js"></script>
-			<link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css"></link>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<script data-main="test" src="../packages/RequireJS.2.1.6/content/Scripts/require.js"></script>
+		<script src="../bower_components/qunit/qunit.js"></script>
+		<link rel="stylesheet" href="../bower_components/qunit/qunit.css">
+		<link rel="stylesheet" href="../packages/jQuery.UI.Combined.1.8.16/Content/Content/themes/base/jquery.ui.all.css">
 	</head>
+	<script>
+		QUnit.config.autostart = false;
+	</script>
 	<body>
-		<script type="text/coffeescript">
-			$ ->
-				test "filter table rows", ->
-					link = $(".filter a[data-filter=f1]")
-					equal link.length, 1
-					link.click()
-					equal $("tr[data-filter=f2]").css("display"), "none"
-					notEqual $("tr[data-filter=f1]").css("display"), "none"
-
-				test "filter checker", ->
-					$(".filter-checker").hide()
-					checker = $(".filter-checker")
-					equal checker.css("display"), "none"
-					link = $(".filter a[data-filter=f1]")
-					link.click()
-					notEqual checker.css("display"), "none"
-					checker.click()
-					notEqual $("tr[data-filter=f1]").css("display"), "none"
-					notEqual $("tr[data-filter=f2]").css("display"), "none"
-					checker.click()
-					equal $("tr[data-filter=f2]").css("display"), "none"
-					notEqual $("tr[data-filter=f1]").css("display"), "none"
-
-				test "filter items", ->
-					$(".filter a[data-filter=f1]").click()
-					equal $("tr[data-filter=f2]").css("display"), "none"
-					notEqual $("tr[data-filter=f1]").css("display"), "none"
-					
-					$(".filter a[data-filter=f2]").click()
-					notEqual $("tr[data-filter=f2]").css("display"), "none"
-					equal $("tr[data-filter=f1]").css("display"), "none"
-		</script>
 		<h1 id="qunit-header">QUnit example</h1>
-	  	<h2 id="qunit-banner"></h2>
-	  	<div id="qunit-testrunner-toolbar"></div>
+		<h2 id="qunit-banner"></h2>
+		<div id="qunit-testrunner-toolbar"></div>
 		<h2 id="qunit-userAgent"></h2>
 		<ol id="qunit-tests"></ol>
-	 	<div id="qunit-fixture">test markup, will be hidden</div>
-
-		<table class=filter>
-			<tr>
-				<td>
-					<a href="javascript:" data-filter="f1">f1</a>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<a href="javascript:" data-filter="f2">f2</a>
-				</td>
-			</tr>
-		</table>
-		<a href="javascript:" class="filter-checker">Показать всех</a>
-		<table class=filtrable>
-			<tr data-filter="f1">
-				<td>f1</td>
-			</tr>
-			<tr data-filter="f2">
-				<td>f2</td>
-			</tr>
-		</table>
+		<div id="qunit-fixture">
+			<table class=filter>
+				<tr>
+					<td>
+						<a href="javascript:" data-filter="f1">f1</a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a href="javascript:" data-filter="f2">f2</a>
+					</td>
+				</tr>
+			</table>
+			<a href="javascript:" class="filter-checker">Показать всех</a>
+			<table class=filtrable>
+				<tr data-filter="f1">
+					<td>f1</td>
+				</tr>
+				<tr data-filter="f2">
+					<td>f2</td>
+				</tr>
+			</table>
+		</div>
 	</body>
 </html>
