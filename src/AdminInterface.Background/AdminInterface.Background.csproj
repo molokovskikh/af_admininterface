@@ -72,7 +72,6 @@
     <Compile Include="ReportLogsTask.cs" />
     <Compile Include="ReportTask.cs" />
     <Compile Include="SendPaymentNotification.cs" />
-    <Compile Include="Task.cs" />
     <Compile Include="UpdateAccountTask.cs" />
     <Compile Include="Waiter.cs" />
   </ItemGroup>

@@ -5,6 +5,7 @@ using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Background
 {
