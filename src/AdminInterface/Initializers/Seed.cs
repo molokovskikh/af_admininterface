@@ -15,18 +15,16 @@ namespace AdminInterface.Initializers
 {
 	public class Seed
 	{
-		public void Run()
+		public Administrator Run()
 		{
 			using (new SessionScope()) {
-				ArHelper.WithSession(s => {
+				return ArHelper.WithSession(s => {
 					//нужно только для того что бы запустить в браузере
 					var admin = Administrator.GetByName(Environment.UserName);
 					if (admin == null) {
 						admin = Administrator.CreateLocalAdministrator();
 						s.Save(admin);
 					}
-
-					SecurityContext.GetAdministrator = () => admin;
 
 					var defaults = s.Query<DefaultValues>().First();
 					if (defaults.SmartOrderAssortmentPrice == null) {
@@ -41,6 +39,7 @@ namespace AdminInterface.Initializers
 						defaults.SmartOrderAssortmentPrice = supplier.AddPrice("Базовый", PriceType.Assortment);
 						s.Save(supplier);
 					}
+					return admin;
 				});
 			}
 		}

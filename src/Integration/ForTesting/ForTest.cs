@@ -6,7 +6,9 @@ using System.Reflection;
 using AdminInterface.Initializers;
 using AdminInterface.Mailers;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.MonoRailExtentions;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using Castle.Core.Smtp;
@@ -31,7 +33,10 @@ namespace Integration.ForTesting
 				var activeRecord = new ActiveRecord();
 				activeRecord.Assemblies = activeRecord.Assemblies.Concat(new[] { "Test.Support" }).ToArray();
 				activeRecord.Initialize(ActiveRecordSectionHandler.Instance);
-				new Seed().Run();
+				var admin = new Seed().Run();
+
+				SecurityContext.GetAdministrator = () => admin;
+				Administrator.GetHost = () => "localhost";
 			}
 		}
 

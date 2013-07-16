@@ -21,24 +21,6 @@ namespace Integration
 			Global.Config.DocsPath = "../../../AdminInterface/Docs/";
 
 			ForTest.InitialzeAR();
-			var admin = new Administrator {
-				UserName = Environment.UserName,
-				Email = "kvasovtest@analit.net",
-				PhoneSupport = "112",
-				RegionMask = ulong.MaxValue,
-				ManagerName = "test",
-			};
-			using(new SessionScope()) {
-				ArHelper.WithSession(session => {
-					admin.AllowedPermissions = Enum.GetValues(typeof(PermissionType))
-						.Cast<PermissionType>()
-						.Select(t => Permission.Find(t))
-						.ToList();
-					ActiveRecordMediator.Save(admin);
-					SecurityContext.GetAdministrator = () => admin;
-					Administrator.GetHost = () => "localhost";
-				});
-			}
 		}
 	}
 }
