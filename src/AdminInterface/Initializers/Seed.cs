@@ -26,6 +26,8 @@ namespace AdminInterface.Initializers
 						s.Save(admin);
 					}
 
+					var origin = SecurityContext.GetAdministrator;
+					SecurityContext.GetAdministrator = () => admin;
 					var defaults = s.Query<DefaultValues>().First();
 					if (defaults.SmartOrderAssortmentPrice == null) {
 						var payer = new Payer("Тестовый плательщик");
@@ -39,6 +41,7 @@ namespace AdminInterface.Initializers
 						defaults.SmartOrderAssortmentPrice = supplier.AddPrice("Базовый", PriceType.Assortment);
 						s.Save(supplier);
 					}
+					SecurityContext.GetAdministrator = origin;
 					return admin;
 				});
 			}

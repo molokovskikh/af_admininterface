@@ -259,7 +259,7 @@ namespace AdminInterface.Models.Security
 				Email = "kvasovtest@analit.net",
 				PhoneSupport = "112",
 				RegionMask = UInt64.MaxValue,
-				ManagerName = "Для тестирования",
+				ManagerName = "test",
 			};
 			admin.AllowedPermissions = Enum.GetValues(typeof(PermissionType))
 				.Cast<PermissionType>()
