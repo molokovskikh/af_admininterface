@@ -6,7 +6,7 @@ configPaths = {
 	"knockout": "packages/knockoutjs.2.1.0/Content/Scripts/knockout-2.1.0.debug",
 	"underscore": "packages/underscore.js.1.1.7/Content/Scripts/underscore",
 	"confirmation": "src/AdminInterface/Assets/Javascripts/confirmation",
-	"search-editor": "src/AdminInterface/Assets/Javascripts/search.editor.v2",
+	"search-editor": "src/Common.Web.UI/Common.Web.UI/Assets/Content/Javascripts/search.editor.v2",
 	"smart-order-settings": "src/AdminInterface/Assets/Javascripts/smart.order.settings",
 	"edit-payment": "src/AdminInterface/Assets/Javascripts/EditPayment",
 	"filter": "src/AdminInterface/Assets/Javascripts/filter",

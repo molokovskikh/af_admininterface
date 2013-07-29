@@ -2,11 +2,13 @@
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
@@ -233,8 +235,15 @@ namespace Functional.Drugstore
 			Click(user.Login);
 			Click("Настройка");
 
-			for (int i = 0; i < 25; i++)
-				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
+			var types = new[] {
+				UserPermissionTypes.Base,
+				UserPermissionTypes.AnalitFExcel,
+				UserPermissionTypes.AnalitFPrint
+			};
+			var total = session.Query<UserPermission>().Count(p => types.Contains(p.Type));
+			for (int i = 0; i < total; i++)
+				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i)))
+					.Checked = (i % 2 == 0);
 
 			ClickButton("Сохранить");
 			AssertText("Сохранено");
@@ -246,16 +255,17 @@ namespace Functional.Drugstore
 			ClickLink("Новый пользователь");
 			browser.TextField(Find.ByName("user.Name")).TypeText("test2");
 
-			for (int i = 0; i < 25; i++)
-				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
+			for (int i = 0; i < total; i++)
+				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i)))
+					.Checked = (i % 2 == 0);
 
 			ClickButton("Создать");
 
 			session.Refresh(client);
 			session.Refresh(user);
 			Assert.AreEqual(2, client.Users.Count);
-			Assert.AreEqual(13, client.Users[0].AssignedPermissions.Count);
-			Assert.AreEqual(13, client.Users[1].AssignedPermissions.Count);
+			Assert.AreEqual(total / 2, client.Users[0].AssignedPermissions.Count);
+			Assert.AreEqual(total / 2, client.Users[1].AssignedPermissions.Count);
 		}
 
 		[Test]
