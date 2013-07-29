@@ -233,7 +233,7 @@ namespace Functional.Drugstore
 			Click(user.Login);
 			Click("Настройка");
 
-			for (int i = 0; i < 26; i++)
+			for (int i = 0; i < 25; i++)
 				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
 
 			ClickButton("Сохранить");
@@ -246,7 +246,7 @@ namespace Functional.Drugstore
 			ClickLink("Новый пользователь");
 			browser.TextField(Find.ByName("user.Name")).TypeText("test2");
 
-			for (int i = 0; i < 26; i++)
+			for (int i = 0; i < 25; i++)
 				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
 
 			ClickButton("Создать");
@@ -255,7 +255,7 @@ namespace Functional.Drugstore
 			session.Refresh(user);
 			Assert.AreEqual(2, client.Users.Count);
 			Assert.AreEqual(13, client.Users[0].AssignedPermissions.Count);
-			Assert.AreEqual(14, client.Users[1].AssignedPermissions.Count);
+			Assert.AreEqual(13, client.Users[1].AssignedPermissions.Count);
 		}
 
 		[Test]
