@@ -216,7 +216,7 @@ namespace AdminInterface.Controllers
 			}
 
 			service.AddUser(user);
-			user.Setup(string.IsNullOrEmpty(jsonSource));
+			user.Setup();
 			var password = user.CreateInAd();
 			if (string.IsNullOrEmpty(jsonSource)) {
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
