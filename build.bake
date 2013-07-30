@@ -49,8 +49,7 @@ Global(
 	Project : "AdminInterface",
 	DeployAlias : "FutureAdm",
 	HumanReadableName : "Административный интерфейс",
-	AdditionalAssemblies : ("Common.Web.UI",),
-	Environment : @Local
+	AdditionalAssemblies : ("Common.Web.UI",)
 )
 
 #если мы запускаем тесты на сервере не надо загружать проект что бы
@@ -74,12 +73,16 @@ task @BuildPrinter:
 	Globals.Project = oldProject
 
 task @DeployPrinter:
+	return if Globals.Environment == @Test
+
 	Globals.Project = @Printer
 	Globals.DeployTo = """\\adc.analit.net\Inforoom\Apps\Printer"""
 	Engine.Tasks.First({t| t.Name == "WebDeploy"}).Executed = false
 	Engine.Execute("WebDeploy")
 
 task @DeployBackground, [@BuildBackground]:
+	return if Globals.Environment == @Test
+
 	Globals.Project = "AdminInterface.Background"
 	Globals.DeployTo = """\\fms\TopShelf\Services\""" + Globals.Project
 	Engine.Tasks.First({t| t.Name == "WebDeploy"}).Executed = false
@@ -99,8 +102,6 @@ task @BuildBackground:
 task @DeployApp, [@WebDeploy, @DeployBackground]
 
 task @deploy, [@DeployPipeline]
-
-task @TestDeploy, [@BuildWebSite, @WebDeploy]
 
 task @FindIntruders:
 	Impersonate:
