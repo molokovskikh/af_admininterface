@@ -40,7 +40,11 @@ ${app.Asset("UserScripts.js")}
 			${app.Edit("user.AllowDownloadUnconfirmedOrders")}<br>
 			${app.Edit("user.ShowSupplierCost")}<br>
 			${app.Edit("user.Auditor", {@text: "Аудитор, может просматривать заказы всех пользователей текущего клиента и клиентов которые назначены как показываемые"})}<br>
-			${app.Edit("user.InheritPricesFrom", {@items: user.CanInheritPricesFrom, @firstoption: "Не наследовать", @firstoptionvalue: "", @text: @LoginAndName})}
+			${app.Edit("user.InheritPricesFrom", {@items: user.CanInheritPricesFrom,
+				@firstoption: "Не наследовать",
+				@firstoptionvalue: "",
+				@value: @Id,
+				@text: @LoginAndName})}
 			${app.Label("user.InheritPricesFrom")}<br>
 		</div>
 	
