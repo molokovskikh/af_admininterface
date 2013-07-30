@@ -242,13 +242,9 @@ namespace Integration.ForTesting
 		public static User CreateSupplierUser()
 		{
 			var supplier = CreateSupplier();
-			var user = new User(supplier.Payer, supplier) {
-				Login = User.GetTempLogin()
-			};
-			ActiveRecordMediator.Save(user);
+			var user = new User(supplier.Payer, supplier);
+			ArHelper.WithSession(s => user.AssignDefaultPermission(s));
 			user.Setup();
-			ArHelper.WithSession(s => { user.AssignDefaultPermission(s); });
-			ActiveRecordMediator.Save(user);
 			return user;
 		}
 
