@@ -456,12 +456,15 @@ namespace Functional.Billing
 			// Выключаем клиента. Сумма должна стать равной нулю
 			Css(String.Format("#ClientStatus{0}", client.Id)).Click();
 			AddCommentInDisableDialig();
-			Thread.Sleep(500);
-			currentSum = GetTotalSum();
+
+			Wait(() => {
+				currentSum = GetTotalSum();
+				return currentSum == 0m;
+			}, String.Format("Не дождался что бы сумма стала 0 {0}", browser.Url));
 			Assert.That(currentSum, Is.EqualTo(0));
 		}
 
-		private object GetTotalSum()
+		private decimal GetTotalSum()
 		{
 			var value = (string)Css("#TotalSum").Text.ToString().Trim();
 			return Convert.ToDecimal(value.Substring(0, value.Length - 2), CultureInfo.GetCultureInfo("ru-RU"));

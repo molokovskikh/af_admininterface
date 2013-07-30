@@ -25,10 +25,12 @@ namespace Functional.Suppliers
 			browser.CheckBox(Find.ByName("status")).Click();
 			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
 			ConfirmDialog();
-			Thread.Sleep(500);
 
-			session.Refresh(supplier);
-			Assert.That(supplier.Disabled, Is.True);
+			Wait(() => {
+				session.Refresh(supplier);
+				return supplier.Disabled;
+			}, String.Format("Нe удалось дождаться отключения поставщика {0}", browser.Url));
+			Assert.That(supplier.Disabled, Is.True, browser.Url);
 		}
 	}
 }
