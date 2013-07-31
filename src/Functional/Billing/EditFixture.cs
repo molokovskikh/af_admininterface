@@ -32,7 +32,6 @@ namespace Functional.Billing
 			session.Save(_payer);
 			session.Save(report);
 			session.Save(new ReportAccount(report));
-			Flush();
 		}
 
 		[Test]
@@ -52,11 +51,13 @@ namespace Functional.Billing
 		public void Check_comment_with_disable_client()
 		{
 			Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
-			var checkBox = Css("#clients input[name=\"status\"]");
-			checkBox.Checked = false;
-			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
+			Css("#clients input[name=\"status\"]").Checked = false;
+			Css("input[name=AddComment]").AppendText("TestComment");
 			ConfirmDialog();
-			Thread.Sleep(1000);
+
+			Wait(() => session.Query<PayerAuditRecord>()
+				.Any(r => r.Comment == "TestComment" && r.Payer == _payer),
+				String.Format("не дождался сохранения сообщения {0}", _payer.Id));
 			browser.Refresh();
 			AssertText("TestComment");
 		}
@@ -69,7 +70,14 @@ namespace Functional.Billing
 			Css("input[name=free]").Checked = true;
 			Css("input[name=FreePeriodEnd]").AppendText(DateTime.Now.AddMonths(1).ToShortDateString());
 			Css("input[name=AddComment]").AppendText("Check_free_accounting");
+
 			ConfirmDialog();
+			Wait(() => {
+				var account = _payer.Users[0].Accounting;
+				session.Refresh(account);
+				return account.IsFree;
+			}, "Не удалось дождаться обновления учетной информации");
+
 			var accounted = Css("input[name=accounted]");
 			Assert.IsFalse(accounted.Checked);
 			Assert.IsFalse(accounted.Enabled);
@@ -88,6 +96,10 @@ namespace Functional.Billing
 			Css("#reports input[name=status]").Checked = false;
 			Css("input[name=AddComment]").AppendText("Check_report_status_test");
 			ConfirmDialog();
+
+			Wait(() => session.Query<PayerAuditRecord>()
+				.Any(r => r.Comment == "Check_report_status_test" && r.Payer == _payer),
+				String.Format("не дождался сохранения сообщения {0}", _payer.Id));
 			browser.Refresh();
 			AssertText("Check_report_status_test");
 		}

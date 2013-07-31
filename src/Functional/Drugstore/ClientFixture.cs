@@ -82,16 +82,16 @@ namespace Functional.Drugstore
 			AssertText("This message for client");
 			browser.TextField(Find.ByName("message")).TypeText("This message for user1");
 			ClickButton("Принять");
+			AssertText("Сохранено");
 
-			browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", client.Users[1].Id)));
-			browser.Refresh();
+			Open(client.Users[1], "Edit");
 			AssertText("This message for client");
 			Assert.That(browser.Text, Is.Not.StringContaining("This message for user1"));
 			browser.TextField(Find.ByName("message")).TypeText("This message for user2");
 			ClickButton("Принять");
+			AssertText("Сохранено");
 
-			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
-			browser.Refresh();
+			Open(client);
 			AssertText("This message for user1");
 			AssertText("This message for user2");
 			AssertText("This message for client");
