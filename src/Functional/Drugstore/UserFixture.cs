@@ -264,6 +264,7 @@ namespace Functional.Drugstore
 			session.Refresh(client);
 			session.Refresh(user);
 			Assert.AreEqual(2, client.Users.Count);
+
 			Assert.AreEqual(total / 2, client.Users[0].AssignedPermissions.Count);
 			Assert.AreEqual(total / 2, client.Users[1].AssignedPermissions.Count);
 		}
