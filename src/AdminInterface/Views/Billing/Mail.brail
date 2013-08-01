@@ -193,8 +193,9 @@ end
 		<div class="InputGroupHeader">
 			Отправка корреспонденции
 		</div>
-		${app.Form("SentMail")}
+		${app.Form("SendMail")}
 			${FormHelper.HiddenField("MailSentEntity.Id", Instance.Id)}
+			${FormHelper.HiddenField("MailSentEntity.PayerId", Instance.Id)}
 			${FormHelper.LabelFor("MailSentEntity.SentDate", "Дата отправки:")}
 			<br>
 			${FormHelper.TextFieldValue("MailSentEntity.SentDate", Today.ToShortDateString(), { "class" : "CheckDate DateInFuture" })}

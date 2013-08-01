@@ -254,11 +254,11 @@ namespace AdminInterface.Controllers
 			PropertyBag["filter"] = filter;
 		}
 
-		public void SentMail(uint clientCode, string tab, [DataBind("MailSentEntity")] MailSentEntity sentEntity)
+		public void SendMail(uint clientCode, string tab, [DataBind("MailSentEntity")] MailSentEntity sentEntity)
 		{
 			try {
 				sentEntity.UserName = Admin.UserName;
-				sentEntity.SaveAndFlush();
+				DbSession.Save(sentEntity);
 				Notify("Cохранено");
 			}
 			catch (ValidationException ex) {
