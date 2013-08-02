@@ -114,7 +114,7 @@ namespace Functional.Drugstore
 			Css("#SearchSupplierTextPattern").TypeText(supplier.Name);
 			Css("#SearchSupplierButton").Click();
 
-			Thread.Sleep(500);
+			WaitForText(supplier.Name);
 			Assert.That(browser.Text, Is.StringContaining(supplier.Name), "не нашли поставщика");
 			browser.SelectList(Find.ById("SupplierComboBox")).Select(String.Format("{0}. {1}", supplier.Id, supplier.Name));
 			Assert.That(Css("#options_FillBillingInfo").Enabled, Is.False);
