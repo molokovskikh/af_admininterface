@@ -5,7 +5,7 @@
 		source: "SearchPayer",
 		minLength: 2,
 		select: function (event, ui) {
-			$("#payment_Payer_PayerId").val(ui.item.id);
+			$("#payment_Payer_Id").val(ui.item.id);
 		}
 	});
 

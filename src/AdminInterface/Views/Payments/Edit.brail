@@ -5,7 +5,7 @@
 <% component Bubble, {@bredcrumbs :
 	[("Платежи", "${siteroot}/Payments/")]} %>
 	${app.Asset("EditPayment.js")}
-<form class="accountant-friendly" method="post">
+<form method="post">
 	${FormHelper.HiddenField("payment.Id")}
 	${FormHelper.HiddenField("payment.Payer.Id")}
 
