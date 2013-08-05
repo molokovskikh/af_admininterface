@@ -66,6 +66,22 @@ namespace Functional
 			var savedMarkup = session.Query<Markup>().FirstOrDefault(m => m.Id == markup.Id);
 			Assert.That(savedMarkup.Value, Is.EqualTo(112));
 			Assert.That(field.Value, Is.EqualTo("112,00"));
+			Assert.That(savedMarkup.Begin, Is.EqualTo(150));
+			Assert.That(savedMarkup.End, Is.EqualTo(170));
+		}
+
+		[Test]
+		public void NewMarkupsTest()
+		{
+			Open("Main/Index");
+			ClickLink("Регионы");
+			AssertText("Регионы");
+			Click("Курск");
+			session.Flush();
+			var suppliersMarkup = session.Query<Markup>().Where(m => m.RegionId == 4 && m.Type == 0).ToList();
+			var drugstoreMarkup = session.Query<Markup>().Where(m => m.RegionId == 4 && m.Type == 1).ToList();
+			Assert.That(suppliersMarkup.Count, Is.EqualTo(3));
+			Assert.That(drugstoreMarkup.Count, Is.EqualTo(3));
 		}
 	}
 }
