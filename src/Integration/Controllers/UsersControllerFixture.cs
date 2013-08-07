@@ -75,7 +75,7 @@ namespace Integration.Controllers
 			Prepare();
 			Request.Params.Add("user.Payer.Id", client.Payers.First().Id.ToString());
 
-			controller.Add(clientContacts, regionSettings, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut", null);
+			controller.Add(clientContacts, regionSettings, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut", null, null);
 			Flush();
 
 			var user = Registred();
@@ -95,7 +95,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null);
 
 			var user = Registred();
 			var messages = AuditRecord.Queryable.Where(l => l.ObjectId == user.Id);
@@ -117,7 +117,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null);
 
 			Assert.IsTrue(Response.WasRedirected);
 			var user = Registred();
@@ -142,7 +142,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null);
 			Assert.That(controller.Flash["Message"].ToString(),
 				Is.StringContaining("Ошибка регистрации: попытка зарегистрировать пользователя и адрес в различных Плательщиках"));
 		}
@@ -165,7 +165,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null);
 
 			Assert.IsTrue(Response.WasRedirected);
 			var user = Registred();
@@ -286,7 +286,15 @@ namespace Integration.Controllers
 			var thisJson = json.Replace("\"Id\":5", string.Format("\"Id\":{0}", supplier.Id)).Replace("\"PayerID\":5", string.Format("\"PayerID\":{0}", supplier.Payer.Id)).Replace("testLoginRegister", tempLogin);
 
 			Prepare();
-			controller.Add(new Contact[0], new RegionSettings[0], new Person[0], "тестовое сообщение для биллинга", true, supplier.Id, null, thisJson);
+			controller.Add(new Contact[0],
+				new RegionSettings[0],
+				new Person[0],
+				"тестовое сообщение для биллинга",
+				true,
+				supplier.Id,
+				null,
+				thisJson,
+				null);
 
 			var user = Registred();
 

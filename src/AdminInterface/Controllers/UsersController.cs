@@ -48,12 +48,19 @@ namespace AdminInterface.Controllers
 		public void Add()
 		{
 			var encode = Encoding.GetEncoding("utf-8");
+			Request.InputStream.Seek(0, SeekOrigin.Begin);
 			var responseStream = new StreamReader(Request.InputStream, encode);
-			//что бы сохранить обратную совместимость, раньше первичный ключ в Payer назывался PayerId теперь Id
-			//правим PayerId -> Id
 			var jsonText = PatchJson(responseStream.ReadLine());
 			var deserializedObj = JsonConvert.DeserializeObject<User>(jsonText);
-			Add(new Contact[0], null, new Person[0], "Пользователь создан из интерфейса поставщика", true, deserializedObj.RootService.Id, string.Empty, jsonText);
+			Add(new Contact[0],
+				null,
+				new Person[0],
+				"Пользователь создан из интерфейса поставщика",
+				true,
+				deserializedObj.RootService.Id,
+				string.Empty,
+				jsonText,
+				deserializedObj);
 		}
 
 		public static string PatchJson(string request)
@@ -63,10 +70,22 @@ namespace AdminInterface.Controllers
 			if (payer == null)
 				return request;
 			var id = payer.GetValue("PayerID") as JValue;
-			if (id == null)
-				return request;
-			payer.Remove("PayerID");
-			payer.Add("Id", id);
+			if (id != null) {
+				payer.Remove("PayerID");
+				payer.Add("Id", id);
+			}
+			payer.Remove("ContactGroupOwner");
+			json.Remove("Client");
+			json.Remove("AvaliableAddresses");
+			json.Remove("InheritPricesFrom");
+			foreach (var child in json.GetValue("AssignedPermissions").Children()) {
+				((JObject)child).Remove("Name");
+				((JObject)child).Remove("Shortcut");
+				((JObject)child).Remove("AvailableFor");
+				((JObject)child).Remove("Type");
+				((JObject)child).Remove("AssignDefaultValue");
+				((JObject)child).Remove("OrderIndex");
+			}
 			return json.ToString();
 		}
 
@@ -181,16 +200,17 @@ namespace AdminInterface.Controllers
 			bool sendClientCard,
 			uint clientId,
 			string mails,
-			string jsonSource)
+			string jsonSource,
+			User userJson)
 		{
 			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
 			DbSession.Get<Client>(clientId);
 			DbSession.Get<Supplier>(clientId);
-
 			var service = Service.FindAndCheck<Service>(clientId);
 			var user = new User(service);
 			var address = new Address();
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+
 			BindObjectInstanceForUser(user, "user", jsonSource);
 			BindObjectInstance(address, "address", AutoLoadBehavior.NewInstanceIfInvalidKey);
 
@@ -223,7 +243,7 @@ namespace AdminInterface.Controllers
 				user.OrderRegionMask = regionSettings.GetOrderMask();
 			}
 			else {
-				user.WorkRegionMask = BitConverter.ToUInt64(user.RegionSettings.Select(Convert.ToByte).ToArray(), 0);
+				user.WorkRegionMask = BitConverter.ToUInt64(userJson.RegionSettings.Select(Convert.ToByte).ToArray(), 0);
 				mails = user.EmailForCard;
 			}
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);

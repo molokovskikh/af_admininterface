@@ -305,6 +305,8 @@ namespace AdminInterface.Models.Billing
 
 		public override string ToString()
 		{
+			if (string.IsNullOrEmpty(Name))
+				return string.Empty;
 			return Name;
 		}
 
