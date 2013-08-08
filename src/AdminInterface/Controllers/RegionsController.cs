@@ -8,6 +8,7 @@ using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Models;
 using NHibernate.Linq;
+using NHibernate.Mapping;
 
 namespace AdminInterface.Controllers
 {
@@ -31,23 +32,32 @@ namespace AdminInterface.Controllers
 				.Where(m => m.RegionId == region.Id && m.Type == 0).ToList();
 			var qdrugstoreMarkup = DbSession.Query<Markup>()
 				.Where(m => m.RegionId == region.Id && m.Type == 1).ToList();
+			var limit1 = new { begin = 0, end = 50 };
+			var limit2 = new { begin = 50, end = 500 };
+			var limit3 = new { begin = 500, end = 1000000 };
+			var markupLimits = new[] { limit1, limit2, limit3 };
 
-			while (qsuppliersMarkup.Count() < 3) {
-				var markup = new Markup {
-					RegionId = region.Id,
-					Type = 0
-				};
-				qsuppliersMarkup.Add(markup);
-				DbSession.Save(markup);
-			}
-
-			while (qdrugstoreMarkup.Count() < 3) {
-				var markup = new Markup {
-					RegionId = region.Id,
-					Type = 1
-				};
-				qdrugstoreMarkup.Add(markup);
-				DbSession.Save(markup);
+			foreach (var limit in markupLimits) {
+				if (!qsuppliersMarkup.Any(m => m.Begin == limit.begin && m.End == limit.end)) {
+					var markup = new Markup {
+						RegionId = region.Id,
+						Type = 0,
+						Begin = limit.begin,
+						End = limit.end
+					};
+					qsuppliersMarkup.Add(markup);
+					DbSession.Save(markup);
+				}
+				if (!qdrugstoreMarkup.Any(m => m.Begin == limit.begin && m.End == limit.end)) {
+					var markup = new Markup {
+						RegionId = region.Id,
+						Type = 1,
+						Begin = limit.begin,
+						End = limit.end
+					};
+					qdrugstoreMarkup.Add(markup);
+					DbSession.Save(markup);
+				}
 			}
 
 			if (IsPost) {

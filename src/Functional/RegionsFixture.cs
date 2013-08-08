@@ -82,6 +82,14 @@ namespace Functional
 			var drugstoreMarkup = session.Query<Markup>().Where(m => m.RegionId == 4 && m.Type == 1).ToList();
 			Assert.That(suppliersMarkup.Count, Is.EqualTo(3));
 			Assert.That(drugstoreMarkup.Count, Is.EqualTo(3));
+			var limit1 = new { begin = 0, end = 50 };
+			var limit2 = new { begin = 50, end = 500 };
+			var limit3 = new { begin = 500, end = 1000000 };
+			var markupLimits = new[] { limit1, limit2, limit3 };
+			foreach (var limit in markupLimits) {
+				Assert.That(suppliersMarkup.Any(m => m.Begin == limit.begin));
+				Assert.That(drugstoreMarkup.Any(m => m.End == limit.end));
+			}
 		}
 	}
 }
