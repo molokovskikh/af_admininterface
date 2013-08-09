@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
+using System.Text;
 using AddUser;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
@@ -9,12 +12,16 @@ using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using AdminInterface.Queries;
 using Castle.ActiveRecord.Framework;
+using Castle.Components.Binder;
+using Castle.MonoRail.Framework;
+using Castle.MonoRail.Framework.Test;
 using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NHibernate;
 using NHibernate.Linq;
 using NUnit.Framework;
+using Rhino.Mocks;
 using Test.Support.log4net;
 
 namespace Integration.Controllers
@@ -27,7 +34,7 @@ namespace Integration.Controllers
 		private Client client;
 		private DateTime begin;
 
-		private string json = "{\"Id\":0,\"Login\":\"testLoginRegister\",\"Enabled\":true,\"Name\":\"testComment\",\"SubmitOrders\":false,\"Auditor\":false,\"WorkRegionMask\":0,\"AuthorizationDate\":null,\"Client\":null,\"RootService\":{\"Name\":\"Протек-15\",\"Id\":5},\"SendWaybills\":false,\"SendRejects\":true,\"ShowSupplierCost\":true,\"InheritPricesFrom\":null,\"Payer\":{\"PayerID\":5,\"Name\":null,\"Reports\":null,\"Contacts\":null,\"ContactGroupOwner\":null},\"AvaliableAddresses\":[],\"ImpersonableUsers\":null,\"AssignedPermissions\":[{\"Id\":27,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":29,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":31,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":33,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":35,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":37,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":39,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":41,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":43,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":45,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":47,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false}],\"RegionSettings\":[1,8,0,0,0,0,0,0],\"IsInheritPrices\":false,\"NameOrLogin\":\"testComment\",\"CanViewClientInterface\":true}";
+		private string json = "{\"Id\":0,\"Login\":\"testLoginRegister\",\"Enabled\":true,\"Name\":\"testComment\",\"SubmitOrders\":false,\"Auditor\":false,\"WorkRegionMask\":0,\"AuthorizationDate\":null,\"Client\":null,\"RootService\":{\"Name\":\"Протек-15\",\"Id\":5},\"SendWaybills\":false,\"SendRejects\":true,\"ShowSupplierCost\":true,\"InheritPricesFrom\":null,\"Payer\":{\"PayerID\":5,\"Name\": \"testPayer\",\"Reports\":null,\"Contacts\":null,\"ContactGroupOwner\":null},\"AvaliableAddresses\":[],\"ImpersonableUsers\":null,\"AssignedPermissions\":[{\"Id\":27,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":29,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":31,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":33,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":35,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":37,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":39,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":41,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":43,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":45,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":47,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false}],\"RegionSettings\":[1,8,0,0,0,0,0,0],\"IsInheritPrices\":false,\"NameOrLogin\":\"testComment\",\"CanViewClientInterface\":true}";
 
 		[SetUp]
 		public void Setup()
@@ -175,6 +182,7 @@ namespace Integration.Controllers
 		private void Prepare()
 		{
 			Request.Params.Add("user.Name", "Тестовый пользователь");
+			Request.Params.Add("address.Id", "0");
 		}
 
 		[Test]
@@ -276,30 +284,35 @@ namespace Integration.Controllers
 			Assert.That(result, Is.Not.StringContaining("PayerID"));
 		}
 
-		[Test, Ignore("Чтобы выяснить с этим ли тестом связана поломка")]
+		[Test]
 		public void Add_from_json()
 		{
-			var tempLogin = Guid.NewGuid().ToString().Replace("-", string.Empty).Substring(0, 20);
+			var tempLogin = Generator.Name();
 			var supplier = DataMother.CreateSupplier();
 			session.Save(supplier);
 
-			var thisJson = json.Replace("\"Id\":5", string.Format("\"Id\":{0}", supplier.Id)).Replace("\"PayerID\":5", string.Format("\"PayerID\":{0}", supplier.Payer.Id)).Replace("testLoginRegister", tempLogin);
+			json = json.Replace("\"Id\":5", string.Format("\"Id\":{0}", supplier.Id)).Replace("\"PayerID\":5", string.Format("\"PayerID\":{0}", supplier.Payer.Id)).Replace("testLoginRegister", tempLogin);
 
 			Prepare();
-			controller.Add(new Contact[0],
-				new RegionSettings[0],
-				new Person[0],
-				"тестовое сообщение для биллинга",
-				true,
-				supplier.Id,
-				null,
-				thisJson,
-				null);
+			PrepareController(controller);
+
+			Flush();
+			controller.Add();
 
 			var user = Registred();
 
 			Assert.AreEqual(user.Login, tempLogin);
 			Assert.AreEqual(user.Name, "testComment");
+		}
+
+		protected override IMockRequest BuildRequest()
+		{
+			var requestTest = new MemoryStream(Encoding.UTF8.GetBytes(json));
+			var request = MockRepository.GenerateStub<IMockRequest>();
+			request.Stub(r => r.InputStream).Return(requestTest);
+			request.Stub(r => r.Params).Return(new NameValueCollection());
+			request.Stub(r => r.ObtainParamsNode(ParamStore.Params)).Return(new CompositeNode("root"));
+			return request;
 		}
 	}
 }

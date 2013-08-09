@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Net.Mail;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
@@ -70,7 +71,7 @@ namespace Integration.ForTesting
 			session = sessionHolder.CreateSession(typeof(ActiveRecordBase));
 		}
 
-		private void Close()
+		protected void Close()
 		{
 			if (session != null) {
 				session.Flush();
