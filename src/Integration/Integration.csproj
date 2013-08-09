@@ -110,6 +110,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\RegisterFromClientInterfaceFixture.cs" />
     <Compile Include="Helpers\ADHelperFixture.cs" />
     <Compile Include="AnalysisOfWorkDrugstoresFixture.cs" />
     <Compile Include="Helpers\AppHelperFixture.cs" />

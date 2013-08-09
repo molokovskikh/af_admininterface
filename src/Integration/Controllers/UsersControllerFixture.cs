@@ -26,15 +26,10 @@ using Test.Support.log4net;
 
 namespace Integration.Controllers
 {
-	[TestFixture]
-	public class UsersControllerFixture : ControllerFixture
+	public class CommonUserControllerFuxtire : ControllerFixture
 	{
-		private UsersController controller;
-		private User user1, user2;
-		private Client client;
+		protected UsersController controller;
 		private DateTime begin;
-
-		private string json = "{\"Id\":0,\"Login\":\"testLoginRegister\",\"Enabled\":true,\"Name\":\"testComment\",\"SubmitOrders\":false,\"Auditor\":false,\"WorkRegionMask\":0,\"AuthorizationDate\":null,\"Client\":null,\"RootService\":{\"Name\":\"Протек-15\",\"Id\":5},\"SendWaybills\":false,\"SendRejects\":true,\"ShowSupplierCost\":true,\"InheritPricesFrom\":null,\"Payer\":{\"PayerID\":5,\"Name\": \"testPayer\",\"Reports\":null,\"Contacts\":null,\"ContactGroupOwner\":null},\"AvaliableAddresses\":[],\"ImpersonableUsers\":null,\"AssignedPermissions\":[{\"Id\":27,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":29,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":31,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":33,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":35,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":37,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":39,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":41,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":43,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":45,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false},{\"Id\":47,\"Name\":null,\"Shortcut\":null,\"AvailableFor\":0,\"Type\":0,\"AssignDefaultValue\":false}],\"RegionSettings\":[1,8,0,0,0,0,0,0],\"IsInheritPrices\":false,\"NameOrLogin\":\"testComment\",\"CanViewClientInterface\":true}";
 
 		[SetUp]
 		public void Setup()
@@ -44,6 +39,24 @@ namespace Integration.Controllers
 			PrepareController(controller, "DoPasswordChange");
 			controller.DbSession = session;
 		}
+
+		protected void Prepare()
+		{
+			Request.Params.Add("user.Name", "Тестовый пользователь");
+			Request.Params.Add("address.Id", "0");
+		}
+
+		protected User Registred()
+		{
+			return session.Query<User>().Where(u => u.Registration.RegistrationDate >= begin).ToArray().Last();
+		}
+	}
+
+	[TestFixture]
+	public class UsersControllerFixture : CommonUserControllerFuxtire
+	{
+		private User user1, user2;
+		private Client client;
 
 		[Test]
 		public void Change_user_password()
@@ -179,12 +192,6 @@ namespace Integration.Controllers
 			Assert.That(user.Payer, Is.EqualTo(payer));
 		}
 
-		private void Prepare()
-		{
-			Request.Params.Add("user.Name", "Тестовый пользователь");
-			Request.Params.Add("address.Id", "0");
-		}
-
 		[Test]
 		public void Show_supplier_client()
 		{
@@ -192,11 +199,6 @@ namespace Integration.Controllers
 			Flush();
 
 			controller.Edit(user.Id, new MessageQuery());
-		}
-
-		private User Registred()
-		{
-			return session.Query<User>().Where(u => u.Registration.RegistrationDate >= begin).ToArray().Last();
 		}
 
 		[Test]
@@ -257,62 +259,6 @@ namespace Integration.Controllers
 			controller.ResetAFVersion(user.Id);
 			Flush();
 			Assert.AreEqual(session.Get<User>(user.Id).UserUpdateInfo.AFAppVersion, 999);
-		}
-
-		[Test]
-		public void CollectionFromJSonText()
-		{
-			var user = new User();
-			controller.BindObjectInstanceForUser(user, "User", json);
-
-			var regionMask = BitConverter.ToUInt64(user.RegionSettings.Select(r => Convert.ToByte(r)).ToArray(), 0);
-
-			Assert.AreEqual(regionMask, 2049);
-			Assert.AreEqual(user.Login, "testLoginRegister");
-			Assert.AreEqual(user.Name, "testComment");
-			Assert.AreEqual(user.AssignedPermissions.Count, 11);
-			Assert.AreEqual(user.AssignedPermissions[0].Id, 27);
-			Assert.AreEqual(user.RootService.Id, 5);
-			Assert.AreEqual(user.RootService.Name, "Протек-15");
-			Assert.IsNull(user.InheritPricesFrom);
-		}
-
-		[Test]
-		public void Patch_json()
-		{
-			var result = UsersController.PatchJson(json);
-			Assert.That(result, Is.Not.StringContaining("PayerID"));
-		}
-
-		[Test]
-		public void Add_from_json()
-		{
-			var tempLogin = Generator.Name();
-			var supplier = DataMother.CreateSupplier();
-			session.Save(supplier);
-
-			json = json.Replace("\"Id\":5", string.Format("\"Id\":{0}", supplier.Id)).Replace("\"PayerID\":5", string.Format("\"PayerID\":{0}", supplier.Payer.Id)).Replace("testLoginRegister", tempLogin);
-
-			Prepare();
-			PrepareController(controller);
-
-			Flush();
-			controller.Add();
-
-			var user = Registred();
-
-			Assert.AreEqual(user.Login, tempLogin);
-			Assert.AreEqual(user.Name, "testComment");
-		}
-
-		protected override IMockRequest BuildRequest()
-		{
-			var requestTest = new MemoryStream(Encoding.UTF8.GetBytes(json));
-			var request = MockRepository.GenerateStub<IMockRequest>();
-			request.Stub(r => r.InputStream).Return(requestTest);
-			request.Stub(r => r.Params).Return(new NameValueCollection());
-			request.Stub(r => r.ObtainParamsNode(ParamStore.Params)).Return(new CompositeNode("root"));
-			return request;
 		}
 	}
 }
