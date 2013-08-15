@@ -89,10 +89,10 @@ namespace Functional.Suppliers
 			Open("/users/search");
 			Css("#filter_SearchText").TypeText("Тестовый поставщик");
 			Click("Поиск");
-			AssertText("Тестовый поставщик");
+			WaitForText("Тестовый поставщик");
 
 			ClickLink("Тестовый поставщик");
-			AssertText("Поставщик");
+			WaitForText("Поставщик");
 		}
 
 		[Test]
@@ -155,6 +155,7 @@ namespace Functional.Suppliers
 			session.Save(newCertificate);
 			Flush();
 			browser.Button("editChangerButton").Click();
+			var a = Css("select[name='sertificateSourceId']");
 			browser.SelectList(Find.ByName("sertificateSourceId")).SelectByValue(newCertificate.Id.ToString());
 			browser.Button("saveCertificateSourceButton").Click();
 			AssertText("Сохранено");

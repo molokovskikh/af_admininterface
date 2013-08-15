@@ -442,6 +442,7 @@ namespace Functional.Drugstore
 
 			Open(user, "Edit");
 			Click("Настройка");
+			Wait(() => browser.CheckBox("WorkRegions[0]").Checked, "Не дождались");
 			Assert.IsTrue(browser.CheckBox("WorkRegions[0]").Checked);
 			Assert.IsFalse(browser.CheckBox("WorkRegions[1]").Checked);
 			Assert.IsFalse(browser.CheckBox("WorkRegions[2]").Checked);
@@ -476,6 +477,7 @@ namespace Functional.Drugstore
 			session.SaveOrUpdate(settings);
 
 			Refresh();
+			Wait(() => browser.CheckBox("WorkRegions[3]").Exists, "Не дождались");
 			Assert.IsTrue(browser.CheckBox("WorkRegions[3]").Exists);
 			Assert.IsTrue(browser.CheckBox("WorkRegions[4]").Exists);
 			Assert.IsFalse(browser.CheckBox("WorkRegions[5]").Exists);

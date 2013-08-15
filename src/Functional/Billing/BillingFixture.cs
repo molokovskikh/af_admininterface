@@ -199,11 +199,11 @@ namespace Functional.Billing
 			Wait(() => select.Options.Count > 0, "не удалось найти ни одного пользователя для подключения");
 			Css("#ConnectAddressToUserButton" + address.Id).Click();
 
-			Thread.Sleep(2000);
+			WaitForCss("#RowAddress" + address.Id + "User" + user.Id);
 			var row = browser.TableRow(Find.ById("RowAddress" + address.Id + "User" + user.Id));
 			Assert.That(row.Exists, Is.True);
 			browser.CheckBox(Find.ById(String.Format("CheckBoxAddress{0}User{1}", address.Id, user.Id))).Click();
-			Thread.Sleep(500);
+			Thread.Sleep(1000);
 			var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxAddress{0}User{1}", address.Id, user.Id)));
 			Assert.That(checkBox.Exists, Is.False);
 
@@ -218,13 +218,13 @@ namespace Functional.Billing
 			WaitForText("Подключить адрес");
 			ClickLink("Подключить адрес");
 			SearchAndSelectAddress(address.Value);
-			Thread.Sleep(500);
+			WaitForCss("#ConnectAddressToUserButton" + user.Id);
 			browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
 			Thread.Sleep(2000);
 			var row = browser.TableRow(Find.ById("RowUser" + user.Id + "Address" + address.Id));
 			Assert.That(row.Exists, Is.True);
 			browser.CheckBox(Find.ById(String.Format("CheckBoxUser{0}Address{1}", user.Id, address.Id))).Click();
-			Thread.Sleep(500);
+			Thread.Sleep(1000);
 			var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxUser{0}Address{1}", user.Id, address.Id)));
 			Assert.That(checkBox.Exists, Is.False);
 
@@ -806,7 +806,7 @@ namespace Functional.Billing
 			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked = false;
 			browser.TextField("AddCommentField").AppendText("testComment");
 			ConfirmDialog();
-			Thread.Sleep(1000);
+			Thread.Sleep(3000);
 
 			Refresh();
 

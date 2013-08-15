@@ -20,23 +20,23 @@ namespace Functional
 			Open("Main/Index");
 
 			ClickLink("Регионы");
-			AssertText("Регионы");
+			WaitForText("Регионы");
 			AssertText("Телефон по умолчанию");
 			AssertText("Регионы работы по умолчанию");
 			AssertText("Стоимость копии для поставщика");
 			AssertText("Регион для справки");
 
 			ClickLink("Воронеж");
-			AssertText("Телефон по умолчанию");
+			WaitForText("Телефон по умолчанию");
 			AssertText("Временной сдвиг относительно Москвы");
 			browser.Link(Find.ById("ShowRegionsLink")).Click();
-			AssertText(@"Регионы работы
+			WaitForText(@"Регионы работы
  по умолчанию");
 			browser.TextField(Find.ById("region_DefaultPhone")).Value = "123-1233210";
 			ClickButton("Сохранить");
-			AssertText("Сохранено");
+			WaitForText("Сохранено");
 			ClickLink("Регионы");
-			AssertText("123-1233210");
+			WaitForText("123-1233210");
 		}
 
 		[Test]
