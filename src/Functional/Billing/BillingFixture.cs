@@ -303,7 +303,7 @@ namespace Functional.Billing
 			Assert.That(clientRow.ClassName, Is.Not.StringContaining("disabled"));
 			clientStatus.Click();
 			AddCommentInDisableDialig();
-			Thread.Sleep(2000);
+			Wait(() => !userStatus.Enabled, "не дождались");
 			Assert.IsTrue(userStatus.Checked);
 			Assert.IsFalse(userStatus.Enabled);
 			Assert.IsTrue(addressStatus.Checked);
