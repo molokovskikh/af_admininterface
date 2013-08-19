@@ -53,6 +53,7 @@ namespace Functional.Billing
 			Css("input[name=AddComment]").AppendText("Disable_report");
 			ConfirmDialog();
 			session.Refresh(report);
+			Wait(() => !report.Allow, "Не дождались");
 			Assert.That(report.Allow, Is.False);
 		}
 

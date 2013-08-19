@@ -436,12 +436,16 @@ namespace Functional.Billing
 			Refresh();
 			var disabledAddress = client.Addresses.Where(a => !a.Enabled).First();
 			var sum = GetTotalSum();
+			var currentSum = sum;
 
 			// Включаем адрес. Сумма должна увеличиться
 			Assert.That(Css(String.Format("#AddressRow{0} input[name=status]", disabledAddress.Id)).Checked, Is.False);
 			Css(String.Format("#AddressRow{0} input[name=status]", disabledAddress.Id)).Click();
-			Thread.Sleep(500);
-			var currentSum = GetTotalSum();
+			Wait(() => {
+				currentSum = GetTotalSum();
+				return currentSum > sum;
+			}, String.Format("Не дождался что бы сумма увеличилась {0}", browser.Url));
+
 			Assert.That(currentSum, Is.GreaterThan(sum));
 			sum = currentSum;
 
@@ -449,8 +453,10 @@ namespace Functional.Billing
 			Assert.That(Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked, Is.True);
 			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Click();
 			AddCommentInDisableDialig();
-			Thread.Sleep(500);
-			currentSum = GetTotalSum();
+			Wait(() => {
+				currentSum = GetTotalSum();
+				return currentSum < sum;
+			}, String.Format("Не дождался что бы сумма уменьшилась {0}", browser.Url));
 			Assert.That(currentSum, Is.LessThan(sum));
 
 			// Выключаем клиента. Сумма должна стать равной нулю
