@@ -76,8 +76,10 @@ namespace AdminInterface.ManagerReportsFilters
 		{
 			get
 			{
-				if (!ForSubQuery) return _addressCount;
-				else return string.Empty;
+				if (!ForSubQuery)
+					return _addressCount;
+				else
+					return string.Empty;
 			}
 			set { _addressCount = value; }
 		}
