@@ -32,28 +32,24 @@ namespace AdminInterface.Controllers
 				.Where(m => m.RegionId == region.Id && m.Type == 0).ToList();
 			var qdrugstoreMarkup = DbSession.Query<Markup>()
 				.Where(m => m.RegionId == region.Id && m.Type == 1).ToList();
-			var limit1 = new { begin = 0, end = 50 };
-			var limit2 = new { begin = 50, end = 500 };
-			var limit3 = new { begin = 500, end = 1000000 };
-			var markupLimits = new[] { limit1, limit2, limit3 };
 
-			foreach (var limit in markupLimits) {
-				if (!qsuppliersMarkup.Any(m => m.Begin == limit.begin && m.End == limit.end)) {
+			foreach (var limit in MarkupLimits.markupLimits) {
+				if (!qsuppliersMarkup.Any(m => m.Begin == limit.Begin && m.End == limit.End)) {
 					var markup = new Markup {
 						RegionId = region.Id,
 						Type = 0,
-						Begin = limit.begin,
-						End = limit.end
+						Begin = limit.Begin,
+						End = limit.End
 					};
 					qsuppliersMarkup.Add(markup);
 					DbSession.Save(markup);
 				}
-				if (!qdrugstoreMarkup.Any(m => m.Begin == limit.begin && m.End == limit.end)) {
+				if (!qdrugstoreMarkup.Any(m => m.Begin == limit.Begin && m.End == limit.End)) {
 					var markup = new Markup {
 						RegionId = region.Id,
 						Type = 1,
-						Begin = limit.begin,
-						End = limit.end
+						Begin = limit.Begin,
+						End = limit.End
 					};
 					qdrugstoreMarkup.Add(markup);
 					DbSession.Save(markup);
