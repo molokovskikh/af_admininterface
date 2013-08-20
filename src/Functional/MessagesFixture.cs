@@ -14,7 +14,7 @@ namespace Functional
 		{
 			Open();
 			ClickLink("История обращений");
-			AssertText("История обращений");
+			WaitForText("История обращений");
 		}
 
 		[Test]
@@ -24,7 +24,7 @@ namespace Functional
 			AssertText("История обращений");
 			Css("#filter_SearchText").TypeText("тест");
 			ClickButton("Показать");
-			AssertText("История обращений");
+			WaitForText("История обращений");
 		}
 	}
 }

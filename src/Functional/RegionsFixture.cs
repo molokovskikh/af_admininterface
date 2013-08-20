@@ -20,23 +20,23 @@ namespace Functional
 			Open("Main/Index");
 
 			ClickLink("Регионы");
-			AssertText("Регионы");
+			WaitForText("Регионы");
 			AssertText("Телефон по умолчанию");
 			AssertText("Регионы работы по умолчанию");
 			AssertText("Стоимость копии для поставщика");
 			AssertText("Регион для справки");
 
 			ClickLink("Воронеж");
-			AssertText("Телефон по умолчанию");
+			WaitForText("Телефон по умолчанию");
 			AssertText("Временной сдвиг относительно Москвы");
 			browser.Link(Find.ById("ShowRegionsLink")).Click();
-			AssertText(@"Регионы работы
+			WaitForText(@"Регионы работы
  по умолчанию");
 			browser.TextField(Find.ById("region_DefaultPhone")).Value = "123-1233210";
 			ClickButton("Сохранить");
-			AssertText("Сохранено");
+			WaitForText("Сохранено");
 			ClickLink("Регионы");
-			AssertText("123-1233210");
+			WaitForText("123-1233210");
 		}
 
 		[Test]
@@ -66,6 +66,26 @@ namespace Functional
 			var savedMarkup = session.Query<Markup>().FirstOrDefault(m => m.Id == markup.Id);
 			Assert.That(savedMarkup.Value, Is.EqualTo(112));
 			Assert.That(field.Value, Is.EqualTo("112,00"));
+			Assert.That(savedMarkup.Begin, Is.EqualTo(150));
+			Assert.That(savedMarkup.End, Is.EqualTo(170));
+		}
+
+		[Test]
+		public void NewMarkupsTest()
+		{
+			Open("Main/Index");
+			ClickLink("Регионы");
+			AssertText("Регионы");
+			Click("Курск");
+			session.Flush();
+			var suppliersMarkup = session.Query<Markup>().Where(m => m.RegionId == 4 && m.Type == 0).ToList();
+			var drugstoreMarkup = session.Query<Markup>().Where(m => m.RegionId == 4 && m.Type == 1).ToList();
+			Assert.That(suppliersMarkup.Count, Is.EqualTo(3));
+			Assert.That(drugstoreMarkup.Count, Is.EqualTo(3));
+			foreach (var limit in MarkupLimits.markupLimits) {
+				Assert.That(suppliersMarkup.Any(m => m.Begin == limit.Begin));
+				Assert.That(drugstoreMarkup.Any(m => m.End == limit.End));
+			}
 		}
 	}
 }

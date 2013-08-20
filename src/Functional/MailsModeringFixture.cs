@@ -81,10 +81,9 @@ namespace Functional
 			Open();
 			Click("Модерирование минипочты");
 			Click("Удалить");
-			Thread.Sleep(500);
-			AssertText("Удалить письмо");
+			WaitForText("Удалить письмо");
 			Click("Да");
-			Thread.Sleep(1000);
+			Thread.Sleep(2000);
 			Close();
 			Assert.IsTrue(session.Get<Mail>(Mail.Id).Deleted);
 		}

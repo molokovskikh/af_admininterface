@@ -8,6 +8,7 @@ using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Models;
 using NHibernate.Linq;
+using NHibernate.Mapping;
 
 namespace AdminInterface.Controllers
 {
@@ -26,16 +27,47 @@ namespace AdminInterface.Controllers
 			[DataBind("DrugstoreMarkup")] Markup[] drugstoreMarkup)
 		{
 			var region = DbSession.Load<Region>(id);
+
+			var qsuppliersMarkup = DbSession.Query<Markup>()
+				.Where(m => m.RegionId == region.Id && m.Type == 0).ToList();
+			var qdrugstoreMarkup = DbSession.Query<Markup>()
+				.Where(m => m.RegionId == region.Id && m.Type == 1).ToList();
+
+			foreach (var limit in MarkupLimits.markupLimits) {
+				if (!qsuppliersMarkup.Any(m => m.Begin == limit.Begin && m.End == limit.End)) {
+					var markup = new Markup {
+						RegionId = region.Id,
+						Type = 0,
+						Begin = limit.Begin,
+						End = limit.End
+					};
+					qsuppliersMarkup.Add(markup);
+					DbSession.Save(markup);
+				}
+				if (!qdrugstoreMarkup.Any(m => m.Begin == limit.Begin && m.End == limit.End)) {
+					var markup = new Markup {
+						RegionId = region.Id,
+						Type = 1,
+						Begin = limit.Begin,
+						End = limit.End
+					};
+					qdrugstoreMarkup.Add(markup);
+					DbSession.Save(markup);
+				}
+			}
+
 			if (IsPost) {
 				BindObjectInstance(region, "region");
 				region.DefaultRegionMask = defaultRegions.Aggregate(0UL, (v, a) => a + v);
 				region.DefaultShowRegionMask = defaultShowRegion.Aggregate(0UL, (v, a) => a + v);
 				if (IsValid(region)) {
 					DbSession.Save(region);
-					foreach (var markup in drugstoreMarkup) {
+					foreach (var markup in qsuppliersMarkup) {
+						markup.Value = suppliersMarkup.Where(x => x.Id == markup.Id).FirstOrDefault().Value;
 						DbSession.Update(markup);
 					}
-					foreach (var markup in suppliersMarkup) {
+					foreach (var markup in qdrugstoreMarkup) {
+						markup.Value = drugstoreMarkup.Where(x => x.Id == markup.Id).FirstOrDefault().Value;
 						DbSession.Update(markup);
 					}
 					Notify("Сохранено");
@@ -44,10 +76,8 @@ namespace AdminInterface.Controllers
 			}
 			PropertyBag["region"] = region;
 			PropertyBag["AllRegions"] = Region.All();
-			PropertyBag["SuppliersMarkup"] = DbSession.Query<Markup>()
-				.Where(m => m.RegionId == region.Id && m.Type == 0).ToList();
-			PropertyBag["DrugstoreMarkup"] = DbSession.Query<Markup>()
-				.Where(m => m.RegionId == region.Id && m.Type == 1).ToList();
+			PropertyBag["SuppliersMarkup"] = qsuppliersMarkup;
+			PropertyBag["DrugstoreMarkup"] = qdrugstoreMarkup;
 		}
 
 		public void ShowRegions(uint? clientId, ulong? homeRegionId)
