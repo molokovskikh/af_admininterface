@@ -54,8 +54,9 @@ Global(
 
 #если мы запускаем тесты на сервере не надо загружать проект что бы
 #не блокировать библиотеки
-unless Configuration.IsDefined(@notInteractive):
-	Engine.Execute("LoadProject")
+task @ready:
+	unless Configuration.IsDefined(@notInteractive):
+		Engine.Execute("LoadProject")
 
 task @default, [@Build]
 
