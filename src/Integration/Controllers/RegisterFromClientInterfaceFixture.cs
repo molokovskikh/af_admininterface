@@ -55,7 +55,9 @@ namespace Integration.Controllers
 			session.Save(supplier);
 
 			var ojdJson = _json;
-			_json = _json.Replace("\"Id\":5", string.Format("\"Id\":{0}", supplier.Id)).Replace("\"PayerID\":5", string.Format("\"PayerID\":{0}", supplier.Payer.Id)).Replace("testLoginRegister", tempLogin);
+			_json = _json.Replace("\"Id\":5", string.Format("\"Id\":{0}", supplier.Id))
+				.Replace("\"PayerID\":5", string.Format("\"PayerID\":{0}", supplier.Payer.Id))
+				.Replace("testLoginRegister", tempLogin);
 
 			Prepare();
 			PrepareController(controller);
