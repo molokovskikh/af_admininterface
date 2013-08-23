@@ -95,6 +95,9 @@
     <Reference Include="WatiN.CssSelectorExtensions">
       <HintPath>..\..\lib\WatiNCssSelectorExtensions\WatiN.CssSelectorExtensions.dll</HintPath>
     </Reference>
+    <Reference Include="WebDriver">
+      <HintPath>..\..\packages\Selenium.WebDriver.2.33.0\lib\net40\WebDriver.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Billing\BalanceOperationFixture.cs" />
@@ -152,6 +155,7 @@
     <Compile Include="Drugstore\UserFixture.cs" />
     <Compile Include="Drugstore\UserSearchFixture.cs" />
     <Compile Include="UserFixture.cs" />
+    <Compile Include="UserSeleniumFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -178,6 +182,10 @@
     <ProjectReference Include="..\Integration\Integration.csproj">
       <Project>{AFB6C06A-079A-43B4-B314-8E5F6359C77A}</Project>
       <Name>Integration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Test.Support\Test.Support.Selenium\Test.Support.Selenium.csproj">
+      <Project>{E37375CE-ADBA-47C9-9FA1-D7C5C704CD89}</Project>
+      <Name>Test.Support.Selenium</Name>
     </ProjectReference>
     <ProjectReference Include="..\Test.Support\Test.Support\Test.Support.csproj">
       <Project>{A215E837-1208-49E3-AF93-A9612223122C}</Project>

@@ -538,6 +538,7 @@ namespace AdminInterface.Controllers
 				user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
 
 			user.ShowUsers = user.ShowUsers.Where(u => u != null).ToList();
+			user.ActionsIfNeededIfUpdate(DbSession);
 			DbSession.Save(user);
 			Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new { id = user.Id });

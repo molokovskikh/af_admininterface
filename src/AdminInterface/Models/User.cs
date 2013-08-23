@@ -526,6 +526,21 @@ namespace AdminInterface.Models
 			UserUpdateInfo.AFCopyId = "";
 		}
 
+		public virtual void ActionsIfNeededIfUpdate(ISession session)
+		{
+			if (Client != null) {
+				if (AssignedPermissions.FirstOrDefault(p => p.Shortcut == "ConfigureMatrixAssortiment") != null &&
+					Client.Settings.BuyingMatrix == null) {
+					var matrix = new Matrix();
+					session.Save(matrix);
+					Client.Settings.BuyingMatrix = matrix;
+					Client.Settings.BuyingMatrixType = MatrixType.BlackList;
+					Client.Settings.BuyingMatrixAction = MatrixAction.Delete;
+					session.Save(Client.Settings);
+				}
+			}
+		}
+
 		public virtual void AddContactGroup()
 		{
 			var groupOwner = ContactGroupoOwner;
