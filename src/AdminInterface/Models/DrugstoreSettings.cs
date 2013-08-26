@@ -155,7 +155,7 @@ namespace AdminInterface.Models
 		[Description("Подключить матрицу предложений")]
 		public virtual bool EnableBuyingMatrix
 		{
-			get { return BuyingMatrixPrice != null; }
+			get { return BuyingMatrix != null; }
 			set
 			{
 				if (!value) {
@@ -204,7 +204,7 @@ namespace AdminInterface.Models
 		[Description("Подключить матрицу закупок")]
 		public virtual bool EnableOfferMatrix
 		{
-			get { return OfferMatrixPrice != null; }
+			get { return OfferMatrix != null; }
 			set
 			{
 				if (!value) {
