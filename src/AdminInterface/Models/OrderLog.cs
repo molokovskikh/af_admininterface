@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AdminInterface.Security;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.NHibernateExtentions;
 
@@ -43,6 +44,8 @@ namespace AdminInterface.Models
 
 		public bool Deleted { get; set; }
 
+		public string Addition { get; set; }
+
 		public string GetResult()
 		{
 			if(Deleted)
@@ -54,6 +57,9 @@ namespace AdminInterface.Models
 
 			if (PriceId == 2647)
 				return "ok (Обезличенный заказ)";
+
+			if (Addition != null && Addition.IndexOf("Отказ:", StringComparison.CurrentCultureIgnoreCase) >= 0)
+				return Addition;
 
 			switch (TransportType) {
 				case 1:

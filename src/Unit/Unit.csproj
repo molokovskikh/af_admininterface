@@ -97,6 +97,7 @@
     <Compile Include="Models\ClientInfoLogEntityFixture.cs" />
     <Compile Include="Models\GetPasswordChangeNotificationAddressFixture.cs" />
     <Compile Include="Models\InvoiceFixture.cs" />
+    <Compile Include="Models\OrderLogFixture.cs" />
     <Compile Include="Models\PasswordChangeLogEntityFixture.cs" />
     <Compile Include="Models\PayerFixture.cs" />
     <Compile Include="Models\PaymentOptionsFixture.cs" />
