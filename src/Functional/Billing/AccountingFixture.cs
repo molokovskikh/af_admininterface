@@ -117,7 +117,6 @@ namespace Functional.Billing
 		public void Show_accounting_history_for_supplier_user()
 		{
 			var user = DataMother.CreateSupplierUser();
-			user.Name = user.Login;
 			user.Accounting.Accounted();
 			Open("Accounts/Index?tab=AccountingHistory");
 			browser.WaitUntilContainsText("Поиск", 2);

@@ -460,6 +460,8 @@ namespace AdminInterface.Models
 			ActiveRecordMediator.Save(this);
 			if (updateLogin)
 				Login = Id.ToString();
+			if (String.IsNullOrEmpty(Name))
+				Name = Login;
 			ActiveRecordMediator.Save(this);
 
 			if (Client != null)
