@@ -351,7 +351,7 @@ where Phone like :phone")
 		{
 			var client = Client.FindAndCheck<Client>(clientId);
 			var payer = DbSession.Load<Payer>(payerId);
-			var org = payer.JuridicalOrganizations.FirstOrDefault(j => j.Id == orgId);
+			var org = payer.Orgs.FirstOrDefault(j => j.Id == orgId);
 			if (!andJurdicalOrganization)
 				client.ChangePayer(DbSession, payer, org);
 			else {
@@ -416,7 +416,7 @@ where Phone like :phone")
 		public object[] GetPayerOrgs(uint id)
 		{
 			var payer = DbSession.Load<Payer>(id);
-			return payer.JuridicalOrganizations.Select(o => new {
+			return payer.Orgs.Select(o => new {
 				id = o.Id,
 				name = o.Name
 			}).ToArray();
@@ -511,8 +511,6 @@ group by s.Id")
 
 			query.Execute(DbSession);
 			DbSession.Save(log);
-			//нужно сохранить изменения, иначе oldClient.Refresh(); не зафиксирует их
-			DbSession.Flush();
 
 			if (address != null)
 				this.Mailer()
@@ -532,6 +530,9 @@ group by s.Id")
 				Notify("Пользователь успешно перемещен");
 				RedirectUsingRoute("users", "Edit", new { id = user.Id });
 			}
+
+			//нужно сохранить изменения, иначе oldClient.Refresh(); не зафиксирует их
+			DbSession.Flush();
 			DbSession.Refresh(oldClient);
 			if (oldClient.Users.Count == 0
 				&& oldClient.Addresses.Count == 0

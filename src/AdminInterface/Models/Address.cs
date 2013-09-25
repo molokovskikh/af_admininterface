@@ -52,7 +52,7 @@ namespace AdminInterface.Models
 		{
 			Client = client;
 			Payer = client.Payers.First();
-			LegalEntity = Payer.JuridicalOrganizations.First();
+			LegalEntity = Payer.Orgs.First();
 			Accounting = new AddressAccount(this);
 		}
 

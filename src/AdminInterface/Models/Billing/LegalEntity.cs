@@ -13,6 +13,11 @@ namespace AdminInterface.Models.Billing
 		{
 		}
 
+		public LegalEntity(Payer payer)
+			: this(payer.Name, payer.JuridicalName, payer)
+		{
+		}
+
 		public LegalEntity(string name, string fullName, Payer payer)
 		{
 			Name = name;

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Mail;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
@@ -11,6 +13,7 @@ using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
+using Common.Tools;
 using Common.Web.Ui.Controllers;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
@@ -98,6 +101,16 @@ namespace Integration.ForTesting
 		public void Flush()
 		{
 			session.Flush();
+		}
+
+		protected void MakeNameUniq(dynamic entity)
+		{
+			if (entity is IEnumerable) {
+				((IEnumerable)entity).Cast<object>().Each(MakeNameUniq);
+			}
+			else {
+				entity.Name += " " + entity.Id;
+			}
 		}
 
 		protected override IMockResponse BuildResponse(UrlInfo info)

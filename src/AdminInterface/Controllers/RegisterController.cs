@@ -321,13 +321,10 @@ namespace AdminInterface.Controllers
 				if ((payer != null && payer.Id != 0) || existingPayerId.HasValue) {
 					var id = existingPayerId.HasValue ? existingPayerId.Value : payer.Id;
 					currentPayer = DbSession.Load<Payer>(id);
-					if (currentPayer.JuridicalOrganizations.Count == 0) {
-						var organization = new LegalEntity();
-						organization.Payer = currentPayer;
-						organization.Name = currentPayer.Name;
-						organization.FullName = currentPayer.JuridicalName;
-						currentPayer.JuridicalOrganizations = new List<LegalEntity> { organization };
-						DbSession.Save(organization);
+					if (currentPayer.Orgs.Count == 0) {
+						var org = new LegalEntity(currentPayer);
+						currentPayer.Orgs.Add(org);
+						DbSession.Save(org);
 					}
 				}
 			}
@@ -438,7 +435,7 @@ WHERE   pricesdata.firmcode = s.Id
 			var payer = Payer.TryFind(id);
 			if (payer == null) {
 				payer = new Payer {
-					JuridicalOrganizations = new List<LegalEntity> {
+					Orgs = {
 						new LegalEntity()
 					}
 				};
@@ -446,7 +443,7 @@ WHERE   pricesdata.firmcode = s.Id
 
 			PropertyBag["Instance"] = payer;
 			PropertyBag["payer"] = payer;
-			PropertyBag["JuridicalOrganization"] = payer.JuridicalOrganizations.First();
+			PropertyBag["JuridicalOrganization"] = payer.Orgs.First();
 			PropertyBag["showRegistrationCard"] = showRegistrationCard;
 			PropertyBag["PaymentOptions"] = new PaymentOptions();
 		}
@@ -461,13 +458,11 @@ WHERE   pricesdata.firmcode = s.Id
 
 			payer.AddComment(paymentOptions.GetCommentForPayer());
 
-			if (payer.JuridicalOrganizations == null || payer.JuridicalOrganizations.Count == 0) {
-				payer.JuridicalOrganizations = new List<LegalEntity> {
-					new LegalEntity(payer.Name, payer.JuridicalName, payer)
-				};
+			if (payer.Orgs.Count == 0) {
+				payer.Orgs.Add(new LegalEntity(payer));
 			}
 			else {
-				var org = payer.JuridicalOrganizations.First();
+				var org = payer.Orgs.First();
 				org.Name = payer.Name;
 				org.FullName = payer.JuridicalName;
 			}

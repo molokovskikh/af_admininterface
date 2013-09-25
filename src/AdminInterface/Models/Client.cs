@@ -185,7 +185,7 @@ namespace AdminInterface.Models
 			get
 			{
 				var addressPayers = Addresses.Select(a => a.Payer);
-				return Payers.Count == 1 && Payers[0].JuridicalOrganizations.Count == 1 && addressPayers.All(a => a.Id == Payers[0].Id);
+				return Payers.Count == 1 && Payers[0].Orgs.Count == 1 && addressPayers.All(a => a.Id == Payers[0].Id);
 			}
 		}
 
@@ -278,7 +278,7 @@ group by u.ClientId")
 
 		public virtual IEnumerable<LegalEntity> Orgs()
 		{
-			return Payers.SelectMany(p => p.JuridicalOrganizations);
+			return Payers.SelectMany(p => p.Orgs);
 		}
 
 		public virtual Address AddAddress(string address)
@@ -491,7 +491,7 @@ where ClientId = :clientId")
 					address.Payer.Addresses.Add(address);
 				}
 
-				var legalEntities = oldPayers.SelectMany(p => p.JuridicalOrganizations).ToList();
+				var legalEntities = oldPayers.SelectMany(p => p.Orgs).ToList();
 				if (legalEntities.Count > 1)
 					throw new Exception(string.Format("Количество ЮрЛиц у клиента {0} более одного, не могу поменять плательщика у клиента", Id));
 
@@ -597,7 +597,7 @@ where ClientId = :clientId")
 
 		public virtual IList<LegalEntity> GetLegalEntity()
 		{
-			return Payers.SelectMany(p => p.JuridicalOrganizations).ToList();
+			return Payers.SelectMany(p => p.Orgs).ToList();
 		}
 	}
 }

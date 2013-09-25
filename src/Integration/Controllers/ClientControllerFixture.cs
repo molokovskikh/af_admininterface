@@ -153,26 +153,44 @@ namespace Integration.Controllers
 		[Test]
 		public void Move_address()
 		{
-			var sourceClient = DataMother.CreateTestClientWithAddress();
-			var destinationClient = DataMother.TestClient();
-			var address = sourceClient.Addresses[0];
+			var src = DataMother.CreateTestClientWithAddress();
+			var dst = DataMother.TestClient();
+			var address = src.Addresses[0];
 
-			controller.MoveUserOrAddress(destinationClient.Id,
+			//должны быть уникальные имена что можно было сделать проверку на правильность написания письма
+			MakeNameUniq(src);
+			MakeNameUniq(src.Payers);
+			MakeNameUniq(src.Payers.SelectMany(p => p.Orgs));
+
+			MakeNameUniq(dst);
+			MakeNameUniq(dst.Payers);
+			MakeNameUniq(dst.Payers.SelectMany(p => p.Orgs));
+
+			controller.MoveUserOrAddress(dst.Id,
 				0u,
 				address.Id,
-				destinationClient.Orgs().First().Id,
+				dst.Orgs().First().Id,
 				true);
 			session.Flush();
 
-			session.Refresh(destinationClient);
-			session.Refresh(sourceClient);
+			session.Refresh(dst);
+			session.Refresh(src);
 
-			Assert.That(sourceClient.Addresses.Count, Is.EqualTo(0));
-			Assert.That(sourceClient.Disabled, Is.True);
-			Assert.That(destinationClient.Addresses.Count, Is.EqualTo(1));
-			Assert.That(destinationClient.Addresses[0].Id, Is.EqualTo(address.Id));
-			Assert.That(notifications.FirstOrDefault(m => m.Subject.Contains("Перемещение адреса доставки")),
+			Assert.That(src.Addresses.Count, Is.EqualTo(0));
+			Assert.That(src.Disabled, Is.True);
+			Assert.That(dst.Addresses.Count, Is.EqualTo(1));
+			Assert.That(dst.Addresses[0].Id, Is.EqualTo(address.Id));
+			var mail = notifications.FirstOrDefault(m => m.Subject.Contains("Перемещение адреса доставки"));
+			Assert.That(mail,
 				Is.Not.Null, "не могу найти уведомление о перемещении " + notifications.Select(n => n.Subject).Implode());
+			Assert.That(mail.Body, Is.StringContaining(String.Format("Старый клиент {0} плательщик {1} юр.лицо {2}",
+				src.Name,
+				src.Payers[0].Name,
+				src.Payers[0].Orgs[0].Name)));
+			Assert.That(mail.Body, Is.StringContaining(String.Format("Новый клиент {0} плательщик {1} юр.лицо {2}",
+				dst.Name,
+				dst.Payers[0].Name,
+				dst.Payers[0].Orgs[0].Name)));
 		}
 
 		[Test]

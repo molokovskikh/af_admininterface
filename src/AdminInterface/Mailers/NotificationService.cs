@@ -55,7 +55,7 @@ namespace AdminInterface.Services
 			var client = address.Client;
 			var emails = GetEmailsForNotification(client);
 			var orgName = client.FullName;
-			if (client.Payers.Count > 1 || address.Payer.JuridicalOrganizations.Count > 1)
+			if (client.Payers.Count > 1 || address.Payer.Orgs.Count > 1)
 				orgName = address.LegalEntity.FullName;
 
 			foreach (var email in emails)

@@ -68,7 +68,7 @@ namespace AdminInterface.Models.Billing
 			Name = name;
 			JuridicalName = fullname;
 			ContactGroupOwner = new ContactGroupOwner();
-			JuridicalOrganizations.Add(new LegalEntity(name, JuridicalName, this));
+			JuridicalOrganizations.Add(new LegalEntity(this));
 			Comment = "";
 
 			Init(SecurityContext.Administrator);
@@ -211,6 +211,11 @@ namespace AdminInterface.Models.Billing
 			Schema = "Billing",
 			ColumnRef = "ClientId")]
 		public virtual IList<Client> Clients { get; set; }
+
+		public virtual IList<LegalEntity> Orgs
+		{
+			get { return JuridicalOrganizations; }
+		}
 
 		public virtual string GetMailAddress()
 		{
