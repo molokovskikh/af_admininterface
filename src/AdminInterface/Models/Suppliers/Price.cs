@@ -196,6 +196,16 @@ namespace AdminInterface.Models.Suppliers
 		}
 	}
 
+	[ActiveRecord("pricefmts", Schema = "Farm", Lazy = true)]
+	public class PriceFormat
+	{
+		[PrimaryKey]
+		public virtual uint Id { get; set; }
+
+		[Property]
+		public virtual string FileExtention { get; set; }
+	}
+
 	[ActiveRecord("PriceItems", Schema = "Usersettings", Lazy = true)]
 	public class PriceItem
 	{
@@ -227,6 +237,13 @@ namespace AdminInterface.Models.Suppliers
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
+
+		[BelongsTo("PriceFormatId", Cascade = CascadeEnum.All,
+			NotFoundBehaviour = NotFoundBehaviour.Ignore, Lazy = FetchWhen.OnInvoke)]
+		public virtual PriceFormat Format { get; set; }
+
+		[Property]
+		public virtual string FCode { get; set; }
 	}
 
 	[ActiveRecord("downlogs", Schema = "logs")]

@@ -7,6 +7,7 @@ using System.Threading;
 using AdminInterface.Controllers;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
+using AdminInterface.Models.Suppliers;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate.Linq;
@@ -171,14 +172,13 @@ namespace Functional
 		[Test]
 		public void FormPositionFixture()
 		{
-			var supplier = TestSupplier.Create();
+			var supplier = DataMother.CreateSupplier();
 			var price = supplier.Prices[0];
-			var itemFormat = price.Costs[0].PriceItem.Format;
-			itemFormat.PriceFormat = PriceFormatType.NativeDbf;
-			itemFormat.FCode = "F1";
-			session.Save(itemFormat);
-			session.Flush();
-			session.Save(price);
+			var item = price.Costs[0].PriceItem;
+			item.FormRule.FCode = "F1";
+			item.FormRule.Format = session.Query<PriceFormat>().First(f => f.FileExtention == ".dbf");
+			session.Save(supplier);
+
 			Open("ManagerReports");
 			Click("Отчет о состоянии формализуемых полей в прайс-листах поставщиков");
 			AssertText("Отчет о состоянии формализуемых полей в прайс-листах поставщиков");
