@@ -53,15 +53,19 @@
 			<th>Дата</th>
 			<th>Тема</th>
 			<th>Отправитель</th>
+			<th>Получатель</th>
+			<th>Тип сообщения</td>
 			<th>Причина</th>
 		</tr>
 	</thead>
 	<% for i, reject in enumerate(rejects): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
-		<td>${reject.SmtpId}</td>
-		<td>${reject.LogTime}</td>
-		<td>${reject.Subject}</td>
-		<td>${reject.From}</td>
+		<td>!{reject.SmtpId}</td>
+		<td>!{reject.LogTime}</td>
+		<td>!{reject.Subject}</td>
+		<td>!{reject.From}</td>
+		<td>!{reject.To}</td>
+		<td>${app.Display(reject.MessageType)}</td>
 		<td>${ViewHelper.FormatMessage(reject.Comment)}</td>
 	</tr>
 	<% end %>

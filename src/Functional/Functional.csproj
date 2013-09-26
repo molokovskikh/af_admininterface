@@ -145,6 +145,7 @@
     <Compile Include="RegionsFixture.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="MessagesFixture.cs" />
+    <Compile Include="SmapRejectorSeleniumFixture.cs" />
     <Compile Include="StatusColorFixture.cs" />
     <Compile Include="Suppliers\BillingFixture.cs" />
     <Compile Include="Suppliers\EditRegionalInfoFixture.cs" />

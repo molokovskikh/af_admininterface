@@ -1,11 +1,22 @@
 ﻿using System;
+using System.ComponentModel;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Common.Web.Ui.Models.Audit;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
+	public enum RejectedMessageType
+	{
+		[Description("Неизвестный")] Unknown,
+		[Description("Накладная")] Waybills,
+		[Description("Отказ")] Reject,
+		[Description("Прайс-лист")] Price,
+		[Description("Мини-почта")] MiniMail
+	}
+
 	[ActiveRecord("EmailRejectLogs", Schema = "logs")]
 	public class RejectedEmail : ActiveRecordLinqBase<RejectedEmail>
 	{
@@ -23,6 +34,12 @@ namespace AdminInterface.Models.Logs
 
 		[Property(Column = "`From`")]
 		public virtual string From { get; set; }
+
+		[Property(Column = "`To`")]
+		public virtual string To { get; set; }
+
+		[Property(Column = "`MessageType`")]
+		public virtual RejectedMessageType MessageType { get;  set; }
 
 		[Property]
 		public virtual string Subject { get; set; }
