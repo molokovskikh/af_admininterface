@@ -80,7 +80,7 @@ namespace Functional.Billing
 			AssertText("Введите причину удаления");
 			Click("Продолжить");
 			AssertText("Это поле необходимо заполнить.");
-			browser.TextField("CommentField").AppendText("123456");
+			Css("#CommentField").AppendText("123456");
 			Click("Продолжить");
 		}
 

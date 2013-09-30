@@ -100,7 +100,7 @@ namespace AdminInterface.Controllers
 			if (IsPost) {
 				var file = Request.Files["inputfile"] as HttpPostedFile;
 				if (file == null || file.ContentLength == 0) {
-					PropertyBag["Message"] = Message.Error("Нужно выбрать файл для загрузки");
+					Error("Нужно выбрать файл для загрузки");
 					return;
 				}
 
@@ -118,7 +118,7 @@ namespace AdminInterface.Controllers
 			if (IsPost) {
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
 				payment.UpdateInn();
-				Flash["Message"] = Message.Notify("Сохранено");
+				Notify("Сохранено");
 				RedirectToReferrer();
 			}
 			else {
@@ -130,7 +130,7 @@ namespace AdminInterface.Controllers
 
 		public void SessionExpired()
 		{
-			Flash["Message"] = Message.Error("Время сессии истекло. Загрузите выписку повторно.");
+			Error("Время сессии истекло. Загрузите выписку повторно.");
 			RedirectToAction("ProcessPayments");
 		}
 
@@ -167,7 +167,7 @@ namespace AdminInterface.Controllers
 			if (IsPost) {
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
 				payment.DoUpdate();
-				Flash["Message"] = Message.Notify("Сохранено");
+				Notify("Сохранено");
 				RedirectToReferrer();
 			}
 			else {

@@ -23,7 +23,7 @@ namespace AdminInterface.ManagerReportsFilters
 			{
 				if (ForExport)
 					return _clientId;
-				return Link(_clientId, "Clients", new Tuple<string, object>("Id", _clientId));
+				return AppHelper.LinkToNamed(_clientId, "Clients", parameters: new { @params = new { Id = _clientId } });
 			}
 			set { _clientId = value; }
 		}
@@ -37,7 +37,7 @@ namespace AdminInterface.ManagerReportsFilters
 			{
 				if (ForExport)
 					return _clientName;
-				return Link(_clientName, "Clients", new Tuple<string, object>("Id", _clientId));
+				return AppHelper.LinkToNamed(_clientName, "Clients", parameters: new { @params = new { Id = _clientId } });
 			}
 			set { _clientName = value; }
 		}
@@ -56,7 +56,7 @@ namespace AdminInterface.ManagerReportsFilters
 			{
 				if (ForExport)
 					return _userName;
-				return Link(_userName, "Users", new Tuple<string, object>("Id", UserId));
+				return AppHelper.LinkToNamed(_userName, "Users", parameters: new { @params = new { Id = UserId } });
 			}
 			set { _userName = value; }
 		}

@@ -87,11 +87,7 @@ namespace AdminInterface.Controllers
 			if(filter.Session == null)
 				filter.Session = DbSession;
 			var result = ExportModel.GetClientAddressesMonitor(filter);
-			Response.Clear();
-			Response.AppendHeader("Content-Disposition",
-				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Клиенты и адреса в регионе, по которым не принимаются накладные.xls")));
-			Response.ContentType = "application/vnd.ms-excel";
-			Response.OutputStream.Write(result, 0, result.Length);
+			this.RenderFile("Клиенты и адреса в регионе, по которым не принимаются накладные.xls", result);
 		}
 
 		public void SwitchOffClients()
@@ -158,14 +154,10 @@ namespace AdminInterface.Controllers
 
 		public void UpdatedAndDidNotDoOrders()
 		{
-			var urlHelper = new UrlHelper(Context);
 			var filter = BindFilter<UpdatedAndDidNotDoOrdersFilter, UpdatedAndDidNotDoOrdersField>();
 			PropertyBag["filter"] = filter;
 			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null || filter.LoadDefault) {
 				var result = filter.Find();
-				foreach (var updatedAndDidNotDoOrdersField in result) {
-					updatedAndDidNotDoOrdersField.SetUrlHelper(urlHelper);
-				}
 				PropertyBag["Clients"] = result.Cast<BaseItemForTable>().ToList();
 			}
 			else {
@@ -175,12 +167,10 @@ namespace AdminInterface.Controllers
 
 		public void AnalysisOfWorkDrugstores()
 		{
-			var urlHelper = new UrlHelper(Context);
 			var filter = BindFilter<AnalysisOfWorkDrugstoresFilter, BaseItemForTable>();
 			filter.SetDefaultRegion();
 			FindFilter(filter);
 			foreach (var item in (IList)PropertyBag["Items"]) {
-				((AnalysisOfWorkFiled)item).SetUrlHelper(urlHelper);
 				((AnalysisOfWorkFiled)item).ReportType = AnalysisReportType.Client;
 			}
 		}
@@ -189,7 +179,6 @@ namespace AdminInterface.Controllers
 		public object GetAnalysUserInfo(uint clientId)
 		{
 			CancelLayout();
-			var urlHelper = new UrlHelper(Context);
 			var filter = BindFilter<AnalysisOfWorkDrugstoresFilter, BaseItemForTable>();
 			PropertyBag["filter"] = filter;
 			var thisClient = DbSession.Get<Client>(clientId);
@@ -201,7 +190,6 @@ namespace AdminInterface.Controllers
 				filter.Type = AnalysisReportType.User;
 				filter.RenderHead = false;
 				var result = filter.Find();
-				result.Cast<AnalysisOfWorkFiled>().Each(r => { r.ReportType = AnalysisReportType.User; r.SetUrlHelper(urlHelper); });
 				PropertyBag["Items"] = result;
 				TextWriter writer = new StringWriter();
 				BaseMailer.ViewEngineManager.Process("ManagerReports/SimpleTable", writer, Context, this, ControllerContext);
@@ -212,7 +200,7 @@ namespace AdminInterface.Controllers
 					filter.Type = AnalysisReportType.Address;
 					filter.RenderHead = false;
 					var resultAddress = filter.Find();
-					resultAddress.Cast<AnalysisOfWorkFiled>().Each(r => { r.ReportType = AnalysisReportType.Address; r.SetUrlHelper(urlHelper); });
+					resultAddress.Cast<AnalysisOfWorkFiled>().Each(r => r.ReportType = AnalysisReportType.Address);
 					PropertyBag["Items"] = resultAddress;
 					TextWriter writerAddress = new StringWriter();
 					BaseMailer.ViewEngineManager.Process("ManagerReports/SimpleTable", writerAddress, Context, this, ControllerContext);
@@ -243,7 +231,7 @@ namespace AdminInterface.Controllers
 			else {
 				service.NotifySupplierAboutDrugstoreRegistration(client, true);
 			}
-			Flash["Message"] = Message.Notify("Уведомления отправлены");
+			Notify("Уведомления отправлены");
 			RedirectToReferrer();
 		}
 
@@ -264,23 +252,15 @@ namespace AdminInterface.Controllers
 		public void FormPosition()
 		{
 			var filter = BindFilter<FormPositionFilter, BaseItemForTable>();
-			if(filter.Session == null)
-				filter.Session = DbSession;
 			FindFilter(filter);
 		}
 
 		public void FormPositionToExcel([DataBind("filter")] FormPositionFilter filter)
 		{
-			CancelLayout();
-			CancelView();
 			if(filter.Session == null)
 				filter.Session = DbSession;
 			var result = ExportModel.GetFormPosition(filter);
-			Response.Clear();
-			Response.AppendHeader("Content-Disposition",
-				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Отчет о состоянии формализуемых полей.xls")));
-			Response.ContentType = "application/vnd.ms-excel";
-			Response.OutputStream.Write(result, 0, result.Length);
+			this.RenderFile("Отчет о состоянии формализуемых полей.xls", result);
 		}
 
 		public void NotParcedWaybills()
@@ -295,38 +275,26 @@ namespace AdminInterface.Controllers
 
 		public void NotParcedWaybillsToExcel([DataBind("filter")] DocumentFilter filter)
 		{
-			CancelLayout();
-			CancelView();
 			var result = ExportModel.GetNotParcedWaybills(filter);
-			Response.Clear();
-			Response.AppendHeader("Content-Disposition",
-				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Отчет о состоянии неформализованных накладных.xls")));
-			Response.ContentType = "application/vnd.ms-excel";
-			Response.OutputStream.Write(result, 0, result.Length);
+			this.RenderFile("Отчет о состоянии неформализованных накладных.xls", result);
 		}
 
 		public void ParsedWaybills()
 		{
 			var filter = BindFilter<ParsedWaybillsFilter, BaseItemForTable>();
-			if(filter.Session == null)
-				filter.Session = DbSession;
 			FindFilter(filter);
 			if(!String.IsNullOrEmpty(filter.ClientName) && filter.ClientId == null)
-				Flash["Message"] = "Поиск выполнен без учета клиента! Для включения клиента в поиск необходимо выбрать полное наименование клиента из выпадающего списка, появляющегося при вводе части наименования клиента в поле 'Клиент' ";
+				Warning("Поиск выполнен без учета клиента!" +
+					" Для включения клиента в поиск необходимо выбрать полное наименование клиента" +
+					" из выпадающего списка, появляющегося при вводе части наименования клиента в поле 'Клиент' ");
 		}
 
 		public void ParsedWaybillsToExcel([DataBind("filter")] ParsedWaybillsFilter filter)
 		{
-			CancelLayout();
-			CancelView();
 			if(filter.Session == null)
 				filter.Session = DbSession;
 			var result = ExportModel.GetParcedWaybills(filter);
-			Response.Clear();
-			Response.AppendHeader("Content-Disposition",
-				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Отчет о состоянии формализованных накладных.xls")));
-			Response.ContentType = "application/vnd.ms-excel";
-			Response.OutputStream.Write(result, 0, result.Length);
+			this.RenderFile("Отчет о состоянии формализованных накладных.xls", result);
 		}
 	}
 }

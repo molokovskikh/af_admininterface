@@ -17,5 +17,5 @@ ${app.ExportLink("Выгрузить в Excel", @FormPositionToExcel, filter)}
 </tr>
 ${app.EndFormFor("filter")}
 <div id="FormPositionTable">
-${tableHelper.ViewResult(Items, filter, app)}
+${tableHelper.ViewResult(Items, filter)}
 </div>

@@ -142,7 +142,7 @@ namespace Functional.Billing
 		{
 			Assert.That(address.AvaliableForUsers.Count, Is.EqualTo(0));
 			address.AvaliableForUsers = new List<User>();
-			browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
+			Css("#usersForAddress" + address.Id).Click();
 			Thread.Sleep(500);
 			var connectUserLink = browser.Link(Find.ByText("Подключить пользователя"));
 			connectUserLink.Click();
@@ -171,7 +171,7 @@ namespace Functional.Billing
 		{
 			Assert.That(address.AvaliableForUsers.Count, Is.EqualTo(0));
 
-			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+			Css("#addressesForUser" + user.Id).Click();
 			Thread.Sleep(500);
 			var connectAddressLink = browser.Link(Find.ByText("Подключить адрес"));
 			connectAddressLink.Click();
@@ -317,7 +317,7 @@ namespace Functional.Billing
 		[Test]
 		public void Test_view_connecting_user_to_address()
 		{
-			browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
+			Css("#usersForAddress" + address.Id).Click();
 			ClickLink("Подключить пользователя");
 			var searchDiv = browser.Div(Find.ById("SearchUserDiv" + address.Id));
 			var selectDiv = browser.Div(Find.ById("SelectUserDiv" + address.Id));
@@ -347,7 +347,7 @@ namespace Functional.Billing
 		[Test]
 		public void Test_view_connecting_address_to_user()
 		{
-			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+			Css("#addressesForUser" + user.Id).Click();
 			Thread.Sleep(500);
 			ClickLink("Подключить адрес");
 			Thread.Sleep(500);
@@ -480,13 +480,13 @@ namespace Functional.Billing
 		public void Show_message_if_server_error_occured()
 		{
 			// Подключаем пользователю адрес
-			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+			Css("#addressesForUser" + user.Id).Click();
 			Thread.Sleep(500);
 			browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
 			Thread.Sleep(500);
 			browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
 			Thread.Sleep(2000);
-			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+			Css("#addressesForUser" + user.Id).Click();
 
 			// Удаляем адрес и пользователя, чтобы произошла ошибка на сервере
 			client.Users.Remove(user);
@@ -501,7 +501,7 @@ namespace Functional.Billing
 			Assert.IsTrue(errorMessageDiv.Style.Display.ToLower().Equals("none"));
 
 			// Пытаемся посмотреть адреса, доступные пользователю
-			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+			Css("#addressesForUser" + user.Id).Click();
 			Thread.Sleep(500);
 
 			Assert.IsTrue(errorMessageDiv.Exists);
@@ -565,7 +565,7 @@ namespace Functional.Billing
 
 				var div = browser.Div(Find.ById("CurrentMessageForUser" + user.Id));
 				Assert.IsTrue(div.Exists);
-				browser.Link(Find.ById("ViewMessageForUser" + user.Id)).Click();
+				Css("#ViewMessageForUser" + user.Id).Click();
 				Thread.Sleep(500);
 				var messageBody = browser.Table(Find.ById("MessageForUser" + user.Id));
 				Assert.IsTrue(messageBody.Exists);
@@ -694,7 +694,7 @@ namespace Functional.Billing
 				&& !row.Id.Contains("UserRowHidden")
 				&& (row.Style.Display != "none"));
 
-			browser.Link(Find.ById("ShowOrHideUsers")).Click();
+			Css("#ShowOrHideUsers").Click();
 			Thread.Sleep(1000);
 
 			var countVisibleRows2 = usersTable.TableRows.Count(row => (row != null)
@@ -702,14 +702,14 @@ namespace Functional.Billing
 				&& !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"));
 
 			Assert.That(countVisibleRows, Is.LessThan(countVisibleRows2));
-			browser.Link(Find.ById("ShowOrHideUsers")).Click();
+			Css("#ShowOrHideUsers").Click();
 			Thread.Sleep(1000);
 
 			var countVisibleRows3 = usersTable.TableRows.Count(row => (row != null)
 				&& (row.Id != null)
 				&& !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"));
 			Assert.That(countVisibleRows, Is.EqualTo(countVisibleRows3));
-			browser.Link(Find.ById("ShowOrHideUsers")).Click();
+			Css("#ShowOrHideUsers").Click();
 			Thread.Sleep(1000);
 		}
 
@@ -810,7 +810,7 @@ namespace Functional.Billing
 			Assert.That(Css(String.Format("#UserRow{0} input[name=accounted]", user.Id)).Checked, Is.True);
 
 			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked = false;
-			browser.TextField("AddCommentField").AppendText("testComment");
+			Css("#AddCommentField").AppendText("testComment");
 			ConfirmDialog();
 			Thread.Sleep(3000);
 

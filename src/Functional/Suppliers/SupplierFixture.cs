@@ -37,11 +37,11 @@ namespace Functional.Suppliers
 		{
 			Open(supplier);
 			Click("Сформировать заказы");
-			browser.TextField("email").Clear();
-			browser.TextField("email").AppendText("kvasovtest@analit.net");
+			Css("#email").Clear();
+			Css("#email").AppendText("kvasovtest@analit.net");
 			Click("Получить файлы");
 			AssertText("Вы не указали номера заказов");
-			browser.TextField("ordersNames").AppendText("0000");
+			Css("#ordersNames").AppendText("0000");
 			Click("Получить файлы");
 			AssertText("Не удалось получить все файлы от сервиса, некоторые заказы не были сформированы, проверте почту");
 		}
@@ -137,7 +137,7 @@ namespace Functional.Suppliers
 		{
 			Open(supplier);
 			Click("Настройка");
-			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_0").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Vip).ToString());
+			Css("MainContentPlaceHolder_PricesGrid_PriceTypeList_0").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Vip).ToString());
 			Click("Применить");
 			AssertText("Все клиенты были отключены от VIP прайсов");
 		}
@@ -170,8 +170,8 @@ namespace Functional.Suppliers
 			Open(supplier);
 			Click("Настройка");
 			//создаем ассортиментный прайс
-			browser.Button("MainContentPlaceHolder_PricesGrid_AddButton").Click();
-			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_1").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Assortment).ToString());
+			Css("#MainContentPlaceHolder_PricesGrid_AddButton").Click();
+			Css("#MainContentPlaceHolder_PricesGrid_PriceTypeList_1").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Assortment).ToString());
 			Click("Применить");
 			session.Refresh(supplier);
 			var source = session.CreateSQLQuery(@"
@@ -195,7 +195,7 @@ Where pc.PriceCode = :PriceId1")
 			Click("Файлы, исключенные из разбора в качестве накладных");
 			Click("Добавить");
 			AssertText("Это поле необходимо заполнить.");
-			browser.TextField("addNewExcludeFileInput").AppendText("1234");
+			Css("#addNewExcludeFileInput").AppendText("1234");
 			Click("Добавить");
 			AssertText("Сохранено");
 		}
@@ -204,7 +204,7 @@ Where pc.PriceCode = :PriceId1")
 		public void Edit_waybill_exlude_file()
 		{
 			Open("Suppliers/WaybillExcludeFiles?supplierId=" + supplier.Id);
-			browser.TextField("addNewExcludeFileInput").AppendText("1234");
+			Css("#addNewExcludeFileInput").AppendText("1234");
 			Click("Добавить");
 			browser.TextField(Find.ByClass("excludeFileMask")).Clear();
 			browser.TextField(Find.ByClass("excludeFileMask")).AppendText("0000");
@@ -221,11 +221,11 @@ Where pc.PriceCode = :PriceId1")
 			Flush();
 			Open("Suppliers/WaybillSourceSettings?supplierId=" + supplier.Id);
 			AssertText("Настройка данных для доступа к FTP");
-			browser.TextField("source_WaybillUrl").AppendText("testUrl");
-			browser.TextField("source_RejectUrl").AppendText("testUrl");
-			browser.TextField("userName").AppendText("testUser");
-			browser.TextField("source_Password").AppendText("testPassword");
-			browser.TextField("source_downloadInterval").AppendText("5");
+			Css("#source_WaybillUrl").AppendText("testUrl");
+			Css("#source_RejectUrl").AppendText("testUrl");
+			Css("#userName").AppendText("testUser");
+			Css("#source_Password").AppendText("testPassword");
+			Css("#source_downloadInterval").AppendText("5");
 			Click("Сохранить");
 			AssertText("Сохранено");
 		}
@@ -234,7 +234,7 @@ Where pc.PriceCode = :PriceId1")
 		public void Delete_waybill_exclude_file()
 		{
 			Open("Suppliers/WaybillExcludeFiles?supplierId=" + supplier.Id);
-			browser.TextField("addNewExcludeFileInput").AppendText("1234");
+			Css("#addNewExcludeFileInput").AppendText("1234");
 			Click("Добавить");
 			Click("Удалить");
 			AssertText("Вы уверены, что хотите удалить маску \"1234\" ?");

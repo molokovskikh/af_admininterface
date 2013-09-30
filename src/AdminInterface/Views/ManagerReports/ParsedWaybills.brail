@@ -23,5 +23,5 @@ ${FormHelper.HiddenField("filter.SortBy")}
 ${FormHelper.HiddenField("filter.SortDirection")}
 ${app.EndFormFor("filter")}
 <div id="ParsedWaybillsTable">
-${tableHelper.ViewResult(Items, filter, app)}
+${tableHelper.ViewResult(Items, filter)}
 </div>

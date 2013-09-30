@@ -78,7 +78,7 @@ namespace Functional
 			for (int i = 0; i < addressesCount; i++) {
 				browser.CheckBox(Find.ByName(string.Format("user.AvaliableAddresses[{0}].Id", i))).Checked = true;
 			}
-			browser.TextField("user_Name").AppendText("TestUser");
+			Css("#user_Name").AppendText("TestUser");
 			browser.CheckBox("sendClientCard").Checked = true;
 			browser.TextField(Find.ByName("mails")).AppendText("kvasovtest@analit.net");
 			Click("Создать");

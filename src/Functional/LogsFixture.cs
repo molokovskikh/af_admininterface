@@ -34,10 +34,10 @@ namespace Functional
 			Css("#StatisticsTD a").Click();
 			AssertText("Статистика по сертификатам");
 			var otherRegion = session.QueryOver<Region>().List().Last();
-			browser.SelectList("filter_Region_Id").SelectByValue(otherRegion.Id.ToString());
+			Css("#filter_Region_Id").SelectByValue(otherRegion.Id.ToString());
 			Click("Показать");
 			Assert.That(browser.Text, !Is.StringContaining("TestCertificateRequestLogProduct"));
-			browser.SelectList("filter_Region_Id").SelectByValue(client.MaskRegion.ToString());
+			Css("#filter_Region_Id").SelectByValue(client.MaskRegion.ToString());
 			Click("Показать");
 			AssertText("TestCertificateRequestLogProduct");
 		}

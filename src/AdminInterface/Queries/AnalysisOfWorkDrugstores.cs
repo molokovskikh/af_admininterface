@@ -1,24 +1,18 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 using System.Linq;
-using System.Web;
+using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Security;
-using Castle.MonoRail.Framework.Helpers;
-using Common.MySql;
 using Common.Tools.Calendar;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
-using MySql.Data.MySqlClient;
 using NHibernate;
 using NHibernate.Linq;
-using MySqlHelper = Common.MySql.MySqlHelper;
 
-namespace AdminInterface.ManagerReportsFilters
+namespace AdminInterface.Queries
 {
 	public class AnalysisOfWorkFiled : BaseItemForTable
 	{
@@ -31,7 +25,7 @@ namespace AdminInterface.ManagerReportsFilters
 			{
 				if (ForExport)
 					return _id;
-				return Link(_id, ReportType.GetDescription(), new System.Tuple<string, object>("Id", _id));
+				return AppHelper.LinkToNamed(_id, ReportType.GetDescription(), parameters: new { @params = new { _id } });
 			}
 			set { _id = value; }
 		}
@@ -46,7 +40,7 @@ namespace AdminInterface.ManagerReportsFilters
 			{
 				if (ForExport)
 					return _name;
-				return Link(_name, ReportType.GetDescription(), new System.Tuple<string, object>("Id", _id));
+				return AppHelper.LinkToNamed(_name, ReportType.GetDescription(), parameters: new { @params = new { _id } });
 			}
 			set { _name = value; }
 		}

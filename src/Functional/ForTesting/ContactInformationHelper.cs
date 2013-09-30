@@ -4,6 +4,7 @@ using System.Linq;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Models;
 using NUnit.Framework;
+using Test.Support.Web;
 using WatiN.Core;
 
 namespace Functional.ForTesting
@@ -29,7 +30,7 @@ namespace Functional.ForTesting
 					break;
 				}
 			}
-			browser.Link(Find.ById("addContactLink")).Click();
+			browser.Css("#addContactLink").Click();
 			var rowId = 0;
 			if (contactType == ContactType.Phone) {
 				var comboBox = browser.SelectList(Find.ByName(String.Format("contactTypes[{0}]", --rowId)));
@@ -47,7 +48,7 @@ namespace Functional.ForTesting
 		public static void AddPerson(Browser browser, string personName, string applyButtonText, uint clientId)
 		{
 			var rowId = 0;
-			browser.Link(Find.ById("addPersonLink")).Click();
+			browser.Css("#addPersonLink").Click();
 			browser.TextField(String.Format("persons[{0}].Name", --rowId)).TypeText(personName);
 			browser.Button(Find.ByValue(applyButtonText)).Click();
 		}

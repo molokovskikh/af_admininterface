@@ -44,7 +44,7 @@ namespace Functional.Drugstore
 			Open(client);
 			Click("Новый адрес доставки");
 			AssertText("Тестовый текст памятки адреса");
-			browser.TextField("address_Value").AppendText("Тестовые адрес доставки");
+			Css("#address_Value").AppendText("Тестовые адрес доставки");
 			Click("Создать");
 			Open(client);
 			Click("Тестовые адрес доставки");
@@ -267,12 +267,12 @@ WHERE AddressId = :AddressId
 			AssertText("Максимальная сумма заказа за 1 день, руб.:");
 			Assert.That(browser.CheckBox("address_CheckDailyOrdersSum").Checked, Is.False);
 			browser.CheckBox("address_CheckDailyOrdersSum").Checked = true;
-			browser.TextField("address_MaxDailyOrdersSum").Value = "100";
+			Css("#address_MaxDailyOrdersSum").Value = "100";
 			Click("Сохранить");
 			AssertText("Сохранено");
 			Open(address);
 			Assert.That(browser.CheckBox("address_CheckDailyOrdersSum").Checked, Is.True);
-			Assert.That(browser.TextField("address_MaxDailyOrdersSum").Value, Is.EqualTo("100"));
+			Assert.That(Css("#address_MaxDailyOrdersSum").Value, Is.EqualTo("100"));
 		}
 
 		[Test]
@@ -281,7 +281,7 @@ WHERE AddressId = :AddressId
 			ClickLink("Новый адрес доставки");
 			AssertText("Новый адрес доставки");
 			browser.CheckBox("address_CheckDailyOrdersSum").Checked = true;
-			browser.TextField("address_MaxDailyOrdersSum").Value = "100";
+			Css("#address_MaxDailyOrdersSum").Value = "100";
 			browser.TextField(Find.ByName("address.Value")).TypeText("тестовый адрес");
 			ClickButton("Создать");
 			AssertText("Адрес доставки создан");

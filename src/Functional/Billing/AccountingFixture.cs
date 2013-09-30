@@ -23,7 +23,7 @@ namespace Functional.Billing
 			browser.TextField(Find.ById("SearchText")).TypeText(searchText);
 			ClickButton("Найти");
 
-			Assert.That(browser.Text, Is.Not.Contains("За указанный период ничего не найдено"));
+			AssertNoText("За указанный период ничего не найдено");
 			Assert.That(browser.Table(Find.ById("MainTable")).TableRows.Count(), Is.GreaterThan(1));
 		}
 

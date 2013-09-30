@@ -80,5 +80,5 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 </table>
 ${FormHelper.EndFormTag()}
 <div id="AnalysisOfWorkDrugstoresTable">
-${tableHelper.ViewResult(Items, filter, app)}
+${tableHelper.ViewResult(Items, filter)}
 </div>

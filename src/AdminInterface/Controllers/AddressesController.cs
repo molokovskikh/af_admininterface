@@ -107,7 +107,7 @@ namespace AdminInterface.Controllers
 					address.Client, oldLegalEntity);
 			}
 
-			Flash["Message"] = new Message("Сохранено");
+			Notify("Сохранено");
 			RedirectUsingRoute("client", "show", new { address.Client.Id });
 		}
 

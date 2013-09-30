@@ -16,6 +16,7 @@ using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.MonoRailExtentions;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
 
@@ -264,7 +265,7 @@ namespace AdminInterface.Controllers
 		{
 			var promotion = DbSession.Load<SupplierPromotion>(id);
 			DbSession.Delete(promotion);
-			Flash["Message"] = "Удалено";
+			Notify("Удалено");
 
 			RedirectToReferrer();
 		}
@@ -291,7 +292,7 @@ namespace AdminInterface.Controllers
 					var file = Request.Files["inputfile"] as HttpPostedFile;
 					if (file != null && file.ContentLength > 0) {
 						if (!IsAllowedExtention(Path.GetExtension(file.FileName))) {
-							PropertyBag["Message"] = Message.Error("Выбранный файл имеет недопустимый формат.");
+							Error("Выбранный файл имеет недопустимый формат.");
 							return;
 						}
 
@@ -322,7 +323,7 @@ namespace AdminInterface.Controllers
 		{
 			var promotion = DbSession.Load<SupplierPromotion>(id);
 			promotion.Enabled = !promotion.Enabled;
-			Flash["Message"] = "Сохранено";
+			Notify("Сохранено");
 			DbSession.Save(promotion);
 			RedirectToAction("Index", filter.ToUrl());
 		}
@@ -331,7 +332,7 @@ namespace AdminInterface.Controllers
 		{
 			var promotion = DbSession.Load<SupplierPromotion>(id);
 			promotion.AgencyDisabled = !promotion.AgencyDisabled;
-			Flash["Message"] = "Сохранено";
+			Notify("Сохранено");
 			DbSession.Save(promotion);
 			RedirectToAction("Index", filter.ToUrl());
 		}
@@ -367,7 +368,7 @@ namespace AdminInterface.Controllers
 					var file = Request.Files["inputfile"] as HttpPostedFile;
 					if (file != null && file.ContentLength > 0) {
 						if (!IsAllowedExtention(Path.GetExtension(file.FileName))) {
-							PropertyBag["Message"] = Message.Error("Выбранный файл имеет недопустимый формат.");
+							Error("Выбранный файл имеет недопустимый формат.");
 							return;
 						}
 
@@ -399,26 +400,9 @@ namespace AdminInterface.Controllers
 
 		public void GetPromoFile(uint id)
 		{
-			CancelLayout();
-			CancelView();
-
 			var promotion = DbSession.Load<SupplierPromotion>(id);
 			var fileName = GetPromoFile(promotion);
-
-			if (File.Exists(fileName) && !String.IsNullOrEmpty(promotion.PromoFile))
-				using (var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read)) {
-					Response.Clear();
-
-					var extention = Path.GetExtension(promotion.PromoFile);
-					if (_allowedExtentions.ContainsKey(extention))
-						Response.ContentType = _allowedExtentions[extention];
-					else
-						Response.AppendHeader("Content-Disposition",
-							String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString(promotion.PromoFile)));
-					fileStream.CopyTo(Response.OutputStream);
-				}
-			else
-				throw new Exception(String.Format("Для акции №{0} не существует файл {1}", promotion.Id, promotion.PromoFile));
+			this.RenderFile(fileName, promotion.PromoFile);
 		}
 
 		public void SelectSupplier([DataBind("filter")] SupplierFilter filter)
@@ -475,7 +459,7 @@ namespace AdminInterface.Controllers
 
 				ActiveRecordMediator.Evict(promotion);
 				if (Validator.IsValid(promotion) && promotion.Catalogs.Count > 0) {
-					Flash["Message"] = "Сохранено";
+					Notify("Сохранено");
 					DbSession.Update(promotion);
 					RedirectToAction("EditCatalogs", filter.ToUrl());
 				}
@@ -487,7 +471,7 @@ namespace AdminInterface.Controllers
 					if (promotion.Catalogs.Count == 0)
 						summary = String.Join(Environment.NewLine, summary, "Список препаратов не может быть пустым.");
 
-					Flash["Message"] = Message.Error(summary);
+					Error(summary);
 					ActiveRecordMediator.Evict(promotion);
 					var discardedPromotion = DbSession.Load<SupplierPromotion>(id);
 					PropertyBag["promotion"] = discardedPromotion;

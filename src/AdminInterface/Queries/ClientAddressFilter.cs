@@ -46,7 +46,7 @@ namespace AdminInterface.ManagerReportsFilters
 		{
 			get
 			{
-				return RejectReason == null ? "" : RejectReason.Value.GetDescription();
+				return RejectReason == null ? "" : BindingHelper.GetDescription(RejectReason.Value);
 			}
 		}
 	}

@@ -28,7 +28,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 </table>
 
 <div id="AnalysisOfWorkDrugstoresTable">
-${tableHelper.ViewResult(Items, filter, app)}
+${tableHelper.ViewResult(Items, filter)}
 <button type='button' id='deleteSelectedButton'>Удалить отмеченные</buttom>
 </div>
 

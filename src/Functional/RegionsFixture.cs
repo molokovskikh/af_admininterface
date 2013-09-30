@@ -29,7 +29,7 @@ namespace Functional
 			ClickLink("Воронеж");
 			WaitForText("Телефон по умолчанию");
 			AssertText("Временной сдвиг относительно Москвы");
-			browser.Link(Find.ById("ShowRegionsLink")).Click();
+			Css("#ShowRegionsLink").Click();
 			WaitForText(@"Регионы работы
  по умолчанию");
 			browser.TextField(Find.ById("region_DefaultPhone")).Value = "123-1233210";

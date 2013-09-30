@@ -168,7 +168,7 @@ namespace Functional.Drugstore
 			Click(organizaion.Name);
 			AssertText("Краткое наименование");
 			AssertText(organizaion.Name);
-			browser.TextField("JuridicalOrganization_Name").AppendText("Test_JuridicalOrganization");
+			Css("#JuridicalOrganization_Name").AppendText("Test_JuridicalOrganization");
 			Click("Сохранить");
 			AssertText("Test_JuridicalOrganization");
 			AssertText("Сохранено");
@@ -178,8 +178,8 @@ namespace Functional.Drugstore
 		public void Create_delete_legal_entity_test()
 		{
 			Click("Новое юр. лицо");
-			browser.TextField("JuridicalOrganization_Name").AppendText("new_JuridicalOrganization_name");
-			browser.TextField("JuridicalOrganization_FullName").AppendText("new_JuridicalOrganization_FullName");
+			Css("#JuridicalOrganization_Name").AppendText("new_JuridicalOrganization_name");
+			Css("#JuridicalOrganization_FullName").AppendText("new_JuridicalOrganization_FullName");
 			Click("Создать");
 			AssertText("Юридическое лицо создано");
 			browser.Refresh();

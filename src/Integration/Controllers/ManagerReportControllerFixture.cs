@@ -6,6 +6,7 @@ using System.Text;
 using AdminInterface.Controllers;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
+using AdminInterface.Queries;
 using ExcelLibrary.SpreadSheet;
 using Integration.ForTesting;
 using NUnit.Framework;

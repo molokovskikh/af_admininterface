@@ -1,28 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using AdminInterface.Controllers;
 using AdminInterface.ManagerReportsFilters;
-using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
-using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using Test.Support;
-using Test.Support.Suppliers;
+using Test.Support.Selenium;
 using Test.Support.Web;
 using WatiN.Core;
-using Test.Support.Web;
-using WatiN.Core.Native.Windows;
 
 namespace Functional
 {
 	[TestFixture]
-	public class ManagerReportsFixture : WatinFixture2
+	public class ManagerReportsFixture : SeleniumFixture
 	{
 		[Test]
 		public void BaseShowTest()
@@ -34,7 +25,7 @@ namespace Functional
 			AssertText("Зарегистрированные пользователи и адреса в регионе");
 			Click("Показать");
 			AssertText("Зарегистрированные пользователи и адреса в регионе");
-			browser.SelectList(Find.ByName("filter.FinderType")).SelectByValue(((int)RegistrationFinderType.Addresses).ToString());
+			Css("[name='filter.FinderType']").SelectByValue(((int)RegistrationFinderType.Addresses).ToString());
 			Click("Показать");
 			AssertText("Зарегистрированные пользователи и адреса в регионе");
 			Open();
@@ -70,7 +61,7 @@ namespace Functional
 			Save(supplier);
 			var client = DataMother.CreateClientAndUsers();
 			Save(client);
-			var documentLog = new AdminInterface.Models.Logs.DocumentReceiveLog(supplier);
+			var documentLog = new DocumentReceiveLog(supplier);
 			documentLog.ForClient = client;
 			documentLog.LogTime = DateTime.Now;
 			Save(documentLog);
@@ -79,11 +70,11 @@ namespace Functional
 			Click("Неразобранные накладные");
 			AssertText("Неразобранные накладные");
 			AssertText("Регион:");
-			Assert.That(browser.Text, Is.Not.Contains("Только неразобранные накладные"));
+			AssertNoText("Только неразобранные накладные");
 			Click("Показать");
 			AssertText("Номер документа");
-			Assert.That(browser.Text, Is.Not.Contains("Дата документа"));
-			Assert.That(browser.Text, Is.Not.Contains("Дата отправки"));
+			AssertNoText("Дата документа");
+			AssertNoText("Дата отправки");
 			AssertText(client.Name);
 			AssertText(supplier.Name);
 		}
@@ -95,9 +86,8 @@ namespace Functional
 			Save(supplier);
 			var client = DataMother.CreateClientAndUsers();
 			Save(client);
-			var documentLog = new AdminInterface.Models.Logs.DocumentReceiveLog(supplier);
+			var documentLog = new DocumentReceiveLog(supplier);
 			documentLog.ForClient = client;
-			documentLog.LogTime = DateTime.Now;
 			Save(documentLog);
 
 			Open("ManagerReports");
@@ -146,11 +136,11 @@ namespace Functional
 			session.Save(address);
 			Open("ManagerReports");
 			Click("Сравнительный анализ работы аптек");
-			browser.SelectList("filter_Region_Id").SelectByValue(client.HomeRegion.Id.ToString());
+			Css("#filter_Region_Id").SelectByValue(client.HomeRegion.Id.ToString());
 			Click("Показать");
 			Click("Код");
 			Click("Код");
-			browser.Link(client.Id.ToString()).Click();
+			browser.FindElementById(client.Id.ToString()).Click();
 			AssertText(string.Format("Клиент: {0}", client.Name));
 			AssertText(user.Id.ToString());
 			AssertText(address.Name);
@@ -162,7 +152,7 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			Open("ManagerReports");
 			Click("Зарегистрированные пользователи и адреса");
-			browser.Link(client.Id.ToString()).Click();
+			browser.FindElementById(client.Id.ToString()).Click();
 			AssertText(string.Format("Клиент: {0}", client.Name));
 			foreach (var user in client.Users) {
 				AssertText(string.Format("{0} - ({1})", user.Name, user.Id));

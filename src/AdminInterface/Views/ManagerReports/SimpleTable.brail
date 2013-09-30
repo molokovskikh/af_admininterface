@@ -1,1 +1,1 @@
-﻿${tableHelper.ViewResult(Items, filter, app)}
+﻿${tableHelper.ViewResult(Items, filter)}

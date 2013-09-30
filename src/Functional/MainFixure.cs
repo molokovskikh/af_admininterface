@@ -63,13 +63,13 @@ namespace Functional
 			Open("main/Settings");
 			AssertText("Настройки по умолчанию");
 			Click("Режим работы техподдержки");
-			browser.TextField("defaults_TechOperatingModeBegin").Value = "70.30";
-			browser.TextField("defaults_TechOperatingModeEnd").Value = "19.80";
+			Css("#defaults_TechOperatingModeBegin").Value = "70.30";
+			Css("#defaults_TechOperatingModeEnd").Value = "19.80";
 			Click("Сохранить");
 			AssertText("Некорректное время начала рабочего дня");
 			AssertText("Некорректное время окончания рабочего дня");
-			browser.TextField("defaults_TechOperatingModeBegin").Value = "8.00";
-			browser.TextField("defaults_TechOperatingModeEnd").Value = "20.30";
+			Css("#defaults_TechOperatingModeBegin").Value = "8.00";
+			Css("#defaults_TechOperatingModeEnd").Value = "20.30";
 			Click("Сохранить");
 			AssertText("Сохранено");
 		}
@@ -80,10 +80,10 @@ namespace Functional
 			Open("main/Settings");
 			AssertText("Настройки по умолчанию");
 			Click("Уведомления Обработки");
-			browser.TextField("Defaults_ProcessingAboutFirmSubject").AppendText("testFirmSubject_interface");
-			browser.TextField("Defaults_ProcessingAboutFirmBody").AppendText("testFirmBody_interface");
-			browser.TextField("Defaults_ProcessingAboutNamesSubject").AppendText("testNameSubject_interface");
-			browser.TextField("Defaults_ProcessingAboutNamesBody").AppendText("testNameBody_interface");
+			Css("#Defaults_ProcessingAboutFirmSubject").AppendText("testFirmSubject_interface");
+			Css("#Defaults_ProcessingAboutFirmBody").AppendText("testFirmBody_interface");
+			Css("#Defaults_ProcessingAboutNamesSubject").AppendText("testNameSubject_interface");
+			Css("#Defaults_ProcessingAboutNamesBody").AppendText("testNameBody_interface");
 			Click("Сохранить");
 			AssertText("Сохранено");
 		}

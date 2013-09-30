@@ -1028,7 +1028,7 @@ namespace AdminInterface.Models
 				sheetRow = sheet.CreateRow(row++);
 				NPOIExcelHelper.FillNewCell(sheetRow, 0, item.Id.ToString(), dataStyle);
 				NPOIExcelHelper.FillNewCell(sheetRow, 1, item.LogTime.ToString(), dataStyle);
-				NPOIExcelHelper.FillNewCell(sheetRow, 2, item.DocumentType.GetDescription(), dataStyle);
+				NPOIExcelHelper.FillNewCell(sheetRow, 2, BindingHelper.GetDescription(item.DocumentType), dataStyle);
 				NPOIExcelHelper.FillNewCell(sheetRow, 3, item.Supplier, dataStyle);
 				NPOIExcelHelper.FillNewCell(sheetRow, 4, item.Client, dataStyle);
 				NPOIExcelHelper.FillNewCell(sheetRow, 5, item.Address, dataStyle);

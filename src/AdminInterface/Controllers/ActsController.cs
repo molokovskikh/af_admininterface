@@ -68,7 +68,7 @@ namespace AdminInterface.Controllers
 					new MonorailMailer().DeleteOrEditAct(act, "billing@analit.net", "Удален акт", true).Send();
 				}
 
-				Flash["message"] = "Удалено";
+				Notify("Удалено");
 				RedirectToReferrer();
 			}
 			if (Form["print"] != null) {
@@ -76,7 +76,7 @@ namespace AdminInterface.Controllers
 				filter.PrepareFindActInvoiceIds(acts.Implode(i => i.Id));
 				var arguments = String.Format("act \"{0}\" \"{1}\"", printer, filter.Find<Act>().Implode(i => i.Id));
 				Printer.Execute(arguments);
-				Flash["message"] = "Отправлено на печать";
+				Notify("Отправлено на печать");
 				RedirectToReferrer();
 			}
 		}
@@ -97,7 +97,7 @@ namespace AdminInterface.Controllers
 					act.CalculateSum();
 					DbSession.Save(act);
 					new MonorailMailer().DeleteOrEditAct(act, "billing@analit.net", "Изменен акт", false).Send();
-					Flash["Message"] = "Сохранено";
+					Notify("Сохранено");
 					RedirectUsingRoute("Acts", "Edit", new { act.Id });
 				}
 			}

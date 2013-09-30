@@ -6,6 +6,7 @@ using System.Text;
 using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.Models.Audit;
+using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support;

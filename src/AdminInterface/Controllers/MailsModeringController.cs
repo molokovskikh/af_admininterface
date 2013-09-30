@@ -25,12 +25,8 @@ namespace AdminInterface.Controllers
 	{
 		public void ShowMails()
 		{
-			var urlHelper = new UrlHelper(Context);
 			var filter = BindFilter<MiniMailFilter, BaseItemForTable>();
 			FindFilter(filter);
-			foreach (var item in (IList)PropertyBag["Items"]) {
-				((MailItem)item).SetUrlHelper(urlHelper);
-			}
 		}
 
 		public void GetMail(uint mailId)

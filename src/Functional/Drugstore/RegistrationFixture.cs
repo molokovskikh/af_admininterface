@@ -47,12 +47,12 @@ namespace Functional.Drugstore
 			Css("#address_Value").TypeText(_randomClientName);
 			browser.Button("RegisterButton").Click();
 			AssertText("Это поле необходимо заполнить.");
-			browser.TextField("client_FullName").TypeText(_randomClientName);
-			browser.TextField("client_Name").TypeText(_randomClientName);
+			Css("#client_FullName").TypeText(_randomClientName);
+			Css("#client_Name").TypeText(_randomClientName);
 			browser.Button("RegisterButton").Click();
 			AssertText("Это поле необходимо заполнить.");
-			browser.TextField("ClientContactPhone").TypeText("123-456789");
-			browser.TextField("ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
+			Css("#ClientContactPhone").TypeText("123-456789");
+			Css("#ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
 			ClickRegisterAndCheck(browser);
 		}
 
@@ -62,16 +62,16 @@ namespace Functional.Drugstore
 			Css("#user_Name").TypeText("Тестовый пользователь");
 
 			Css("#address_Value").TypeText("Test address");
-			browser.TextField("client_FullName").TypeText(_randomClientName);
-			browser.TextField("client_Name").TypeText(_randomClientName);
-			browser.TextField("ClientContactPhone").TypeText("123456789");
+			Css("#client_FullName").TypeText(_randomClientName);
+			Css("#client_Name").TypeText(_randomClientName);
+			Css("#ClientContactPhone").TypeText("123456789");
 			browser.Button("RegisterButton").Click();
 			AssertText("Некорректный телефонный номер");
-			browser.TextField("ClientContactEmail").TypeText(_randomClientName + "test.test");
+			Css("#ClientContactEmail").TypeText(_randomClientName + "test.test");
 			browser.Button("RegisterButton").Click();
 			AssertText("Некорректный адрес электронной почты");
-			browser.TextField("ClientContactPhone").TypeText("123-456789");
-			browser.TextField("ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
+			Css("#ClientContactPhone").TypeText("123-456789");
+			Css("#ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
 			ClickRegisterAndCheck(browser);
 		}
 
@@ -617,11 +617,11 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ById("client_FullName")).TypeText(_randomClientName);
 			browser.TextField(Find.ById("client_Name")).TypeText(_randomClientName);
 			// Заполняем контактную информацию для клиента
-			browser.TextField("ClientContactPhone").TypeText("123-456789");
-			browser.TextField("ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
+			Css("#ClientContactPhone").TypeText("123-456789");
+			Css("#ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
 			// Заполняем контактную информацию для пользователя
-			browser.TextField("userContactPhone").TypeText("123-456789");
-			browser.TextField("userContactEmail").TypeText(_randomClientName + _mailSuffix);
+			Css("#userContactPhone").TypeText("123-456789");
+			Css("#userContactEmail").TypeText(_randomClientName + _mailSuffix);
 			// Если это аптека, заполняем адрес доставки
 		}
 

@@ -100,7 +100,12 @@ namespace AdminInterface.Queries
 		[Display(Name = "Отправитель", Order = 2)]
 		public string SupplierName
 		{
-			get { return Link(Mail.Supplier.Name, "Suppliers", new System.Tuple<string, object>("Id", Mail.Supplier.Id)); }
+			get
+			{
+				return AppHelper.LinkToNamed(Mail.Supplier.Name,
+					"Suppliers",
+					parameters: new { @params = new { Mail.Supplier.Id } });
+			}
 		}
 
 		[Display(Name = "Дом. регион отправителя", Order = 3)]

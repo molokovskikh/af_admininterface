@@ -13,6 +13,7 @@ using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.MonoRailExtentions;
 using ExcelLibrary.SpreadSheet;
 
 namespace AdminInterface.Controllers
@@ -55,7 +56,8 @@ namespace AdminInterface.Controllers
 			Response.Clear();
 			var filename = partNumber.HasValue ? String.Format("{0}_{1}.wav", recordId, partNumber.Value) :
 				String.Format("{0}.wav", recordId);
-			Response.AppendHeader("Content-Disposition", String.Format("attachment; filename=\"{0}\"", filename));
+			Response.AppendHeader("Content-Disposition",
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString(filename)));
 			Response.ContentType = "audio/wav";
 			foreach (var track in files) {
 				using (var fileStream = File.OpenRead(track))
@@ -66,20 +68,9 @@ namespace AdminInterface.Controllers
 		public void CallHistoryExport([DataBind("filter")] CallRecordFilter filter, string format)
 		{
 			if(format.Match("excel")) {
-				ToExcel(filter);
+				var result = ExportModel.GetCallsHistory(filter);
+				this.RenderFile("История звонков.xls", result);
 			}
-		}
-
-		private void ToExcel(CallRecordFilter filter)
-		{
-			CancelLayout();
-			CancelView();
-			var result = ExportModel.GetCallsHistory(filter);
-			Response.Clear();
-			Response.AppendHeader("Content-Disposition",
-				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("История звонков.xls")));
-			Response.ContentType = "application/vnd.ms-excel";
-			Response.OutputStream.Write(result, 0, result.Length);
 		}
 	}
 }

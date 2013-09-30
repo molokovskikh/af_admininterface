@@ -20,8 +20,8 @@ namespace Functional.Suppliers
 			AssertText("Регистрация поставщика");
 			var phoneCount = browser.TableCells.Count(l => l.Text == "Номер телефона:");
 			var emailCount = browser.TableCells.Count(l => l.Text == "Email:");
-			browser.Link(Find.ById("supplieraddPhoneLink")).Click();
-			browser.Link(Find.ById("supplieraddEmailLink")).Click();
+			Css("#supplieraddPhoneLink").Click();
+			Css("#supplieraddEmailLink").Click();
 			Assert.That(browser.TableCells.Count(l => l.Text == "Номер телефона:"), Is.EqualTo(phoneCount + 1));
 			Assert.That(browser.TableCells.Count(l => l.Text == "Email:"), Is.EqualTo(emailCount + 1));
 		}
@@ -120,7 +120,7 @@ namespace Functional.Suppliers
 			Save(supplier);
 			Open(supplier);
 			Click("Новый пользователь");
-			browser.TextField("user_Name").AppendText("test_comment");
+			Css("#user_Name").AppendText("test_comment");
 			browser.TextField(Find.ByName("mails")).AppendText("kvasovtest@analit.net");
 			Click("Создать");
 			AssertText("Пользователь создан");
