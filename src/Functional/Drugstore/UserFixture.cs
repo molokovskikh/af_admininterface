@@ -310,8 +310,8 @@ namespace Functional.Drugstore
 			ContactInformationHelper.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
 			AssertText("Сохранено");
 
-			session.Refresh(client);
-			var group = client.Users[0].ContactGroup;
+			session.Refresh(user);
+			var group = user.ContactGroup;
 			Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
 				"Не совпадают Id владельца группы у клиента и у новой группы");
 			// Проверка, что контактные записи создались в БД
@@ -354,8 +354,8 @@ namespace Functional.Drugstore
 			ContactInformationHelper.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
 			ContactInformationHelper.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
 
-			client = session.Load<Client>(client.Id);
-			var group = client.Users[0].ContactGroup;
+			session.Refresh(user);
+			var group = user.ContactGroup;
 			browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
 			ClickButton("Сохранить");
 			// Проверка, что контактная запись удалена

@@ -14,6 +14,7 @@ using WatiN.Core;
 using Test.Support.Web;
 using Test.Support;
 using WatiN.Core.Native.Windows;
+using PriceType = AdminInterface.Models.Suppliers.PriceType;
 
 namespace Functional.Suppliers
 {
@@ -137,7 +138,7 @@ namespace Functional.Suppliers
 		{
 			Open(supplier);
 			Click("Настройка");
-			Css("MainContentPlaceHolder_PricesGrid_PriceTypeList_0").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Vip).ToString());
+			Css("#MainContentPlaceHolder_PricesGrid_PriceTypeList_0").SelectByValue(((int)PriceType.Vip).ToString());
 			Click("Применить");
 			AssertText("Все клиенты были отключены от VIP прайсов");
 		}
