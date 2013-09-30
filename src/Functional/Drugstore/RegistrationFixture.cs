@@ -256,8 +256,8 @@ namespace Functional.Drugstore
 			SetupGeneralInformation();
 			ClickLink("Показать все регионы");
 			Thread.Sleep(500);
-			var regions = Region.FindAllByProperty("Name", "Чебоксары");
-			var checkBox = browser.CheckBox(Find.ById("browseRegion" + regions.First().Id));
+			var region = session.Query<Region>().First(r => r.Name == "Чебоксары");
+			var checkBox = browser.CheckBox(Find.ById("browseRegion" + region.Id));
 			Assert.IsTrue(checkBox.Exists);
 			checkBox.Checked = true;
 			// Снимаем галку, чтобы не заполнять информацию для биллинга
@@ -265,21 +265,20 @@ namespace Functional.Drugstore
 			browser.Button("RegisterButton").Click();
 			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
-			using (new SessionScope()) {
-				var client = session.Load<Client>(clientCode);
-				ClickLink(client.Users[0].Login);
-				Click("Настройка");
-				var pass = false;
-				for (var i = 0; i < 10; i++) {
-					var regionCheckBox = browser.CheckBox(Find.ByName(String.Format("WorkRegions[{0}]", i)));
-					Assert.IsTrue(regionCheckBox.Exists);
-					if (regionCheckBox.GetValue("value").Equals(regions[0].Id.ToString())) {
-						pass = true;
-						break;
-					}
+
+			var client = session.Load<Client>(clientCode);
+			ClickLink(client.Users[0].Login);
+			Click("Настройка");
+			var pass = false;
+			for (var i = 0; i < 10; i++) {
+				var regionCheckBox = browser.CheckBox(Find.ByName(String.Format("WorkRegions[{0}]", i)));
+				Assert.IsTrue(regionCheckBox.Exists);
+				if (regionCheckBox.GetValue("value").Equals(region.Id.ToString())) {
+					pass = true;
+					break;
 				}
-				Assert.IsTrue(pass);
 			}
+			Assert.IsTrue(pass);
 		}
 
 		[Test]

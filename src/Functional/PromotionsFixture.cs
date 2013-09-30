@@ -194,8 +194,8 @@ limit 1")
 
 			row.Button(Find.ByValue("Удалить")).Click();
 
-			Reopen();
-			var deletedPromotion = SupplierPromotion.TryFind(_promotion.Id);
+			session.Clear();
+			var deletedPromotion = session.Get<SupplierPromotion>(_promotion.Id);
 			Assert.That(deletedPromotion, Is.Null);
 
 			RowPromotionNotExists(_promotion);

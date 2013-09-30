@@ -21,7 +21,8 @@ namespace Functional.Billing
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, new Period(2011, Interval.January), new DateTime(2011, 1, 11));
 			session.Save(invoice);
-			new Payment { Payer = payer, Recipient = payer.Recipient, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800 }.Save();
+			var payment = new Payment(payer, new DateTime(2011, 1, 15), 800);
+			session.Save(payment);
 
 			Open(payer);
 			AssertText("плательщик");

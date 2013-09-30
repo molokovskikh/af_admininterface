@@ -18,18 +18,18 @@ namespace Functional.Billing
 		private Payer payer;
 
 		[SetUp]
-		public new void Setup()
+		public void Setup()
 		{
 			client = DataMother.CreateTestClientWithAddressAndUser();
 			payer = client.Payers.First();
 			payer.Name += payer.Id;
-			payer.UpdateAndFlush();
+			session.Save(payer);
 
 			client.AddAddress(new Address { Client = client, Value = "test address for billing", });
-			session.SaveOrUpdate(client);
+			session.Save(client);
 			foreach (var address in client.Addresses) {
 				address.Enabled = false;
-				address.UpdateAndFlush();
+				session.Save(address);
 			}
 		}
 

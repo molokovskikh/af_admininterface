@@ -310,13 +310,10 @@ namespace Functional.Drugstore
 			ContactInformationHelper.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
 			AssertText("Сохранено");
 
-			ContactGroup group;
-			using (new SessionScope()) {
-				client = session.Load<Client>(client.Id);
-				group = client.Users[0].ContactGroup;
-				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
-					"Не совпадают Id владельца группы у клиента и у новой группы");
-			}
+			session.Refresh(client);
+			var group = client.Users[0].ContactGroup;
+			Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
+				"Не совпадают Id владельца группы у клиента и у новой группы");
 			// Проверка, что контактные записи создались в БД
 			ContactInformationHelper.CheckContactGroupInDb(group);
 			var countContacts = ContactInformationHelper.GetCountContactsInDb(group);
@@ -333,13 +330,12 @@ namespace Functional.Drugstore
 			AssertText("Сохранено");
 			ContactInformationHelper.AddPerson(browser, "Test person2", applyButtonText, client.Id);
 			AssertText("Сохранено");
-			ContactGroup group;
-			using (new SessionScope()) {
-				client = session.Load<Client>(client.Id);
-				group = client.Users[0].ContactGroup;
-				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
-					"Не совпадают Id владельца группы у клиента и у новой группы");
-			}
+
+			session.Refresh(client);
+			session.Refresh(client.Users[0]);
+			var group = client.Users[0].ContactGroup;
+			Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
+				"Не совпадают Id владельца группы у клиента и у новой группы");
 			// Проверка, что контактные записи создались в БД
 			ContactInformationHelper.CheckContactGroupInDb(group);
 			var persons = ContactInformationHelper.GetPersons(group);
@@ -357,12 +353,11 @@ namespace Functional.Drugstore
 
 			ContactInformationHelper.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
 			ContactInformationHelper.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
-			using (new SessionScope()) {
-				client = session.Load<Client>(client.Id);
-				var group = client.Users[0].ContactGroup;
-				browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
-				ClickButton("Сохранить");
-			}
+
+			client = session.Load<Client>(client.Id);
+			var group = client.Users[0].ContactGroup;
+			browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
+			ClickButton("Сохранить");
 			// Проверка, что контактная запись удалена
 			var countContacts = ContactInformationHelper.GetCountContactsInDb(client.Users[0].ContactGroup);
 			Assert.That(countContacts, Is.EqualTo(1));
@@ -647,13 +642,12 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
 			ClickButton("Создать");
 			AssertText("Пользователь создан");
-			using (new SessionScope()) {
-				client = session.Load<Client>(client.Id);
-				Assert.That(client.ContactGroupOwner.ContactGroups.Count, Is.EqualTo(1));
-				var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
-				Assert.That(persons.Count, Is.EqualTo(1));
-				Assert.That(persons[0].Name, Is.EqualTo("Alice"));
-			}
+
+			session.Refresh(client);
+			Assert.That(client.ContactGroupOwner.ContactGroups.Count, Is.EqualTo(1));
+			var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
+			Assert.That(persons.Count, Is.EqualTo(1));
+			Assert.That(persons[0].Name, Is.EqualTo("Alice"));
 		}
 
 		[Test]

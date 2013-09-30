@@ -39,8 +39,8 @@ namespace Functional.Billing
 			Css("input[name='delete']").Click();
 			AssertText("Удалено");
 
-			Reopen();
-			invoice = Invoice.TryFind(invoice.Id);
+			session.Clear();
+			invoice = session.Get<Invoice>(invoice.Id);
 			Assert.That(invoice, Is.Null);
 		}
 
