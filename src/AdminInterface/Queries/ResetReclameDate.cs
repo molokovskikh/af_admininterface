@@ -4,7 +4,7 @@ using NHibernate;
 
 namespace AdminInterface.Queries
 {
-	public class ResetReclameDate : IAppQuery
+	public class ResetReclameDate : ITriggerQuery
 	{
 		private Client _client;
 

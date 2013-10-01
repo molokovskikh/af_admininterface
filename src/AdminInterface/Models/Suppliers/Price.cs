@@ -8,11 +8,34 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Linq;
 
 namespace AdminInterface.Models.Suppliers
 {
+	public class InvalidateMatrix : TriggerQueryAttribute
+	{
+		public override void Trigger(ISession session, object entity, object oldState)
+		{
+			if (oldState == null)
+				return;
+
+			session.CreateSQLQuery(@"
+delete from Farm.BuyingMatrix where MatrixId = :matrixId and priceId = :priceId;
+
+update Usersettings.AnalitFReplicationInfo r
+	join Customers.Users u on u.Id = r.UserId
+		join Usersettings.RetClientsSet rcs on rcs.ClientCode = u.ClientId
+set r.ForceReplication = 1
+where rcs.BuyingMatrix = :matrixId
+	or rcs.OfferMatrix = :matrixId;")
+				.SetParameter("priceId", ((Price)entity).Id)
+				.SetParameter("matrixId", ((Matrix)oldState).Id)
+				.ExecuteUpdate();
+		}
+	}
+
 	public enum PriceType
 	{
 		Regular,
@@ -67,7 +90,7 @@ namespace AdminInterface.Models.Suppliers
 		[Property, Description("Прайс содержит разбраковку")]
 		public virtual bool IsRejectCancellations { get; set; }
 
-		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
+		[BelongsTo(Cascade = CascadeEnum.SaveUpdate), InvalidateMatrix]
 		public virtual Matrix Matrix { get; set; }
 
 		[Description("Объединить с матрицей прайс листа")]

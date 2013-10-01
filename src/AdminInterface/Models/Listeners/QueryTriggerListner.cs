@@ -28,13 +28,23 @@ namespace AdminInterface.Models.Listeners
 	{
 		public Type QueryType;
 
+		protected TriggerQueryAttribute()
+		{
+		}
+
 		protected TriggerQueryAttribute(Type type)
 		{
 			QueryType = type;
 		}
+
+		public virtual void Trigger(ISession session, object entity, object oldValue)
+		{
+			var query = (ITriggerQuery)Activator.CreateInstance(QueryType, entity);
+			query.Execute(session);
+		}
 	}
 
-	public interface IAppQuery
+	public interface ITriggerQuery
 	{
 		void Execute(ISession session);
 	}
@@ -48,17 +58,16 @@ namespace AdminInterface.Models.Listeners
 			if (@event.OldState == null)
 				return;
 
-			var queries = GetDirty(@event)
-				.Select(t => t.Item1.GetCustomAttributes(typeof(TriggerQueryAttribute), true)
+			foreach (var dirty in GetDirty(@event)) {
+				var attr = dirty.Item1.GetCustomAttributes(typeof(TriggerQueryAttribute), true)
 					.OfType<TriggerQueryAttribute>()
-					.FirstOrDefault())
-				.Where(a => a != null);
+					.FirstOrDefault();
+				if (attr == null)
+					continue;
 
-			//что бы избежать рекурсивного flush
-			foreach (var queryAttribute in queries) {
+				//что бы избежать рекурсивного flush
 				BaseAuditListener.LoadData(@event.Session, () => {
-					var query = (IAppQuery)Activator.CreateInstance(queryAttribute.QueryType, @event.Entity);
-					query.Execute(@event.Session);
+					attr.Trigger(@event.Session, @event.Entity, dirty.Item3);
 				});
 			}
 		}

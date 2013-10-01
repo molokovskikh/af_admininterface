@@ -6,7 +6,7 @@ using NHibernate;
 
 namespace AdminInterface.Queries
 {
-	public class SetForceReplication : IAppQuery
+	public class SetForceReplication : ITriggerQuery
 	{
 		private Supplier _supplier;
 		private User _user;

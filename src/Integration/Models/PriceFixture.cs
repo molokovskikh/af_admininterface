@@ -7,6 +7,8 @@ using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using Common.Tools;
 using Integration.ForTesting;
+using NHibernate.Linq;
+using Test.Support;
 using Test.Support.log4net;
 using log4net.Config;
 using NUnit.Framework;
@@ -107,6 +109,30 @@ namespace Integration.Models
 		[Test]
 		public void Clean_matrix()
 		{
+			var supplier = DataMother.CreateSupplier();
+			session.Save(supplier);
+			var price = supplier.Prices[0];
+			price.IsMatrix = true;
+			price.PrepareSave();
+			session.Save(price);
+			session.Flush();
+
+			var testPrice = session.Load<TestPrice>(price.Id);
+			var product = new TestProduct("Тестовый продукт");
+			session.Save(product);
+			var item = new TestBuyingMatrix(testPrice, product);
+			session.Save(item);
+			Reopen();
+
+			price = session.Load<Price>(price.Id);
+			price.IsMatrix = false;
+			price.PrepareSave();
+			session.Save(price);
+			session.Flush();
+			Reopen();
+
+			item = session.Get<TestBuyingMatrix>(item.Id);
+			Assert.IsNull(item);
 		}
 
 		private void CheckForceReplicationIsValue(Supplier supplier, bool value)
