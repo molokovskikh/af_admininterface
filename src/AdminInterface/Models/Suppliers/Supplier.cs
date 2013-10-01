@@ -187,11 +187,6 @@ namespace AdminInterface.Models.Suppliers
 				.Max();
 		}
 
-		public static Supplier Find(uint id)
-		{
-			return ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
-		}
-
 		public override string ToString()
 		{
 			return Name;

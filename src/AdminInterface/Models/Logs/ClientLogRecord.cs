@@ -43,24 +43,6 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual string Comment { get; set; }
 
-		public static IList<ClientLogRecord> GetLogs(IEnumerable<uint> clients)
-		{
-			if (clients.Count() == 0)
-				return Enumerable.Empty<ClientLogRecord>().ToList();
-
-			return (List<ClientLogRecord>)Execute(
-				(session, instance) => session.CreateSQLQuery(@"
-select {ClientLogRecord.*}
-from logs.ClientLogs {ClientLogRecord}
-where status is not null
-		and clientId in (:clientId)
-order by logtime desc
-limit 100")
-					.AddEntity(typeof(ClientLogRecord))
-					.SetParameterList("clientId", clients.ToList())
-					.List<ClientLogRecord>(), null);
-		}
-
 		public static ClientLogRecord LastOff(Client client)
 		{
 			return (ClientLogRecord)Execute(

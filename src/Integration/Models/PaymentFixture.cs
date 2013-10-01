@@ -15,7 +15,7 @@ namespace Integration.Models
 		[Test]
 		public void Parse_payments()
 		{
-			var existsPayment = Payment.Queryable.FirstOrDefault(p => p.Comment == "Оплата за мониторинг оптового фармрынка за январь по счету №161 от 11.01..2011г Cумма 800-00,без налога (НДС).");
+			var existsPayment = session.Query<Payment>().FirstOrDefault(p => p.Comment == "Оплата за мониторинг оптового фармрынка за январь по счету №161 от 11.01..2011г Cумма 800-00,без налога (НДС).");
 			if (existsPayment != null)
 				existsPayment.DeleteAndFlush();
 

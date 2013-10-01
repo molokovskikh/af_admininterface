@@ -27,23 +27,5 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public virtual string Comment { get; set; }
-
-		public static IList<SupplierLog> GetLogs(IEnumerable<Supplier> suppliers)
-		{
-			if (suppliers.Count() == 0)
-				return Enumerable.Empty<SupplierLog>().ToList();
-
-			return (List<SupplierLog>)Execute(
-				(session, instance) => session.CreateSQLQuery(@"
-select {SupplierLog.*}
-from logs.SupplierLogs {SupplierLog}
-where disabled is not null
-		and supplierId in (:supplierId)
-order by logtime desc
-limit 100")
-					.AddEntity(typeof(SupplierLog))
-					.SetParameterList("supplierId", suppliers.Select(c => c.Id).ToArray())
-					.List<SupplierLog>(), null);
-		}
 	}
 }

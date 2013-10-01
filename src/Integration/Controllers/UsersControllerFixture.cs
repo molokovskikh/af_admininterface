@@ -118,7 +118,7 @@ namespace Integration.Controllers
 			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null);
 
 			var user = Registred();
-			var messages = AuditRecord.Queryable.Where(l => l.ObjectId == user.Id);
+			var messages = session.Query<AuditRecord>().Where(l => l.ObjectId == user.Id);
 			Assert.That(messages.Any(m => m.Message == "Сообщение в биллинг: тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
 		}
 

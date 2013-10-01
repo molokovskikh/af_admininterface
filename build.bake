@@ -1,14 +1,4 @@
-﻿import file from Deploy.bake
-import file from Web.Bake
-import file from Lib.bake
-import file from Migration.bake
-import file from Tools.bake
-import file from Test.bake
-import file from AppSupport.bake
-import file from Tools.boo
-import file from Db.bake
-import file from Generate.bake
-import System
+﻿import System
 import System.Reflection
 import System.IO
 import System.Linq.Enumerable
@@ -17,8 +7,6 @@ import System.Xml.XPath.Extensions from System.Xml.Linq
 import System.ComponentModel
 import System.Runtime.InteropServices
 import System.Security.Principal
-import file from Db.boo
-import file from DbShell.bake
 
 [DllImport("advapi32.dll", SetLastError: true, CharSet: CharSet.Unicode)]
 def LogonUser(lpszUsername as String, lpszDomain as String, lpszPassword as String, dwLogonType as int, dwLogonProvider as int, ref phToken as IntPtr) as bool:

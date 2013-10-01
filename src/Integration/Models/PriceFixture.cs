@@ -103,6 +103,12 @@ namespace Integration.Models
 			Assert.AreEqual(price.Costs[0].PriceItem, price.Costs[1].PriceItem);
 		}
 
+
+		[Test]
+		public void Clean_matrix()
+		{
+		}
+
 		private void CheckForceReplicationIsValue(Supplier supplier, bool value)
 		{
 			var info = session.CreateSQLQuery("select ForceReplication from Usersettings.AnalitfReplicationInfo where FirmCode = :SupplierId")

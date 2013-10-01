@@ -6,6 +6,7 @@ using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
 using Common.Tools;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 
 namespace Integration.Controllers
@@ -20,11 +21,11 @@ namespace Integration.Controllers
 		{
 			controller = new SmapRejectorController();
 			PrepareController(controller);
-			RejectedEmail.Queryable
+			session.Query<RejectedEmail>()
 				.Where(r => r.LogTime >= DateTime.Today.AddDays(-1))
 				.Each(r => session.Delete(r));
 
-			RejectedEmail.Queryable
+			session.Query<RejectedEmail>()
 				.Where(r => r.LogTime >= new DateTime(2008, 10, 1) && r.LogTime <= new DateTime(2008, 10, 4))
 				.Each(r => session.Delete(r));
 		}

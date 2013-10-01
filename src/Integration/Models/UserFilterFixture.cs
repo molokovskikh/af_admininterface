@@ -10,6 +10,7 @@ using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support.log4net;
 
@@ -240,7 +241,7 @@ insert into contacts.payerownercontacts (contact, payer) value (@setId, {1});",
 		public void Work_Region_Test()
 		{
 			var client = DataMother.CreateClientAndUsers();
-			var newRegion = Region.Queryable.FirstOrDefault(r => r.Id == 2UL);
+			var newRegion = session.Query<Region>().FirstOrDefault(r => r.Id == 2UL);
 			if (newRegion != null) {
 				client.UpdateRegionSettings(new[] {
 					new RegionSettings {

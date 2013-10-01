@@ -27,7 +27,7 @@ namespace Integration.Controllers
 		public void After_build_redirect_to_index()
 		{
 			var recipient = session.Query<Recipient>().First();
-			var region = Region.Queryable.First();
+			var region = session.Query<Region>().First();
 
 			var invoiceDate = DateTime.Now;
 			var period = invoiceDate.ToPeriod();

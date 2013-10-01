@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -9,6 +9,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Common.MySql;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
@@ -47,7 +48,7 @@ namespace AddUser
 			if (!UInt32.TryParse(Request["cc"], out id))
 				throw new ArgumentException(String.Format("Не верное значение ClientCode = {0}", id), "ClientCode");
 
-			supplier = Supplier.Find(id);
+			supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
 			HandlersLink.NavigateUrl = "~/SpecialHandlers/?supplierId=" + supplier.Id;
 			WaybillExcludeFiles.NavigateUrl = "~/Suppliers/WaybillExcludeFiles?supplierId=" + supplier.Id;
 			WaybillSourceSettings.NavigateUrl = "~/Suppliers/WaybillSourceSettings?supplierId=" + supplier.Id;

@@ -558,7 +558,7 @@ namespace AdminInterface.Models
 				if (NHibernateUtil.GetClass(RootService) == typeof(Client))
 					groupOwner = ActiveRecordMediator<Client>.FindByPrimaryKey(RootService.Id).ContactGroupOwner;
 				else if (NHibernateUtil.GetClass(RootService) == typeof(Supplier))
-					groupOwner = Supplier.Find(RootService.Id).ContactGroupOwner;
+					groupOwner = ActiveRecordMediator<Supplier>.FindByPrimaryKey(RootService.Id).ContactGroupOwner;
 				return groupOwner;
 			}
 		}

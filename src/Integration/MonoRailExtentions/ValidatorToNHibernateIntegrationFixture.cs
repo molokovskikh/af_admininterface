@@ -36,7 +36,7 @@ namespace Integration.MonoRailExtentions
 		public void Do_not_update_not_valid_entity()
 		{
 			var inn = new IgnoredInn("Test");
-			inn.Save();
+			session.Save(inn);
 			Assert.That(inn.Id, Is.Not.EqualTo(0));
 			inn.Name = null;
 			Assert.That(validator.IsValid(inn), Is.False);
@@ -56,21 +56,14 @@ namespace Integration.MonoRailExtentions
 				id = supplier.Id;
 			}
 
-			var item = Supplier.Find(id);
+			var item = session.Load<Supplier>(id);
 			Assert.That(item as INHibernateProxy, Is.Not.Null);
 			item.Name = "";
 			Assert.That(validator.IsValid(item), Is.False);
 
 			Reopen();
-			item = Supplier.Find(id);
+			item = session.Load<Supplier>(id);
 			Assert.That(item.Name, Is.EqualTo("Тестовый поставщик"));
-		}
-
-		private void Reopen()
-		{
-			Flush();
-			scope.Dispose();
-			scope = new TransactionlessSession();
 		}
 	}
 

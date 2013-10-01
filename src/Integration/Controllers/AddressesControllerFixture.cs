@@ -9,6 +9,7 @@ using Castle.MonoRail.TestSupport;
 using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 
 namespace Integration.Controllers
@@ -38,7 +39,7 @@ namespace Integration.Controllers
 			Request.Params.Add("address.AvaliableForUsers[0].Id", user.Id.ToString());
 			controller.Add(new Contact[0], client.Id, "тестовое сообщение для биллинга");
 
-			var messages = AuditRecord.Queryable.Where(m => m.ObjectId == user.Id);
+			var messages = session.Query<AuditRecord>().Where(m => m.ObjectId == user.Id);
 			Assert.That(messages.Any(m => m.Message == "Сообщение в биллинг: тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
 		}
 
@@ -77,7 +78,7 @@ namespace Integration.Controllers
 
 		private Address Registred()
 		{
-			var addresses = Address.Queryable.Where(a => a.Registration.RegistrationDate >= begin).ToList();
+			var addresses = session.Query<Address>().Where(a => a.Registration.RegistrationDate >= begin).ToList();
 			var address = addresses.First(a => a.Id == addresses.Max(x => x.Id));
 			return address;
 		}
