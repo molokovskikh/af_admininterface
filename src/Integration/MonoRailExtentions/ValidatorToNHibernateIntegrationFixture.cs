@@ -49,20 +49,17 @@ namespace Integration.MonoRailExtentions
 		[Test]
 		public void Check_proxy_for_validation_error()
 		{
-			uint id;
-			using (new SessionScope()) {
-				var supplier = DataMother.CreateSupplier();
-				Save(supplier);
-				id = supplier.Id;
-			}
+			var supplier = DataMother.CreateSupplier();
+			Save(supplier);
 
-			var item = session.Load<Supplier>(id);
+			session.Clear();
+			var item = session.Load<Supplier>(supplier.Id);
 			Assert.That(item as INHibernateProxy, Is.Not.Null);
 			item.Name = "";
 			Assert.That(validator.IsValid(item), Is.False);
 
-			Reopen();
-			item = session.Load<Supplier>(id);
+			session.Clear();
+			item = session.Load<Supplier>(supplier.Id);
 			Assert.That(item.Name, Is.EqualTo("Тестовый поставщик"));
 		}
 	}

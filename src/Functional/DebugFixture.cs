@@ -13,7 +13,8 @@ namespace Functional
 		[Test]
 		public void Test_lock_time_out_test()
 		{
-			Open("Error/TestLockTimeOut");
+			CheckStatusCode = false;
+			Open("Error/TestLockTimeOut?error_fixture=true");
 			AssertText("Ошибка при выполнении операции");
 		}
 	}
