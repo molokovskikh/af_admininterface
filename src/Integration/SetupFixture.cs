@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using AddUser;
+using AdminInterface;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;

@@ -1,1 +1,1 @@
-<%@ Application Inherits="AddUser.Global" Language="c#" %>
+<%@ Application Inherits="AdminInterface.Global" Language="c#" %>

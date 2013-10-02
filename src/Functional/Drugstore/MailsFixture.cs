@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using AddUser;
+using AdminInterface;
 using AdminInterface.Models;
 using AdminInterface.Models.Documents;
 using AdminInterface.Models.Logs;

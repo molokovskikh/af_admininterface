@@ -1,64 +1,16 @@
 using System;
 using System.IO;
 using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
 using AdminInterface.Helpers;
-using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using System.Reflection;
-using Castle.MonoRail.Framework;
-using Castle.MonoRail.Framework.Configuration;
-using Castle.MonoRail.Framework.Container;
-using Castle.MonoRail.Framework.Internal;
-using Castle.MonoRail.Framework.Services;
-using Castle.MonoRail.Framework.Views.Aspx;
-using Castle.MonoRail.Views.Brail;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using log4net;
 
-namespace AddUser
+namespace AdminInterface
 {
-	public class MixedRouteHandler : IRouteHandler
-	{
-		public IHttpHandler GetHttpHandler(RequestContext requestContext)
-		{
-			IHttpHandler hander = null;
-			try {
-				hander = new MonoRailHttpHandlerFactory().GetHandler(HttpContext.Current, null, null, null);
-			}
-			catch(UrlTokenizerException) {
-			}
-
-			if (hander is MonoRailHttpHandlerFactory.NotFoundHandler)
-				hander = null;
-
-			if (hander == null)
-				hander = new MvcHandler(requestContext);
-			return hander;
-		}
-
-		public static void ConfigRoute()
-		{
-			var routes = RouteTable.Routes;
-			routes.Add(new Route("{resource}.axd/{*pathInfo}", new StopRoutingHandler()));
-
-			var route = new Route("{controller}/{action}/{id}", new MixedRouteHandler()) {
-				Defaults = new RouteValueDictionary {
-					{ "controller", "Home" },
-					{ "action", "Index" },
-					{ "id", new object() }
-				},
-				DataTokens = new RouteValueDictionary()
-			};
-
-
-			routes.Add(route);
-		}
-	}
-
 	public class AppConfig : BaseConfig
 	{
 		public string ReportSystemPassword { get; set; }
@@ -78,16 +30,13 @@ namespace AddUser
 		public string ErrorFilesPath { get; set; }
 	}
 
-	public class Global : WebApplication, IMonoRailConfigurationEvents
+	public class Global : WebApplication
 	{
-		private static readonly ILog _log = LogManager.GetLogger(typeof(Global));
-
 		public static AppConfig Config = new AppConfig();
 
 		public Global()
 			: base(Assembly.Load("AdminInterface"))
 		{
-			FixMonorailConponentBug = false;
 			LibAssemblies.Add(Assembly.Load("Common.Web.Ui"));
 			Logger.ErrorSubject = "Ошибка в Административном интерфейсе";
 			Logger.SmtpHost = "box.analit.net";
@@ -108,7 +57,7 @@ namespace AddUser
 				MixedRouteHandler.ConfigRoute();
 			}
 			catch (Exception ex) {
-				_log.Fatal("Ошибка при запуске Административного интерфеса", ex);
+				Log.Fatal("Ошибка при запуске Административного интерфеса", ex);
 			}
 		}
 
@@ -126,24 +75,6 @@ namespace AddUser
 
 			if (!Context.IsDebuggingEnabled)
 				Server.Transfer("~/Rescue/Error.aspx");
-		}
-
-		public new void Configure(IMonoRailConfiguration configuration)
-		{
-			configuration.ControllersConfig.AddAssembly("AdminInterface");
-			configuration.ControllersConfig.AddAssembly("Common.Web.Ui");
-			configuration.ViewComponentsConfig.Assemblies = new[] {
-				"AdminInterface",
-				"Common.Web.Ui"
-			};
-			configuration.ViewEngineConfig.ViewPathRoot = "Views";
-			configuration.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(BooViewEngine), false));
-			configuration.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(WebFormsViewEngine), false));
-			configuration.ViewEngineConfig.AssemblySources.Add(new AssemblySourceInfo("Common.Web.Ui", "Common.Web.Ui.Views"));
-			configuration.ViewEngineConfig.VirtualPathRoot = configuration.ViewEngineConfig.ViewPathRoot;
-			configuration.ViewEngineConfig.ViewPathRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuration.ViewEngineConfig.ViewPathRoot);
-
-			base.Configure(configuration);
 		}
 	}
 }
