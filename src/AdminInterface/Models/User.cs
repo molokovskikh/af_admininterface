@@ -528,10 +528,10 @@ namespace AdminInterface.Models
 			UserUpdateInfo.AFCopyId = "";
 		}
 
-		public virtual void ActionsIfNeededIfUpdate(ISession session)
+		public virtual void PrepareSave(ISession session)
 		{
 			if (Client != null) {
-				if (AssignedPermissions.FirstOrDefault(p => p.Shortcut == "ConfigureMatrixAssortiment") != null &&
+				if (AssignedPermissions.FirstOrDefault(p => p.Shortcut == "ConfigureMatrixAssortment") != null &&
 					Client.Settings.BuyingMatrix == null) {
 					var matrix = new Matrix();
 					session.Save(matrix);
