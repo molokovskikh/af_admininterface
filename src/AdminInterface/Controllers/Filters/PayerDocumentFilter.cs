@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
 
@@ -49,7 +51,7 @@ namespace AdminInterface.Controllers.Filters
 			FindActInvoiceIfIds = true;
 		}
 
-		public IList<T> Find<T>()
+		public IList<T> Find<T>(ISession session)
 		{
 			var criteria = DetachedCriteria.For<T>()
 				.CreateAlias("Payer", "p", JoinType.InnerJoin);
@@ -61,10 +63,13 @@ namespace AdminInterface.Controllers.Filters
 			else if (Interval != null)
 				criteria.Add(Expression.Sql("{alias}.Period like " + String.Format("'%-{0}'", (int)Interval)));
 
-			if (Region != null)
-				criteria.CreateCriteria("p.Clients", "c")
-					.Add(Expression.Sql("{alias}.RegionCode = " + Region.Id)
-					/*Expression.Eq("c.HomeRegion", Region)*/);
+			if (Region != null) {
+				criteria.Add(Subqueries.Exists(DetachedCriteria.For<Client>()
+					.SetProjection(Property.ForName("Id"))
+					.CreateAlias("Payers", "pc")
+					.Add(Expression.Eq("HomeRegion", Region))
+					.Add(Expression.EqProperty("pc.Id", "p.Id"))));
+			}
 
 			if (Recipient != null)
 				criteria.Add(Expression.Eq("Recipient", Recipient));
@@ -95,19 +100,11 @@ namespace AdminInterface.Controllers.Filters
 
 			var items = Find<T>(criteria);
 
-			var docs = items
-				.GroupBy(i => ((dynamic)i).Id)
-				.Select(g => g.First())
-				.ToList();
-
 			Count = RowsCount;
-			Sum = ArHelper.WithSession(s => {
-				criteria.SetProjection(Projections.Sum("Sum"));
-				return criteria
-					.GetExecutableCriteria(s)
-					.UniqueResult<decimal>();
-			});
-			return docs;
+			Sum = criteria.SetProjection(Projections.Sum("Sum"))
+				.GetExecutableCriteria(session)
+				.UniqueResult<decimal>();
+			return items;
 		}
 	}
 }

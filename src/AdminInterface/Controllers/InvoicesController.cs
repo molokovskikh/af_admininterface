@@ -26,7 +26,7 @@ namespace AdminInterface.Controllers
 		public void Index([SmartBinder] PayerDocumentFilter filter)
 		{
 			PropertyBag["filter"] = filter;
-			PropertyBag["invoices"] = filter.Find<Invoice>();
+			PropertyBag["invoices"] = filter.Find<Invoice>(DbSession);
 			PropertyBag["buildFilter"] = new DocumentBuilderFilter();
 
 			PropertyBag["printers"] = Printer.All();
@@ -50,7 +50,7 @@ namespace AdminInterface.Controllers
 			if (Form["print"] != null) {
 				var printer = Form["printer"];
 				filter.PrepareFindActInvoiceIds(invoices.Implode(i => i.Id));
-				var arguments = String.Format("invoice \"{0}\" \"{1}\"", printer, filter.Find<Invoice>().Implode(i => i.Id));
+				var arguments = String.Format("invoice \"{0}\" \"{1}\"", printer, filter.Find<Invoice>(DbSession).Implode(i => i.Id));
 				Printer.Execute(arguments);
 
 				Notify("Отправлено на печать");
@@ -69,7 +69,7 @@ namespace AdminInterface.Controllers
 		{
 			LayoutName = "Print";
 			PropertyBag["filter"] = filter;
-			PropertyBag["invoices"] = filter.Find<Invoice>();
+			PropertyBag["invoices"] = filter.Find<Invoice>(DbSession);
 		}
 
 		public void Cancel(uint id)

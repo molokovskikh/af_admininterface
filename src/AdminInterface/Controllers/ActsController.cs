@@ -32,7 +32,7 @@ namespace AdminInterface.Controllers
 		public void Index([SmartBinder] PayerDocumentFilter filter)
 		{
 			PropertyBag["filter"] = filter;
-			PropertyBag["acts"] = filter.Find<Act>();
+			PropertyBag["acts"] = filter.Find<Act>(DbSession);
 			PropertyBag["buildFilter"] = new DocumentBuilderFilter();
 
 			PropertyBag["printers"] = Printer.All();
@@ -42,7 +42,7 @@ namespace AdminInterface.Controllers
 		{
 			LayoutName = "Print";
 			PropertyBag["filter"] = filter;
-			PropertyBag["acts"] = filter.Find<Act>();
+			PropertyBag["acts"] = filter.Find<Act>(DbSession);
 		}
 
 		public void Build([ARDataBind("buildFilter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] DocumentBuilderFilter filter, DateTime actDate)
@@ -74,7 +74,7 @@ namespace AdminInterface.Controllers
 			if (Form["print"] != null) {
 				var printer = Form["printer"];
 				filter.PrepareFindActInvoiceIds(acts.Implode(i => i.Id));
-				var arguments = String.Format("act \"{0}\" \"{1}\"", printer, filter.Find<Act>().Implode(i => i.Id));
+				var arguments = String.Format("act \"{0}\" \"{1}\"", printer, filter.Find<Act>(DbSession).Implode(i => i.Id));
 				Printer.Execute(arguments);
 				Notify("Отправлено на печать");
 				RedirectToReferrer();

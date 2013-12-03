@@ -46,9 +46,10 @@ namespace Integration.ForTesting
 			var values = (DefaultValues)ActiveRecordMediator.FindFirst(typeof(DefaultValues));
 			values.Apply(client);
 
-			payer.Clients = new List<Client> { client };
 			if (action != null)
 				action(client);
+
+			client.Payers.Each(p => p.Clients.Add(client));
 
 			client.Payers.Each(p => p.Save());
 			ActiveRecordMediator.SaveAndFlush(client);

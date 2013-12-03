@@ -27,6 +27,7 @@ namespace AdminInterface.Models.Billing
 		}
 
 		public Act(DateTime actDate, params Invoice[] invoices)
+			: this()
 		{
 			Period = invoices.Select(i => i.Period).Distinct().Single();
 			Payer = invoices.Select(i => i.Payer).Distinct().Single();
@@ -54,8 +55,6 @@ namespace AdminInterface.Models.Billing
 
 			foreach (var invoice in invoices)
 				invoice.Act = this;
-
-			CreatedOn = DateTime.Now;
 		}
 
 		public void SetPayer(Payer payer)
