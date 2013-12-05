@@ -660,7 +660,7 @@ namespace Functional.Billing
 			Refresh();
 
 			// Кликаем на другого клиента
-			browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).First().Click();
+			browser.Links.First(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).Click();
 
 			// В таблице, которая содержит все адреса доставки плательщика должны быть видимыми только те строки,
 			// которые соответствуют адресам, принадлежащим выделенному клиенту
@@ -754,7 +754,7 @@ namespace Functional.Billing
 		public void Create_balance_operation()
 		{
 			Click(String.Format("Платежи/Счета {0}", DateTime.Now.Year));
-			browser.WaitUntilContainsText("Списание", 1000);
+			WaitForText("Списание");
 			Css("#operation_Description").TypeText("тестовый возврат");
 			Css("#operation_Sum").TypeText("500");
 			Css("#operation_Date").TypeText(DateTime.Now.ToShortDateString());

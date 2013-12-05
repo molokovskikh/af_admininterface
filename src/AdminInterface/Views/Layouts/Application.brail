@@ -53,17 +53,7 @@
 			"Common.js")}
 
 		${app.CSS("/App_Themes/Main/Main.css")}
-		<script>
-			$(function () {
-				window.siteroot = "${siteroot}";
-				$.ajaxPrefilter(function (options, originalOptions, jqXHR) {
-					var root = "${siteroot}";
-					var url = options.url;
-					if (url[0] == "/" && root != "" && url.indexOf(root) != 0)
-						options.url = root + options.url;
-				});
-			});
-		</script>
+		<% OutputSubView("/SubViews/DefaultJs") %>
 	</head>
 	<body>
 	<% unless ?ShowHeader: %>
