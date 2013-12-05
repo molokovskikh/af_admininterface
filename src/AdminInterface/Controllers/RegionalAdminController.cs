@@ -85,7 +85,7 @@ namespace AdminInterface.Controllers
 			Mailer.RegionalAdminCreated(admin);
 
 			if (isLoginCreated)
-				RedirectToUrl(@"/OfficeUserRegistrationReport.aspx");
+				RedirectToUrl("~/OfficeUserRegistrationReport.aspx");
 			else
 				RedirectToUrl("~/ViewAdministrators.aspx");
 		}
