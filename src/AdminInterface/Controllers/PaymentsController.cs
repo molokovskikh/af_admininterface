@@ -73,7 +73,7 @@ namespace AdminInterface.Controllers
 			Session["payments"] = null;
 			foreach (var payment in payments) {
 				//если зайти в два платежа и отредактировать их
-				//то получим двух плательщиков из разных сесей
+				//то получим двух плательщиков из разных сессий
 				//правим это
 				if (payment.Payer != null)
 					payment.Payer = DbSession.Load<Payer>(payment.Payer.Id);

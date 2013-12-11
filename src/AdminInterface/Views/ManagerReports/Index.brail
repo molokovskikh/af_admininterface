@@ -5,7 +5,7 @@
 <% end %>
 <div class="block">
 	<ul class="navigation-menu">
-		<li>${app.LinkTo("Зарегистрированные пользователи и адреса", @ManagerReports, @UsersAndAdresses)}</li>
+		<li>${app.LinkTo("зарегистрированные пользователи и адреса", @ManagerReports, @UsersAndAdresses)}</li>
 		<li>${app.LinkTo("Клиенты и адреса, по которым не принимаются накладные", @ManagerReports, @ClientAddressesMonitor)}</li>
 		<li>${app.LinkTo("Список отключенных клиентов", @ManagerReports, @SwitchOffClients)}</li>
 		<li>${app.LinkTo("Кто не обновлялся", @ManagerReports, @WhoWasNotUpdated)}</li>

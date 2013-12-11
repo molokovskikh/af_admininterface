@@ -117,7 +117,7 @@ ${app.Asset("smart.order.settings.js")}
 						${app.Edit("drugstore.SmartOrderRules.Loader", {"data-bind": "read: loader, value: loader"})}
 					</div>
 					<div class="form-block" data-bind="visible: isColumnSeparatorAvailable">
-						${app.Label("drugstore.SmartOrderRules.ColumnSeparator", " (для обозначение табулятора используется последовательноть символов \"\\t\")")}
+						${app.Label("drugstore.SmartOrderRules.ColumnSeparator", " (для обозначение табулятора используется последовательность символов \"\\t\")")}
 						${app.Edit("drugstore.SmartOrderRules.ColumnSeparator")}
 					</div>
 					<div class="form-block" data-bind="visible: isStartLineAvailable">

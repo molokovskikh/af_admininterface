@@ -6,7 +6,7 @@
 		"Пользователь не существует" : "not-exists-user",
 		"Обновление более 2 суток назад" : "old-user-update",
 		"Обновление не подтверждено" : "NotCommitedUpdate",
-		"Клиент скрыт в интерфрейсе поставщика": "invisible-client",
+		"Клиент скрыт в интерфейсе поставщика": "invisible-client",
 		"Пользователь загрузки заказов" : "allow-download-unconfirmed-orders",
 		"Пользователь первый стол" : "first-table"},
 		"ByCenter" : false}

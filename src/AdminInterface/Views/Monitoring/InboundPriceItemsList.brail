@@ -21,7 +21,7 @@
 			<th>${app.Sortable("Домашний регион", "SupplierRegion")}</th>
 			<th>${app.Sortable("Код прайса", "PriceCode")}</th>
 			<th>${app.Sortable("Прайс", "PriceName")}</th>
-			<th>${app.Sortable("Формат плайса", "Extension")}</th>
+			<th>${app.Sortable("Формат прайса", "Extension")}</th>
 			<th>${app.Sortable("Время получения/перепроведения прайса", "PticeTime")}</th>
 		</tr>
 	</thead>
@@ -82,7 +82,7 @@
 <% end %>
 <% else: %>
 	<tr>
-		<td class="EmptyData">В данный момент прас листы не формализуются</td>
+		<td class="EmptyData">В данный момент прайс-листы не формализуются</td>
 	</tr>
 <% end %>
 </table>

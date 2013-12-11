@@ -23,7 +23,7 @@ namespace AdminInterface.Models.Audit
 				var needSave = false;
 				if (item is User && @event.Collection.Role.Contains("AvaliableAddresses")) {
 					var oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<Address>().ToList();
-					message = string.Format("$$$У пользовалеля {0} - ({1}) отключены все адреса доставки: {2}",
+					message = string.Format("$$$У пользователя {0} - ({1}) отключены все адреса доставки: {2}",
 						((User)item).Id,
 						((User)item).Name,
 						UpdateCollectionListner.GetListString(oldList));

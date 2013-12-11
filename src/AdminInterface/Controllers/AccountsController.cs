@@ -44,7 +44,7 @@ namespace AdminInterface.Controllers
 		public object Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment, DateTime? freePeriodEnd, string addComment)
 		{
 			var account = DbSession.Load<Account>(id);
-			//хак бедь бдителен, что бы получить объект реального типа и работали проверки
+			//хак будь бдителен, что бы получить объект реального типа и работали проверки
 			//account is UserAccount нужно спросить тип объекта у хибера и загружать объект с учетом правильного типа
 			account = (Account)DbSession.Load(NHibernateUtil.GetClass(account), id);
 			account.Comment = addComment;
@@ -110,7 +110,7 @@ namespace AdminInterface.Controllers
 		{
 			object result = null;
 			var account = DbSession.Load<Account>(accountId);
-			//хак бедь бдителен, что бы получить объект реального типа и работали проверки
+			//хак будь бдителен, что бы получить объект реального типа и работали проверки
 			//account is UserAccount нужно спросить тип объекта у хибера и загружать объект с учетом правильного типа
 			account = (Account)DbSession.Load(NHibernateUtil.GetClass(account), accountId);
 

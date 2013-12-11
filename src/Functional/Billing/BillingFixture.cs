@@ -738,9 +738,9 @@ namespace Functional.Billing
 		{
 			var recipient = session.Query<Recipient>().First();
 
-			ClickLink("Отправка кореспонденции");
+			ClickLink("Отправка корреспонденции");
 
-			Click("Отправка кореспонденции");
+			Click("Отправка корреспонденции");
 			var select = browser.SelectList(Find.ByName("Instance.Recipient.Id"));
 			Assert.That(select.SelectedItem, Is.Null);
 			select.Select(recipient.Name);

@@ -144,8 +144,8 @@ namespace AdminInterface.Controllers
 			}
 			responseString = responseString.Remove(responseString.Length - 1);
 			var bytes = new ASCIIEncoding().GetBytes(responseString);
-			// Отдаем строку, в которой через запятую указаны идентификаторы тех прав доступа,
-			// которые являются дефолтными для данного подразделения
+			//отдаем строку, в которой через запятую указаны идентификаторы тех прав доступа,
+			//которые назначаются по умолчанию для нанного подразделения
 			Response.OutputStream.Write(bytes, 0, bytes.Length);
 		}
 

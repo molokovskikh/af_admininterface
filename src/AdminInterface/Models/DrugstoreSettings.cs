@@ -66,7 +66,7 @@ namespace AdminInterface.Models
 		[Property, Description("Не доставлять заказы поставщикам"), Auditable]
 		public virtual bool ServiceClient { get; set; }
 
-		[Property, Description("Тип клиента в интерфрейсе поставщика"), Auditable]
+		[Property, Description("Тип клиента в интерфейсе поставщика"), Auditable]
 		public virtual DrugstoreType InvisibleOnFirm { get; set; }
 
 		[Property(NotNull = true), Description("Зашумлять цены"), Auditable]
@@ -139,7 +139,7 @@ namespace AdminInterface.Models
 		[Property, Description("Не подключать новые прайсы \"В работе\""), Auditable]
 		public virtual bool IgnoreNewPriceForUser { get; set; }
 
-		[Description("Скрыть клиента в интерфрейсе поставщика, не доставлять заказы поставщикам")]
+		[Description("Скрыть клиента в интерфейсе поставщика, не доставлять заказы поставщикам")]
 		public virtual bool IsHiddenFromSupplier
 		{
 			get { return InvisibleOnFirm == DrugstoreType.Hidden; }
@@ -192,7 +192,7 @@ namespace AdminInterface.Models
 		[Property, Description("Автозаказ"), Auditable]
 		public virtual bool EnableSmartOrder { get; set; }
 
-		[Property, Description("Pассчитывать лидеров при получении заказов"), Auditable]
+		[Property, Description("Рассчитывать лидеров при получении заказов"), Auditable]
 		public virtual bool CalculateLeader { get; set; }
 
 		[BelongsTo("SmartOrderRuleId", Cascade = CascadeEnum.SaveUpdate)]

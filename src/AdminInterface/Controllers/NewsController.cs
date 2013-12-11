@@ -25,7 +25,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(news, "news");
 				if (IsValid(news)) {
 					DbSession.Save(news);
-					new MonorailMailer().RegisterOrDeleteNews(news, "AFNews@subscribe.analit.net", "Зарегистрированна новость").Send();
+					new MonorailMailer().RegisterOrDeleteNews(news, "AFNews@subscribe.analit.net", "Зарегистрирована новость").Send();
 					Notify("Сохранено");
 					RedirectToAction("Index");
 					return;

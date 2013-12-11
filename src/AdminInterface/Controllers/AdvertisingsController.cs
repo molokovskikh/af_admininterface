@@ -13,10 +13,10 @@ namespace AdminInterface.Controllers
 {
 	public class AdvertisingFilter
 	{
-		[Description("Покачать только не размещенную:")]
+		[Description("Показать только не размещенную:")]
 		public bool ShowWithoutDates { get; set; }
 
-		[Description("Показачать только неоплаченную:")]
+		[Description("Показать только неоплаченную:")]
 		public bool ShowWithoutPayment { get; set; }
 
 		public List<Advertising> Filter(ISession session)

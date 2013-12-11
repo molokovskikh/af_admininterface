@@ -369,7 +369,7 @@ group by info.SupplierCode, info.Parser;",
 		[Display(Name = "Код грузополучателя", Order = 10, GroupName = "CenterClass")]
 		public string RecipientId { get; set; }
 
-		[Display(Name = "Код полупателя", Order = 10, GroupName = "CenterClass")]
+		[Display(Name = "Код покупателя", Order = 10, GroupName = "CenterClass")]
 		public string BuyerId { get; set; }
 
 		[Display(Name = "Отсрочка платежа (календарные дни)", Order = 10, GroupName = "CenterClass")]
@@ -378,10 +378,10 @@ group by info.SupplierCode, info.Parser;",
 		[Display(Name = "Отсрочка платежа (банковские дни)", Order = 10, GroupName = "CenterClass")]
 		public string DelayOfPaymentInBankDays { get; set; }
 
-		[Display(Name = "Номер договора (коммисии)", Order = 10, GroupName = "CenterClass")]
+		[Display(Name = "Номер договора (комиссии)", Order = 10, GroupName = "CenterClass")]
 		public string CommissionFeeContractId { get; set; }
 
-		[Display(Name = "Ставка коммисионного вознаграждения", Order = 10, GroupName = "CenterClass")]
+		[Display(Name = "Ставка комиссионного вознаграждения", Order = 10, GroupName = "CenterClass")]
 		public string CommissionFee { get; set; }
 
 		[Display(Name = "Склад", Order = 10, GroupName = "CenterClass")]

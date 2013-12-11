@@ -36,7 +36,7 @@ namespace Integration.Controllers
 			var stream = new MemoryStream(buf);
 			var wb = Workbook.Load(stream);
 			var ws = wb.Worksheets.First();
-			Assert.That(ws.Name, Is.StringContaining("Зарегистрированные пользователи и адреса в регионе"));
+			Assert.That(ws.Name, Is.StringContaining("зарегистрированные пользователи и адреса в регионе"));
 			Assert.That(ws.Cells.GetRow(1).GetCell(0).Value, Is.EqualTo("Регион:"));
 			Assert.That(ws.Cells.GetRow(1).GetCell(1).Value, Is.EqualTo("Все"));
 			Assert.That(ws.Cells.GetRow(2).GetCell(0).Value, Is.EqualTo("Период:"));

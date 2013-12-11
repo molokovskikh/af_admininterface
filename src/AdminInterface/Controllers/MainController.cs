@@ -97,7 +97,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["query"] = query;
 		}
 
-		//елси в mysql применить агрегирующую функцию к выражению с датой
+		//если в mysql применить агрегирующую функцию к выражению с датой
 		//то результирующий тип будет строка, правим это
 		//пример max(if(1 == 1, someDate, null))
 		public static object TryToFixProkenDateTimeValue(object value)

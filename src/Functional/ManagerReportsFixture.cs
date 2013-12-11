@@ -21,13 +21,13 @@ namespace Functional
 			Open();
 			Click("Отчеты менеджеров");
 			AssertText("Отчеты для менеджеров");
-			Click("Зарегистрированные пользователи и адреса");
-			AssertText("Зарегистрированные пользователи и адреса в регионе");
+			Click("зарегистрированные пользователи и адреса");
+			AssertText("зарегистрированные пользователи и адреса в регионе");
 			Click("Показать");
-			AssertText("Зарегистрированные пользователи и адреса в регионе");
+			AssertText("зарегистрированные пользователи и адреса в регионе");
 			Css("[name='filter.FinderType']").SelectByValue(((int)RegistrationFinderType.Addresses).ToString());
 			Click("Показать");
-			AssertText("Зарегистрированные пользователи и адреса в регионе");
+			AssertText("зарегистрированные пользователи и адреса в регионе");
 			Open();
 			Click("Отчеты менеджеров");
 			AssertText("Отчеты для менеджеров");
@@ -151,7 +151,7 @@ namespace Functional
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			Open("ManagerReports");
-			Click("Зарегистрированные пользователи и адреса");
+			Click("зарегистрированные пользователи и адреса");
 			browser.FindElementById(client.Id.ToString()).Click();
 			AssertText(string.Format("Клиент: {0}", client.Name));
 			foreach (var user in client.Users) {

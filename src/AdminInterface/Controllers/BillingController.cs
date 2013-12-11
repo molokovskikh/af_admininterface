@@ -259,7 +259,7 @@ namespace AdminInterface.Controllers
 			try {
 				sentEntity.UserName = Admin.UserName;
 				DbSession.Save(sentEntity);
-				Notify("Cохранено");
+				Notify("Сохранено");
 			}
 			catch (ValidationException ex) {
 				Flash["SendMailError"] = ex.ValidationErrorMessages[0];

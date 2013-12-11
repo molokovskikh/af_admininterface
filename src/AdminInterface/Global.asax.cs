@@ -51,7 +51,7 @@ namespace AdminInterface
 				MixedRouteHandler.ConfigRoute();
 			}
 			catch (Exception ex) {
-				Log.Fatal("Ошибка при запуске Административного интерфеса", ex);
+				Log.Fatal("Ошибка при запуске Административного интерфейса", ex);
 			}
 		}
 

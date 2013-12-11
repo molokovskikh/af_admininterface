@@ -66,7 +66,7 @@ namespace AdminInterface.Controllers
 
 		public void GetUsersAndAdresses([DataBind("filter")] UserFinderFilter userFilter)
 		{
-			this.RenderFile("Пользоватети_и_адреса.xls", ExportModel.GetUserOrAdressesInformation(userFilter));
+			this.RenderFile("Пользователи_и_адреса.xls", ExportModel.GetUserOrAdressesInformation(userFilter));
 		}
 
 		public void ClientAddressesMonitor()

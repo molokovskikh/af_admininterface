@@ -44,7 +44,7 @@ namespace AdminInterface.Models.Billing
 		public uint Id { get; set; }
 
 		//информация ниже получается из выписки
-		//фактическа дата платежа когда он прошел через банк
+		//фактическая дата платежа когда он прошел через банк
 		[Property, ValidateNonEmpty]
 		public DateTime PayedOn { get; set; }
 
@@ -118,7 +118,7 @@ namespace AdminInterface.Models.Billing
 
 			var payers = ActiveRecordLinq.AsQueryable<Payer>().Where(p => p.INN == PayerClient.Inn).ToList();
 			if (payers.Count == 0) {
-				return String.Format("Не удалось найти ни одного платильщика с ИНН {0}", PayerClient.Inn);
+				return String.Format("Не удалось найти ни одного плательщика с ИНН {0}", PayerClient.Inn);
 			}
 			else if (payers.Count == 1) {
 				Payer = payers.Single();
@@ -391,7 +391,7 @@ namespace AdminInterface.Models.Billing
 				&& ForAd
 				&& this.IsChanged(p => p.ForAd)) {
 				//магия будь бдителен!
-				//запрос должен быть в другой сесии а то будет stackoverflow
+				//запрос должен быть в другой сессии а то будет stackoverflow
 				Advertising ad;
 				using (new SessionScope())
 					ad = ActiveRecordLinqBase<Advertising>.Queryable.FirstOrDefault(a => a.Payer == Payer && a.Payment == null);

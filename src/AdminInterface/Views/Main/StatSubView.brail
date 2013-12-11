@@ -164,7 +164,7 @@
 				<% if IsDefined(@DownloadDataSize): %>
 				<tr>
 					<td class="statistic-label">
-						Загруженно данных:
+						Загружено данных:
 					</td>
 					<td class="statistic-value">
 						${DownloadDataSize}

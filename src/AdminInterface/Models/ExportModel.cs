@@ -156,7 +156,7 @@ namespace AdminInterface.Models
 		public static byte[] GetUserOrAdressesInformation(UserFinderFilter filter)
 		{
 			var wb = new Workbook();
-			var ws = new Worksheet("Зарегистрированные пользователи и адреса в регионе");
+			var ws = new Worksheet("зарегистрированные пользователи и адреса в регионе");
 
 			int row = 4;
 			int colShift = 0;
@@ -164,9 +164,9 @@ namespace AdminInterface.Models
 			ws.Merge(0, 0, 0, 6);
 
 			if (filter.FinderType == RegistrationFinderType.Users)
-				ExcelHelper.WriteHeader1(ws, 0, 0, "Зарегистрированные пользователи", false, true);
+				ExcelHelper.WriteHeader1(ws, 0, 0, "зарегистрированные пользователи", false, true);
 			if (filter.FinderType == RegistrationFinderType.Addresses)
-				ExcelHelper.WriteHeader1(ws, 0, 0, "Зарегистрированные адреса", false, true);
+				ExcelHelper.WriteHeader1(ws, 0, 0, "зарегистрированные адреса", false, true);
 
 			ws.Merge(1, 1, 1, 2);
 			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
@@ -742,7 +742,7 @@ namespace AdminInterface.Models
 			sheetRow = sheet.CreateRow(row++);
 
 			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_YELLOW.index));
-			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Не подключен ни к одному из проайсов", dataStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Не подключен ни к одному из прайсов", dataStyle);
 			sheetRow = sheet.CreateRow(row++);
 
 			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_BLUE.index));
@@ -754,7 +754,7 @@ namespace AdminInterface.Models
 			sheetRow = sheet.CreateRow(row++);
 
 			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_GREEN.index));
-			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Более половины аптек, подключенных к прайсу имеют коды адресов доставки, а для рассматриваемой аптеки этот код не прописан, либо для рассмастриваемой аптеки прописаны не все коды адресов доставки", dataStyle);
+			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Более половины аптек, подключенных к прайсу имеют коды адресов доставки, а для рассматриваемой аптеки этот код не прописан, либо для рассматриваемой аптеки прописаны не все коды адресов доставки", dataStyle);
 			sheetRow = sheet.CreateRow(row++);
 
 			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LAVENDER.index));

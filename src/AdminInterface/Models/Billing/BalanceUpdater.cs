@@ -10,7 +10,7 @@ namespace AdminInterface.Models.Billing
 	public interface IBalanceUpdater
 	{
 		/// <summary>
-		/// сумма изменения баланся с учетом знака
+		/// сумма изменения баланса с учетом знака
 		/// "-" - списание
 		/// "+" - пополнение
 		/// </summary>

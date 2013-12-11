@@ -84,6 +84,7 @@ namespace AdminInterface.Models.Billing
 			Suppliers = new List<Supplier>();
 			Ads = new List<Advertising>();
 			Reports = new List<Report>();
+			AutoInvoice = InvoiceType.Auto;
 		}
 
 		[PrimaryKey("PayerId"), Description("Договор")]
@@ -344,7 +345,7 @@ namespace AdminInterface.Models.Billing
 
 			var contacts = mails.Implode();
 			if (String.IsNullOrWhiteSpace(contacts))
-				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для отправки счетов", Id, Name));
+				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактная информаци для отправки счетов", Id, Name));
 
 			return contacts;
 		}

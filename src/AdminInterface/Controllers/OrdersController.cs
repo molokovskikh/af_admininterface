@@ -64,7 +64,7 @@ limit 5")
 							mailMessage.Attachments.Add(attachment);
 						}
 					else {
-						Error("Не удалось получить все файлы от сервиса, некоторые заказы не были сформированы, проверте почту");
+						Error("Не удалось получить все файлы от сервиса, некоторые заказы не были сформированы, проверьте почту");
 						isGood = false;
 					}
 				}
@@ -75,7 +75,7 @@ limit 5")
 			var smtpClient = new SmtpClient { Host = Func.GetSmtpServer() };
 			smtpClient.Send(mailMessage);
 			if (isGood)
-				Notify("Заказы сформированы и отправлены, проверте почту");
+				Notify("Заказы сформированы и отправлены, проверьте почту");
 			RedirectToReferrer();
 		}
 	}

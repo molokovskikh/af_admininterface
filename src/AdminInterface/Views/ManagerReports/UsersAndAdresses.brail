@@ -2,7 +2,7 @@
  <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
-	Зарегистрированные пользователи и адреса в регионе
+	зарегистрированные пользователи и адреса в регионе
 <% end %>
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.SortBy")}

@@ -220,7 +220,7 @@ namespace AdminInterface.Mailers
 
 			//может быть null если property решило что не нужно отправлять
 			//уведомления для этого изменения
-			//например: регин который был добавлен помечен как не уведомляемый
+			//например: регион который был добавлен помечен как не уведомляемый
 			if (String.IsNullOrEmpty(propertyMessage))
 				return this;
 
@@ -273,7 +273,7 @@ namespace AdminInterface.Mailers
 				return "плательщика";
 			if (type == typeof(News))
 				return "новости";
-			return "не оптеделено";
+			return "не определено";
 		}
 
 		public MonorailMailer DeleteOrEditAct(Act act, string to, string messageSubject, bool isDelete)

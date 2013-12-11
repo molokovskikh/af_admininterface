@@ -30,7 +30,7 @@ namespace AdminInterface.Models.Billing
 	{
 		[Description("Все")] All,
 		[Description("Отключенные")] Disabled,
-		[Description("Включеные")] Enabled
+		[Description("Включенные")] Enabled
 	}
 
 	public enum SearchBy
@@ -196,7 +196,7 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 
 			if (SearchWithoutDocuments) {
 				//мы не должны выбирать тех плательщиков у которых не могло быть документов
-				//за этот период тк они еще не были зарегистрированны
+				//за этот период тк они еще не были зарегистрированы
 				And(where, "p.RegistrationDate <= :PeriodEnd");
 				And(where, "p.PayCycle = :InvoicePeriod");
 				And(where, GetDocumentSubQuery(DocumentType));

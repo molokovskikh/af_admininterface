@@ -28,7 +28,7 @@ ${app.Asset("billing.css")}
 			<a id="payments" href="#" ${"class='selected'" if filter.Tab == "payments"}>Платежи</a>
 		</li>
 		<li>
-			<a id="mail" href="#" ${"class='selected'" if filter.Tab == "mail"}>Отправка кореспонденции</a>
+			<a id="mail" href="#" ${"class='selected'" if filter.Tab == "mail"}>Отправка корреспонденции</a>
 		</li>
 		<% for year in payer.Years: %>
 		<li>

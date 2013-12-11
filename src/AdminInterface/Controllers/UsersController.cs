@@ -269,7 +269,7 @@ namespace AdminInterface.Controllers
 				new Mailer(DbSession).Registred(address, comment, Defaults);
 			}
 			if (user.Client != null) {
-				var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены следующие адреса доставки: \r\n {2}",
+				var message = string.Format("$$$Пользователю {0} - ({1}) подключены следующие адреса доставки: \r\n {2}",
 					user.Id,
 					user.Name,
 					user.AvaliableAddresses.Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
