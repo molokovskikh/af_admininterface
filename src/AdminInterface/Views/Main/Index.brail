@@ -54,6 +54,7 @@
 						</li>
 						<li>${app.LinkTo("Регионы", "Regions", "Index")}</li>
 						<li>${app.LinkTo("Отчеты менеджеров", "ManagerReports", "Index")}</li>
+						<li>${app.LinkTo("Статситика отдела Обработки", "ManagerReports", "SynonymStat")}</li>
 						<li>${app.LinkTo("Статистика", "Main", "Stat")}</li>
 						<li>${app.LinkTo("Модерирование минипочты", "MailsModering", "ShowMails")}</li>
 						<li>${app.LinkTo("Новости", "News", "Index")}</li>

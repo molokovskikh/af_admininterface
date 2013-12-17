@@ -182,6 +182,7 @@
     <Compile Include="PrinterFixture.cs" />
     <Compile Include="Queries\ParsedWaybillsFilterFixture.cs" />
     <Compile Include="Queries\ResetReclameDateFixture.cs" />
+    <Compile Include="Queries\SynonymStatFixture.cs" />
     <Compile Include="Queries\UpdateOrdersFixture.cs" />
     <Compile Include="RegionalBaseCostsFixture.cs" />
     <Compile Include="Queries\BaseFiltersFixture.cs" />

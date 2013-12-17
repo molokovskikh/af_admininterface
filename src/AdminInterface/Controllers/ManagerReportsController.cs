@@ -36,10 +36,20 @@ namespace AdminInterface.Controllers
 	]
 	public class ManagerReportsController : AdminInterfaceController
 	{
+		public ManagerReportsController()
+		{
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+		}
+
+		public void SynonymStat([SmartBinder] SynonymStat filter)
+		{
+			PropertyBag["filter"] = filter;
+			PropertyBag["items"] = filter.Find(DbSession);
+		}
+
 		public void UsersAndAdresses()
 		{
 			var userFilter = new UserFinderFilter();
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(userFilter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			PropertyBag["filter"] = userFilter;
 			PropertyBag["Users"] = userFilter.Find(DbSession);
@@ -72,7 +82,6 @@ namespace AdminInterface.Controllers
 		public void ClientAddressesMonitor()
 		{
 			var filter = new ClientAddressFilter();
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			if(filter.Session == null)
 				filter.Session = DbSession;
@@ -93,7 +102,6 @@ namespace AdminInterface.Controllers
 		public void SwitchOffClients()
 		{
 			var filter = new SwitchOffClientsFilter();
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			PropertyBag["filter"] = filter;
 			PropertyBag["Clients"] = filter.Find(DbSession);
@@ -102,7 +110,6 @@ namespace AdminInterface.Controllers
 		public void ExcelSwitchOffClients()
 		{
 			var filter = new SwitchOffClientsFilter();
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			this.RenderFile("Список_отключенных_клиентов.xls", ExportModel.ExcelSwitchOffClients(filter));
 		}
@@ -110,7 +117,6 @@ namespace AdminInterface.Controllers
 		public void ExcelWhoWasNotUpdated()
 		{
 			var filter = new WhoWasNotUpdatedFilter();
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			this.RenderFile("Кто_не_обновлялся_с_опред._даты.xls", ExportModel.ExcelWhoWasNotUpdated(filter));
 		}
@@ -118,7 +124,6 @@ namespace AdminInterface.Controllers
 		public void ExcelUpdatedAndDidNotDoOrders()
 		{
 			var filter = new UpdatedAndDidNotDoOrdersFilter();
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			this.RenderFile("Кто_обновлялся_и_не_делал_заказы.xls", ExportModel.ExcelUpdatedAndDidNotDoOrders(filter));
 		}
@@ -126,7 +131,6 @@ namespace AdminInterface.Controllers
 		public void ExcelAnalysisOfWorkDrugstores()
 		{
 			var filter = new AnalysisOfWorkDrugstoresFilter();
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			this.RenderFile("Сравнительный_анализ_работы_аптек.xls", ExportModel.ExcelAnalysisOfWorkDrugstores(filter));
 		}
@@ -135,7 +139,6 @@ namespace AdminInterface.Controllers
 		{
 			var filter = new ClientConditionsMonitoringFilter();
 			filter.Session = DbSession;
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			this.RenderFile("Мониторинг_выставления_условий_клиенту.xls", ExportModel.GetClientConditionsMonitoring(filter));
 		}
@@ -143,7 +146,6 @@ namespace AdminInterface.Controllers
 		public void WhoWasNotUpdated()
 		{
 			var filter = new WhoWasNotUpdatedFilter();
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			PropertyBag["filter"] = filter;
 			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null)
@@ -266,7 +268,6 @@ namespace AdminInterface.Controllers
 		public void NotParcedWaybills()
 		{
 			var filter = new DocumentFilter();
-			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			var documents = filter.FindStat();
 			PropertyBag["filter"] = filter;

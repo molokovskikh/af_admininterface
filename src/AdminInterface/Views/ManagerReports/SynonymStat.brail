@@ -1,0 +1,44 @@
+﻿<% component Bubble, {"bredcrumbs" : [("Статситика отдела Обработки", "")]} %>
+
+${app.BeginFormFor("filter")}
+${app.FilterFor("filter.Period")}
+${app.EndFormFor("filter")}
+
+<% if items.Count: %>
+<table class="DataTable HighLightCurrentRow">
+	<thead>
+		<tr>
+			<th>Cопоставлений по товару</th>
+			<th>Cопоставлений по товару</th>
+			<th>Cопоставлений по производителю</th>
+			<th>Сопоставлений всего</th>
+			<th>Удаление сопоставлений по товару</th>
+			<th>Удаление сопоставлений по производителю</th>
+			<th>Удалений всего</th>
+			<th>Откорректировано описаний товаров</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% for i, item in enumerate(items): %>
+		<tr class="${ViewHelper.GetRowStyle(i)}">
+			<td>!{item.OperatorName}</td>
+			<td>!{item.ProductSynonymCreationCount}</td>
+			<td>!{item.ProducerSynonymCreationCount}</td>
+			<td>!{item.TotalCreation}</td>
+			<td>!{item.ProductSynonymDeletionCount}</td>
+			<td>!{item.ProducerSynonymDeletionCount}</td>
+			<td>!{item.TotalDeletion}</td>
+			<td>!{item.DescriptionOperationCount}</td>
+		</tr>
+		<% end %>
+	</tbody>
+</table>
+<% else: %>
+<table class="DataTable">
+	<tbody>
+		<tr class="EmptyData">
+			<td>Ничего не найдено</td>
+		</tr>
+	</tbody>
+</table>
+<% end %>

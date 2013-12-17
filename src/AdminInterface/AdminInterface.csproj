@@ -224,6 +224,7 @@
     <Compile Include="Queries\ParsedWaybillsFilter.cs" />
     <Compile Include="Queries\RegistrationInformation.cs" />
     <Compile Include="Queries\SwitchOffClientsFilter.cs" />
+    <Compile Include="Queries\SynonymStat.cs" />
     <Compile Include="Queries\UpdatedAndDidNotDoOrders.cs" />
     <Compile Include="Queries\UserFinderFilter.cs" />
     <Compile Include="Queries\WhoWasNotUpdatedFilter.cs" />
@@ -583,6 +584,7 @@
     <Content Include="Views\Monitoring\InboundPriceItemsList.brail" />
     <Content Include="Views\ManagerReports\ParsedWaybills.brail" />
     <Content Include="Views\ManagerReports\NotParcedWaybills.brail" />
+    <Content Include="Views\ManagerReports\SynonymStat.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />
