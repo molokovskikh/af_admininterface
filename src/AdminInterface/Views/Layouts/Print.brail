@@ -50,7 +50,7 @@
 
 			#mail_address
 			{
-				position:fixed;
+				position:absolute;
 				bottom:2cm;
 				right:1cm;
 				width:8cm;

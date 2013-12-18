@@ -124,8 +124,9 @@ namespace Functional.Suppliers
 			Open(supplier);
 			browser.TextField(Find.ByClass("term")).AppendText("Тестовый");
 			browser.Button(Find.ByClass("search")).Click();
-			var selectList = browser.Div(Find.ByClass("search")).SelectLists.First();
-			Assert.IsNotNull(selectList);
+			var bloack = browser.Div(Find.ByClass("search"));
+			var selectList = bloack.SelectLists.First();
+			Assert.IsNotNull(selectList, bloack.InnerHtml);
 			Assert.That(selectList.Options.Count, Is.GreaterThan(0));
 			var option = selectList.Options.First();
 			selectList.SelectByValue(option.Value);
@@ -143,22 +144,19 @@ namespace Functional.Suppliers
 			AssertText("Все клиенты были отключены от VIP прайсов");
 		}
 
-
 		[Test]
 		public void Set_sertificate_source()
 		{
 			Open(supplier);
-			Thread.Sleep(3000);
 			var newCertificate = new CertificateSource {
 				Name = "Test_Source",
 				SourceClassName = "Test_class_Name"
 			};
 			session.Save(newCertificate);
 			Flush();
-			browser.Button("editChangerButton").Click();
-			var a = Css("select[name='sertificateSourceId']");
-			browser.SelectList(Find.ByName("sertificateSourceId")).SelectByValue(newCertificate.Id.ToString());
-			browser.Button("saveCertificateSourceButton").Click();
+			Css("#editChangerButton").Click();
+			Css("select[name='sertificateSourceId']").SelectByValue(newCertificate.Id.ToString());
+			Css("#saveCertificateSourceButton").Click();
 			AssertText("Сохранено");
 			session.Refresh(supplier);
 			Assert.That(supplier.GetSertificateSource().Name, Is.StringContaining("Test_Source"));
