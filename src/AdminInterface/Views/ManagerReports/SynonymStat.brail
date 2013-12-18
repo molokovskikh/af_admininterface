@@ -8,7 +8,7 @@ ${app.EndFormFor("filter")}
 <table class="DataTable HighLightCurrentRow">
 	<thead>
 		<tr>
-			<th>Cопоставлений по товару</th>
+			<th>Оператор</th>
 			<th>Cопоставлений по товару</th>
 			<th>Cопоставлений по производителю</th>
 			<th>Сопоставлений всего</th>
