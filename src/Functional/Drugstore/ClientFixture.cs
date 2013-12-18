@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -203,6 +204,8 @@ namespace Functional.Drugstore
 			session.Save(payer);
 			payer.Name = "Тестовый плательщик " + payer.Id;
 			Flush();
+			DebugContext.Add("clientId", client.Id);
+			DebugContext.Add("payerId", payer.Id);
 
 			Css("#ChangePayer .term").TypeText(payer.Name);
 			Css("#ChangePayer input[type=button].search").Click();
@@ -220,8 +223,8 @@ namespace Functional.Drugstore
 			var payer = Prepare_change_payer();
 
 			Css("#ChangePayer [type=submit]").Click();
-			session.Refresh(payer);
 
+			session.Refresh(payer);
 			Assert.IsFalse(payer.JuridicalOrganizations.Contains(client.Orgs().First()));
 			AssertText("Изменено");
 			AssertText("ИНН: " + payer.INN);
