@@ -60,13 +60,9 @@ group by l.OperatorName;")
 				.List<object[]>();
 
 			foreach (var result in results) {
-				var stat = stats.FirstOrDefault(r => r.OperatorName.Match(Convert.ToString(result[0])))
-					?? new SynonymStatUnit {
-						OperatorName = Convert.ToString(result[0])
-					};
+				var stat = Allocate(stats, result);
 				stat.ProductSynonymCreationCount = Convert.ToInt32(result[1]);
 				stat.ProductSynonymDeletionCount = Convert.ToInt32(result[2]);
-				stats.Add(stat);
 			}
 
 			results = session.CreateSQLQuery(@"
@@ -84,13 +80,9 @@ group by l.OperatorName
 				.SetParameter("end", end)
 				.List<object[]>();
 			foreach (var result in results) {
-				var stat = stats.FirstOrDefault(r => r.OperatorName.Match(Convert.ToString(result[0])))
-					?? new SynonymStatUnit {
-						OperatorName = Convert.ToString(result[0])
-					};
+				var stat = Allocate(stats, result);
 				stat.ProducerSynonymCreationCount = Convert.ToInt32(result[1]);
 				stat.ProducerSynonymDeletionCount = Convert.ToInt32(result[2]);
-				stats.Add(stat);
 			}
 
 			results = session.CreateSQLQuery(@"
@@ -104,12 +96,8 @@ group by l.OperatorName
 				.SetParameter("end", end)
 				.List<object[]>();
 			foreach (var result in results) {
-				var stat = stats.FirstOrDefault(r => r.OperatorName.Match(Convert.ToString(result[0])))
-					?? new SynonymStatUnit {
-						OperatorName = Convert.ToString(result[0])
-					};
+				var stat = Allocate(stats, result);
 				stat.DescriptionOperationCount = Convert.ToInt32(result[1]);
-				stats.Add(stat);
 			}
 
 			var names = stats.Select(s => s.OperatorName).ToArray();
@@ -122,6 +110,18 @@ group by l.OperatorName
 			}
 
 			return stats;
+		}
+
+		private static SynonymStatUnit Allocate(List<SynonymStatUnit> stats, object[] result)
+		{
+			var stat = stats.FirstOrDefault(r => r.OperatorName.Match(Convert.ToString(result[0])));
+			if (stat == null) {
+				stat = new SynonymStatUnit {
+					OperatorName = Convert.ToString(result[0])
+				};
+				stats.Add(stat);
+			}
+			return stat;
 		}
 	}
 }
