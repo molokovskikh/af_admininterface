@@ -1,4 +1,4 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Статситика отдела Обработки", "")]} %>
+﻿<% component Bubble, {"bredcrumbs" : [("Статистика отдела Обработки", "")]} %>
 
 ${app.BeginFormFor("filter")}
 ${app.FilterFor("filter.Period")}
