@@ -25,7 +25,7 @@ namespace Integration.ForTesting
 {
 	public class ControllerFixture : BaseControllerTest
 	{
-		protected List<MailMessage> notifications;
+		protected List<MailMessage> Emails;
 		protected ISessionScope scope;
 		protected string referer;
 		protected ValidatorRunner validator;
@@ -38,14 +38,14 @@ namespace Integration.ForTesting
 			appController = null;
 			validator = new ValidatorRunner(new CachedValidationRegistry());
 
-			notifications = new List<MailMessage>();
+			Emails = new List<MailMessage>();
 
 			var sender = MockRepository.GenerateStub<IEmailSender>();
 			ForTest.InitializeMailer();
 			sender.Stub(s => s.Send(new MailMessage())).IgnoreArguments()
 				.Repeat.Any()
 				.Callback(new Delegates.Function<bool, MailMessage>(m => {
-					notifications.Add(m);
+					Emails.Add(m);
 					return true;
 				}));
 			BaseMailerExtention.SenderForTest = sender;

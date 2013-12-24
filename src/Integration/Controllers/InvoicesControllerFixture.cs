@@ -20,7 +20,7 @@ namespace Integration.Controllers
 		public void Setup()
 		{
 			controller = new InvoicesController();
-			PrepareController(controller);
+			Prepare(controller);
 		}
 
 		[Test, Ignore("НЕ запускается исполняемый файл для печати неправельный путь")]
@@ -39,6 +39,26 @@ namespace Integration.Controllers
 					(int)period.Interval,
 					region.Id,
 					recipient.Id)));
+		}
+
+		[Test]
+		public void Notify_abount_modification()
+		{
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
+			var invoice = new Invoice(payer, DateTime.Now);
+			session.Save(invoice);
+
+			var oldValue = invoice.Period.Clone();
+			var newValue = new Period(DateTime.Today.Year + 1, invoice.Period.Interval);
+			Request.Params.Add("invoice.Period.Year", newValue.Year.ToString());
+			Request.Params.Add("invoice.Period.Interval", newValue.Interval.ToString());
+			Request.HttpMethod = "POST";
+			controller.Edit(invoice.Id);
+			controller.SendMails();
+			Assert.AreEqual(1, Emails.Count);
+			var email = Emails[0];
+			Assert.AreEqual("Изменен счет", Emails[0].Subject);
+			Assert.That(email.Body, Is.StringContaining(String.Format("Параметр Период изменился с {0} на {1}", oldValue, newValue)));
 		}
 	}
 }

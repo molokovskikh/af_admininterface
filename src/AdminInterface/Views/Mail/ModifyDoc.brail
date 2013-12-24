@@ -1,0 +1,16 @@
+﻿${messageSubject}: <br/>
+Документ №${doc.Id}, дата: ${doc.Date.ToString("dd.MM.yyyy")}<br/>
+Период: ${doc.Period}<br/>
+Сумма: ${doc.Sum}<br/>
+Организация: ${doc.Customer}<br/>
+Контрагент от Аналит: ${doc.Recipient.Name}<br/>
+Пользователь: ${admin.Name}<br/>
+${dateTime}<br>
+
+<% if changes.Count: %>
+<ul>
+<% for change in changes: %>
+	<li>Параметр !{change.Name} изменился с !{change.OldValue} на !{change.NewValue}</li>
+<% end %>
+</ul>
+<% end %>

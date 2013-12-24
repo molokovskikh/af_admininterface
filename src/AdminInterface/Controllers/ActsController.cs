@@ -64,8 +64,8 @@ namespace AdminInterface.Controllers
 			var filter = (PayerDocumentFilter)BindObject(ParamStore.Form, typeof(PayerDocumentFilter), "filter");
 			if (Form["delete"] != null) {
 				foreach (var act in acts) {
+					Mail().ActDeleted(act);
 					DbSession.Delete(act);
-					new MonorailMailer().DeleteOrEditAct(act, "billing@analit.net", "Удален акт", true).Send();
 				}
 
 				Notify("Удалено");
@@ -96,7 +96,7 @@ namespace AdminInterface.Controllers
 				if (!HasValidationError(act)) {
 					act.CalculateSum();
 					DbSession.Save(act);
-					new MonorailMailer().DeleteOrEditAct(act, "billing@analit.net", "Изменен акт", false).Send();
+					Mail().ActModified(act);
 					Notify("Сохранено");
 					RedirectUsingRoute("Acts", "Edit", new { act.Id });
 				}

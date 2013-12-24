@@ -118,7 +118,7 @@ namespace Integration.Controllers
 			Assert.That(oldClient.Addresses.Count, Is.EqualTo(1));
 
 			Assert.That(oldClient.Status, Is.EqualTo(ClientStatus.On));
-			Assert.That(notifications.FirstOrDefault(m => m.Subject.Contains("Перемещение пользователя")),
+			Assert.That(Emails.FirstOrDefault(m => m.Subject.Contains("Перемещение пользователя")),
 				Is.Not.Null, "не могу найти уведомление о перемещении");
 		}
 
@@ -180,9 +180,9 @@ namespace Integration.Controllers
 			Assert.That(src.Disabled, Is.True);
 			Assert.That(dst.Addresses.Count, Is.EqualTo(1));
 			Assert.That(dst.Addresses[0].Id, Is.EqualTo(address.Id));
-			var mail = notifications.FirstOrDefault(m => m.Subject.Contains("Перемещение адреса доставки"));
+			var mail = Emails.FirstOrDefault(m => m.Subject.Contains("Перемещение адреса доставки"));
 			Assert.That(mail,
-				Is.Not.Null, "не могу найти уведомление о перемещении " + notifications.Select(n => n.Subject).Implode());
+				Is.Not.Null, "не могу найти уведомление о перемещении " + Emails.Select(n => n.Subject).Implode());
 			Assert.That(mail.Body, Is.StringContaining(String.Format("Старый клиент {0} плательщик {1} юр.лицо {2}",
 				src.Name,
 				src.Payers[0].Name,

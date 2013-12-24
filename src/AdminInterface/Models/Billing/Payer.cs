@@ -67,6 +67,7 @@ namespace AdminInterface.Models.Billing
 		{
 			Name = name;
 			JuridicalName = fullname;
+			Customer = fullname;
 			ContactGroupOwner = new ContactGroupOwner();
 			JuridicalOrganizations.Add(new LegalEntity(this));
 			Comment = "";

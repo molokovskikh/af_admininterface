@@ -50,8 +50,8 @@ namespace Integration.Controllers
 			session.Refresh(supplier);
 			Assert.That(supplier.Disabled, Is.True);
 
-			var message = notifications.First();
-			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), notifications.Implode(n => n.Subject));
+			var message = Emails.First();
+			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), Emails.Implode(n => n.Subject));
 			var logs = session.Query<AuditRecord>().Where(l => l.ObjectId == supplier.Id).ToList();
 			Assert.That(logs.FirstOrDefault(l => l.Message.Contains("$$$Изменено 'Включен' было 'вкл'") && l.Type == LogObjectType.Supplier), Is.Not.Null, logs.Implode());
 		}
@@ -60,11 +60,11 @@ namespace Integration.Controllers
 		public void UpdateSupplierStatusWithComment()
 		{
 			controller.UpdateClientStatus(supplier.Id, false, "тестовое отключение поставщика");
-			var message = notifications.Last();
-			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), notifications.Implode(n => n.Subject));
+			var message = Emails.Last();
+			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), Emails.Implode(n => n.Subject));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение поставщика"));
 			controller.UpdateClientStatus(supplier.Id, true, null);
-			message = notifications.Last();
+			message = Emails.Last();
 			Assert.That(message.Subject, Is.EqualTo("Возобновлена работа поставщика"));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение поставщика"));
 		}
@@ -73,12 +73,12 @@ namespace Integration.Controllers
 		public void UpdateClientStatusWithComment()
 		{
 			controller.UpdateClientStatus(client.Id, false, "тестовое отключение клиента");
-			var message = notifications.Last();
-			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа клиента"), notifications.Implode(n => n.Subject));
+			var message = Emails.Last();
+			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа клиента"), Emails.Implode(n => n.Subject));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение клиента"));
 			controller.UpdateClientStatus(client.Id, true, null);
-			message = notifications.Last();
-			Assert.That(message.Subject, Is.EqualTo("Возобновлена работа клиента"), notifications.Implode(n => n.Subject));
+			message = Emails.Last();
+			Assert.That(message.Subject, Is.EqualTo("Возобновлена работа клиента"), Emails.Implode(n => n.Subject));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение клиента"));
 		}
 	}

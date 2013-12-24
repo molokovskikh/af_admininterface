@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using AdminInterface.Security;
@@ -9,7 +10,7 @@ using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Billing
 {
-	[ActiveRecord(Schema = "billing")]
+	[ActiveRecord(Schema = "billing"), Description("счет")]
 	public class Invoice : BalanceUpdater<Invoice>
 	{
 		public Invoice()
@@ -88,7 +89,7 @@ namespace AdminInterface.Models.Billing
 		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
 		public override Payer Payer { get; set; }
 
-		[Property]
+		[Property, Description("Сумма")]
 		public virtual decimal Sum { get; set; }
 
 		[Property]
@@ -100,10 +101,12 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public string Customer { get; set; }
 
-		[Property, ValidateNonEmpty]
+		[Property, ValidateNonEmpty, Description("Дата")]
 		public DateTime Date { get; set; }
 
-		[Property(ColumnType = "AdminInterface.NHibernateExtentions.PeriodUserType, AdminInterface"), ValidateNonEmpty]
+		[Property(ColumnType = "AdminInterface.NHibernateExtentions.PeriodUserType, AdminInterface"),
+			ValidateNonEmpty,
+			Description("Период")]
 		public Period Period { get; set; }
 
 		[Property]

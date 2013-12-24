@@ -51,7 +51,7 @@ namespace Functional.Billing
 			Open(payer);
 			Click("Доп. акт");
 			AssertText("Формирование дополнительного акта");
-			Css("#act_ActDate").Value = DateTime.Now.ToShortDateString();
+			Css("#act_Date").Value = DateTime.Now.ToShortDateString();
 			Css("#act_parts_0__name").Value = "Информационные услуги за октябрь";
 			Css("#act_parts_0__cost").Value = "800";
 			Css("#act_parts_0__count").Value = "2";

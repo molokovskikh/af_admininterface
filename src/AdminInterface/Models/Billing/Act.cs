@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
@@ -9,7 +10,7 @@ using Common.Web.Ui.MonoRailExtentions;
 
 namespace AdminInterface.Models.Billing
 {
-	[ActiveRecord(Schema = "Billing")]
+	[ActiveRecord(Schema = "Billing"), Description("акт")]
 	public class Act : ActiveRecordLinqBase<Act>
 	{
 		public Act()
@@ -22,7 +23,7 @@ namespace AdminInterface.Models.Billing
 			: this()
 		{
 			SetPayer(payer);
-			ActDate = Payer.GetDocumentDate(date);
+			Date = Payer.GetDocumentDate(date);
 			Period = date.ToPeriod();
 		}
 
@@ -35,7 +36,7 @@ namespace AdminInterface.Models.Billing
 			PayerName = invoices.Select(i => i.PayerName).Distinct().Single();
 			Customer = invoices.Select(i => i.Customer).Distinct().Single();
 
-			ActDate = Payer.GetDocumentDate(actDate);
+			Date = Payer.GetDocumentDate(actDate);
 			var invoiceParts = invoices.SelectMany(i => i.Parts);
 			if (Payer.InvoiceSettings.DoNotGroupParts) {
 				Parts = invoiceParts
@@ -68,13 +69,13 @@ namespace AdminInterface.Models.Billing
 		[PrimaryKey]
 		public uint Id { get; set; }
 
-		[Property(ColumnType = "AdminInterface.NHibernateExtentions.PeriodUserType, AdminInterface")]
+		[Property(ColumnType = "AdminInterface.NHibernateExtentions.PeriodUserType, AdminInterface"), Description("Период")]
 		public Period Period { get; set; }
 
-		[Property]
-		public DateTime ActDate { get; set; }
+		[Property("ActDate"), Description("Дата")]
+		public DateTime Date { get; set; }
 
-		[Property]
+		[Property, Description("Сумма")]
 		public decimal Sum { get; set; }
 
 		[BelongsTo, ValidateNonEmpty("У плательщика должен быть установлен получатель платежей")]

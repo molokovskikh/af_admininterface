@@ -64,7 +64,7 @@
 			<% for i, act in enumerate(acts): %>
 			<tr>
 				<td>${i + 1}</td>
-				<td>${act.ActDate.ToShortDateString()}</td>
+				<td>${act.Date.ToShortDateString()}</td>
 				<td>${act.Id}</td>
 				<td style="text-align:right;">${act.Sum.ToString("C")}</td>
 				<td>${act.Payer}</td>

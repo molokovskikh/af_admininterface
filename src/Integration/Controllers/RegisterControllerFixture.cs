@@ -182,8 +182,8 @@ namespace Integration.Controllers
 			var org = newPayer.JuridicalOrganizations[0];
 			Assert.That(org.Name, Is.EqualTo("Тестовый плательщик"));
 			Assert.That(org.FullName, Is.EqualTo("Тестовый плательщик"));
-			Assert.That(notifications.Count, Is.EqualTo(1));
-			Assert.That(notifications[0].Subject, Is.EqualTo("Зарегистрирован плательщик"));
+			Assert.That(Emails.Count, Is.EqualTo(1));
+			Assert.That(Emails[0].Subject, Is.EqualTo("Зарегистрирован плательщик"));
 		}
 
 		[Test]

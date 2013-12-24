@@ -4,7 +4,7 @@
 	Адрес:${act.Recipient.Address}
 	</p>
 
-	<h2>Акт сдачи-приемки оказанных услуг (выполненных работ) № ${act.Id} от ${act.ActDate.ToString("dd MMMM yyyy")}</h2>
+	<h2>Акт сдачи-приемки оказанных услуг (выполненных работ) № ${act.Id} от ${act.Date.ToString("dd MMMM yyyy")}</h2>
 	<p>Заказчик: ${act.Customer}</p>
 	<table>
 		<tr>

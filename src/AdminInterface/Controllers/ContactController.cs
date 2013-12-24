@@ -11,10 +11,7 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[
-		Layout("General"),
-		Secure,
-	]
+	[Secure]
 	public class ContactController : AbstractContactController
 	{
 		public void NewContactGroup(uint billingCode)

@@ -33,7 +33,7 @@ namespace Integration.Controllers
 		{
 			controller.Mail(payer.Id, DateTime.Today.AddMonths(3), DateTime.Today, "test@analit.net", "Тестовое примечание");
 
-			var message = notifications.First();
+			var message = Emails.First();
 			Assert.That(message.Body, Is.StringContaining("Тестовое примечание"));
 		}
 	}

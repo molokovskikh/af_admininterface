@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -234,7 +235,7 @@ namespace AdminInterface.Mailers
 				IsBodyHtml = false;
 			}
 			var message = new StringBuilder();
-			message.Append(GetAdditionalMessages(entity).ToString());
+			message.Append(GetAdditionalMessages(entity));
 			if (propertyMessage.StartsWith("$$$"))
 				propertyMessage = propertyMessage.Remove(0, 3);
 			message.AppendLine(propertyMessage);
@@ -276,21 +277,60 @@ namespace AdminInterface.Mailers
 			return "не определено";
 		}
 
-		public MonorailMailer DeleteOrEditAct(Act act, string to, string messageSubject, bool isDelete)
+		public void ActDeleted(Act act)
 		{
-			From = "billing@analit.net";
-			To = to;
-			IsBodyHtml = true;
-			Template = "ModifyAct";
-			Subject = messageSubject;
-			PropertyBag["admin"] = SecurityContext.Administrator;
-			PropertyBag["act"] = act;
-			if(isDelete)
+			DocModified(act, true);
+		}
+
+		public void ActModified(Act act)
+		{
+			DocModified(act, false);
+		}
+
+		public void InvoiceDeleted(Invoice invoice)
+		{
+			DocModified(invoice, true);
+		}
+
+		public void InvoiceModified(Invoice invoice)
+		{
+			DocModified(invoice, false);
+		}
+
+		private void DocModified(object doc, bool deleted)
+		{
+			if (deleted) {
+				Subject = String.Format("Удален {0}", BindingHelper.GetDescription(doc));
 				PropertyBag["dateTime"] = String.Format("Дата и время удаления: {0}", DateTime.Now);
-			else
+			}
+			else {
+				Subject = String.Format("Изменен {0}", BindingHelper.GetDescription(doc));
 				PropertyBag["dateTime"] = String.Format("Дата и время изменения: {0}", DateTime.Now);
-			PropertyBag["messageSubject"] = messageSubject;
-			return this;
+			}
+			From = "billing@analit.net";
+			To = "billing@analit.net";
+			Template = "ModifyDoc";
+			IsBodyHtml = true;
+
+
+			var type = doc.GetType();
+			var properties = new[] {
+				type.GetProperty("Date"),
+				type.GetProperty("Period"),
+				type.GetProperty("Sum")
+			};
+
+			var changes = new List<AuditableProperty>();
+			foreach (var property in properties) {
+				if (DbSession.IsChanged(doc, property.Name)) {
+					changes.Add(new AuditableProperty(property, null, property.GetValue(doc, null), DbSession.OldValue<object>(doc, property.Name)));
+				}
+			}
+
+			PropertyBag["messageSubject"] = Subject;
+			PropertyBag["admin"] = SecurityContext.Administrator;
+			PropertyBag["doc"] = doc;
+			PropertyBag["changes"] = changes;
 		}
 
 		public MonorailMailer RegisterOrDeleteNews(News news, string to, string messageSubject)

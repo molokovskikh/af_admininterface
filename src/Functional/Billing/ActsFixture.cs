@@ -58,14 +58,14 @@ namespace Functional.Billing
 
 			Open(act, "Edit");
 			var newActDate = DateTime.Today.AddDays(10);
-			var date = Css("input[name='act.ActDate']");
+			var date = Css("input[name='act.Date']");
 			date.Clear();
 			date.TypeText(newActDate.ToString("dd.MM.yyyy"));
 			ClickButton("Сохранить");
 			AssertText("Сохранено");
 
 			session.Refresh(act);
-			Assert.That(act.ActDate, Is.EqualTo(newActDate));
+			Assert.That(act.Date, Is.EqualTo(newActDate));
 		}
 	}
 }

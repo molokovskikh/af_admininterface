@@ -19,7 +19,7 @@ namespace AdminInterface.Models.Billing
 			var items = invoices
 				.Select(i => new { i.Id, i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = false, Object = (object)i, Comment = "" })
 				.Union(payments.Select(p => new { p.Id, Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true, IsOperation = false, Object = (object)p, Comment = "" }))
-				.Union(acts.Select(a => new { a.Id, Date = a.ActDate, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = false, Object = (object)a, Comment = "" }))
+				.Union(acts.Select(a => new { a.Id, Date = a.Date, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = false, Object = (object)a, Comment = "" }))
 				.Union(refunds.Select(d => new {
 					d.Id, d.Date, Sum = Decimal.Negate(d.Sum),
 					IsInvoice = true,

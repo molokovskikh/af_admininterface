@@ -117,8 +117,8 @@ namespace AdminInterface.Models.Billing
 
 		public RevisionActPart(Act act)
 		{
-			Name = String.Format("Продажа ({0:dd.MM.yy} № {1})", act.ActDate, act.Id);
-			Date = act.ActDate;
+			Name = String.Format("Продажа ({0:dd.MM.yy} № {1})", act.Date, act.Id);
+			Date = act.Date;
 			Debit = act.Sum;
 		}
 

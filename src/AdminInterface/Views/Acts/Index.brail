@@ -103,7 +103,7 @@
 						<td>${app.LinkTo(act.Payer)}</td>
 						<td style="text-align:right;">${act.Sum.ToString("C")}</td>
 						<td>${BindingHelper.GetDescription(act.Period)}</td>
-						<td>${act.ActDate.ToShortDateString()}</td>
+						<td>${act.Date.ToShortDateString()}</td>
 					</tr>
 					<% end %>
 				</tbody>

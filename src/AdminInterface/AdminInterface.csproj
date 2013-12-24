@@ -527,13 +527,9 @@
     <Content Include="Images\loading.gif" />
     <Content Include="Images\sipphone.png" />
     <Content Include="Images\Sound-icon.png" />
-    <Content Include="JavaScript\builder.js" />
     <Content Include="JavaScript\Common.js" />
     <Content Include="Assets\Javascripts\filter.coffee" />
     <Content Include="JavaScript\contact.registrator.js" />
-    <Content Include="JavaScript\controls.js" />
-    <Content Include="JavaScript\dragdrop.js" />
-    <Content Include="JavaScript\effects.js" />
     <Content Include="JavaScript\jquery.maskedinput-1.2.2.js" />
     <Content Include="JavaScript\jquery.maskedinput-1.2.2.min.js" />
     <Content Include="JavaScript\jquery.tmpl.js" />
@@ -542,7 +538,6 @@
     <Content Include="JavaScript\ManagerReport.js" />
     <Content Include="JavaScript\payer.search.js" />
     <Content Include="Assets\Javascripts\search.editor.js" />
-    <Content Include="JavaScript\slider.js" />
     <Content Include="Rescue\Error.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Images\arrow-down-blue-reversed.gif" />
@@ -566,11 +561,11 @@
     </Content>
     <None Include="Views\Logs\OrdersTable.brail" />
     <None Include="Views\Logs\Statistics.brail" />
-    <Content Include="Views\Mail\ModifyAct.brail" />
     <Content Include="Views\Mail\DeletePayer.brail" />
     <Content Include="Views\MailsModering\ShowMails.brail" />
     <Content Include="Views\MailsModering\GetMail.brail" />
     <Content Include="Views\Mail\DeleteMiniMail.brail" />
+    <Content Include="Views\Mail\ModifyDoc.brail" />
     <None Include="Views\Mail\RegisterNews.brail" />
     <Content Include="Views\ManagerReports\ClientAddressesMonitor.brail" />
     <None Include="Views\ManagerReports\ClientConditionsMonitoring.brail" />
@@ -694,7 +689,6 @@
     <Content Include="Images\warning.png" />
     <Content Include="JavaScript\date-ru-RU.js" />
     <Content Include="JavaScript\messages_ru.js" />
-    <Content Include="JavaScript\validation.js" />
     <Content Include="Main.Master" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -773,7 +767,6 @@
     <Content Include="Rescue\NotAuthorized.aspx" />
     <Content Include="SenderProperties.aspx" />
     <None Include="Views\Billing\Payments.brail" />
-    <None Include="Views\Layouts\General.brail" />
     <None Include="Views\Telephony\Edit.brail" />
     <None Include="Views\Telephony\Show.brail" />
     <None Include="Views\Clients\LegendView.brail" />
@@ -789,8 +782,6 @@
     <Content Include="JavaScript\calendar-ru_win_.js" />
     <Content Include="JavaScript\calendar-setup.js" />
     <Content Include="JavaScript\calendar.js" />
-    <Content Include="JavaScript\prototype.js" />
-    <Content Include="JavaScript\scriptaculous.js" />
     <Content Include="Web.Release.Config">
       <SubType>Designer</SubType>
     </Content>

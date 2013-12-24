@@ -95,9 +95,6 @@ namespace AdminInterface.Controllers.Filters
 				criteria.Add(Expression.Ge("CreatedOn", CreatedOn));
 			}
 
-			if (typeof(T) == typeof(Act))
-				SortKeyMap["Date"] = "ActDate";
-
 			var items = Find<T>(criteria);
 
 			Count = RowsCount;

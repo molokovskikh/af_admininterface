@@ -24,20 +24,20 @@ ${app.GetValidationError(act, "Recipient")}
 		</tr>
 		<tr>
 			<td>
-				<label>Дата:</label>
+				${app.Edit("act.Date")}
 			</td>
 			<td>
-				${app.Edit("act.ActDate")}
-				${app.GetValidationError(act, "ActDate")}
+				${app.Edit("act.Date")}
+				${app.Error("act.Date")}
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<label>Период:</label>
+				${app.Label("act.Period")}
 			</td>
 			<td>
 				${app.Edit("act.Period")}
-				${app.GetValidationError(act, "Period")}
+				${app.Error("act.Period")}
 			</td>
 		</tr>
 		</table>

@@ -41,8 +41,10 @@ namespace AdminInterface.Controllers
 			var invoices = BindObject<Invoice[]>("invoices");
 
 			if (Form["delete"] != null) {
-				foreach (var act in invoices)
-					DbSession.Delete(act);
+				foreach (var invoice in invoices) {
+					Mail().InvoiceDeleted(invoice);
+					DbSession.Delete(invoice);
+				}
 
 				Notify("Удалено");
 				RedirectToReferrer();
@@ -75,6 +77,7 @@ namespace AdminInterface.Controllers
 		public void Cancel(uint id)
 		{
 			var invoice = DbSession.Load<Invoice>(id);
+			Mail().InvoiceDeleted(invoice);
 			DbSession.Delete(invoice);
 			Notify("Сохранено");
 			RedirectToReferrer();
@@ -101,6 +104,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(invoice, "invoice");
 				if (!HasValidationError(invoice)) {
 					invoice.CalculateSum();
+					Mail().InvoiceModified(invoice);
 					DbSession.Save(invoice);
 					Notify("Сохранено");
 					Redirect("Invoices", "Edit", new { invoice.Id });

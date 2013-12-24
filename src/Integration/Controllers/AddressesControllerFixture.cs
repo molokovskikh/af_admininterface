@@ -101,7 +101,7 @@ namespace Integration.Controllers
 			controller.Update(address, new Contact[0], new Contact[0]);
 
 			Assert.That(address.Payer, Is.EqualTo(payer));
-			var message = notifications.First();
+			var message = Emails.First();
 			Assert.That(message.Body, Is.StringContaining("плательщик Фарм-братан юр.лицо ООО Фарм-братан"));
 			Assert.That(message.Body, Is.StringContaining("плательщик Фарм-друган юр.лицо ООО Фарм-друган"));
 		}
