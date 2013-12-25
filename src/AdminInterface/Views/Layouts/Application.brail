@@ -13,7 +13,6 @@
 		</title>
 
 		${app.Asset("jquery-1.6.2.js")}
-		${app.Asset("jquery.validate.js")}
 		${app.Asset("underscore.js")}
 		${app.Asset("backbone.js")}
 		${app.Asset("jquery-ui-1.10.2.js")}
@@ -48,7 +47,6 @@
 			"calendar-setup.js",
 			"date-ru-RU.js",
 			"jquery.contact.validation.js",
-			"messages_ru.js",
 			"jquery.maskedinput-1.2.2.min.js",
 			"Common.js")}
 

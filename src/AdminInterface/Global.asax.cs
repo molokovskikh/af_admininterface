@@ -38,6 +38,7 @@ namespace AdminInterface
 			: base(Assembly.Load("AdminInterface"))
 		{
 			LibAssemblies.Add(Assembly.Load("Common.Web.Ui"));
+			InstallBundle("jquery.validate");
 			Logger.ErrorSubject = "Ошибка в Административном интерфейсе";
 			Logger.SmtpHost = "box.analit.net";
 		}
