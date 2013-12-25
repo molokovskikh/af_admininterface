@@ -110,10 +110,3 @@ function HideVisible(folder) {
 	$(folder).addClass("ShowHiden");
 	$(folder).siblings("div").addClass("hidden");
 }
-
-function ShowElement(show, selector) {
-	var displayValue = "none";
-	if (show)
-		displayValue = "block";
-	$(selector).css("display", displayValue);
-}

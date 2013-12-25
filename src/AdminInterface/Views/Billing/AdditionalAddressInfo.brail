@@ -1,16 +1,16 @@
 ﻿<script type="text/javascript">
 	function ShowConnectingUserDiv(addressId) {
-		ShowElement(true, "#ConnectingUserDiv" + addressId);
-		ShowElement(true, "#SearchUserDiv" + addressId);
-		ShowElement(false, "#SelectUserDiv" + addressId);
-		ShowElement(false, "#ConnectUserLink" + addressId);
+		$("#ConnectingUserDiv" + addressId).show();
+		$("#SearchUserDiv" + addressId).show();
+		$("#SelectUserDiv" + addressId).hide();
+		$("#ConnectUserLink" + addressId).hide();
 		$("#SearchUserMessage" + addressId).html("");
 		$("#AddressUserText" + addressId).val("");
 	}
 
 	function ResetSearchUser(addressId) {
-		ShowElement(false, "#SelectUserDiv" + addressId);
-		ShowElement(true, "#SearchUserDiv" + addressId);
+		$("#SelectUserDiv" + addressId).hide();
+		$("#SearchUserDiv" + addressId).show();
 	}
 
 	function ConnectUserToAddress(addressId) {
@@ -50,8 +50,8 @@
 				if (html.length > 0) {
 					$("#SearchUserMessage" + addressId).html("");
 					$("#UsersComboBox" + addressId).append(html);
-					ShowElement(false, "#SearchUserDiv" + addressId);
-					ShowElement(true, "#SelectUserDiv" + addressId);
+					$("#SearchUserDiv" + addressId).hide();
+					$("#SelectUserDiv" + addressId).show();
 					return;
 				}
 				$("#SearchUserMessage" + addressId).html("<i>Ничего не найдено</i>");
@@ -60,8 +60,8 @@
 	}
 	
 	function CancelSearchUser(addressId) {
-		ShowElement(false, "#ConnectingUserDiv" + addressId);
-		ShowElement(true, "#ConnectUserLink" + addressId);
+		$("#ConnectingUserDiv" + addressId).hide();
+		$("#ConnectUserLink" + addressId).show();
 	}
 </script>
 

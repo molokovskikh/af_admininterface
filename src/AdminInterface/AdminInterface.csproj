@@ -543,7 +543,6 @@
     <Content Include="Images\arrow-down-blue-reversed.gif" />
     <Content Include="Images\arrow-down-blue.gif" />
     <Content Include="Images\logo.gif" />
-    <Content Include="JavaScript\Main.js" />
     <Content Include="ManageCosts.aspx" />
     <Content Include="managep.aspx" />
     <Content Include="ViewAdministrators.aspx" />

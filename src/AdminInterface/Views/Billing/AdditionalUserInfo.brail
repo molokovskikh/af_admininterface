@@ -1,16 +1,16 @@
 ﻿<script type="text/javascript">
 	function ShowConnectingAddressDiv(userId) {
-		ShowElement(true, "#ConnectingAddressDiv" + userId);
-		ShowElement(true, "#SearchAddressDiv" + userId);
-		ShowElement(false, "#SelectAddressDiv" + userId);
-		ShowElement(false, "#ConnectAddressLink" + userId);
+		$("#ConnectingAddressDiv" + userId).show();
+		$("#SearchAddressDiv" + userId).show();
+		$("#SelectAddressDiv" + userId).hide();
+		$("#ConnectAddressLink" + userId).hide();
 		$("#SearchAddressMessage" + userId).html("");
 		$("#AddressSearchText" + userId).val("");
 	}
 
 	function ResetSearchAddress(userId) {
-		ShowElement(false, "#SelectAddressDiv" + userId);
-		ShowElement(true, "#SearchAddressDiv" + userId);
+		$("#SelectAddressDiv" + userId).hide();
+		$("#SearchAddressDiv" + userId).show();
 	}
 
 	function ConnectAddressToUser(userId) {
@@ -56,8 +56,8 @@
 				if (html.length > 0) {
 					$("#SearchAddressMessage" + userId).html("");
 					$("#AddressesComboBox" + userId).append(html);
-					ShowElement(false, "#SearchAddressDiv" + userId);
-					ShowElement(true, "#SelectAddressDiv" + userId);
+					$("#SearchAddressDiv" + userId).hide();
+					$("#SelectAddressDiv" + userId).show();
 					return;
 				}
 				$("#SearchAddressMessage" + userId).html("<i>Ничего не найдено</i>");
@@ -66,8 +66,8 @@
 	}
 	
 	function CancelSearchAddress(userId) {
-		ShowElement(false, "#ConnectingAddressDiv" + userId);
-		ShowElement(true, "#ConnectAddressLink" + userId);
+		$("#ConnectingAddressDiv" + userId).hide();
+		$("#ConnectAddressLink" + userId).show();
 	}
 </script>
 
