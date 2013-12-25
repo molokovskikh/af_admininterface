@@ -1,5 +1,6 @@
 {
-	"dependencies" : {
+	"name": "admininterface",
+	"dependencies": {
 		"qunit": "1.11"
 	}
 }
