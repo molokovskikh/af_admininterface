@@ -11,20 +11,21 @@
 <h2>Формирование дополнительного акта</h2>
 <% end %>
 
-${app.GetValidationError(act, "Recipient")}
+${app.Error("act.Recipient")}
+${app.Error("act.Parts")}
 
 <form class="accountant-friendly" method=post>
 	<div class=block>
 		<table>
 		<tr>
-			<td>Плательщик:</td>
+			<td>Плательщик</td>
 			<td>
 				${app.LinkTo(act.Payer)}
 			</td>
 		</tr>
 		<tr>
 			<td>
-				${app.Edit("act.Date")}
+				${app.Label("act.Date")}
 			</td>
 			<td>
 				${app.Edit("act.Date")}

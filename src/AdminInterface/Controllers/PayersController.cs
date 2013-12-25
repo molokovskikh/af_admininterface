@@ -53,7 +53,7 @@ namespace AdminInterface.Controllers
 			var payer = DbSession.Load<Payer>(id);
 			var payment = new Payment(payer);
 			BindObjectInstance(payment, "payment");
-			if (!HasValidationError(payment)) {
+			if (IsValid(payment)) {
 				Notify("Сохранено");
 				payment.RegisterPayment();
 				DbSession.Save(payment);
@@ -121,7 +121,7 @@ namespace AdminInterface.Controllers
 
 			if (IsPost) {
 				BindObjectInstance(invoice, "invoice");
-				if (!HasValidationError(invoice)) {
+				if (IsValid(invoice)) {
 					invoice.SetPayer(payer);
 					invoice.CalculateSum();
 					DbSession.Save(invoice);
@@ -173,7 +173,7 @@ namespace AdminInterface.Controllers
 			var ad = new Advertising(payer);
 			if (IsPost) {
 				BindObjectInstance(ad, "ad");
-				if (!HasValidationError(ad)) {
+				if (IsValid(ad)) {
 					DbSession.Save(ad);
 					Redirect("Payers", "Ad", new { payer.Id });
 				}

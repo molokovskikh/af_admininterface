@@ -18,9 +18,10 @@ namespace Functional.Billing
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, DateTime.Now);
-			session.SaveOrUpdate(invoice);
+			invoice.Parts.Add(new InvoicePart(invoice, "Мониторинг оптового фармрынка", 500, 1, DateTime.Now));
+			session.Save(invoice);
 			act = new Act(DateTime.Now, invoice);
-			session.SaveOrUpdate(act);
+			session.Save(act);
 		}
 
 		[Test]

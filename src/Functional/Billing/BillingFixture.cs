@@ -800,7 +800,8 @@ namespace Functional.Billing
 			AssertText("Тестовое сообщение");
 		}
 
-		[Test]
+		//тест не стабильный и ломается порой без видимых на то причин
+		[Test, Category("unstable")]
 		public void Accounted_not_selected_if_unchecked_status()
 		{
 			user.Accounting.BeAccounted = true;

@@ -95,7 +95,7 @@ namespace AdminInterface.Controllers
 			var ad = DbSession.Load<Advertising>(id);
 			if (IsPost) {
 				BindObjectInstance(ad, "ad");
-				if (!HasValidationError(ad)) {
+				if (IsValid(ad)) {
 					DbSession.Save(ad);
 					Redirect("Advertisings", "Index");
 				}

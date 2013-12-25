@@ -288,7 +288,7 @@ namespace AdminInterface.Controllers
 
 				BindObjectInstance(promotion, "promotion");
 
-				if (!HasValidationError(promotion) && Binder.Validator.IsValid(promotion)) {
+				if (IsValid(promotion)) {
 					var file = Request.Files["inputfile"] as HttpPostedFile;
 					if (file != null && file.ContentLength > 0) {
 						if (!IsAllowedExtention(Path.GetExtension(file.FileName))) {
@@ -364,7 +364,7 @@ namespace AdminInterface.Controllers
 
 				BindObjectInstance(promotion, "promotion");
 
-				if (!HasValidationError(promotion) && Binder.Validator.IsValid(promotion)) {
+				if (IsValid(promotion)) {
 					var file = Request.Files["inputfile"] as HttpPostedFile;
 					if (file != null && file.ContentLength > 0) {
 						if (!IsAllowedExtention(Path.GetExtension(file.FileName))) {

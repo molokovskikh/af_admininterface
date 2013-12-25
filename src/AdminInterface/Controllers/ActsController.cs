@@ -93,7 +93,7 @@ namespace AdminInterface.Controllers
 				RecreateOnlyIfNullBinder.Prepare(this, "act.Parts");
 
 				BindObjectInstance(act, "act");
-				if (!HasValidationError(act)) {
+				if (IsValid(act)) {
 					act.CalculateSum();
 					DbSession.Save(act);
 					Mail().ActModified(act);

@@ -102,7 +102,7 @@ namespace AdminInterface.Controllers
 				RecreateOnlyIfNullBinder.Prepare(this, "invoice.Parts");
 
 				BindObjectInstance(invoice, "invoice");
-				if (!HasValidationError(invoice)) {
+				if (IsValid(invoice)) {
 					invoice.CalculateSum();
 					Mail().InvoiceModified(invoice);
 					DbSession.Save(invoice);

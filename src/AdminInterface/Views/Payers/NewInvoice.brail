@@ -19,43 +19,43 @@
 	<% end %>
 </div>
 
-${app.GetValidationError(invoice, "Recipient")}
+${app.Error("invoice.Recipient")}
+${app.Error("invoice.Parts")}
 
-<form class="accountant-friendly" method=post>
-	<div class=block>
+<form class="accountant-friendly" method="post">
+	<div class="block">
 		<table>
 		<tr>
-			<td>Плательщик:</td>
+			<td>Плательщик</td>
 			<td>
 				${app.LinkTo(invoice.Payer)}
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<label>Дата:</label>
+				${app.Label("invoice.Date")}
 			</td>
 			<td>
-				<input type=text name="invoice.Date" class="required validate-date input-date" value="${invoice.Date.ToShortDateString()}">
-				<input type=button class=CalendarInput>
-				${app.GetValidationError(invoice, "Date")}
+				${app.Edit("invoice.Date")}
+				${app.Error("invoice.Date")}
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<label>Период:</label>
+				${app.Label("invoice.Period")}
 			</td>
 			<td>
 				${app.Edit("invoice.Period")}
-				${app.GetValidationError(invoice, "Period")}
+				${app.Error("invoice.invoicePeriod")}
 			</td>
 		</tr>
 		</table>
 	</div>
-	<div class=block>
+	<div class="block">
 
 		<% OutputSubView("/Templates/Nomenclatures") %>
 
-		<table id=bills class="DataTable editable">
+		<table id="bills" class="DataTable editable">
 			<thead>
 				<tr>
 					<th><a href="javascript:" class=add>Добавить</a></th>
@@ -92,5 +92,5 @@ ${app.GetValidationError(invoice, "Recipient")}
 			<% end %>
 		</table>
 	</div>
-	<input type=submit value=Сохранить>
+	<input type="submit" value="Сохранить">
 </form>
