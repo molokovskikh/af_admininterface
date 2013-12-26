@@ -182,7 +182,7 @@ namespace Functional.Drugstore
 		{
 			Open(client, "Settings");
 			ClickButton("Отправить уведомления о регистрации поставщикам");
-			Assert.That(browser.ContainsText("Уведомления отправлены"));
+			AssertText("Уведомления отправлены");
 		}
 
 		[Test]
@@ -191,8 +191,8 @@ namespace Functional.Drugstore
 			var homeRegionSelect = GetHomeRegionSelect(browser);
 			var changeTo = homeRegionSelect.Options.Skip(1).First(o => o.Value != homeRegionSelect.SelectedOption.Value).Text;
 			homeRegionSelect.Select(changeTo);
-			browser.Button(b => b.Value.Equals("Сохранить")).Click();
-			Assert.That(browser.ContainsText("Сохранено"), Is.True);
+			Click("Сохранить");
+			AssertText("Сохранено");
 			ClickLink("Настройка");
 			var selectedText = GetHomeRegionSelect(browser).SelectedOption.Text;
 			Assert.That(selectedText, Is.EqualTo(changeTo));
