@@ -1,4 +1,4 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Акции", "Index.rails"), ("Редактирование акции", "Edit.rails?id="+promotion.Id), ("Редактирование списка препаратов акции", "")], "pageTitle":"Акции"} %>
+﻿<% component Bubble, {"bredcrumbs" : [("Акции", "Index"), ("Редактирование акции", "Edit?id="+promotion.Id), ("Редактирование списка препаратов акции", "")], "pageTitle":"Акции"} %>
 
 
 <script type="text/javascript">
@@ -12,12 +12,12 @@
 
 	function MarkNotselected() {
 		nsChecked = !nsChecked;
-		jQuery('.nsCheckBox').attr('checked', nsChecked);
+		jQuery('.nsCheckBox').prop('checked', nsChecked);
 	}
 
 	function MarkSelected() {
 		sChecked = !sChecked;
-		jQuery('.sCheckBox').attr('checked', sChecked);
+		jQuery('.sCheckBox').prop('checked', sChecked);
 	}
 </script>
 
@@ -36,7 +36,7 @@
 	</div>
 
 		
-<form method="post" action="${siteroot}/Promotions/EditCatalogs.rails?${filter.ToUrlQuery()}">
+<form method="post" action="${siteroot}/Promotions/EditCatalogs?${filter.ToUrlQuery()}">
 			<table style="width:100%;">
 				<tr>
 					<td class="DocumentHeader" style="width:45%;">Список препаратов</td>

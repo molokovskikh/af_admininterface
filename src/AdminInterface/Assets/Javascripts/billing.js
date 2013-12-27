@@ -44,7 +44,7 @@ function hideMessage() {
 
 function RemoveMessage(userId) {
 	showNotificationMessage("Удаление...");
-	AjaxRequest("CancelMessage.rails?userId=" + userId,
+	AjaxRequest("CancelMessage?userId=" + userId,
 			function () {
 				$("#CurrentMessageForUser" + userId).remove();
 				showSuccessMessage("Сообщение удалено");
@@ -53,7 +53,7 @@ function RemoveMessage(userId) {
 
 function RemoveMailEntity(id) {
 	showNotificationMessage("Удаление...");
-	AjaxRequest("DeleteMail.rails?id=" + id,
+	AjaxRequest("DeleteMail?id=" + id,
 			function () {
 				$('#mail' + id).remove();
 				showSuccessMessage("Сообщение удалено");
@@ -62,7 +62,7 @@ function RemoveMailEntity(id) {
 
 function ShowMessage(userId) {
 	showNotificationMessage("Загрузка...", "Notification");
-	AjaxRequest("ShowMessageForUser.rails?userId=" + userId,
+	AjaxRequest("ShowMessageForUser?userId=" + userId,
 			function (html) {
 				hideMessage();
 				$("#CurrentMessageForUser" + userId).children().replaceWith(html);

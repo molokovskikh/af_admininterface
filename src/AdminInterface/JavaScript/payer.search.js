@@ -6,16 +6,16 @@
 	$("#SearchPayerDiv").hide();
 	$("#SelectPayerDiv").hide();
 	var disabled = null;
-	var checked = 'checked';
+	var checked = true;
 	if (selectedValue) {
 		ShowSearchPayerDiv();
 		disabled = 'disabled';
-		checked = null;
+		checked = false;
 	}
 	$("#options_FillBillingInfo").attr('disabled', disabled);
 	$("#FillBillingInfo").attr('disabled', disabled);
-	$("#options_FillBillingInfo").attr('checked', checked);
-	$("#FillBillingInfo").attr('checked', checked);
+	$("#options_FillBillingInfo").prop('checked', checked);
+	$("#FillBillingInfo").prop('checked', checked);
 	$("#PayerExistsValue").val(selectedValue);
 	$("#MessageForPayer").html("");
 }

@@ -6,7 +6,7 @@
 
 <script type="text/javascript">
 	function ShowCallTracks(recordId) {
-		jQuery.get("ListenCallRecord.rails?recordId=" + recordId, function (html) {
+		jQuery.get("ListenCallRecord?recordId=" + recordId, function (html) {
 			var trackList = jQuery("#CallRecordTracks" + recordId);
 			if (trackList.size() == 0)
 				jQuery("#TrackList" + recordId).append(html);

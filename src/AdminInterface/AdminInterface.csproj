@@ -695,11 +695,15 @@
     </None>
     <None Include="Views\Accounts\Index.brail" />
     <None Include="Views\Accounts\AccountingHistory.brail" />
-    <None Include="Views\Billing\AdditionalUserInfo.brail" />
+    <None Include="Views\Billing\AdditionalUserInfo.brail">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Views\Billing\Mail.brail" />
     <None Include="Views\Billing\SearchAddressesForUser.brail" />
     <None Include="Views\Billing\SearchUsersForAddress.brail" />
-    <None Include="Views\Billing\AdditionalAddressInfo.brail" />
+    <None Include="Views\Billing\AdditionalAddressInfo.brail">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Views\Billing\ShowMessageForUser.brail" />
     <None Include="Views\Accounts\Unaccounted.brail" />
     <None Include="Views\CallHistory\ListenCallRecord.brail" />

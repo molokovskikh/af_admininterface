@@ -1,17 +1,19 @@
 (function() {
   var addComment, freePeriodEnd, requests, showForm;
+
   requests = Object();
+
   this.fillDependedData = function(url, element, next) {
     var cancel, request, requestFunction, showRequest;
     request = element.attr("data-request");
     requestFunction = requests[request];
-    showRequest = (element.attr("checked") && requestFunction && !element.attr("unchecked")) || (!element.attr("checked") && requestFunction && element.attr("unchecked"));
+    showRequest = (element.prop("checked") && requestFunction && !element.attr("unchecked")) || (!element.prop("checked") && requestFunction && element.attr("unchecked"));
     if (showRequest) {
       cancel = function() {
         if (!element.attr("unchecked")) {
-          element.removeAttr("checked");
+          element.prop("checked", false);
         } else {
-          element.attr("checked", true);
+          element.prop("checked", true);
         }
         return element.change();
       };
@@ -20,6 +22,7 @@
       return next(url);
     }
   };
+
   showForm = function(url, next, cancel, form) {
     form.dialog({
       modal: true,
@@ -44,16 +47,21 @@
     });
     return form.validate();
   };
+
   freePeriodEnd = function(url, next, cancel) {
     var form;
     form = $("<form><div><label>Дата окончания бесплатного периода</label><input name=FreePeriodEnd class='date'> </br>" + "<label>Основание бесплатного обслуживания</label><input id='AddCommentField' name='AddComment' class='required' >" + "</div></form>");
     return showForm(url, next, cancel, form);
   };
+
   addComment = function(url, next, cancel) {
-	var form;
-	form = $("<form onsubmit='return false;'><div><label>Введите причину отключения</label><input id='AddCommentField' name='AddComment' class='required' ></div></form>");
+    var form;
+    form = $("<form onsubmit='return false;'><div><label>Введите причину отключения</label><input id='AddCommentField' name='AddComment' class='required' ></div></form>");
     return showForm(url, next, cancel, form);
   };
+
   requests["FreePeriodEnd"] = freePeriodEnd;
+
   requests["AddComment"] = addComment;
+
 }).call(this);

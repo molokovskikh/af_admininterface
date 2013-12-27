@@ -45,9 +45,11 @@
       }
     });
   };
+
   if (typeof require === "undefined" || require === null) {
     $(function() {
       return registerConfirm();
     });
   }
+
 }).call(this);

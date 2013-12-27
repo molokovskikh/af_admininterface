@@ -53,7 +53,16 @@ module.exports = function(grunt) {
 		   src: ['*.coffee'],
 	       dest: 'test',
 		   ext: '.js'
-       }
+       },
+		app: {
+			files: [{
+				expand: true,
+				flatten: true,
+				src: ['src/AdminInterface/Assets/Javascripts/*.coffee'],
+				dest: 'src/AdminInterface/Assets/Javascripts/',
+				ext: '.js'
+			}]
+		}
     }
   });
 

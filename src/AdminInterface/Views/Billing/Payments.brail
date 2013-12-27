@@ -19,7 +19,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 ${app.Asset("Payments.js")}
 <script type="text/javascript">
 function RefreshTotalSum() {
-	var link = "${siteroot}/Billing/TotalSum.rails?payerId=${Instance.Id}";
+	var link = "${siteroot}/Billing/TotalSum?payerId=${Instance.Id}";
 	AjaxRequest(link,
 		function (html) { $("#TotalSum").html(html); },
 		function (xhr, textStatus, error) { $("#TotalSum").html(""); });
@@ -93,7 +93,7 @@ function RefreshTotalSum() {
 					</td>
 					<td>${client.Id}</td>
 					<td>
-						<a data-filter="${filter.GetFilterValue(client)}" href="edit.rails?billingCode=${payer.Id}&ClientCode=${client.Id}&tab=payments" ${'class=current-filter' if client == filter.Service}>
+						<a data-filter="${filter.GetFilterValue(client)}" href="edit?billingCode=${payer.Id}&ClientCode=${client.Id}&tab=payments" ${'class=current-filter' if client == filter.Service}>
 							${client.Name}
 						</a>
 					</td>

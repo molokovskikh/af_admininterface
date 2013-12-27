@@ -13,13 +13,13 @@
 			});
 			setDepartmentPermissions(name);
 		}).change();
-		$("#CheckAllRegions").attr("checked", "checked");
+		$("#CheckAllRegions").prop("checked", true);
 		allRegions(true);
 	});
 
 	function setDepartmentPermissions(departmentDescription) {
 		<% for i, permission in enumerate(permissions): %>
-			$("#permission${permission.Id}").removeAttr("checked");
+			$("#permission${permission.Id}").prop("checked", false);
 		<% end %>
 		$.ajax({
 			url: "${siteroot}/RegionalAdmin/GetDefaultPermissions?departmentDescription=" + departmentDescription,
@@ -27,7 +27,7 @@
 			success: function(html) {
 				var ids = html.split(',');
 				for (var i = 0; i < ids.length; i++) {
-					$("#permission" + ids[i]).attr("checked", "checked");
+					$("#permission" + ids[i]).prop("checked", true);
 				}
 			}
 		});

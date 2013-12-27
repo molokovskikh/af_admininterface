@@ -3,13 +3,13 @@
 this.fillDependedData = (url, element, next) ->
 	request = element.attr("data-request")
 	requestFunction = requests[request]
-	showRequest = (element.attr("checked") and requestFunction and not element.attr("unchecked")) or (not element.attr("checked") and requestFunction and element.attr("unchecked"))
+	showRequest = (element.prop("checked") and requestFunction and not element.attr("unchecked")) or (not element.prop("checked") and requestFunction and element.attr("unchecked"))
 	if showRequest
 		cancel = ->
 			if not element.attr("unchecked")
-				element.removeAttr("checked")
+				element.prop("checked", false)
 			else
-				element.attr("checked", true)
+				element.prop("checked", true)
 			element.change()
 		requestFunction(url, next, cancel)
 	else

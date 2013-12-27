@@ -4,4 +4,5 @@
       return $(this).parents("form").submit();
     });
   });
+
 }).call(this);

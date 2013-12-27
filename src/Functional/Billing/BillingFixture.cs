@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Collections.Generic;
 using AdminInterface.Models.Suppliers;
@@ -153,9 +154,9 @@ namespace Functional.Billing
 			Assert.That(comboBox.Options.Count, Is.GreaterThan(0));
 			Assert.That(comboBox.HasSelectedItems, Is.True);
 			Assert.That(comboBox.SelectedOption.Text.Contains(user.GetLoginOrName()));
-			browser.Button(Find.ById("ConnectAddressToUserButton" + address.Id)).Click();
+			Css("#ConnectAddressToUserButton" + address.Id).Click();
 			Thread.Sleep(2000);
-			Assert.That(connectUserLink.Style.Display, Is.EqualTo("block"));
+			Assert.That(connectUserLink.Style.Display, Is.EqualTo("inline"));
 			var connectingDiv = browser.Div(Find.ById("ConnectingUserDiv" + address.Id));
 			Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 
@@ -180,7 +181,7 @@ namespace Functional.Billing
 
 			browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
 			Thread.Sleep(2000);
-			Assert.That(connectAddressLink.Style.Display, Is.EqualTo("block"));
+			Assert.That(connectAddressLink.Style.Display, Is.EqualTo("inline"));
 			var connectingDiv = browser.Div(Find.ById("ConnectingAddressDiv" + user.Id));
 			Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 
@@ -272,16 +273,21 @@ namespace Functional.Billing
 		[Test]
 		public void NotSubmitInCommentDialogTest()
 		{
-			var clientStatus = browser.Css(String.Format("#ClientStatus{0}", client.Id));
+			var clientStatus = Css(String.Format("#ClientStatus{0}", client.Id));
 			Assert.IsTrue(clientStatus.Checked);
 			clientStatus.Click();
 			((TextField)Css(".ui-dialog-content #AddCommentField")).TypeText("TestComment");
 			browser.Eval("$('input#AddCommentField').trigger($.Event( 'keydown', {which:$.ui.keyCode.ENTER, keyCode:$.ui.keyCode.ENTER}));");
 			ConfirmDialog();
 			Assert.IsFalse(clientStatus.Checked);
-			Thread.Sleep(1000);
+			WaitAjax();
 			browser.Refresh();
 			AssertText("TestComment");
+		}
+
+		public void WaitAjax()
+		{
+			Wait(() => Convert.ToInt32(browser.Eval("$.active")) == 0, "");
 		}
 
 		[Test]
@@ -805,7 +811,7 @@ namespace Functional.Billing
 		public void Accounted_not_selected_if_unchecked_status()
 		{
 			user.Accounting.BeAccounted = true;
-			session.SaveOrUpdate(client);
+			session.Save(client);
 			Refresh();
 
 			Assert.That(Css(String.Format("#UserRow{0} input[name=accounted]", user.Id)).Checked, Is.True);

@@ -16,7 +16,7 @@
 	function ConnectAddressToUser(userId) {
 		var addressId = $("#AddressesComboBox" + userId + " option:selected").val();
 		var address = $("#AddressesComboBox" + userId + " option:selected").html();
-		var link = "${siteroot}/Billing/ConnectUserToAddress.rails?userId=" + userId + "&addressId=" + addressId;
+		var link = "${siteroot}/Billing/ConnectUserToAddress?userId=" + userId + "&addressId=" + addressId;
 		$.ajax({
 			url: link,
 			cache: false,
@@ -33,7 +33,7 @@
 	}
 	
 	function DisconnectAddressFromUser(userId, addressId) {
-		var link = "${siteroot}/Billing/DisconnectUserFromAddress.rails?userId=" + userId + "&addressId=" + addressId;
+		var link = "${siteroot}/Billing/DisconnectUserFromAddress?userId=" + userId + "&addressId=" + addressId;
 		$.ajax({
 			url: link,
 			cache: false,
@@ -48,7 +48,7 @@
 		$('#AddressesComboBox' + userId).find('option').remove().end();
 		$("#SearchAddressMessage" + userId).html("<i>Выполняется поиск</i>");
 		var searchText = $("#AddressSearchText" + userId).val();
-		var link = "${siteroot}/Billing/SearchAddressesForUser.rails?userId=" + userId + "&searchText=" + searchText;
+		var link = "${siteroot}/Billing/SearchAddressesForUser?userId=" + userId + "&searchText=" + searchText;
 		$.ajax({
 			url: link,
 			cache: false,

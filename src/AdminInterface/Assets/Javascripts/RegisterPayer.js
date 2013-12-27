@@ -15,8 +15,7 @@
 	}
 
 	$.validator.addMethod("CommentValidator", function (value, element, params) {
-		var checkBox = $('PaymentOptions_WorkForFree');
-		if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
+		if ($('PaymentOptions_WorkForFree').prop("checked"))
 			return true;
 
 		if (!$("PaymentOptions_Comment").empty())
@@ -28,8 +27,7 @@
 	}, "Клиент слишком долго работает бесплатно, нужно указать причину.");
 
 	$.validator.addMethod("DateInFuture", function (value, element, params) {
-		var checkBox = $('PaymentOptions_WorkForFree');
-		if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
+		if ($('PaymentOptions_WorkForFree').prop("checked"))
 			return true;
 
 		var paymentPeriodBeginDate = Date.parse($('#PaymentOptions_PaymentPeriodBeginDate').val());

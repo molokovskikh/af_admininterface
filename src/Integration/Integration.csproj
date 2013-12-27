@@ -172,7 +172,6 @@
     <Compile Include="Models\UserFilterFixture.cs" />
     <Compile Include="Models\UserFixture.cs" />
     <Compile Include="Models\WorkingPricesInheritanceFixture.cs" />
-    <Compile Include="MonoRailExtentions\BindParametersFixture.cs" />
     <Compile Include="MonoRailExtentions\ValidatorToNHibernateIntegrationFixture.cs" />
     <Compile Include="NewsFixture.cs" />
     <Compile Include="Models\OffersFixture.cs" />

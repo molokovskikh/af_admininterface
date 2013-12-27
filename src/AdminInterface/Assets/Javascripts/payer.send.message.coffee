@@ -13,7 +13,7 @@
 		this.showOrHideSubject()
 
 	showOrHideSubject: () ->
-		if $("#userMessage_SendToEmail").attr("checked") or $("#userMessage_SendToMinimail").attr("checked")
+		if $("#userMessage_SendToEmail").prop("checked") or $("#userMessage_SendToMinimail").prop("checked")
 			$("#EmailSubjectRow").show()
 		else
 			$("#EmailSubjectRow").hide()

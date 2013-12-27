@@ -10,7 +10,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 <script type="text/javascript">
 
 	function validateSupplier() {
-		if ($("#ShowForOneSupplier").attr("checked"))
+		if ($("#ShowForOneSupplier").prop("checked"))
 			return (($("#SupplierComboBox").val() != null) &&
 						($("#SupplierComboBox").val().length > 0) &&
 						($("#SelectSupplierDiv").css("display") == "block"));
@@ -18,7 +18,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 	}
 
 	function validatePayer() {
-		if ($("#PayerExists").attr("checked"))
+		if ($("#PayerExists").prop("checked"))
 			return (($("#PayerComboBox").val() != null) &&
 						($("#PayerComboBox").val().length > 0) &&
 						($("#SelectPayerDiv").css("display") == "block"));
@@ -41,7 +41,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 
 		$.validator.addMethod("noEmailAddress", function (value, element) {
 			if (value.toString().length == 0 && $("#additionalEmails").val().length == 0
-				&& $("#SendRegistrationCard").attr("checked")) {
+				&& $("#SendRegistrationCard").prop("checked")) {
 				return false;
 			}
 			else return true;
@@ -56,7 +56,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		}, "Выберите плательщика");
 
 		$("#options_RegisterEmpty").change(function () {
-			if ($(this).attr("checked"))
+			if ($(this).prop("checked"))
 				$("#user_Name").rules("remove", "required");
 			else
 				$("#user_Name").rules("add", "required");
@@ -175,18 +175,18 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 	}
 	
 	function LockPayer() {
-		$("#PayerExists").removeAttr("checked");
+		$("#PayerExists").prop("checked", false);
 		$("#PayerExists").click();
 		$("#PayerExistsValue").val(true);
 		$("#PayerExists").attr("disabled", "disabled");
-		$("#options_FillBillingInfo").removeAttr("checked");
+		$("#options_FillBillingInfo").prop("checked", false);
 		$("#options_FillBillingInfo").attr("disabled", "disabled");
 		ViewDiv(false, '#SelectPayerDiv');
 		ViewDiv(false, "#SearchPayerDiv");
 	}
 	
 	function SetLockedPayer(payerName) {
-		$("#PayerExists").attr('checked', 'checked');
+		$("#PayerExists").prop("checked", true);
 		$("#PayerExistsValue").val(true);
 		$("#PayerExists").attr('disabled', 'disabled');
 		$("#PayerComboBox").attr('disabled', 'disabled');

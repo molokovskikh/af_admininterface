@@ -7,8 +7,8 @@
 		if (!id)
 			return;
 		cancel(id);
-		if ($("#" + id).attr("checked")) {
-			$("#" + id).attr("checked", false);
+		if ($("#" + id).prop("checked")) {
+			$("#" + id).prop("checked", false);
 		}
 	});
 

@@ -2,7 +2,7 @@
 	Добавление новой группы контактной информации
 <% end %>
 <div class="ContactBaseDiv" style="width: 700px">
-	<form method="post" action="AddContactGroup.rails">
+	<form method="post" action="AddContactGroup">
 		<input type="hidden" value=${billingCode} name="billingCode" />
 		<div class="ContactHeaderDiv">
 			Добавление новой группы контактной информации

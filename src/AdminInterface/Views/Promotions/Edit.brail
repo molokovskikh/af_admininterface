@@ -3,13 +3,13 @@
 	Редактирование акции №${promotion.Id}
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : [("Акции", "Index.rails"), ("Редактирование акции №${promotion.Id}", "")], "pageTitle":"Акции"} %>
+<% component Bubble, {"bredcrumbs" : [("Акции", "Index"), ("Редактирование акции №${promotion.Id}", "")], "pageTitle":"Акции"} %>
 <% else: %>
 <% component CaptureFor, {"id" : "Title"}: %>
 	Создание новой акции
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : [("Акции", "Index.rails"), ("Создание новой акции", "")], "pageTitle":"Акции"} %>
+<% component Bubble, {"bredcrumbs" : [("Акции", "Index"), ("Создание новой акции", "")], "pageTitle":"Акции"} %>
 <% end %>
 
 <style type="text/css">
@@ -48,7 +48,7 @@
 			<td>
 				<div class="block">
 					<% if promotion.Id: %>
-						<a href="${siteroot}/Promotions/EditCatalogs.rails?id=${promotion.Id}">Редактировать список препаратов</a>
+						<a href="${siteroot}/Promotions/EditCatalogs?id=${promotion.Id}">Редактировать список препаратов</a>
 						<table id="catalogs" cellpadding="3px" cellspacing="3px" style="width: 60%;">	
 							<% if promotion.Catalogs.Count: %>
 								<% for i, catalog in enumerate(promotion.Catalogs): %>
@@ -116,7 +116,7 @@
 			<td>
 				<% if promotion.Id: %>
 					<% if promotion.PromoFile: %>
-					<a href="${siteroot}/Promotions/GetPromoFile.rails?Id=${promotion.Id}" target="_blank">${promotion.PromoFile}</a>
+					<a href="${siteroot}/Promotions/GetPromoFile?Id=${promotion.Id}" target="_blank">${promotion.PromoFile}</a>
 					<% else: %>
 					&lt;не установлен&gt;
 					<% end %>

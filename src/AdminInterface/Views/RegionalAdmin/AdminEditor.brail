@@ -1,12 +1,12 @@
 ﻿<script type="text/javascript">
 	function allRegions(checked) {
 		<% for j,region in enumerate(regions): %>
-			$("#region${j}").attr("checked", checked);
+			$("#region${j}").prop("checked", checked);
 		<% end %>
 	}
 
 	function deselectCheckboxAll() {
-		$("#CheckAllRegions").removeAttr("checked");
+		$("#CheckAllRegions").prop("checked", false);
 	}
 </script>
 

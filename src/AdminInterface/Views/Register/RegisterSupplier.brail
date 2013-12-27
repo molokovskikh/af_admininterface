@@ -10,7 +10,7 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 <script type="text/javascript">
 
 	function validatePayer() {
-		if ($("#PayerExists").attr("checked"))
+		if ($("#PayerExists").prop("checked"))
 			return (($("#PayerComboBox").val() != null) &&
 						($("#PayerComboBox").val().length > 0) &&
 						($("#SelectPayerDiv").css("display") == "block"));
@@ -37,7 +37,7 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 
 		jQuery.validator.addMethod("noEmailAddress", function(value, element) {
 			if (value.toString().length == 0 && $("#additionalEmails").val().length == 0 
-				&& $("#SendRegistrationCard").attr("checked"))
+				&& $("#SendRegistrationCard").prop("checked"))
 			{
 				return false;
 			}

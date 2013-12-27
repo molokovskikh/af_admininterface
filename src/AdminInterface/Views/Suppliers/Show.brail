@@ -174,12 +174,12 @@ ${app.Asset("ClientsShow.css")}
 			component ContactViewer, {"ContactGroups" : ContactGroups}:
 				section ContactGroupHeaderLink:
 				%>
-					<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
+					<a href='../Contact/EditContactGroup?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
 				<%
 				end
 				section Person:
 				%>
-					<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+					<a href='../Contact/EditPerson?personId=${PersonId}' target='_blank'>${PersonName}</a>
 				<%
 				end
 			end

@@ -17,17 +17,17 @@ function ShowAdditionalInfo(id, selectorAdditionalInfo, selectorInfoCell, ajaxLi
 
 function ShowAdditionalInfoForUser(userId, cssClass) {
 	ShowAdditionalInfo(userId, "#additionalUserInfo", "#additionalUserInfoCell",
-		"AdditionalUserInfo.rails?userId=" + userId + "&cssClassName=" + cssClass);
+		"AdditionalUserInfo?userId=" + userId + "&cssClassName=" + cssClass);
 }
 
 function ShowAdditionalInfoForSupplier(supplierId, cssClass) {
 	ShowAdditionalInfo(supplierId, "#additionalSupplierInfo", "#additionalSupplierInfoCell",
-		"AdditionalSupplierInfo.rails?supplierId=" + supplierId + "&cssClassName=" + cssClass);
+		"AdditionalSupplierInfo?supplierId=" + supplierId + "&cssClassName=" + cssClass);
 }
 
 function ShowAdditionalInfoForAddress(addressId, cssClass) {
 	ShowAdditionalInfo(addressId, "#additionalAddressInfo", "#additionalAddressInfoCell",
-		"AdditionalAddressInfo.rails?addressId=" + addressId + "&cssClassName=" + cssClass);
+		"AdditionalAddressInfo?addressId=" + addressId + "&cssClassName=" + cssClass);
 }
 
 function updateChildren(id, status) {
@@ -80,7 +80,6 @@ function Update(url, item, success) {
 		function (html) {
 			hideWaiter(item, waiter);
 			RefreshTotalSum();
-			//				showSuccessMessage("Сохранено");
 			processResponse(html, item);
 			if (success)
 				success();
@@ -98,7 +97,7 @@ function processResponse(data, element) {
 		$(data.accounts).each(function (index, account) {
 			idElement = $("input[name=id][value=" + account.id + "]");
 			row = idElement.parents("tr").first();
-			row.find("input[name=free]").attr("checked", account.free);
+			row.find("input[name=free]").prop("checked", account.free);
 			if (account.free)
 				row.addClass("consolidate-free");
 			else
@@ -106,7 +105,7 @@ function processResponse(data, element) {
 		});
 	}
 	if (data.data) {
-		$(element).parent().append(data.data)
+		$(element).parent().append(data.data);
 	}
 }
 
@@ -114,7 +113,7 @@ function buildAjaxUrl(url, element) {
 	var id = element.parents("tr").find("input[name=id]").val();
 	var value = element.val();
 	if (element.attr("type") == "checkbox")
-		value = element.get(0).checked;
+		value = element.prop("checked");
 
 	var link = url + "?id=" + id + "&" + element.attr("name") + "=" + value;
 	return link;
@@ -126,11 +125,11 @@ function checkBoxChanger(url, item) {
 			if (item.attr("name") == "status") {
 				var id = $(item).parents("tr").find("input[name=service_id]").val();
 				if (id) {
-					updateChildren(id, item.attr("checked"));
+					updateChildren(id, item.prop("checked"));
 				}
-				if (item.attr("checked") == false || item.attr("checked") == undefined) {
+				if (!item.prop("checked")) {
 					var accounted = $(item).parents("tr").find("input[name=accounted]");
-					accounted.attr("checked", false);
+					accounted.prop("checked", false);
 					accounted.change();
 				}
 			}
@@ -146,7 +145,7 @@ $(function () {
 		if (this.checked) {
 			$(this).parents("tr").addClass("consolidate-free");
 			accounted.attr("disabled", true);
-			accounted.removeAttr("checked");
+			accounted.prop("checked", false);
 		}
 		else {
 			$(this).parents("tr").removeClass("consolidate-free");

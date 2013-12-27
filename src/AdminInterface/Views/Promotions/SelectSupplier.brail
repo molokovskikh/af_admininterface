@@ -2,7 +2,7 @@
 	Выбор поставщика для акции
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : [("Акции", "Index.rails"), ("Выбор поставщика для акции", "")], "pageTitle":"Выбор поставщика для акции"} %>
+<% component Bubble, {"bredcrumbs" : [("Акции", "Index"), ("Выбор поставщика для акции", "")], "pageTitle":"Выбор поставщика для акции"} %>
 
 <div class="block">Выбор поставщика для акции</div>
 
@@ -26,7 +26,7 @@
 			</tr>
 			<% for i, supplier in enumerate(suppliers): %>
 			<tr class="${ViewHelper.GetRowStyle(i)}">
-				<td><a href="${siteroot}/Promotions/New.rails?supplierId=${supplier.Id}">${supplier.Name}</a></td>
+				<td><a href="${siteroot}/Promotions/New?supplierId=${supplier.Id}">${supplier.Name}</a></td>
 				<td>${supplier.HomeRegion.Name}</td>
 			</tr>
 			<% end %>

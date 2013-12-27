@@ -73,7 +73,7 @@ end
 
 		<% if payer.ContactGroupOwner.ContactGroups.Count == 0: %>
 			<td class="InputGroupHeader" colspan="2">
-				<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.Id}" target="_blank">Добавить группу контактной информации</a>
+				<a href="../Contact/NewContactGroup?billingCode=${Instance.Id}" target="_blank">Добавить группу контактной информации</a>
 			</td>
 		<% end %>
 
@@ -85,7 +85,7 @@ end
 			<tr>
 				<% if contactGroupIndex == 0: %>
 					<td class="InputGroupHeader">
-						<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.Id}" target="_blank">Добавить группу контактной информации</a>
+						<a href="../Contact/NewContactGroup?billingCode=${Instance.Id}" target="_blank">Добавить группу контактной информации</a>
 					</td>
 					<td class="InputGroupHeader">
 						${ContactGroupName}
@@ -113,12 +113,12 @@ end
 			end
 			section Person:
 			%>
-				<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+				<a href='../Contact/EditPerson?personId=${PersonId}' target='_blank'>${PersonName}</a>
 			<%
 			end
 			section ContactGroupHeaderLink:
 			%>
-				<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' target="_blank" >${ContactGroupName}</a>
+				<a href='../Contact/EditContactGroup?contactGroupId=${ContactGroupId}' target="_blank" >${ContactGroupName}</a>
 			<%
 			end
 		end
