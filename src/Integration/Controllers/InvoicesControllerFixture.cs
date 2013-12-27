@@ -4,6 +4,7 @@ using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.MonoRail.TestSupport;
+using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NHibernate.Linq;
@@ -46,15 +47,20 @@ namespace Integration.Controllers
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, DateTime.Now);
+			invoice.Parts.Add(new InvoicePart(invoice, "Мониторинг оптового фармрынка за декабрь", 500, 2, DateTime.Now));
 			session.Save(invoice);
 
 			var oldValue = invoice.Period.Clone();
 			var newValue = new Period(DateTime.Today.Year + 1, invoice.Period.Interval);
 			Request.Params.Add("invoice.Period.Year", newValue.Year.ToString());
 			Request.Params.Add("invoice.Period.Interval", newValue.Interval.ToString());
+			Request.Params.Add("invoice.Parts[0].Id", invoice.Parts[0].Id.ToString());
 			Request.HttpMethod = "POST";
 			controller.Edit(invoice.Id);
 			controller.SendMails();
+
+			var errors = controller.Validator.GetErrorSummary(invoice);
+			Assert.AreEqual(0, errors.ErrorsCount, errors.ErrorMessages.Implode());
 			Assert.AreEqual(1, Emails.Count);
 			var email = Emails[0];
 			Assert.AreEqual("Изменен счет", Emails[0].Subject);
