@@ -263,7 +263,6 @@ namespace Functional.Billing
 		}
 
 		//я обрабатываю change но почему то click не вызывает change, по этому симулирую его
-
 		private void SimulateClick(Document browser, string selector, CheckBox checkbox)
 		{
 			checkbox.Click();
@@ -340,8 +339,8 @@ namespace Functional.Billing
 			Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("none"));
 			// Жмем "Отмена". Должна появиться ссылка "Подключить пользователя", а поле ввода и кнопки - исчезнуть
 			browser.Button(Find.ById("CancelUserSearchButton" + address.Id)).Click();
-			Assert.IsTrue(browser.Link(Find.ByText("Подключить пользователя")).Style.Display.ToLower().Equals("block"));
-			Assert.IsTrue(browser.Div(Find.ById("ConnectingUserDiv" + address.Id)).Style.Display.ToLower().Equals("none"));
+			Assert.AreEqual(browser.Link(Find.ByText("Подключить пользователя")).Style.Display.ToLower(), "inline");
+			Assert.AreEqual(Css("#ConnectingUserDiv" + address.Id).Style.Display.ToLower(), "none");
 			// Жмем "Подключить пользователя" и вводим то, что не сможем найти. Должно быть сообщение что ничего не нашли
 			ClickLink("Подключить пользователя");
 			browser.TextField(Find.ById("UserSearchText" + address.Id)).TypeText("1234567890");
@@ -372,8 +371,8 @@ namespace Functional.Billing
 			Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("none"));
 			// Жмем "Отмена". Должна появиться ссылка "Подключить адрес", а поле ввода и кнопки - исчезнуть
 			browser.Button(Find.ById("CancelSearchButton" + user.Id)).Click();
-			Assert.IsTrue(browser.Link(Find.ByText("Подключить адрес")).Style.Display.ToLower().Equals("block"));
-			Assert.IsTrue(browser.Div(Find.ById("ConnectingAddressDiv" + user.Id)).Style.Display.ToLower().Equals("none"));
+			Assert.AreEqual(browser.Link(Find.ByText("Подключить адрес")).Style.Display.ToLower(), "inline");
+			Assert.AreEqual(browser.Div(Find.ById("ConnectingAddressDiv" + user.Id)).Style.Display.ToLower(), "none");
 			// Жмем "Подключить адрес" и вводим то, что не сможем найти. Должно быть сообщение что ничего не нашли
 			ClickLink("Подключить адрес");
 			browser.TextField(Find.ById("AddressSearchText" + user.Id)).TypeText("1234567890");
@@ -445,8 +444,9 @@ namespace Functional.Billing
 			var currentSum = sum;
 
 			// Включаем адрес. Сумма должна увеличиться
-			Assert.That(Css(String.Format("#AddressRow{0} input[name=status]", disabledAddress.Id)).Checked, Is.False);
-			Css(String.Format("#AddressRow{0} input[name=status]", disabledAddress.Id)).Click();
+			Css("#AddressListHeader").Click();
+			Assert.That(Css("#AddressRow{0} input[name=status]", disabledAddress.Id).Checked, Is.False);
+			Css("#AddressRow{0} input[name=status]", disabledAddress.Id).Click();
 			Wait(() => {
 				currentSum = GetTotalSum();
 				return currentSum > sum;
@@ -456,8 +456,8 @@ namespace Functional.Billing
 			sum = currentSum;
 
 			// Выключаем пользователя. Сумма должна уменьшиться
-			Assert.That(Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked, Is.True);
-			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Click();
+			Assert.That(Css("#UserRow{0} input[name=status]", user.Id).Checked, Is.True);
+			Css("#UserRow{0} input[name=status]", user.Id).Click();
 			AddCommentInDisableDialig();
 			Wait(() => {
 				currentSum = GetTotalSum();
@@ -466,7 +466,7 @@ namespace Functional.Billing
 			Assert.That(currentSum, Is.LessThan(sum));
 
 			// Выключаем клиента. Сумма должна стать равной нулю
-			Css(String.Format("#ClientStatus{0}", client.Id)).Click();
+			Css("#ClientStatus{0}", client.Id).Click();
 			AddCommentInDisableDialig();
 
 			Wait(() => {
