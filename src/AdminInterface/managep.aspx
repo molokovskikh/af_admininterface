@@ -5,7 +5,7 @@
 	<form id="form1" runat="server">
 		<asp:ScriptManager ID="ScriptManager1" runat="server" AjaxFrameworkMode="Disabled" EnableScriptLocalization="False" EnableScriptGlobalization="False" EnablePageMethods="False" EnablePartialRendering="False" EnableSecureHistoryState="False">
 			<Scripts>
-				<asp:ScriptReference Path="~/Assets/Javascripts/jquery-1.6.2.min.js" />
+				<asp:ScriptReference Path="~/Assets/Javascripts/jquery-1.6.4.min.js" />
 				<asp:ScriptReference Path="~/Assets/Javascripts/jquery-ui-1.10.2.min.js" />
 			</Scripts>
 		</asp:ScriptManager>
