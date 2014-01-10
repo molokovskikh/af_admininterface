@@ -19,7 +19,7 @@ namespace AdminInterface.Background
 
 		public Waiter()
 		{
-			Delay = (int)TimeSpan.FromHours(1).TotalMilliseconds;
+			Delay = TimeSpan.FromHours(1);
 			Action = () => {
 				var mailer = new MonorailMailer {
 					SiteRoot = ConfigurationManager.AppSettings["SiteRoot"]
