@@ -26,9 +26,8 @@
 		sendToMinimail = $("#userMessage_SendToMinimail")
 		id = parseInt(val)
 		if id
-			sendToMinimail.attr("disabled", "disabled")
+			sendToMinimail.prop("disabled", true)
 			$("select#messageReceiverComboBox option[selected]").removeAttr("selected")
 			$("select#messageReceiverComboBox option[value='#{ id }']").attr("selected", "selected")
 		else
-			sendToMinimail.removeAttr("disabled")
-
+			sendToMinimail.prop("disabled", false)

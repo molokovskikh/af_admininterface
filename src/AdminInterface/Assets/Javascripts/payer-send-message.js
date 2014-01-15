@@ -12,7 +12,7 @@
       return this.showOrHideSubject();
     },
     showOrHideSubject: function() {
-      if ($("#userMessage_SendToEmail").attr("checked") || $("#userMessage_SendToMinimail").attr("checked")) {
+      if ($("#userMessage_SendToEmail").prop("checked") || $("#userMessage_SendToMinimail").prop("checked")) {
         return $("#EmailSubjectRow").show();
       } else {
         return $("#EmailSubjectRow").hide();
@@ -28,12 +28,13 @@
       sendToMinimail = $("#userMessage_SendToMinimail");
       id = parseInt(val);
       if (id) {
-        sendToMinimail.attr("disabled", "disabled");
+        sendToMinimail.prop("disabled", true);
         $("select#messageReceiverComboBox option[selected]").removeAttr("selected");
         return $("select#messageReceiverComboBox option[value='" + id + "']").attr("selected", "selected");
       } else {
-        return sendToMinimail.removeAttr("disabled");
+        return sendToMinimail.prop("disabled", false);
       }
     }
   });
+
 }).call(this);

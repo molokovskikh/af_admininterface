@@ -2,10 +2,10 @@
   var setAttribute;
 
   setAttribute = function(parent, element) {
-    if (!parent.attr("checked")) {
-      return element.attr("disabled", "disabled");
+    if (!parent.prop("checked")) {
+      return element.prop("disabled", true);
     } else {
-      return element.removeAttr("disabled");
+      return element.prop("disabled", false);
     }
   };
 

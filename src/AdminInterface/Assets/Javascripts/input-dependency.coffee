@@ -1,8 +1,8 @@
 setAttribute = (parent, element) ->
-	if not parent.attr "checked"
-		element.attr "disabled", "disabled"
+	if not parent.prop "checked"
+		element.prop "disabled", true
 	else
-		element.removeAttr "disabled"
+		element.prop "disabled", false
 
 this.trackDependencies = () ->
 	$("input[data-depend-on]").each ->

@@ -20,7 +20,7 @@
 		${app.Asset("search.editor.js")}
 
 		${app.Asset("confirmation.js")}
-		${app.Asset("input.dependency.coffee")}
+		${app.Asset("input-dependency.coffee")}
 		${app.Asset("details.js")}
 		${app.Asset("UserCommon.js")}
 		${app.Asset("editable.js")}
