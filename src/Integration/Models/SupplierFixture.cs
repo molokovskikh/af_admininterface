@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using Test.Support;
 using NUnit.Framework;
 using Test.Support.log4net;
@@ -15,6 +17,8 @@ namespace Integration.Models
 		{
 			var supplier = DataMother.CreateSupplier();
 			supplier.Disabled = true;
+			var format = session.Query<PriceFormat>().First();
+			supplier.Prices[0].Costs[0].PriceItem.FormRule.Format = format;
 			Save(supplier);
 
 			Reopen();
@@ -24,6 +28,7 @@ namespace Integration.Models
 
 			Reopen();
 			Assert.That(session.Get<Supplier>(supplier.Id), Is.Null);
+			Assert.IsNotNull(session.Get<PriceFormat>(format.Id));
 		}
 
 		[Test]

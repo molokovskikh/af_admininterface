@@ -261,8 +261,7 @@ where rcs.BuyingMatrix = :matrixId
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
-		[BelongsTo("PriceFormatId", Cascade = CascadeEnum.All,
-			NotFoundBehaviour = NotFoundBehaviour.Ignore, Lazy = FetchWhen.OnInvoke)]
+		[BelongsTo("PriceFormatId", NotFoundBehaviour = NotFoundBehaviour.Ignore, Lazy = FetchWhen.OnInvoke)]
 		public virtual PriceFormat Format { get; set; }
 
 		[Property]
