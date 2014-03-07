@@ -36,6 +36,7 @@ namespace AdminInterface.Models
 		[Description("SST для Здоровые Люди")] SSTLong = 2,
 		[Description("Устаревшая версия универсального dbf")] LessUniversalDbf = 3,
 		[Description("Универсальный dbf")] UniversalDbf = 4,
+		[Description("ИнфоАптека(Xml)")] InfoDrugstoreXml = 5,
 	}
 
 	[ActiveRecord("RetClientsSet", Schema = "usersettings", Lazy = true), Auditable]
