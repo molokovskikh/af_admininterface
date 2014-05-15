@@ -1,0 +1,13 @@
+﻿a.contact-phone-icon {
+	display: block;
+	width: 16px;
+	height: 16px;
+	background-image: url(../../Images/sipphone.png);
+}
+
+a.contact-email-icon {
+	display: block;
+	width: 16px;
+	height: 16px;
+	background-image: url(../../Images/email.png);
+}

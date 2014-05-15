@@ -40,6 +40,7 @@
 					<li><asp:HyperLink runat="server" ID="HandlersLink">Настройка форматеров и отправщиков доступных поставщику</asp:HyperLink></li>
 					<li><asp:HyperLink runat="server" ID="WaybillExcludeFiles">Файлы, исключенные из разбора в качестве накладных</asp:HyperLink></li>
 					<li><asp:HyperLink runat="server" ID="WaybillSourceSettings">Настройки передачи документов</asp:HyperLink></li>
+					<li><asp:HyperLink runat="server" ID="AddRegion">Подключить регион</asp:HyperLink></li>
 				</ul>
 			</div>
 			<div class="BorderedBlock">
@@ -133,18 +134,18 @@
 					<asp:DropDownList ID="HomeRegion" runat="server" DataTextField="Region" DataMember="Regions"
 						DataValueField="RegionCode">
 					</asp:DropDownList>
-					<asp:CheckBox ID="ShowAllRegionsCheck" runat="server" Text="Показывать все регионы." AutoPostBack="True" OnCheckedChanged="ShowAllRegionsCheck_CheckedChanged" />
 				</div>
 				<div class="ContentBlock">
-					<label for="WRList">
-						Доступные регионы:
-					</label>
-					<div>
-						<asp:Label runat="server" ForeColor="Red" ID="RegionValidationError" Visible="False">Вы не выбрали регионы работы</asp:Label>
-					</div>
-					<asp:CheckBoxList ID="WorkRegionList" runat="server" BorderStyle="None" DataMember="EnableRegions"
-						DataTextField="Region" DataValueField="RegionCode" CellSpacing="0" CellPadding="0">
-					</asp:CheckBoxList>
+					<asp:GridView ID="Regions" AutoGenerateColumns="False" runat="server" OnRowCommand="DisableRegion">
+						<Columns>
+							<asp:TemplateField>
+								<ItemTemplate>
+									<asp:Button runat="server" CommandName="Disable" CommandArgument='<%# Eval("Id") %>' Text="Отключить" />
+								</ItemTemplate>
+							</asp:TemplateField>
+							<asp:BoundField DataField="Name" HeaderText="Подключенные регионы" />
+						</Columns>
+					</asp:GridView>
 				</div>
 				<div class="ContentBlock">
 					<asp:GridView ID="RegionalSettingsGrid" runat="server" AutoGenerateColumns="False"

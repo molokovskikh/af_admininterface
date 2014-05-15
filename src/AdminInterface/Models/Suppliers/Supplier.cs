@@ -12,10 +12,12 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Security;
 using AdminInterface.Models.Validators;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
+using Common.MySql;
 using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
@@ -23,15 +25,72 @@ using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
-using NHibernate.Linq;
 using log4net;
 
 namespace AdminInterface.Models.Suppliers
 {
+	public class RegionEdit
+	{
+		private Supplier supplier;
+		private Administrator admin;
+		private List<Region> regions;
+
+		public RegionEdit(ISession session, Supplier supplier, Administrator admin)
+		{
+			this.supplier = supplier;
+			this.admin = admin;
+			regions = Region.GetRegionsByMask(admin.RegionMask).Except(supplier.GetRegions(session, admin)).ToList();
+		}
+
+		[ValidateNonEmpty, Description("Регион")]
+		public Region Region { get; set; }
+
+		[ValidateNonEmpty, Description("ФИО согласовавшего включение")]
+		public string PermitedBy { get; set; }
+
+		[ValidateNonEmpty, Description("Фиксированная ежемесячная оплата")]
+		public decimal FixedPayAmount { get; set; }
+
+		[ValidateNonEmpty, Description("Процентная ставка по заказам")]
+		public decimal PercentPayAmount { get; set; }
+
+		[ValidateNonEmpty, Description("Контактное лицо поставщика")]
+		public string RequestedBy { get; set; }
+
+		public bool ShouldNotify()
+		{
+			return FixedPayAmount > 0 || PercentPayAmount > 0;
+		}
+
+		public List<Region> Regions()
+		{
+			return regions;
+		}
+
+		public string Subject()
+		{
+			return String.Format("Поставщик {0} код {1} добавлен регион {2}", supplier.Name, supplier.Id, Region.Name);
+		}
+
+		public string Body()
+		{
+			return String.Format("Дата изменения: {0}\r\n" +
+				"Сотрудник: {1}\r\n" +
+				"Хост: {2}\r\n" +
+				"Регион: {3}\r\n" +
+				"ФИО согласовавшего включение: {4}\r\n" +
+				"Фиксированная ежемесячная оплата: {5}\r\n" +
+				"Процентная ставка по заказам: {6}\r\n" +
+				"Контактное лицо поставщика: {7}",
+				DateTime.Now, admin.Name, admin.Host,
+				Region.Name, PermitedBy, FixedPayAmount, PercentPayAmount, RequestedBy);
+		}
+	}
+
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Поставщик")]
 	public class Supplier : Service, IChangesNotificationAware, IMultiAuditable
 	{
-		private ContactGroupType[] _defaultGroups = new[] {
+		private ContactGroupType[] _defaultGroups = {
 			ContactGroupType.ClientManagers,
 			ContactGroupType.OrderManagers
 		};
@@ -335,9 +394,12 @@ namespace AdminInterface.Models.Suppliers
 		public virtual void AddRegion(Region region)
 		{
 			RegionMask |= region.Id;
-			RegionalData.Add(new RegionalData(region, this));
-			foreach (var price in Prices)
-				price.RegionalData.Add(new PriceRegionalData(price, region));
+			if (RegionalData.All(r => r.Region != region))
+				RegionalData.Add(new RegionalData(region, this));
+			foreach (var price in Prices) {
+				if (price.RegionalData.All(r => r.Region != region))
+					price.RegionalData.Add(new PriceRegionalData(price, region));
+			}
 		}
 
 
@@ -420,58 +482,32 @@ where s.Id = :supplierId")
 				return res.Distinct().OrderBy(r => r.Name).ToList();
 			}
 		}
-	}
 
-	[ActiveRecord("RegionalData", Schema = "Usersettings")]
-	public class RegionalData
-	{
-		public RegionalData()
+		public virtual void RemoveRegion(Region region)
 		{
-			ContactInfo = "";
-			OperativeInfo = "";
+			RegionMask &= ~region.Id;
 		}
 
-		public RegionalData(Region region, Supplier supplier)
-			: this()
+		public virtual List<Region> GetRegions(ISession dbSession, Administrator admin)
 		{
-			Region = region;
-			Supplier = supplier;
+			return Region.GetRegionsByMask(admin.RegionMask & RegionMask).ToList();
 		}
 
-		[PrimaryKey("RowId")]
-		public virtual uint Id { get; set; }
-
-		[BelongsTo("RegionCode")]
-		public virtual Region Region { get; set; }
-
-		[BelongsTo("FirmCode")]
-		public virtual Supplier Supplier { get; set; }
-
-		[Property(NotNull = true)]
-		public virtual string ContactInfo { get; set; }
-
-		[Property(NotNull = true)]
-		public virtual string OperativeInfo { get; set; }
-
-		public static void AddForSuppler(ISession DbSession, uint supplierId, ulong newMask)
+		public virtual void MergePerson(ContactGroupType type, Person person)
 		{
-			var supplier = DbSession.Get<Supplier>(supplierId);
-			var supplierRegions = DbSession.Query<Region>().Where(r => (r.Id & newMask) > 0).ToList();
-			var supplierRegionalData = DbSession.Query<RegionalData>().Where(r => r.Supplier == supplier).Select(r => r.Region).ToList();
-			var newRegions = supplierRegions.Where(n => !supplierRegionalData.Contains(n)).ToList();
-			foreach (var newRegion in newRegions) {
-				var regionalData = new RegionalData(newRegion, supplier);
-				DbSession.Save(regionalData);
-				//DbSession.Flush();
-				foreach (var value in Enum.GetValues(typeof(DayOfWeek))) {
-					var day = (DayOfWeek)value;
-					var reorderSchedule = new ReorderSchedule(regionalData, day);
-					reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(684000000000);
-					if (day == DayOfWeek.Saturday)
-						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(504000000000);
-					if (day == DayOfWeek.Sunday)
-						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(863400000000);
-					DbSession.Save(reorderSchedule);
+			var group = ContactGroupOwner.ContactGroups.FirstOrDefault(g => g.Type == type)
+				?? ContactGroupOwner.AddContactGroup(type);
+
+			var exists = group.Persons.FirstOrDefault(p => String.Equals(p.Name, person.Name, StringComparison.CurrentCultureIgnoreCase));
+			if (exists == null) {
+				group.Persons.Add(person);
+				group.Adopt();
+			}
+			else {
+				foreach (var contact in person.Contacts) {
+					if (!exists.Contacts.Any(c => c.Type == contact.Type && String.Equals(contact.ContactText, c.ContactText, StringComparison.CurrentCultureIgnoreCase))) {
+						exists.AddContact(new Contact(contact.Type, contact.ContactText, contact.Comment));
+					}
 				}
 			}
 		}

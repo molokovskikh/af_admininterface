@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Text;
 using System.Web;
 using AdminInterface.Helpers;
@@ -19,6 +21,7 @@ using Castle.ActiveRecord;
 using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.MySql;
 using Common.Tools;
 using Common.Web.Ui.Controllers;
 using Common.Web.Ui.Helpers;
@@ -38,7 +41,7 @@ namespace AdminInterface.Controllers
 	{
 		public void Show(uint id, [SmartBinder(Expect = "filter.Types")] MessageQuery filter)
 		{
-			var supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
+			var supplier = DbSession.Load<Supplier>(id);
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["users"] = supplier.Users;
 
@@ -92,7 +95,7 @@ namespace AdminInterface.Controllers
 		[return: JSONReturnBinder]
 		public uint DeleteMask(uint maskId)
 		{
-			var mask = DbSession.Get<WaybillExcludeFile>(maskId);
+			var mask = DbSession.Load<WaybillExcludeFile>(maskId);
 			var supplierId = mask.Supplier.Id;
 			DbSession.Delete(mask);
 			Notify("Удалено");
@@ -102,12 +105,9 @@ namespace AdminInterface.Controllers
 		public void ChangePayer(uint supplierId, uint payerId)
 		{
 			var suplier = DbSession.Load<Supplier>(supplierId);
-
-			SecurityContext.Administrator.CheckRegion(suplier.HomeRegion.Id);
-			if (!SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers))
-				throw new NotHavePermissionException();
-
 			var payer = DbSession.Load<Payer>(payerId);
+
+			Admin.CheckRegion(suplier.HomeRegion.Id);
 			suplier.ChangePayer(payer);
 
 			Notify("Изменено");
@@ -116,7 +116,7 @@ namespace AdminInterface.Controllers
 
 		public void SendMessage(uint id, string message)
 		{
-			var supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
+			var supplier = DbSession.Load<Supplier>(id);
 			if (!string.IsNullOrWhiteSpace(message)) {
 				new AuditRecord(message, supplier).Save();
 				Notify("Сохранено");
@@ -197,6 +197,59 @@ namespace AdminInterface.Controllers
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["source"] = source;
 			PropertyBag["sourceTypes"] = sourceTypes;
+		}
+
+		public void AddRegion(uint id)
+		{
+			var supplier = DbSession.Load<Supplier>(id);
+			var edit = new RegionEdit(DbSession, supplier, Admin);
+			PropertyBag["supplier"] = supplier;
+			PropertyBag["edit"] = edit;
+			PropertyBag["EmailContactType"] = ContactType.Email;
+			PropertyBag["PhoneContactType"] = ContactType.Phone;
+
+			if (IsPost) {
+				SetSmartBinder(AutoLoadBehavior.NullIfInvalidKey);
+				Bind(edit, "edit");
+				SetBinder(new DataBinder());
+				var contacts = BindObject<Contact[]>("contacts");
+				if (IsValid(edit)) {
+					supplier.MergePerson(ContactGroupType.General, new Person(edit.RequestedBy, contacts));
+					supplier.AddRegion(edit.Region);
+					RegionalData.AddForSuppler(DbSession, supplier.Id, supplier.RegionMask);
+					if (edit.ShouldNotify()) {
+						Mail().RegionAdded(edit);
+						RedminePostIssue(new {
+							subject = edit.Subject(),
+							description = edit.Body(),
+							assigned_to_id = Config.RedmineAssignedTo
+						});
+					}
+					Maintainer.MaintainIntersection(supplier, DbSession);
+					DbSession.Save(supplier);
+					Notify("Регион добавлен");
+					RedirectToAction("Show", new { id = supplier.Id });
+				}
+			}
+		}
+
+		private void RedminePostIssue(object issue)
+		{
+			if (String.IsNullOrEmpty(Config.RedmineUrl))
+				return;
+			var data = "";
+			var output = "";
+			try {
+				data = JsonConvert.SerializeObject(new { issue });
+				var webClient = new WebClient();
+				webClient.Encoding = Encoding.UTF8;
+				webClient.Headers.Add(HttpRequestHeader.ContentType, "application/json");
+				output = webClient.UploadString(Config.RedmineUrl, data);
+			}
+			catch (Exception e) {
+				Logger.Error(String.Format("Не удалось создать задачу в redmine\r\n{0}\r\n{1}\r\n",
+					Config.RedmineUrl, data, output), e);
+			}
 		}
 	}
 }

@@ -213,6 +213,7 @@
     <Compile Include="Models\ProducerSynonym.cs" />
     <Compile Include="Models\ProductSynonym.cs" />
     <Compile Include="Models\ReorderSchedule.cs" />
+    <Compile Include="Models\Suppliers\RegionalData.cs" />
     <Compile Include="Models\WaybillExcludeFile.cs" />
     <Compile Include="Models\WaybillSource.cs" />
     <Compile Include="Queries\AnalysisOfWorkDrugstores.cs" />
@@ -492,6 +493,7 @@
     <Content Include="Assets\Javascripts\Client.js" />
     <Content Include="Assets\Javascripts\client.settings.js" />
     <Content Include="Assets\Javascripts\confirmation.coffee" />
+    <Content Include="Assets\Javascripts\contact-editor.js" />
     <Content Include="Assets\Javascripts\EditPayment.js" />
     <Content Include="Assets\Javascripts\input-dependency.coffee" />
     <Content Include="Assets\Javascripts\MainSettings.js" />
@@ -512,6 +514,7 @@
     <Content Include="Assets\Stylesheets\alt.form.css" />
     <Content Include="Assets\Stylesheets\billing.css" />
     <Content Include="Assets\Stylesheets\ClientsShow.css" />
+    <Content Include="Assets\Stylesheets\contact-editor.css" />
     <Content Include="Assets\Stylesheets\Documents.css" />
     <Content Include="Assets\Stylesheets\MonitoringOrder.css" />
     <Content Include="Assets\Stylesheets\News.css" />
@@ -649,6 +652,7 @@
     <None Include="Views\Shared\EditorTemplates\Account.brail" />
     <None Include="Views\SubViews\ContactGroupRegistrator.brail" />
     <None Include="Views\SubViews\MemoAboutWritingAddresses.brail" />
+    <Content Include="Views\Suppliers\AddRegion.brail" />
     <None Include="Views\Templates\Addresses.brail" />
     <None Include="Views\Templates\DocumentPayerSelector.brail" />
     <None Include="Views\Templates\Messages.brail" />

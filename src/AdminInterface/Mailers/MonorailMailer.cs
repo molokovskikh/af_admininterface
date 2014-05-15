@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms.VisualStyles;
 using AdminInterface.Models;
 using AdminInterface.Models.Audit;
 using AdminInterface.Models.Billing;
@@ -542,6 +543,14 @@ namespace AdminInterface.Mailers
 			Template = "PropertyChanged_html";
 			Subject = String.Format("Зарегистрирован {0}", BindingHelper.GetDescription(payer).ToLower());
 			return this;
+		}
+
+		public void RegionAdded(RegionEdit edit)
+		{
+			To = "billing@analit.net";
+			From = "billing@analit.net";
+			Subject = edit.Subject();
+			Body = edit.Body();
 		}
 	}
 }

@@ -28,6 +28,8 @@ namespace AdminInterface
 
 		public string AttachmentsPath { get; set; }
 		public string ErrorFilesPath { get; set; }
+		public string RedmineUrl { get; set; }
+		public string RedmineAssignedTo { get; set; }
 	}
 
 	public class Global : WebApplication

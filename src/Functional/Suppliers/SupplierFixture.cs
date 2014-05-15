@@ -9,11 +9,13 @@ using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
 using Test.Support;
 using WatiN.Core.Native.Windows;
+using ContactGroupType = Common.Web.Ui.Models.ContactGroupType;
 using PriceType = AdminInterface.Models.Suppliers.PriceType;
 
 namespace Functional.Suppliers
@@ -252,6 +254,48 @@ Where pc.PriceCode = :PriceId1")
 			browser.CheckBox(Find.ByName("WorkRegions[0]")).Checked = true;
 			Click("Сохранить");
 			AssertText("$$$Изменено 'Регионы работы' Удалено 'Воронеж' Добавлено 'Все регионы'");
+		}
+
+		[Test]
+		public void Add_region()
+		{
+			var regions = session.Query<Region>().ToList();
+			var region = regions
+				.Except(regions.Where(r => (r.Id & supplier.RegionMask) > 0).Concat(new[] { supplier.HomeRegion }))
+				.First();
+			Open("managep.aspx?cc={0}", supplier.Id);
+			Click("Подключить регион");
+			Css("#edit_Region_Id").SelectByValue(region.Id.ToString());
+			Css("#edit_PermitedBy").AppendText("Тест Т.Т.");
+			Css("#edit_RequestedBy").AppendText("Тест 1 Т.Т.");
+			Css("#addContactLink").Click();
+			Css("input.email").AppendText("test@analit.net");
+			Click("Добавить");
+			AssertText("Регион добавлен");
+
+			session.Refresh(supplier);
+			Assert.That(supplier.RegionMask & region.Id, Is.GreaterThan(0));
+			Assert.AreEqual("test@analit.net", supplier.ContactGroupOwner.Group(ContactGroupType.General).Persons[0].Contacts[0].ContactText);
+		}
+
+		[Test]
+		public void Disable_region()
+		{
+			var regions = session.Query<Region>().ToList();
+			var region = regions
+				.Except(regions.Where(r => (r.Id & supplier.RegionMask) > 0).Concat(new[] { supplier.HomeRegion }))
+				.First();
+			supplier.AddRegion(region);
+
+			Open("managep.aspx?cc={0}", supplier.Id);
+			var table = (Table)Css("#MainContentPlaceHolder_Regions");
+			var row = table.FindRow(region.Name, 1);
+			Click(row, "Отключить");
+			table = (Table)Css("#MainContentPlaceHolder_Regions");
+			Assert.That(table.Text, Is.Not.Contains(region.Name));
+
+			session.Refresh(supplier);
+			Assert.AreEqual(0, supplier.RegionMask & region.Id);
 		}
 	}
 }

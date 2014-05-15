@@ -1,0 +1,52 @@
+﻿${app.Asset("alt.form.css")}
+${app.Asset("contact-editor.js")}
+${app.Asset("contact-editor.css")}
+<script>
+	window.EmailContactType = '${EmailContactType}';
+	window.PhoneContactType = '${PhoneContactType}';
+</script>
+
+<% component Bubble, {"bredcrumbs" : [("Поставщик ${supplier.Name}", "${siteroot}/Suppliers/${supplier.Id}")]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	!{supplier.Name} добавление нового региона
+<% end %>
+
+${app.Form("")}
+	<div class="form-block">
+		${app.Label("edit.Region")}
+		${app.Edit("edit.Region", edit.Regions())}
+		${app.Error("edit.Region")}
+	</div>
+
+	<div class="form-block">
+		${app.Label("edit.PermitedBy")}
+		${app.Edit("edit.PermitedBy")}
+		${app.Error("edit.PermitedBy")}
+	</div>
+
+	<div class="form-block">
+		${app.Label("edit.FixedPayAmount")}
+		${app.Edit("edit.FixedPayAmount")}
+		${app.Error("edit.FixedPayAmount")}
+	</div>
+
+	<div class="form-block">
+		${app.Label("edit.PercentPayAmount")}
+		${app.Edit("edit.PercentPayAmount")}
+		${app.Error("edit.PercentPayAmount")}
+	</div>
+
+	<div class="form-block">
+		${app.Label("edit.RequestedBy")}
+		${app.Edit("edit.RequestedBy")}
+		${app.Error("edit.RequestedBy")}
+		<div>
+			<span>Контактная информация</span>
+			<a id="addContactLink" class="icon icon-add" href="javascript:" onclick="addContactRow(--insertId, '', '')">Добавить</a>
+			<table id="ContactHolder">
+			</table>
+		</div>
+	</div>
+	${FormHelper.Submit("Добавить")}
+${app.End()}

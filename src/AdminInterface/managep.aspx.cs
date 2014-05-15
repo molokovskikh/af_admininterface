@@ -40,18 +40,22 @@ namespace AddUser
 		}
 
 		private Supplier supplier;
+		private Administrator admin;
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
+			admin = SecurityContext.Administrator;
+			admin.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
 			uint id;
 			if (!UInt32.TryParse(Request["cc"], out id))
 				throw new ArgumentException(String.Format("Не верное значение ClientCode = {0}", id), "ClientCode");
 
 			supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
+			Regions.DataSource = supplier.GetRegions(DbSession, admin);
 			HandlersLink.NavigateUrl = "~/SpecialHandlers/?supplierId=" + supplier.Id;
 			WaybillExcludeFiles.NavigateUrl = "~/Suppliers/WaybillExcludeFiles?supplierId=" + supplier.Id;
 			WaybillSourceSettings.NavigateUrl = "~/Suppliers/WaybillSourceSettings?supplierId=" + supplier.Id;
+			AddRegion.NavigateUrl = String.Format("~/Suppliers/{0}/AddRegion", supplier.Id);
 
 			if (!IsPostBack)
 				LoadPageData();
@@ -66,11 +70,8 @@ namespace AddUser
 
 			var code = Convert.ToUInt32(priceCode);
 			var isParentSynonim = IsParentSynonym(code);
-
 			var haveOrders = HaveOrders(code);
-
 			var havePriceReplace = HavePriceReplace(code);
-
 			var regionFlag = HavePriceInThisRgionMask(code);
 
 			return !isParentSynonim && !haveOrders && havePriceReplace && regionFlag;
@@ -132,6 +133,7 @@ where p.pricecode = :Code;")
 
 		private void LoadPageData()
 		{
+			Regions.DataSource = supplier.GetRegions(DbSession, admin);
 			Data = GetData(supplier);
 			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", supplier.Name);
 			ConnectDataSource();
@@ -145,7 +147,6 @@ where p.pricecode = :Code;")
 		{
 			PricesGrid.DataSource = Data;
 			RegionalSettingsGrid.DataSource = Data;
-			WorkRegionList.DataSource = Data;
 			HomeRegion.DataSource = Data;
 			OrderSendRules.DataSource = Data;
 		}
@@ -195,19 +196,6 @@ FROM Farm.Regions
 WHERE regionCode & ?AdminRegionMask > 0
 ORDER BY region;";
 
-			var enableRegionsCommandText = @"
-SELECT  a.RegionCode,
-		a.Region,
-		s.RegionMask & a.regioncode > 0 as Enable
-FROM    farm.regions as a, 
-		farm.regions as b, 
-		Customers.Suppliers as s
-WHERE   b.regioncode = ?HomeRegion
-		AND s.Id = ?ClientCode
-		AND a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | s.RegionMask) > 0
-GROUP BY regioncode
-ORDER BY region;";
-
 			var orderSendConfig = @"
 SELECT osr.Id, osr.SenderId, osr.FormaterId, osr.SendDebugMessage, osr.ErrorNotificationDelay, r.RegionCode
 FROM ordersendrules.order_send_rules osr
@@ -248,9 +236,6 @@ order by r.Region;";
 			dataAdapter.SelectCommand.CommandText = regionsCommandText;
 			dataAdapter.Fill(data, "Regions");
 
-			dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
-			dataAdapter.Fill(data, "EnableRegions");
-
 			dataAdapter.SelectCommand.CommandText = orderSendConfig;
 			dataAdapter.Fill(data, "OrderSendConfig");
 
@@ -273,8 +258,6 @@ order by r.Region;";
 		private void SetRegions()
 		{
 			HomeRegion.SelectedValue = supplier.HomeRegion.Id.ToString();
-			for (var i = 0; i < Data.Tables["EnableRegions"].Rows.Count; i++)
-				WorkRegionList.Items[i].Selected = Convert.ToBoolean(Data.Tables["EnableRegions"].Rows[i]["Enable"]);
 		}
 
 		protected void PricesGrid_RowCommand(object sender, GridViewCommandEventArgs e)
@@ -303,14 +286,7 @@ order by r.Region;";
 		protected void SaveButton_Click(object sender, EventArgs e)
 		{
 			try {
-				if (!WorkRegionList.Items.Cast<ListItem>().Any(i => i.Selected)) {
-					RegionValidationError.Visible = true;
-					return;
-				}
-				RegionValidationError.Visible = false;
-				ShowAllRegionsCheck.Checked = false;
 				UpdateHomeRegion();
-				UpdateMaskRegion((MySqlConnection)DbSession.Connection);
 				ProcessChanges();
 
 				var message = "";
@@ -713,102 +689,6 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 			}
 		}
 
-		protected void ShowAllRegionsCheck_CheckedChanged(object sender, EventArgs e)
-		{
-			string commandText;
-			if (((CheckBox)sender).Checked) {
-				commandText = @"
-SELECT  a.RegionCode,   
-		a.Region,
-		s.RegionMask & a.regioncode > 0 as Enable
-FROM farm.regions as a, Customers.Suppliers as s
-WHERE a.regionCode & ?AdminRegionMask > 0 and s.Id = ?ClientCode
-ORDER BY region;";
-			}
-			else {
-				commandText = @"
-SELECT  a.RegionCode,
-		a.Region,
-		s.RegionMask & a.regioncode > 0 as Enable
-FROM    farm.regions as a, 
-		farm.regions as b, 
-		Customers.Suppliers as s
-WHERE   b.regioncode = ?HomeRegion
-		and s.Id = ?ClientCode
-		and a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | s.RegionMask) > 0
-GROUP BY regioncode
-ORDER BY region;";
-			}
-			Data.Tables["EnableRegions"].Clear();
-			With.Connection(
-				c => {
-					var adapter = new MySqlDataAdapter(commandText, c);
-					adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
-					adapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", supplier.HomeRegion.Id);
-					adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
-					adapter.Fill(Data, "EnableRegions");
-				});
-			WorkRegionList.DataBind();
-			SetRegions();
-		}
-
-		private void UpdateMaskRegion(MySqlConnection connection)
-		{
-			var oldMaskRegion = supplier.RegionMask;
-			var newMaskRegion = oldMaskRegion;
-			foreach (ListItem item in WorkRegionList.Items) {
-				if (item.Selected)
-					newMaskRegion |= Convert.ToUInt64(item.Value);
-				else
-					newMaskRegion &= ~Convert.ToUInt64(item.Value);
-			}
-			if (oldMaskRegion == newMaskRegion)
-				return;
-
-			supplier.RegionMask = newMaskRegion;
-			DbSession.Save(supplier);
-
-			var updateCommand = new MySqlCommand(
-				@"
-update customers.Suppliers s
-set RegionMask = ?MaskRegion
-where s.id = ?ClientCode;
-
-SET @InHost = ?UserHost;
-SET @InUser = ?UserName;
-
-INSERT
-INTO pricesregionaldata
-(
-	regioncode,
-	pricecode,
-	enabled,
-	basecost
-)
-SELECT  r.RegionCode,
-		p.PriceCode,
-		if(p.pricetype<>1, 1, 0),
-		(select prd.basecost from usersettings.pricesregionaldata prd where prd.pricecode = p.pricecode limit 1)
-FROM pricesdata p, Customers.Suppliers s, farm.regions r
-WHERE s.Id = ?ClientCode
-		AND p.FirmCode = s.Id
-		AND (r.RegionCode & s.RegionMask > 0)
-		AND not exists
-		(SELECT * 
-		FROM    pricesregionaldata prd 
-		WHERE   prd.PriceCode      = p.PriceCode 
-				AND prd.RegionCode = r.RegionCode
-		);
-", connection);
-			updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
-			updateCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
-			updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-			updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-			updateCommand.ExecuteNonQuery();
-			RegionalData.AddForSuppler(DbSession, supplier.Id, newMaskRegion);
-			Maintainer.MaintainIntersection(supplier, DbSession);
-		}
-
 		private void UpdateHomeRegion()
 		{
 			var currentHomeRegion = Convert.ToUInt64(HomeRegion.SelectedValue);
@@ -821,13 +701,12 @@ WHERE s.Id = ?ClientCode
 
 		protected void RegionalSettingsGrid_RowCreated(object sender, GridViewRowEventArgs e)
 		{
+			if (supplier == null)
+				return;
+
 			if (e.Row.RowType == DataControlRowType.DataRow) {
-				var rows = Data.Tables["EnableRegions"].Select(String.Format("RegionCode = {0}", Data.Tables["RegionSettings"].Rows[e.Row.DataItemIndex]["RegionCode"]));
-				if (rows.Length > 0) {
-					if (Convert.ToBoolean(rows[0]["Enable"]) == false)
-						e.Row.BackColor = ColorTranslator.FromHtml("#B5B5B5");
-				}
-				else {
+				var regionId = Convert.ToUInt64(Data.Tables["RegionSettings"].Rows[e.Row.DataItemIndex]["RegionCode"]);
+				if ((supplier.RegionMask & regionId) == 0) {
 					e.Row.BackColor = ColorTranslator.FromHtml("#B5B5B5");
 				}
 			}
@@ -887,6 +766,12 @@ WHERE s.Id = ?ClientCode
 			region.DataSource = Data.Tables["SenRuleRegions"];
 			region.DataBind();
 			region.SelectedValue = ((DataRowView)e.Row.DataItem)["RegionCode"].ToString();
+		}
+
+		protected void DisableRegion(object sender, GridViewCommandEventArgs e)
+		{
+			supplier.RemoveRegion(DbSession.Load<Common.Web.Ui.Models.Region>(Convert.ToUInt64(e.CommandArgument)));
+			LoadPageData();
 		}
 	}
 }

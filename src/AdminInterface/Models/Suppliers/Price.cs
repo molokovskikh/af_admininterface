@@ -175,8 +175,8 @@ where rcs.BuyingMatrix = :matrixId
 		{
 			Price = price;
 			Region = region;
-			Enabled = true;
-			Cost = price.Costs[0];
+			Enabled = price.PriceType != PriceType.Assortment;
+			Cost = price.RegionalData.Select(p => p.Cost).FirstOrDefault();
 		}
 
 		[PrimaryKey("RowId")]
