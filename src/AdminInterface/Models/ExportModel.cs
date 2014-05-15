@@ -477,13 +477,13 @@ namespace AdminInterface.Models
 		private static ICellStyle GetHeaderStyle(HSSFWorkbook book)
 		{
 			var font = book.CreateFont();
-			font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.BOLD;
+			font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
 			var style = book.CreateCellStyle();
-			style.BorderRight = BorderStyle.MEDIUM;
-			style.BorderLeft = BorderStyle.MEDIUM;
-			style.BorderBottom = BorderStyle.MEDIUM;
-			style.BorderTop = BorderStyle.MEDIUM;
-			style.Alignment = HorizontalAlignment.CENTER;
+			style.BorderRight = BorderStyle.Medium;
+			style.BorderLeft = BorderStyle.Medium;
+			style.BorderBottom = BorderStyle.Medium;
+			style.BorderTop = BorderStyle.Medium;
+			style.Alignment = HorizontalAlignment.Center;
 			style.SetFont(font);
 			style.WrapText = true;
 			return style;
@@ -492,15 +492,15 @@ namespace AdminInterface.Models
 		private static ICellStyle GetDataStyle(HSSFWorkbook book, bool isCenter = false, bool isWrap = true)
 		{
 			var style = book.CreateCellStyle();
-			style.BorderRight = BorderStyle.THIN;
-			style.BorderLeft = BorderStyle.THIN;
-			style.BorderBottom = BorderStyle.THIN;
-			style.BorderTop = BorderStyle.THIN;
+			style.BorderRight = BorderStyle.Thin;
+			style.BorderLeft = BorderStyle.Thin;
+			style.BorderBottom = BorderStyle.Thin;
+			style.BorderTop = BorderStyle.Thin;
 			style.GetFont(book).Boldweight = (short)FontBoldWeight.None;
 			if (isWrap)
 				style.WrapText = true;
 			if (isCenter)
-				style.Alignment = HorizontalAlignment.CENTER;
+				style.Alignment = HorizontalAlignment.Center;
 			return style;
 		}
 
@@ -639,11 +639,11 @@ namespace AdminInterface.Models
 			// стиль для ячеек с данными, выравненный по центру
 			var centerDataStyle = NPOIExcelHelper.GetCenterDataStyle(book);
 
-			ICellStyle LIGHT_ORANGE_STYLE;
-			ICellStyle LIGHT_YELLOW_STYLE;
-			ICellStyle LIGHT_BLUE_STYLE;
+			ICellStyle LightORANGE_STYLE;
+			ICellStyle LightYELLOW_STYLE;
+			ICellStyle LightBlue_STYLE;
 			ICellStyle PINK_STYLE;
-			ICellStyle LIGHT_GREEN_STYLE;
+			ICellStyle LightGreen_STYLE;
 			ICellStyle LAVENDER_STYLE;
 
 			dateCell.CellStyle = dataStyle;
@@ -658,8 +658,8 @@ namespace AdminInterface.Models
 				NPOIExcelHelper.FillNewCell(sheetRow, 4, monitoringItem.PriceType, dataStyle);
 
 				if (monitoringItem.CostCollumn) {
-					LIGHT_ORANGE_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_ORANGE.index);
-					NPOIExcelHelper.FillNewCell(sheetRow, 5, monitoringItem.CostName, LIGHT_ORANGE_STYLE);
+					LightORANGE_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LightOrange.Index);
+					NPOIExcelHelper.FillNewCell(sheetRow, 5, monitoringItem.CostName, LightORANGE_STYLE);
 				}
 				else {
 					NPOIExcelHelper.FillNewCell(sheetRow, 5, monitoringItem.CostName, centerDataStyle);
@@ -668,23 +668,23 @@ namespace AdminInterface.Models
 				NPOIExcelHelper.FillNewCell(sheetRow, 6, !monitoringItem.AvailableForClient ? "Нет" : string.Empty, centerDataStyle);
 
 				if (monitoringItem.NoPriceConnected) {
-					LIGHT_YELLOW_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_YELLOW.index);
-					NPOIExcelHelper.FillNewCell(sheetRow, 7, monitoringItem.CountAvailableForClient, LIGHT_YELLOW_STYLE);
+					LightYELLOW_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LightYellow.Index);
+					NPOIExcelHelper.FillNewCell(sheetRow, 7, monitoringItem.CountAvailableForClient, LightYELLOW_STYLE);
 				}
 				else {
 					NPOIExcelHelper.FillNewCell(sheetRow, 7, monitoringItem.CountAvailableForClient, centerDataStyle);
 				}
 
 				if (monitoringItem.PriceMarkupStyle) {
-					LIGHT_BLUE_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_BLUE.index);
-					NPOIExcelHelper.FillNewCell(sheetRow, 8, monitoringItem.PriceMarkup > 0 ? monitoringItem.PriceMarkup.ToString() : string.Empty, LIGHT_BLUE_STYLE);
+					LightBlue_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LightBlue.Index);
+					NPOIExcelHelper.FillNewCell(sheetRow, 8, monitoringItem.PriceMarkup > 0 ? monitoringItem.PriceMarkup.ToString() : string.Empty, LightBlue_STYLE);
 				}
 				else {
 					NPOIExcelHelper.FillNewCell(sheetRow, 8, monitoringItem.PriceMarkup > 0 ? monitoringItem.PriceMarkup.ToString() : string.Empty, centerDataStyle);
 				}
 
 				if (monitoringItem.ClientCodeStyle) {
-					PINK_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.PINK.index);
+					PINK_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.Pink.Index);
 					NPOIExcelHelper.FillNewCell(sheetRow, 9, monitoringItem.SupplierClientId, PINK_STYLE);
 				}
 				else {
@@ -692,8 +692,8 @@ namespace AdminInterface.Models
 				}
 
 				if (monitoringItem.DeliveryStyle) {
-					LIGHT_GREEN_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_GREEN.index);
-					NPOIExcelHelper.FillNewCell(sheetRow, 10, monitoringItem.DeliveryStyle ? monitoringItem.SupplierDeliveryAdresses.Replace("</br>", Environment.NewLine) : string.Empty, LIGHT_GREEN_STYLE);
+					LightGreen_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LightGreen.Index);
+					NPOIExcelHelper.FillNewCell(sheetRow, 10, monitoringItem.DeliveryStyle ? monitoringItem.SupplierDeliveryAdresses.Replace("</br>", Environment.NewLine) : string.Empty, LightGreen_STYLE);
 				}
 				else {
 					NPOIExcelHelper.FillNewCell(sheetRow, 10, monitoringItem.DeliveryStyle ? monitoringItem.SupplierDeliveryAdresses.Replace("</br>", Environment.NewLine) : string.Empty, centerDataStyle);
@@ -705,7 +705,7 @@ namespace AdminInterface.Models
 				}
 
 				if (monitoringItem.PaymentCodeStyle) {
-					LAVENDER_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LAVENDER.index);
+					LAVENDER_STYLE = NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.Lavender.Index);
 					NPOIExcelHelper.FillNewCell(sheetRow, 11, monitoringItem.SupplierPaymentId, LAVENDER_STYLE);
 				}
 				else {
@@ -737,27 +737,27 @@ namespace AdminInterface.Models
 
 			sheet.CreateRow(row++);
 			sheetRow = sheet.CreateRow(row++);
-			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_ORANGE.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LightOrange.Index));
 			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Если у поставщика менее 30% клиентов подключены к базовой ценовой колонке и данной аптеке назначена базовая", dataStyle);
 			sheetRow = sheet.CreateRow(row++);
 
-			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_YELLOW.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LightYellow.Index));
 			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Не подключен ни к одному из прайсов", dataStyle);
 			sheetRow = sheet.CreateRow(row++);
 
-			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_BLUE.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LightBlue.Index));
 			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Более половины аптек, подключенных к прайсу имеют наценку, отличную от Нуля, а для рассматриваемой аптеки наценка 0", dataStyle);
 			sheetRow = sheet.CreateRow(row++);
 
-			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.PINK.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.Pink.Index));
 			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Более половины аптек, подключенных к прайсу имеют код клиента, а для рассматриваемой аптеки этот код не прописан", dataStyle);
 			sheetRow = sheet.CreateRow(row++);
 
-			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LIGHT_GREEN.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LightGreen.Index));
 			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Более половины аптек, подключенных к прайсу имеют коды адресов доставки, а для рассматриваемой аптеки этот код не прописан, либо для рассматриваемой аптеки прописаны не все коды адресов доставки", dataStyle);
 			sheetRow = sheet.CreateRow(row++);
 
-			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.LAVENDER.index));
+			NPOIExcelHelper.FillNewCell(sheetRow, 0, string.Empty, NPOIExcelHelper.GetCenterDataStyle(book, HSSFColor.Lavender.Index));
 			NPOIExcelHelper.FillNewCell(sheetRow, 1, "- Более половины аптек, подключенных к прайсу имеют код оплаты, а для рассматриваемой аптеки этот код не прописан", dataStyle);
 
 			var buffer = new MemoryStream();

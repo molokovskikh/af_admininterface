@@ -16,3 +16,4 @@ packages/
 src/*.properties
 bower_components
 node_modules
+*.gen.*
