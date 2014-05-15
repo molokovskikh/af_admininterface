@@ -88,7 +88,6 @@ namespace Functional.Drugstore
 		public void Add_offer_matrix_exclude()
 		{
 			var supplier = dataMother.CreateMatrix();
-
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
 
 			Css("#drugstore_EnableOfferMatrix").Click();

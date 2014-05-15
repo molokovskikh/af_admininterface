@@ -84,7 +84,7 @@ namespace Functional
 			WaitForText("Удалить письмо");
 			Click("Да");
 			Thread.Sleep(2000);
-			Close();
+			session.Clear();
 			Assert.IsTrue(session.Get<Mail>(Mail.Id).Deleted);
 		}
 	}
