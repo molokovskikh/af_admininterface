@@ -76,7 +76,6 @@ namespace Functional.Drugstore
 			Open(client);
 			Click("История обновлений");
 			OpenedWindow(String.Format("История обновлений клиента {0}", client.Name));
-			Thread.Sleep(2000);
 			Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
 			browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
 			Thread.Sleep(2000);
@@ -108,7 +107,6 @@ namespace Functional.Drugstore
 			Open(user);
 			Click("История обновлений");
 			OpenedWindow(String.Format("История обновлений пользователя {0}", user.Login));
-			Thread.Sleep(2000);
 			browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
 
 			Thread.Sleep(2000);
@@ -138,9 +136,8 @@ namespace Functional.Drugstore
 			Open(client);
 			Click("История документов");
 			OpenedWindow("История документов");
-			Thread.Sleep(2000);
 			AssertText(supplier.Name);
-			browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+			Css("#ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
 			Thread.Sleep(1000);
 			AssertText("Код товара");
 			AssertText("Наименование");
@@ -166,7 +163,6 @@ namespace Functional.Drugstore
 			Open(client);
 			Click("История документов");
 			OpenedWindow("История документов");
-			Thread.Sleep(2000);
 			AssertText(supplier.Name);
 			browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
 			Thread.Sleep(1000);
@@ -192,7 +188,6 @@ namespace Functional.Drugstore
 			Open("Users/{0}/edit", client.Users[0].Id);
 			ClickLink("История документов");
 			OpenedWindow("История документов");
-			Thread.Sleep(2000);
 			AssertText(supplier.Name);
 			AssertText(documentLogEntity.FileName);
 			Assert.IsFalse(browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Exists);
@@ -211,7 +206,6 @@ namespace Functional.Drugstore
 			Open(user);
 			Click(@"История обновлений");
 			OpenedWindow(String.Format("История обновлений пользователя {0}", user.Login));
-			Thread.Sleep(2000);
 			Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
 			browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
 			Thread.Sleep(2000);

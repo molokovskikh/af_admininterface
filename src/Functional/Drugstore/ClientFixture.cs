@@ -107,7 +107,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("message")).TypeText("This message for user1");
 			ClickButton("Принять");
 			Open(client);
-			browser.Refresh();
+			Refresh();
 
 			Assert.IsTrue(browser.Link(Find.ByText("Дата")).Exists);
 			Assert.IsTrue(browser.Link(Find.ByText("Оператор")).Exists);
@@ -165,7 +165,7 @@ namespace Functional.Drugstore
 			organizaion.Name = "JuridicalOrganization";
 			session.Save(organizaion);
 			Flush();
-			browser.Refresh();
+			Refresh();
 			Click(organizaion.Name);
 			AssertText("Краткое наименование");
 			AssertText(organizaion.Name);
@@ -183,7 +183,7 @@ namespace Functional.Drugstore
 			Css("#JuridicalOrganization_FullName").AppendText("new_JuridicalOrganization_FullName");
 			Click("Создать");
 			AssertText("Юридическое лицо создано");
-			browser.Refresh();
+			Refresh();
 			Open(client);
 			session.Refresh(client);
 			var organ = session.QueryOver<LegalEntity>().Where(e => e.Name == "new_JuridicalOrganization_name").List().Last();

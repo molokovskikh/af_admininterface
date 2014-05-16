@@ -47,10 +47,12 @@ namespace Functional.Suppliers
 			Open("managep.aspx?cc=" + supplier.Id);
 			Click("Удалить");
 			Click("Применить");
-			Close();
 
+			session.Clear();
 			var afterDeleting = session.Query<PriceItem>().Where(i => baseItems.Contains(i.Id)).ToList();
-			var ordersOldUpdate = session.CreateSQLQuery(string.Format("select count(RowId) from ordersold.ordershead where PriceCode ={0};", supplier.Prices[1].Id)).UniqueResult<long?>();
+			var ordersOldUpdate = session
+				.CreateSQLQuery(string.Format("select count(RowId) from ordersold.ordershead where PriceCode ={0};", supplier.Prices[1].Id))
+				.UniqueResult<long?>();
 			Assert.AreEqual(afterDeleting.Count, 0);
 			Assert.AreEqual(ordersOldUpdate, 1);
 		}

@@ -81,6 +81,7 @@ WHERE i.Id IS NULL
 group by pd.pricecode, regions.regioncode, drugstore.Id, le.Id;
 ", filter));
 			prepare(query);
+			query.SetFlushMode(FlushMode.Auto);
 			query.ExecuteUpdate();
 		}
 

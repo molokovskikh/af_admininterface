@@ -225,8 +225,8 @@ namespace AdminInterface.Controllers
 							assigned_to_id = Config.RedmineAssignedTo
 						});
 					}
-					Maintainer.MaintainIntersection(supplier, DbSession);
 					DbSession.Save(supplier);
+					Maintainer.MaintainIntersection(supplier, DbSession);
 					Notify("Регион добавлен");
 					RedirectToAction("Show", new { id = supplier.Id });
 				}

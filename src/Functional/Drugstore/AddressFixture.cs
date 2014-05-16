@@ -162,7 +162,7 @@ namespace Functional.Drugstore
 			// Даем доступ пользователю к адресу доставки
 			browser.CheckBox(Find.ByName("address.AvaliableForUsers[0].Id")).Checked = true;
 			ClickButton("Сохранить");
-			browser.Refresh();
+			Refresh();
 
 			ClickLink(address.Value);
 			// Ищем клиента, к которому нужно передвинуть пользователя и двигаем

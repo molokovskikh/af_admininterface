@@ -58,7 +58,7 @@ namespace Functional.Billing
 			Wait(() => session.Query<PayerAuditRecord>()
 				.Any(r => r.Comment == "TestComment" && r.Payer == _payer),
 				String.Format("не дождался сохранения сообщения {0}", _payer.Id));
-			browser.Refresh();
+			Refresh();
 			AssertText("TestComment");
 		}
 
@@ -83,7 +83,7 @@ namespace Functional.Billing
 			Assert.IsFalse(accounted.Enabled);
 			Assert.That(browser.Text, !Is.StringContaining("Это поле необходимо заполнить."));
 			WaitForText(DateTime.Now.AddMonths(1).ToShortDateString());
-			browser.Refresh();
+			Refresh();
 			WaitForText("Check_free_accounting");
 			AssertText(DateTime.Now.AddMonths(1).ToShortDateString());
 		}
@@ -100,7 +100,7 @@ namespace Functional.Billing
 			Wait(() => session.Query<PayerAuditRecord>()
 				.Any(r => r.Comment == "Check_report_status_test" && r.Payer == _payer),
 				String.Format("не дождался сохранения сообщения {0}", _payer.Id));
-			browser.Refresh();
+			Refresh();
 			AssertText("Check_report_status_test");
 		}
 

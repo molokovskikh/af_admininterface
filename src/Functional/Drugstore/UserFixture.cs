@@ -83,7 +83,7 @@ namespace Functional.Drugstore
 			client = session.Load<Client>(client.Id);
 			Assert.That(client.Users.Count, Is.GreaterThan(0));
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
-			browser.Refresh();
+			Refresh();
 			var userLink = browser.Link(Find.ByText(client.Users[0].Login));
 			Assert.IsTrue(userLink.Exists);
 			userLink.Click();
@@ -189,7 +189,7 @@ namespace Functional.Drugstore
 			Assert.That(user.HaveUin(), Is.True);
 			session.Flush();
 
-			browser.Refresh();
+			Refresh();
 			ClickLink(user.Login);
 			ClickButton("Сбросить УИН");
 			AssertText("Это поле необходимо заполнить.");
@@ -214,7 +214,7 @@ namespace Functional.Drugstore
 				Directory.CreateDirectory(directory);
 			var file = File.Create(preparedDataPath);
 
-			browser.Refresh();
+			Refresh();
 
 			Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.True);
 			ClickButton("Удалить подготовленные данные");
@@ -519,7 +519,7 @@ namespace Functional.Drugstore
 			AssertText("Регистрационная карта ");
 			var login = Helper.GetLoginFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
-			browser.Refresh();
+			Refresh();
 			ClickLink(login.ToString());
 			Click("Настройка");
 			// Проверяем, чтобы были доступны нужные регионы. Берем с первого региона, т.к. галку с нулевого сняли

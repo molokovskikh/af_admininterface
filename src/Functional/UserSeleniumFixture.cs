@@ -37,8 +37,7 @@ namespace Functional
 			ClickButton("Сохранить");
 			AssertText("Сохранено");
 
-			Close();
-
+			session.Clear();
 			Assert.IsNotNull(session.Get<Client>(_client.Id).Settings.BuyingMatrix);
 		}
 	}
