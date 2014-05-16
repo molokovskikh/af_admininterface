@@ -16,7 +16,7 @@ namespace Functional.Billing
 	{
 		private Client client;
 
-		public void BaseSearchBy(Browser browser, string radioButtonId, string searchText)
+		public void BaseSearchBy(string radioButtonId, string searchText)
 		{
 			browser.TextField(Find.ByName("SearchBy.BeginDate")).TypeText("01.01.2009");
 			browser.RadioButton(radioButtonId).Checked = true;
@@ -30,41 +30,36 @@ namespace Functional.Billing
 		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByUser()
 		{
-			using (var browser = Open("Billing/Accounting?tab=AccountingHistory")) {
-				BaseSearchBy(browser, "SearchByUser", "Аптека");
-			}
+			Open("Billing/Accounting?tab=AccountingHistory");
+			BaseSearchBy("SearchByUser", "Аптека");
 		}
 
 		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByAddress()
 		{
-			using (var browser = Open("Billing/Accounting?tab=AccountingHistory")) {
-				BaseSearchBy(browser, "SearchByAddress", "офис");
-			}
+			Open("Billing/Accounting?tab=AccountingHistory");
+			BaseSearchBy("SearchByAddress", "офис");
 		}
 
 		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByClient()
 		{
-			using (var browser = Open("Billing/Accounting?tab=AccountingHistory")) {
-				BaseSearchBy(browser, "SearchByClient", "аптека");
-			}
+			Open("Billing/Accounting?tab=AccountingHistory");
+			BaseSearchBy("SearchByClient", "аптека");
 		}
 
 		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByPayer()
 		{
-			using (var browser = Open("Billing/Accounting?tab=AccountingHistory")) {
-				BaseSearchBy(browser, "SearchByPayer", "офис");
-			}
+			Open("Billing/Accounting?tab=AccountingHistory");
+			BaseSearchBy("SearchByPayer", "офис");
 		}
 
 		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByAuto()
 		{
-			using (var browser = Open("Billing/Accounting?tab=AccountingHistory")) {
-				BaseSearchBy(browser, "Autosearch", "офис");
-			}
+			Open("Billing/Accounting?tab=AccountingHistory");
+			BaseSearchBy("Autosearch", "офис");
 		}
 
 		[Test,
@@ -95,10 +90,9 @@ namespace Functional.Billing
 				addr.AvaliableForUsers = new List<User> { client.Users[0] };
 				session.Save(addr);
 			}
-			using (var browser = Open("Billing/Accounting")) {
-				Assert.That(browser.Text, Is.Not.StringContaining(client.Addresses[0].Value));
-				AssertText(client.Addresses[1].Value);
-			}
+			Open("Billing/Accounting");
+			Assert.That(browser.Text, Is.Not.StringContaining(client.Addresses[0].Value));
+			AssertText(client.Addresses[1].Value);
 		}
 
 

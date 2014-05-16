@@ -711,21 +711,19 @@ namespace Functional.Drugstore
 			var user = oldClient.Users[0];
 			newClient.Name += newClient.Id.ToString();
 			session.SaveOrUpdate(newClient);
-			Flush();
 
-			using (var browser = Open("users/{0}/edit", user.Id)) {
-				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
-				browser.Button(Find.ById("SearchClientButton")).Click();
-				Thread.Sleep(2000);
-				Assert.IsTrue(browser.SelectList(Find.ById("clientsList")).Exists);
-				Assert.That(browser.SelectList(Find.ById("clientsList")).Options.Count, Is.GreaterThan(0));
+			Open("users/{0}/edit", user.Id);
+			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
+			browser.Button(Find.ById("SearchClientButton")).Click();
+			Thread.Sleep(2000);
+			Assert.IsTrue(browser.SelectList(Find.ById("clientsList")).Exists);
+			Assert.That(browser.SelectList(Find.ById("clientsList")).Options.Count, Is.GreaterThan(0));
 
-				Assert.IsTrue(browser.Button(Find.ByValue("Отмена")).Exists);
-				Assert.IsTrue(browser.Button(Find.ByValue("Переместить")).Exists);
+			Assert.IsTrue(browser.Button(Find.ByValue("Отмена")).Exists);
+			Assert.IsTrue(browser.Button(Find.ByValue("Переместить")).Exists);
 
-				ClickButton("Переместить");
-				AssertText("Пользователь успешно перемещен");
-			}
+			ClickButton("Переместить");
+			AssertText("Пользователь успешно перемещен");
 
 			session.Refresh(oldClient);
 			session.Refresh(newClient);
