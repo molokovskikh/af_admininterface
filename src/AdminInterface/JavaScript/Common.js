@@ -8,11 +8,6 @@
 	$('.input-date').each(function () {
 		$(this).mask("99.99.9999");
 	});
-	/*
-	$('.input-sum').each(function () {
-	$(this).mask("999999999,99");
-	});
-	*/
 	$("form.accountant-friendly input[type=text],form.accountant-friendly select,form.accountant-friendly textarea").keydown(function (e) {
 		if (event.keyCode == 13) {
 			var items = $(this).parents("form").find("input[type=text],select,textarea");

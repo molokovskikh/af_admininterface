@@ -11,6 +11,7 @@ configPaths = {
 	"edit-payment": "src/AdminInterface/Assets/Javascripts/EditPayment",
 	"filter": "src/AdminInterface/Assets/Javascripts/filter",
 	"payer-search": "src/AdminInterface/Javascript/payer.search",
+	"region-editor": "src/Common.Web.UI/Common.Web.UI/Assets/Content/Javascripts/region-editor",
 }
 configPaths[name + "-test"] = "test/" + name;
 
@@ -46,6 +47,9 @@ require.config({
 		},
 		"payer-search": {
 			deps: ["jquery"],
+		},
+		"region-editor": {
+			deps: ["jquery"]
 		},
 	},
 	paths: configPaths
