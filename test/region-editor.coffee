@@ -6,5 +6,5 @@ define ["region-editor"], ->
 
 		test "request confirmation", ->
 			ShowRegions()
-			regionId = $("#RegionsTableBody input[type=hidden").val()
+			regionId = $("#RegionsTableBody input[type=hidden]").val()
 			equal regionId, "144115188075855872"
