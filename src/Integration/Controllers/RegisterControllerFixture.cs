@@ -81,7 +81,7 @@ namespace Integration.Controllers
 
 			var paymentOptions = new PaymentOptions { WorkForFree = true };
 
-			controller.Registered(payer, paymentOptions, false);
+			controller.Registered(payer, paymentOptions, false, "");
 
 			Assert.That(session.Load<Payer>(payer.Id).Comment, Is.EqualTo("ata\r\nКлиент обслуживается бесплатно"));
 		}
@@ -162,7 +162,7 @@ namespace Integration.Controllers
 		[Test]
 		public void Register_payer()
 		{
-			controller.RegisterPayer(0, false);
+			controller.RegisterPayer(0, false, "");
 
 			var payer = (Payer)ControllerContext.PropertyBag["Instance"];
 			Assert.That(payer, Is.Not.Null);
@@ -175,7 +175,7 @@ namespace Integration.Controllers
 				Name = "Тестовый плательщик",
 				JuridicalName = "Тестовый плательщик"
 			};
-			controller.Registered(newPayer, new PaymentOptions(), false);
+			controller.Registered(newPayer, new PaymentOptions(), false, "");
 
 			Assert.That(newPayer.Id, Is.Not.EqualTo(0));
 			Assert.That(newPayer.JuridicalOrganizations.Count, Is.EqualTo(1));
@@ -194,7 +194,7 @@ namespace Integration.Controllers
 			var newPayer = new Payer {
 				Name = "Тестовый плательщик" + rnd.Next()
 			};
-			controller.Registered(newPayer, new PaymentOptions(), false);
+			controller.Registered(newPayer, new PaymentOptions(), false, "");
 			controller.SearchPayers("тестовый");
 			var allPayers = (IEnumerable<Payer>)ControllerContext.PropertyBag["payers"];
 			Assert.That(allPayers.Count(p => p.Name == newPayer.Name && p.Id == newPayer.Id), Is.EqualTo(1));
