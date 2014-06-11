@@ -50,9 +50,8 @@ namespace Functional
 				Value = 111
 			};
 			session.Save(markup);
-			session.Flush();
-			Open("Main/Index");
 
+			Open("Main/Index");
 			ClickLink("Регионы");
 			AssertText("Регионы");
 			Click("Воронеж");
@@ -77,7 +76,7 @@ namespace Functional
 			ClickLink("Регионы");
 			AssertText("Регионы");
 			Click("Курск");
-			session.Flush();
+
 			var suppliersMarkup = session.Query<Markup>().Where(m => m.RegionId == 4 && m.Type == 0).ToList();
 			var drugstoreMarkup = session.Query<Markup>().Where(m => m.RegionId == 4 && m.Type == 1).ToList();
 			Assert.That(suppliersMarkup.Count, Is.EqualTo(3));

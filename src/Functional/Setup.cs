@@ -25,6 +25,7 @@ namespace Functional
 		{
 			_webServer.ShutDown();
 			SeleniumFixture.GlobalTearDown();
+			WatinFixture2.GlobalCleanup();
 		}
 	}
 }
