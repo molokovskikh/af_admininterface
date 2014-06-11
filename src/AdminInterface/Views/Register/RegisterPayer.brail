@@ -37,6 +37,7 @@ end
 <form id="PayerInfo" action="registered" method="post">
 	<input type="hidden" name="showRegistrationCard" value="${showRegistrationCard}" />
 	${FormHelper.HiddenField("Instance.Id")}
+	${FormHelper.HiddenField("passwordId")}
 
 <table style="width:800px;">
 	${WriteInputGroupHeader("Юридическое лицо")}

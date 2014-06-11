@@ -166,7 +166,7 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		public void Report(uint id, bool isPasswordChange)
+		public void Report(uint id, bool isPasswordChange, string passwordId)
 		{
 			CancelLayout();
 
@@ -174,7 +174,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["user"] = DbSession.Load<User>(id);
 			PropertyBag["IsPasswordChange"] = isPasswordChange;
 			PropertyBag["defaults"] = Defaults;
-			PropertyBag["password"] = Flash["password"] ?? Session["password"];
+			PropertyBag["password"] = Session[passwordId];
 		}
 
 		public void Stat(DateTime? from, DateTime? to)

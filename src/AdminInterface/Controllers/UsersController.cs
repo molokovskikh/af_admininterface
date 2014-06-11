@@ -238,6 +238,8 @@ namespace AdminInterface.Controllers
 			service.AddUser(user);
 			user.Setup();
 			var password = user.CreateInAd();
+			var passwordId = Guid.NewGuid().ToString();
+			Session[passwordId] = passwordId;
 			if (string.IsNullOrEmpty(jsonSource)) {
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
 				user.OrderRegionMask = regionSettings.GetOrderMask();
@@ -257,7 +259,7 @@ namespace AdminInterface.Controllers
 				address.SaveAndFlush();
 				address.Maintain();
 			}
-			DbSession.SaveOrUpdate(service);
+			DbSession.Save(service);
 
 			if (address != null)
 				address.CreateFtpDirectory();
@@ -310,8 +312,7 @@ namespace AdminInterface.Controllers
 				}
 			}
 			else if (string.IsNullOrEmpty(jsonSource)) {
-				Flash["password"] = password;
-				Redirect("main", "report", new { id = user.Id });
+				Redirect("main", "report", new { id = user.Id, passwordId });
 			}
 			else {
 				Response.StatusCode = 200;
@@ -402,7 +403,7 @@ namespace AdminInterface.Controllers
 			if (changeLogin)
 				user.Login = user.Id.ToString();
 			DbSession.Save(user);
-			AuditRecord.PasswordChange(user, isFree, reason).Save();
+			DbSession.Save(AuditRecord.PasswordChange(user, isFree, reason));
 
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 
@@ -429,8 +430,9 @@ namespace AdminInterface.Controllers
 				RedirectTo(user, "Edit");
 			}
 			else {
-				Flash["password"] = password;
-				Redirect("main", "report", new { id = user.Id, isPasswordChange = true });
+				var passwordId = Guid.NewGuid().ToString();
+				Session[passwordId] = user.Id;
+				Redirect("main", "report", new { id = user.Id, isPasswordChange = true, passwordId });
 			}
 		}
 

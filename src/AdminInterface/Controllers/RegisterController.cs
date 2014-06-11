@@ -83,9 +83,6 @@ namespace AdminInterface.Controllers
 			string additionalEmailsForSendingCard,
 			string comment)
 		{
-			User user;
-			string password;
-
 			var supplier = new Supplier();
 			supplier.RegionMask = regionSettings.GetBrowseMask();
 			SetARDataBinder(AutoLoadBehavior.NewRootInstanceIfInvalidKey);
@@ -100,7 +97,7 @@ namespace AdminInterface.Controllers
 			supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
 			supplier.Registration = new RegistrationInfo(Admin);
 
-			user = new User(supplier.Payer, supplier);
+			var user = new User(supplier.Payer, supplier);
 			BindObjectInstance(user, "user");
 
 			if (!IsValid(supplier, user)) {
@@ -155,8 +152,9 @@ namespace AdminInterface.Controllers
 			user.AssignDefaultPermission(DbSession);
 			user.Setup();
 
-			password = user.CreateInAd();
-
+			var password = user.CreateInAd();
+			var passwordId = Guid.NewGuid().ToString();
+			Session[passwordId] = password;
 			supplier.AddBillingComment(comment);
 
 			Mailer.SupplierRegistred(supplier, comment);
@@ -168,15 +166,14 @@ namespace AdminInterface.Controllers
 			DbSession.Save(log);
 
 			if (options.FillBillingInfo) {
-				Session["password"] = password;
 				Redirect("Register", "RegisterPayer", new {
 					id = supplier.Payer.Id,
-					showRegistrationCard = options.ShowRegistrationCard
+					showRegistrationCard = options.ShowRegistrationCard,
+					passwordId
 				});
 			}
 			else if (supplier.Users.Count > 0 && options.ShowRegistrationCard) {
-				Flash["password"] = password;
-				Redirect("main", "report", new { id = supplier.Users.First().Id });
+				Redirect("main", "report", new { id = supplier.Users.First().Id, passwordId });
 			}
 			else {
 				Notify("Регистрация завершена успешно");
@@ -217,6 +214,7 @@ namespace AdminInterface.Controllers
 			string comment)
 		{
 			var password = "";
+			var passwordId = "";
 			var fullName = client.FullName.Replace("№", "N").Trim();
 			var name = client.Name.Replace("№", "N").Trim();
 			var currentPayer = RegisterPayer(options, payer, existingPayerId, name, fullName);
@@ -280,7 +278,9 @@ namespace AdminInterface.Controllers
 				user.UpdateContacts(userContacts);
 				user.RegistredWith(client.Addresses.LastOrDefault());
 
+				passwordId = Guid.NewGuid().ToString();
 				password = user.CreateInAd();
+				Session[passwordId] = password;
 			}
 
 			client.Addresses.Each(a => a.CreateFtpDirectory());
@@ -298,15 +298,17 @@ namespace AdminInterface.Controllers
 				this.Mailer().NotifyBillingAboutClientRegistration(client);
 
 			if (options.FillBillingInfo) {
-				Session["password"] = password;
 				Redirect("Register", "RegisterPayer", new {
 					id = client.Payers.Single().Id,
-					showRegistrationCard = options.ShowRegistrationCard
+					showRegistrationCard = options.ShowRegistrationCard,
+					passwordId
 				});
 			}
 			else if (client.Users.Count > 0 && options.ShowRegistrationCard) {
-				Flash["password"] = password;
-				Redirect("main", "report", new { id = client.Users.First().Id });
+				Redirect("main", "report", new {
+					id = client.Users.First().Id,
+					passwordId
+				});
 			}
 			else {
 				Notify("Регистрация завершена успешно");
@@ -430,9 +432,9 @@ WHERE   pricesdata.firmcode = s.Id
 			DbSession.Save(owner);
 		}
 
-		public void RegisterPayer(uint id, bool showRegistrationCard)
+		public void RegisterPayer(uint id, bool showRegistrationCard, string passwordId)
 		{
-			var payer = Payer.TryFind(id);
+			var payer = DbSession.Get<Payer>(id);
 			if (payer == null) {
 				payer = new Payer {
 					Orgs = {
@@ -446,12 +448,14 @@ WHERE   pricesdata.firmcode = s.Id
 			PropertyBag["JuridicalOrganization"] = payer.Orgs.First();
 			PropertyBag["showRegistrationCard"] = showRegistrationCard;
 			PropertyBag["PaymentOptions"] = new PaymentOptions();
+			PropertyBag["passwordId"] = passwordId;
 		}
 
 		public void Registered(
 			[ARDataBind("Instance", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Payer payer,
 			[DataBind("PaymentOptions")] PaymentOptions paymentOptions,
-			bool showRegistrationCard)
+			bool showRegistrationCard,
+			string passwordId)
 		{
 			if (payer.Id == 0)
 				payer.Init(Admin);
@@ -479,8 +483,12 @@ WHERE   pricesdata.firmcode = s.Id
 			else
 				this.Mailer().PayerRegistred(payer).Send();
 
-			if (showRegistrationCard && client != null && client.Users.Count > 0)
-				RedirectToUrl(String.Format("~/main/report?id={0}", client.Users.First().Id));
+			if (showRegistrationCard && client != null && client.Users.Count > 0) {
+				Redirect("main", "report", new {
+					id = client.Users.First().Id,
+					passwordId
+				});
+			}
 			else if (client != null)
 				RedirectTo(client);
 			else if (supplier != null)
