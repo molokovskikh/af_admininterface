@@ -82,6 +82,18 @@ namespace AdminInterface.Models
 		bool DisabledByParent { get; }
 	}
 
+	public class PasswordCreation
+	{
+		public PasswordCreation(string password, string passwordId)
+		{
+			Password = password;
+			PasswordId = passwordId;
+		}
+
+		public string Password;
+		public string PasswordId;
+	}
+
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Пользователь")]
 	public class User : IEnablable, IDisabledByParent, IChangesNotificationAware, IMultiAuditable
 	{
@@ -428,13 +440,24 @@ namespace AdminInterface.Models
 			return log.IsChangedByOneSelf();
 		}
 
-		public virtual string CreateInAd()
+		public virtual PasswordCreation ChangePassword(IDictionary session)
 		{
+			var passwordId = Guid.NewGuid().ToString();
+			var password = UserCommon.GeneratePassword();
+			ADHelper.ChangePassword(Login, password);
+			session[passwordId] = password;
+			return new PasswordCreation(passwordId, passwordId);
+		}
+
+		public virtual PasswordCreation CreateInAd(IDictionary session)
+		{
+			var passwordId = Guid.NewGuid().ToString();
 			var password = UserCommon.GeneratePassword();
 			ADHelper.CreateUserInAD(Login,
 				password,
 				RootService.Id);
-			return password;
+			session[passwordId] = password;
+			return new PasswordCreation(passwordId, passwordId);
 		}
 
 		public static string GetTempLogin()

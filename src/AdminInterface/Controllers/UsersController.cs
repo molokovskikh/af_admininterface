@@ -237,9 +237,7 @@ namespace AdminInterface.Controllers
 
 			service.AddUser(user);
 			user.Setup();
-			var password = user.CreateInAd();
-			var passwordId = Guid.NewGuid().ToString();
-			Session[passwordId] = passwordId;
+			var password = user.CreateInAd(Session);
 			if (string.IsNullOrEmpty(jsonSource)) {
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
 				user.OrderRegionMask = regionSettings.GetOrderMask();
@@ -275,7 +273,7 @@ namespace AdminInterface.Controllers
 					user.Id,
 					user.Name,
 					user.AvaliableAddresses.Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
-				new AuditRecord(message, user.Client) { MessageType = LogMessageType.System }.Save();
+				DbSession.Save(new AuditRecord(message, user.Client) { MessageType = LogMessageType.System });
 			}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
@@ -285,18 +283,14 @@ namespace AdminInterface.Controllers
 				var contactEmails = contacts
 					.Where(c => c.Type == ContactType.Email)
 					.Implode(c => c.ContactText);
-				mails = String.Concat(contactEmails, ",", mails);
-				if (mails.EndsWith(","))
-					mails = mails.Remove(mails.Length - 1);
-				if (mails.StartsWith(","))
-					mails = mails.Substring(1, mails.Length - 1);
 				var smtpId = ReportHelper.SendClientCard(user,
-					password,
+					password.Password,
 					false,
 					Defaults,
+					contactEmails,
 					mails);
-				passwordChangeLog.SetSentTo(smtpId, mails);
-				DbSession.SaveOrUpdate(passwordChangeLog);
+				passwordChangeLog.SetSentTo(smtpId, new[] { mails, contactEmails }.Where(s => !String.IsNullOrWhiteSpace(s)).Implode());
+				DbSession.Save(passwordChangeLog);
 
 				Notify("Пользователь создан");
 
@@ -312,7 +306,7 @@ namespace AdminInterface.Controllers
 				}
 			}
 			else if (string.IsNullOrEmpty(jsonSource)) {
-				Redirect("main", "report", new { id = user.Id, passwordId });
+				Redirect("main", "report", new { id = user.Id, passwordId = password.PasswordId });
 			}
 			else {
 				Response.StatusCode = 200;
@@ -392,35 +386,32 @@ namespace AdminInterface.Controllers
 		{
 			var user = DbSession.Load<User>(userId);
 			user.CheckLogin();
-			var administrator = Admin;
-			var password = UserCommon.GeneratePassword();
 
-			ADHelper.ChangePassword(user.Login, password);
-			if (changeLogin)
+			var password = user.ChangePassword(Session);
+			if (changeLogin) {
 				ADHelper.RenameUser(user.Login, user.Id.ToString());
-
-			user.ResetUin();
-			if (changeLogin)
 				user.Login = user.Id.ToString();
-			DbSession.Save(user);
-			DbSession.Save(AuditRecord.PasswordChange(user, isFree, reason));
+			}
+			user.ResetUin();
 
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
-
 			if (isSendClientCard) {
 				var smtpId = ReportHelper.SendClientCard(
 					user,
-					password,
+					password.Password,
 					false,
 					Defaults,
 					emailsForSend);
 				passwordChangeLog.SetSentTo(smtpId, emailsForSend);
 			}
 
+			DbSession.Save(user);
+			DbSession.Save(AuditRecord.PasswordChange(user, isFree, reason));
 			DbSession.Save(passwordChangeLog);
-			NotificationHelper.NotifyAboutPasswordChange(administrator,
+
+			NotificationHelper.NotifyAboutPasswordChange(Admin,
 				user,
-				password,
+				password.Password,
 				isFree,
 				Context.Request.UserHostAddress,
 				reason);
@@ -430,9 +421,7 @@ namespace AdminInterface.Controllers
 				RedirectTo(user, "Edit");
 			}
 			else {
-				var passwordId = Guid.NewGuid().ToString();
-				Session[passwordId] = user.Id;
-				Redirect("main", "report", new { id = user.Id, isPasswordChange = true, passwordId });
+				Redirect("main", "report", new { id = user.Id, isPasswordChange = true, passwordId = password.PasswordId });
 			}
 		}
 

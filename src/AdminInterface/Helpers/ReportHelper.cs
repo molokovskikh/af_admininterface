@@ -99,6 +99,8 @@ namespace AdminInterface.Helpers
 						message.Attachments.Add(new Attachment(Path.Combine(Global.Config.DocsPath, "Инструкция по установке.doc")));
 					foreach (var mail in mails)
 						EmailHelper.BuildAttachementFromString(mail, message);
+					if (message.To.Count == 0)
+						return 0;
 
 					return Func.Send(message);
 			}

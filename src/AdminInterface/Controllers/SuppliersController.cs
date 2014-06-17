@@ -143,7 +143,7 @@ namespace AdminInterface.Controllers
 			}
 			Notify("Сохранено");
 
-			new AuditRecord(logMessage.ToString(), supplier) { MessageType = LogMessageType.System }.Save();
+			DbSession.Save(new AuditRecord(logMessage.ToString(), supplier) { MessageType = LogMessageType.System });
 
 			RedirectToReferrer();
 		}

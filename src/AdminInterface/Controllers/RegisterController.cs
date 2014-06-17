@@ -19,6 +19,7 @@ using Common.Web.Ui.Helpers;
 using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
+using NHibernate;
 using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
@@ -143,6 +144,7 @@ namespace AdminInterface.Controllers
 
 			DbSession.Flush();
 
+			RegionalData.AddForSuppler(DbSession, supplier.Id, supplier.RegionMask);
 			CreateSupplier(supplier);
 			Maintainer.MaintainIntersection(supplier, DbSession);
 
@@ -152,9 +154,7 @@ namespace AdminInterface.Controllers
 			user.AssignDefaultPermission(DbSession);
 			user.Setup();
 
-			var password = user.CreateInAd();
-			var passwordId = Guid.NewGuid().ToString();
-			Session[passwordId] = password;
+			var password = user.CreateInAd(Session);
 			supplier.AddBillingComment(comment);
 
 			Mailer.SupplierRegistred(supplier, comment);
@@ -162,18 +162,21 @@ namespace AdminInterface.Controllers
 
 			var log = new PasswordChangeLogEntity(user.Login);
 			if (options.SendRegistrationCard)
-				log = SendRegistrationCard(log, user, password, additionalEmailsForSendingCard);
+				log = SendRegistrationCard(log, user, password.Password, additionalEmailsForSendingCard);
 			DbSession.Save(log);
 
 			if (options.FillBillingInfo) {
 				Redirect("Register", "RegisterPayer", new {
 					id = supplier.Payer.Id,
 					showRegistrationCard = options.ShowRegistrationCard,
-					passwordId
+					passwordId = password.PasswordId
 				});
 			}
 			else if (supplier.Users.Count > 0 && options.ShowRegistrationCard) {
-				Redirect("main", "report", new { id = supplier.Users.First().Id, passwordId });
+				Redirect("main", "report", new {
+					id = supplier.Users.First().Id,
+					passwordId = password.PasswordId
+				});
 			}
 			else {
 				Notify("Регистрация завершена успешно");
@@ -213,8 +216,7 @@ namespace AdminInterface.Controllers
 			string additionalEmailsForSendingCard,
 			string comment)
 		{
-			var password = "";
-			var passwordId = "";
+			PasswordCreation password = null;
 			var fullName = client.FullName.Replace("№", "N").Trim();
 			var name = client.Name.Replace("№", "N").Trim();
 			var currentPayer = RegisterPayer(options, payer, existingPayerId, name, fullName);
@@ -278,22 +280,18 @@ namespace AdminInterface.Controllers
 				user.UpdateContacts(userContacts);
 				user.RegistredWith(client.Addresses.LastOrDefault());
 
-				passwordId = Guid.NewGuid().ToString();
-				password = user.CreateInAd();
-				Session[passwordId] = password;
+				password = user.CreateInAd(Session);
+
+				var log = new PasswordChangeLogEntity(user.Login);
+				if (options.SendRegistrationCard)
+					log = SendRegistrationCard(log, user, password.Password, additionalEmailsForSendingCard);
+				DbSession.Save(log);
 			}
 
 			client.Addresses.Each(a => a.CreateFtpDirectory());
 			client.AddBillingComment(comment);
-
-			if (user != null) {
-				var log = new PasswordChangeLogEntity(user.Login);
-				if (options.SendRegistrationCard)
-					log = SendRegistrationCard(log, user, password, additionalEmailsForSendingCard);
-				DbSession.Save(log);
-			}
-
 			new Mailer(DbSession).ClientRegistred(client, comment, Defaults);
+
 			if (!options.FillBillingInfo)
 				this.Mailer().NotifyBillingAboutClientRegistration(client);
 
@@ -301,13 +299,13 @@ namespace AdminInterface.Controllers
 				Redirect("Register", "RegisterPayer", new {
 					id = client.Payers.Single().Id,
 					showRegistrationCard = options.ShowRegistrationCard,
-					passwordId
+					passwordId = password != null ? password.PasswordId : ""
 				});
 			}
 			else if (client.Users.Count > 0 && options.ShowRegistrationCard) {
 				Redirect("main", "report", new {
 					id = client.Users.First().Id,
-					passwordId
+					passwordId = password.PasswordId
 				});
 			}
 			else {
@@ -403,13 +401,10 @@ WHERE   pricesdata.firmcode = s.Id
 		AND (s.RegionMask & regions.regioncode) > 0
 		AND pricesregionaldata.pricecode is null;";
 
-			ArHelper.WithSession(s => {
-				s.CreateSQLQuery(command)
-					.SetParameter("ClientCode", supplier.Id)
-					.ExecuteUpdate();
-			});
-
-			RegionalData.AddForSuppler(DbSession, supplier.Id, supplier.RegionMask);
+			DbSession.CreateSQLQuery(command)
+				.SetFlushMode(FlushMode.Auto)
+				.SetParameter("ClientCode", supplier.Id)
+				.ExecuteUpdate();
 		}
 
 		private void CreateUser(User user, UserPermission[] permissions, Person[] persons)

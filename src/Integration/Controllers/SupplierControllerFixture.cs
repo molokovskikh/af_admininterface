@@ -6,7 +6,9 @@ using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
 using Common.Tools;
+using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 
 namespace Integration.Controllers
@@ -55,6 +57,21 @@ namespace Integration.Controllers
 			Assert.AreEqual("Ошибка сохранения", (controller.PropertyBag["message"] ?? "").ToString());
 			Errors(supplier.WaybillSource);
 			session.Clear();
+		}
+
+		[Test]
+		public void Add_region()
+		{
+			var region = session.Query<Region>().First(r => r.Id != supplier.Id);
+			Request.HttpMethod = "POST";
+			controller.Params["edit.Region.Id"] = region.Id.ToString();
+			controller.Params["edit.PermitedBy"] = "test";
+			controller.Params["edit.RequestedBy"] = "test";
+			controller.AddRegion(supplier.Id);
+
+			Assert.AreEqual("Регион добавлен", Context.Flash["message"]);
+			var rules = session.Query<ReorderSchedule>().Where(s => s.RegionalData.Region == region).ToArray();
+			Assert.That(rules.Count(), Is.GreaterThan(0));
 		}
 
 		protected void Errors(object source)

@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web;
 using AddUser;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
@@ -19,6 +20,7 @@ using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NHibernate;
+using NHibernate.Hql.Ast.ANTLR;
 using NHibernate.Linq;
 using NUnit.Framework;
 using Rhino.Mocks;
@@ -26,7 +28,7 @@ using Test.Support.log4net;
 
 namespace Integration.Controllers
 {
-	public class CommonUserControllerFuxtire : ControllerFixture
+	public class CommonUserControllerFixture : ControllerFixture
 	{
 		protected UsersController controller;
 		private DateTime begin;
@@ -53,7 +55,7 @@ namespace Integration.Controllers
 	}
 
 	[TestFixture]
-	public class UsersControllerFixture : CommonUserControllerFuxtire
+	public class UsersControllerFixture : CommonUserControllerFixture
 	{
 		private User user1, user2;
 		private Client client;
@@ -73,6 +75,9 @@ namespace Integration.Controllers
 
 			Assert.That(user1.UserUpdateInfo.AFCopyId, Is.Empty);
 			Assert.That(user2.UserUpdateInfo.AFCopyId, Is.EqualTo("12345"));
+
+			var passwordId = HttpUtility.ParseQueryString(new Uri("http://localhost" + Response.RedirectedTo).Query)["passwordId"];
+			Assert.IsNotNull(Context.Session[passwordId]);
 		}
 
 		[Test]
@@ -101,8 +106,25 @@ namespace Integration.Controllers
 			var user = Registred();
 			var logs = session.Query<PasswordChangeLogEntity>().Where(l => l.TargetUserName == user.Login).ToList();
 			Assert.That(logs.Count, Is.EqualTo(1));
-			Assert.That(logs.Single().SentTo, Is.EqualTo("4411@33.ru, hffty@jhg.ru,11@33.ru, hgf@jhgj.ut"));
+			Assert.That(logs.Single().SentTo, Is.EqualTo("11@33.ru, hgf@jhgj.ut, 4411@33.ru, hffty@jhg.ru"));
 			Assert.That(user.Accounting, Is.Not.Null);
+		}
+
+		[Test]
+		public void Show_password_after_registration()
+		{
+			client = DataMother.CreateClientAndUsers();
+			var regionSettings = new[] {
+				new RegionSettings { Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true }
+			};
+			Prepare();
+			controller.Add(new Contact[0], regionSettings, new Person[0], "", false, client.Id, null, null, null);
+
+			Assert.IsTrue(Response.WasRedirected);
+			var passwordId = HttpUtility.ParseQueryString(new Uri("http://localhost" + Response.RedirectedTo).Query)["passwordId"];
+			var password = Context.Session[passwordId];
+			Assert.IsNotNull(password);
+			Assert.AreNotEqual(password, passwordId);
 		}
 
 		[Test]
