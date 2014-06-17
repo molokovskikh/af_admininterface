@@ -37,27 +37,5 @@ namespace AdminInterface.Models.Suppliers
 
 		[Property(NotNull = true)]
 		public virtual string OperativeInfo { get; set; }
-
-		public static void AddForSuppler(ISession dbSession, uint supplierId, ulong newMask)
-		{
-			var supplier = dbSession.Get<Supplier>(supplierId);
-			var supplierRegions = dbSession.Query<Region>().Where(r => (r.Id & newMask) > 0).ToList();
-			var supplierRegionalData = dbSession.Query<RegionalData>().Where(r => r.Supplier == supplier).Select(r => r.Region).ToList();
-			var newRegions = supplierRegions.Where(n => !supplierRegionalData.Contains(n)).ToList();
-			foreach (var newRegion in newRegions) {
-				var regionalData = new RegionalData(newRegion, supplier);
-				dbSession.Save(regionalData);
-				foreach (var value in Enum.GetValues(typeof(DayOfWeek))) {
-					var day = (DayOfWeek)value;
-					var reorderSchedule = new ReorderSchedule(regionalData, day);
-					reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(684000000000);
-					if (day == DayOfWeek.Saturday)
-						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(504000000000);
-					if (day == DayOfWeek.Sunday)
-						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(863400000000);
-					dbSession.Save(reorderSchedule);
-				}
-			}
-		}
 	}
 }

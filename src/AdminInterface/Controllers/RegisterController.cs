@@ -144,7 +144,9 @@ namespace AdminInterface.Controllers
 
 			DbSession.Flush();
 
-			RegionalData.AddForSuppler(DbSession, supplier.Id, supplier.RegionMask);
+			DbSession.Query<Region>()
+				.Where(r => (r.Id & supplier.RegionMask) > 0)
+				.Each(r => supplier.AddRegion(r, DbSession));
 			CreateSupplier(supplier);
 			Maintainer.MaintainIntersection(supplier, DbSession);
 

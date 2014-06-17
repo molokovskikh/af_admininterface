@@ -210,7 +210,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void After_registration_prices_avaliable()
 		{
-			var supplier = DataMother.CreateSupplier(s => s.AddRegion(session.Load<Region>(524288ul)));
+			var supplier = DataMother.CreateSupplier(s => s.AddRegion(session.Load<Region>(524288ul), session));
 			Save(supplier);
 			Flush();
 

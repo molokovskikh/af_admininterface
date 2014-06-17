@@ -484,7 +484,7 @@ namespace Functional.Drugstore
 		public void When_add_region_for_browse_it_must_be_in_intersection()
 		{
 			var region = session.Load<Region>(64UL);
-			var supplier = DataMother.CreateSupplier(s => { s.AddRegion(region); });
+			var supplier = DataMother.CreateSupplier(s => s.AddRegion(region, session));
 			Save(supplier);
 			Flush();
 

@@ -58,7 +58,7 @@ namespace AdminInterface.Controllers
 			if (IsPost) {
 				BindObjectInstance(supplier, "supplier");
 				if (IsValid(supplier)) {
-					DbSession.SaveOrUpdate(supplier);
+					DbSession.Save(supplier);
 					Notify("Сохранено");
 					RedirectToReferrer();
 				}
@@ -215,8 +215,7 @@ namespace AdminInterface.Controllers
 				var contacts = BindObject<Contact[]>("contacts");
 				if (IsValid(edit)) {
 					supplier.MergePerson(ContactGroupType.General, new Person(edit.RequestedBy, contacts));
-					supplier.AddRegion(edit.Region);
-					RegionalData.AddForSuppler(DbSession, supplier.Id, supplier.RegionMask);
+					supplier.AddRegion(edit.Region, DbSession);
 					if (edit.ShouldNotify()) {
 						Mail().RegionAdded(edit);
 						RedminePostIssue(new {
@@ -225,6 +224,7 @@ namespace AdminInterface.Controllers
 							assigned_to_id = Config.RedmineAssignedTo
 						});
 					}
+					DbSession.Save(edit.GetAuditRecord());
 					DbSession.Save(supplier);
 					Maintainer.MaintainIntersection(supplier, DbSession);
 					Notify("Регион добавлен");

@@ -85,6 +85,17 @@ namespace AdminInterface.Models.Suppliers
 				DateTime.Now, admin.Name, admin.Host,
 				Region.Name, PermitedBy, FixedPayAmount, PercentPayAmount, RequestedBy);
 		}
+
+		public AuditRecord GetAuditRecord()
+		{
+			var message = String.Format("Подключен регион: {0}\r\n" +
+				"ФИО согласовавшего включение: {1}\r\n" +
+				"Фиксированная ежемесячная оплата: {2}\r\n" +
+				"Процентная ставка по заказам: {3}\r\n" +
+				"Контактное лицо поставщика: {4}",
+				Region.Name, PermitedBy, FixedPayAmount, PercentPayAmount, RequestedBy);
+			return new AuditRecord(message, supplier);
+		}
 	}
 
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Поставщик")]
@@ -391,17 +402,29 @@ namespace AdminInterface.Models.Suppliers
 			return price;
 		}
 
-		public virtual void AddRegion(Region region)
+		public virtual void AddRegion(Region region, ISession session)
 		{
 			RegionMask |= region.Id;
-			if (RegionalData.All(r => r.Region != region))
-				RegionalData.Add(new RegionalData(region, this));
+			if (RegionalData.All(r => r.Region != region)) {
+				var regionalData = new RegionalData(region, this);
+				RegionalData.Add(regionalData);
+				session.Flush();
+				foreach (var value in Enum.GetValues(typeof(DayOfWeek))) {
+					var day = (DayOfWeek)value;
+					var reorderSchedule = new ReorderSchedule(regionalData, day);
+					reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(684000000000);
+					if (day == DayOfWeek.Saturday)
+						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(504000000000);
+					if (day == DayOfWeek.Sunday)
+						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(863400000000);
+					session.Save(reorderSchedule);
+				}
+			}
 			foreach (var price in Prices) {
 				if (price.RegionalData.All(r => r.Region != region))
 					price.RegionalData.Add(new PriceRegionalData(price, region));
 			}
 		}
-
 
 		public virtual void ChangePayer(Payer payer)
 		{

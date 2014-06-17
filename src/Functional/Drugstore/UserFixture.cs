@@ -741,7 +741,7 @@ namespace Functional.Drugstore
 		]
 		public void After_user_moving_must_be_entries_in_UserPrices()
 		{
-			var supplier = DataMother.CreateSupplier(s => { s.AddRegion(session.Load<Region>(16UL)); });
+			var supplier = DataMother.CreateSupplier(s => s.AddRegion(session.Load<Region>(16UL), session));
 			Save(supplier);
 			var maskRegion = 1UL | 16UL;
 			var newClient = DataMother.CreateTestClientWithAddressAndUser(maskRegion);

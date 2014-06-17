@@ -285,7 +285,7 @@ Where pc.PriceCode = :PriceId1")
 			var region = regions
 				.Except(regions.Where(r => (r.Id & supplier.RegionMask) > 0).Concat(new[] { supplier.HomeRegion }))
 				.First();
-			supplier.AddRegion(region);
+			supplier.AddRegion(region, session);
 
 			Open("managep.aspx?cc={0}", supplier.Id);
 			var table = (Table)Css("#MainContentPlaceHolder_Regions");

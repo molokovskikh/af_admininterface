@@ -56,7 +56,7 @@ namespace Integration.Models
 				FullName = "Тестовый поставщик",
 				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
 			};
-			supplier.AddRegion(session.Query<Region>().First(r => r.DrugsSearchRegion));
+			supplier.AddRegion(session.Query<Region>().First(r => r.DrugsSearchRegion), session);
 			session.Save(supplier);
 
 			var filter = new PayerFilter(session) {

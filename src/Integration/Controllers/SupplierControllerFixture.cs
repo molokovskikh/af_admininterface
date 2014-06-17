@@ -62,14 +62,14 @@ namespace Integration.Controllers
 		[Test]
 		public void Add_region()
 		{
-			var region = session.Query<Region>().First(r => r.Id != supplier.Id);
+			var region = session.Query<Region>().First(r => r.Id != supplier.HomeRegion.Id);
 			Request.HttpMethod = "POST";
 			controller.Params["edit.Region.Id"] = region.Id.ToString();
 			controller.Params["edit.PermitedBy"] = "test";
 			controller.Params["edit.RequestedBy"] = "test";
 			controller.AddRegion(supplier.Id);
 
-			Assert.AreEqual("Регион добавлен", Context.Flash["message"]);
+			Assert.AreEqual("Регион добавлен", Context.Flash["message"].ToString());
 			var rules = session.Query<ReorderSchedule>().Where(s => s.RegionalData.Region == region).ToArray();
 			Assert.That(rules.Count(), Is.GreaterThan(0));
 		}
