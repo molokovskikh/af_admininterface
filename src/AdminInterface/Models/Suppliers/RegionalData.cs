@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
@@ -14,6 +15,7 @@ namespace AdminInterface.Models.Suppliers
 		{
 			ContactInfo = "";
 			OperativeInfo = "";
+			Rules = new List<ReorderSchedule>();
 		}
 
 		public RegionalData(Region region, Supplier supplier)
@@ -37,5 +39,8 @@ namespace AdminInterface.Models.Suppliers
 
 		[Property(NotNull = true)]
 		public virtual string OperativeInfo { get; set; }
+
+		[HasMany(Inverse = true, Cascade = ManyRelationCascadeEnum.AllDeleteOrphan)]
+		public virtual IList<ReorderSchedule> Rules { get; set; }
 	}
 }

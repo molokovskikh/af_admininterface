@@ -408,7 +408,6 @@ namespace AdminInterface.Models.Suppliers
 			if (RegionalData.All(r => r.Region != region)) {
 				var regionalData = new RegionalData(region, this);
 				RegionalData.Add(regionalData);
-				session.Flush();
 				foreach (var value in Enum.GetValues(typeof(DayOfWeek))) {
 					var day = (DayOfWeek)value;
 					var reorderSchedule = new ReorderSchedule(regionalData, day);
@@ -417,7 +416,7 @@ namespace AdminInterface.Models.Suppliers
 						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(504000000000);
 					if (day == DayOfWeek.Sunday)
 						reorderSchedule.TimeOfStopsOrders = TimeSpan.FromTicks(863400000000);
-					session.Save(reorderSchedule);
+					regionalData.Rules.Add(reorderSchedule);
 				}
 			}
 			foreach (var price in Prices) {
