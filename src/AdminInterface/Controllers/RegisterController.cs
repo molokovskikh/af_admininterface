@@ -404,7 +404,7 @@ WHERE   pricesdata.firmcode = s.Id
 		AND pricesregionaldata.pricecode is null;";
 
 			DbSession.CreateSQLQuery(command)
-				.SetFlushMode(FlushMode.Auto)
+				.SetFlushMode(FlushMode.Always)
 				.SetParameter("ClientCode", supplier.Id)
 				.ExecuteUpdate();
 		}

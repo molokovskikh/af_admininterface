@@ -63,6 +63,7 @@ namespace Integration.Controllers
 		public void Add_region()
 		{
 			var region = session.Query<Region>().First(r => r.Id != supplier.HomeRegion.Id);
+			session.Save(DataMother.CreateTestClientWithUser(region));
 			Request.HttpMethod = "POST";
 			controller.Params["edit.Region.Id"] = region.Id.ToString();
 			controller.Params["edit.PermitedBy"] = "test";
@@ -72,6 +73,8 @@ namespace Integration.Controllers
 			Assert.AreEqual("Регион добавлен", Context.Flash["message"].ToString());
 			var rules = session.Query<ReorderSchedule>().Where(s => s.RegionalData.Region == region).ToArray();
 			Assert.That(rules.Count(), Is.GreaterThan(0));
+			var intersections = session.Query<Intersection>().Count(i => i.Price == supplier.Prices[0] && i.Region == region);
+			Assert.That(intersections, Is.GreaterThan(0));
 		}
 
 		protected void Errors(object source)
