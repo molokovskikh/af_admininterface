@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
@@ -49,6 +50,19 @@ namespace Unit.Models
 			Assert.That(user.IsPermissionAssigned(permission), Is.False);
 			user.AssignedPermissions.Add(new UserPermission { Shortcut = "AF" });
 			Assert.That(user.IsPermissionAssigned(permission));
+		}
+
+		[Test]
+		public void Create_password()
+		{
+			var client = new Client(new Payer(""), Data.DefaultRegion);
+			var user = new User(client);
+			client.AddUser(user);
+			var session = new Dictionary<string, object>();
+			var data = user.CreateInAd(session);
+			Assert.IsNotNull(data.Password);
+			Assert.IsNotNull(data.PasswordId);
+			Assert.AreNotEqual(data.Password, data.PasswordId);
 		}
 	}
 }

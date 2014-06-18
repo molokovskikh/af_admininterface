@@ -442,22 +442,27 @@ namespace AdminInterface.Models
 
 		public virtual PasswordCreation ChangePassword(IDictionary session)
 		{
-			var passwordId = Guid.NewGuid().ToString();
-			var password = UserCommon.GeneratePassword();
-			ADHelper.ChangePassword(Login, password);
-			session[passwordId] = password;
-			return new PasswordCreation(passwordId, passwordId);
+			var passwordCreation = CreatePassword(session);
+			ADHelper.ChangePassword(Login, passwordCreation.Password);
+			return passwordCreation;
 		}
 
 		public virtual PasswordCreation CreateInAd(IDictionary session)
 		{
+			var passwordCreation = CreatePassword(session);
+			ADHelper.CreateUserInAD(Login,
+				passwordCreation.Password,
+				RootService.Id);
+			return passwordCreation;
+		}
+
+		private static PasswordCreation CreatePassword(IDictionary session)
+		{
 			var passwordId = Guid.NewGuid().ToString();
 			var password = UserCommon.GeneratePassword();
-			ADHelper.CreateUserInAD(Login,
-				password,
-				RootService.Id);
 			session[passwordId] = password;
-			return new PasswordCreation(passwordId, passwordId);
+			var passwordCreation = new PasswordCreation(password, passwordId);
+			return passwordCreation;
 		}
 
 		public static string GetTempLogin()
