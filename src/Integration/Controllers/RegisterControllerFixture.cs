@@ -231,7 +231,7 @@ namespace Integration.Controllers
 				Assert.AreEqual(schedule.Count, 7);
 				Assert.AreEqual(schedule.Count(s => s.TimeOfStopsOrders == TimeSpan.FromTicks(684000000000)), 5);
 				Assert.AreEqual(schedule.Count(s => s.TimeOfStopsOrders == TimeSpan.FromTicks(504000000000)), 1);
-				Assert.AreEqual(schedule.Count(s => s.TimeOfStopsOrders == TimeSpan.FromTicks(0)), 1);
+				Assert.AreEqual(schedule.Count(s => s.TimeOfStopsOrders == TimeSpan.FromTicks(863400000000)), 1);
 			}
 		}
 
