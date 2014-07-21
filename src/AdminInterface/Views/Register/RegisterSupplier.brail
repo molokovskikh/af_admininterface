@@ -22,7 +22,7 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 		regions = new window.Regions();
 		var view = new window.GroupListView({ regions: selectedRegions });
 		<% for region in regions: %>
-			regions.add({id: ${region.Id}, name: "${region.Name}"});
+			regions.add({id: "${region.Id}", name: "${region.Name}"});
 		<% end %>
 	});
 
