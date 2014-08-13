@@ -59,6 +59,9 @@ namespace AdminInterface.Models.Logs
 		public virtual DateTime? IOLTime { get; set; }
 
 		[Property]
+		public virtual DateTime? AFNetTime { get; set; }
+
+		[Property]
 		public virtual DateTime? LastLogon { get; set; }
 
 		public virtual string GetLastServicesUsage()
@@ -68,6 +71,7 @@ namespace AdminInterface.Models.Logs
 				AOLTime.HasValue ? new LastServicesUsage { Date = AOLTime.Value, ShortServiceName = "AOL" } : null,
 				CITime.HasValue ? new LastServicesUsage { Date = CITime.Value, ShortServiceName = "CI" } : null,
 				IOLTime.HasValue ? new LastServicesUsage { Date = IOLTime.Value, ShortServiceName = "IOL" } : null,
+				AFNetTime.HasValue ? new LastServicesUsage { Date = AFNetTime.Value, ShortServiceName = "AFNet" } : null,
 			};
 			var usage = LastServicesUsage.GetLastUsage(usages);
 			if (usage == null)

@@ -75,43 +75,51 @@
 			<table style="width: 100%">
 			<tr valign="top">
 			<td>
-				<% if userInfo != null: %>
+				<% if userInfo: %>
 				<table cellspacing="0" cellpadding="1">
-				<tr>
-					<td>${"Последний правильный ввод пароля:" if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}</td>
-					<td style="padding-left: 2px;">${userInfo.LastLogOnDate if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}</td>
-				</tr>
-				<tr>
-					<td>${"Последний неправильный ввод пароля:" if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}</td>
-					<td style="padding-left: 2px;">${userInfo.BadPasswordDate if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}</td>
-				</tr>
-				<tr>
-					<td>${"Последнее изменение пароля:" if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}</td>
-					<td style="padding-left: 2px;">${userInfo.LastPasswordChange if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}</td>
-				</tr>
+					<tr>
+						<td>${"Последний правильный ввод пароля:" if userInfo.LastLogOnDate != null}</td>
+						<td style="padding-left: 2px;">${?userInfo.LastLogOnDate}</td>
+					</tr>
+					<tr>
+						<td>${"Последний неправильный ввод пароля:" if userInfo.BadPasswordDate != null}</td>
+						<td style="padding-left: 2px;">!{?userInfo.BadPasswordDate}</td>
+					</tr>
+					<tr>
+						<td>${"Последнее изменение пароля:" if userInfo.LastPasswordChange != null}</td>
+						<td style="padding-left: 2px;">!{?userInfo.LastPasswordChange}</td>
+					</tr>
 				</table>
 				<% end %>
 			</td>
 
 			<td style="padding-left: 5px; width: 50%">
-				<% if (authorizationLog != null): %>
+				<% if authorizationLog: %>
 				<table cellspacing="0" cellpadding="1">
-				<tr>
-					<td>${"Вход в клиентский интерфейс:" if authorizationLog.CITime != null}</td>
-					<td style="padding-left: 2px;">${authorizationLog.CITime if authorizationLog.CITime != null}</td>
-				</tr>
-				<tr>
-					<td>${"Использование PrgData:" if authorizationLog.AFTime != null}</td>
-					<td style="padding-left: 2px;">${authorizationLog.AFTime if authorizationLog.AFTime != null}</td>
-				</tr>
-				<tr>
-					<td>${"Использование AnalitOnline:" if authorizationLog.AOLTime != null}</td>
-					<td style="padding-left: 2px;">${authorizationLog.AOLTime if authorizationLog.AOLTime != null}</td>
-				</tr>
-				<tr>
-					<td>${"Использование Online сервисов:" if authorizationLog.IOLTime != null}</td>
-					<td style="padding-left: 2px;">${authorizationLog.IOLTime if authorizationLog.IOLTime != null}</td>
-				</tr>
+					<tr>
+						<td>!{"Вход в клиентский интерфейс:" if authorizationLog.CITime != null}</td>
+						<td style="padding-left: 2px;">!{?authorizationLog.CITime}</td>
+					</tr>
+					<tr>
+						<td>!{"Использование PrgData:" if authorizationLog.AFTime != null}</td>
+						<td style="padding-left: 2px;">!{?authorizationLog.AFTime}</td>
+					</tr>
+					<tr>
+						<td>!{"Использование AnalitOnline:" if authorizationLog.AOLTime != null}</td>
+						<td style="padding-left: 2px;">!{?authorizationLog.AOLTime}</td>
+					</tr>
+					<tr>
+						<td>!{"Использование Online сервисов:" if authorizationLog.IOLTime != null}</td>
+						<td style="padding-left: 2px;">!{?authorizationLog.IOLTime}</td>
+					</tr>
+					<tr>
+						<td>!{"Использование Online сервисов:" if authorizationLog.IOLTime != null}</td>
+						<td style="padding-left: 2px;">!{?authorizationLog.IOLTime}</td>
+					</tr>
+					<tr>
+						<td>!{"Использование AnalitF.Net:" if authorizationLog.AFNetTime != null}</td>
+						<td style="padding-left: 2px;">!{?authorizationLog.AFNetTime}</td>
+					</tr>
 				</table>
 				<% end %>
 			</td>
