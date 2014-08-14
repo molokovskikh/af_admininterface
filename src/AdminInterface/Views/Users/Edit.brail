@@ -113,10 +113,6 @@
 						<td style="padding-left: 2px;">!{?authorizationLog.IOLTime}</td>
 					</tr>
 					<tr>
-						<td>!{"Использование Online сервисов:" if authorizationLog.IOLTime != null}</td>
-						<td style="padding-left: 2px;">!{?authorizationLog.IOLTime}</td>
-					</tr>
-					<tr>
 						<td>!{"Использование AnalitF.Net:" if authorizationLog.AFNetTime != null}</td>
 						<td style="padding-left: 2px;">!{?authorizationLog.AFNetTime}</td>
 					</tr>
