@@ -57,15 +57,12 @@ namespace Integration.Controllers
 	[TestFixture]
 	public class UsersControllerFixture : CommonUserControllerFixture
 	{
-		private User user1, user2;
-		private Client client;
-
 		[Test]
 		public void Change_user_password()
 		{
-			client = DataMother.CreateClientAndUsers();
-			user1 = client.Users[0];
-			user2 = client.Users[1];
+			var client = DataMother.CreateClientAndUsers();
+			var user1 = client.Users[0];
+			var user2 = client.Users[1];
 			user1.UserUpdateInfo.AFCopyId = "qwerty";
 			session.Save(user1.UserUpdateInfo);
 			user2.UserUpdateInfo.AFCopyId = "12345";
@@ -83,7 +80,7 @@ namespace Integration.Controllers
 		[Test]
 		public void Add_user()
 		{
-			client = DataMother.CreateTestClientWithUser();
+			var client = DataMother.CreateTestClientWithUser();
 			var client1 = DataMother.CreateClientAndUsers();
 			var address = new Address {
 				Client = client,
@@ -113,7 +110,7 @@ namespace Integration.Controllers
 		[Test]
 		public void Show_password_after_registration()
 		{
-			client = DataMother.CreateClientAndUsers();
+			var client = DataMother.CreateClientAndUsers();
 			var regionSettings = new[] {
 				new RegionSettings { Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true }
 			};
@@ -130,7 +127,7 @@ namespace Integration.Controllers
 		[Test]
 		public void Register_user_with_comment()
 		{
-			client = DataMother.CreateTestClientWithUser();
+			var client = DataMother.CreateTestClientWithUser();
 			Prepare();
 			Request.Params.Add("user.Payer.Id", client.Payers.First().Id.ToString());
 			controller.Add(new Contact[0], new[] {
@@ -147,7 +144,7 @@ namespace Integration.Controllers
 		[Test]
 		public void Register_user_for_client_with_multyplay_payers()
 		{
-			client = DataMother.CreateTestClientWithUser();
+			var client = DataMother.CreateTestClientWithUser();
 			var payer = new Payer("Тестовый плательщик");
 			session.Save(payer);
 			client.Payers.Add(payer);
@@ -169,7 +166,7 @@ namespace Integration.Controllers
 		[Test]
 		public void NotRegisterUserAndAddressWithOtherPayer()
 		{
-			client = DataMother.CreateTestClientWithUser();
+			var client = DataMother.CreateTestClientWithUser();
 			var payer = new Payer("Тестовый плательщик");
 			session.Save(payer);
 			client.Payers.Add(payer);
@@ -192,7 +189,7 @@ namespace Integration.Controllers
 		[Test]
 		public void RegisterUserAndAddressWithSamePayerForMultipayerClient()
 		{
-			client = DataMother.CreateTestClientWithUser();
+			var client = DataMother.CreateTestClientWithUser();
 			var payer = new Payer("Тестовый плательщик");
 			session.Save(payer);
 			client.Payers.Add(payer);
@@ -232,27 +229,47 @@ namespace Integration.Controllers
 			session.Save(user);
 			var oldMask = user.OrderRegionMask;
 			controller.Update(user,
-				new Contact[1] {
+				new[] {
 					new Contact {
 						ContactText = "123"
 					}
 				},
-				new Contact[1] {
+				new[] {
 					new Contact {
 						ContactText = "1231"
 					}
 				},
-				new Person[1] {
+				new[] {
 					new Person {
 						Name = "321"
 					}
 				},
-				new Person[1] {
+				new[] {
 					new Person {
 						Name = "4321"
 					}
 				});
 			Assert.That(user.OrderRegionMask, Is.EqualTo(oldMask));
+		}
+
+		[Test]
+		public void Reset_cost_on_edit()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.Users[0];
+			user.Accounting.BeAccounted = true;
+			user.Accounting.Payment = 500;
+			session.Flush();
+
+			user.SubmitOrders = true;
+			user.IgnoreCheckMinOrder = true;
+			controller.SaveSettings(user,
+				Region.GetRegionsByMask(user.WorkRegionMask).Select(r => r.Id).ToArray(),
+				Region.GetRegionsByMask(user.OrderRegionMask).Select(r => r.Id).ToArray());
+
+			Assert.IsTrue(user.FirstTable);
+			Assert.IsFalse(user.Accounting.BeAccounted);
+			Assert.AreEqual(0, user.Accounting.Payment);
 		}
 
 		[Test]

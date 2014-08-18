@@ -25,6 +25,7 @@ using Common.Web.Ui.Models;
 using System.Linq;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
+using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Linq;
 using Newtonsoft.Json;
@@ -524,6 +525,18 @@ namespace AdminInterface.Controllers
 			[DataBind("WorkRegions")] ulong[] workRegions,
 			[DataBind("OrderRegions")] ulong[] orderRegions)
 		{
+			var oldFirstTable = DbSession.OldValue(user, u => u.SubmitOrders)
+				&& DbSession.OldValue(user, u => u.IgnoreCheckMinOrder);
+			if (oldFirstTable != user.FirstTable) {
+				if (user.FirstTable) {
+					user.Accounting.Payment = 0;
+					user.Accounting.BeAccounted = false;
+				}
+				else {
+					user.Accounting.Payment = user.Client.HomeRegion.UserPayment;
+					user.Accounting.BeAccounted = false;
+				}
+			}
 			user.WorkRegionMask = workRegions.Aggregate(0UL, (v, a) => a + v);
 			if(user.Client != null)
 				user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);

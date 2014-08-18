@@ -108,6 +108,7 @@ namespace AdminInterface.Models
 			ShowSupplierCost = true;
 			AssignedPermissions = new List<UserPermission>();
 			AvaliableAddresses = new List<Address>();
+			ShowUsers = new List<User>();
 		}
 
 		public User(Payer payer, Service rootService)
@@ -598,6 +599,8 @@ namespace AdminInterface.Models
 
 		public virtual void UpdateContacts(Contact[] contacts, Contact[] deletedContacts)
 		{
+			if (contacts == null)
+				return;
 			if (ContactGroup == null)
 				AddContactGroup();
 			ContactGroup.UpdateContacts(contacts, deletedContacts);
@@ -610,7 +613,7 @@ namespace AdminInterface.Models
 
 		public virtual void UpdatePersons(Person[] persons, Person[] deletedPersons)
 		{
-			if (persons.Length == 0)
+			if (persons == null || persons.Length == 0)
 				return;
 			if (ContactGroup == null) {
 				AddContactGroup();
