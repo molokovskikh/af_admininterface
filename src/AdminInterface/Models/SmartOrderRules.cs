@@ -74,6 +74,12 @@ namespace AdminInterface.Models
 		[Property, Description("Колонка количество"), Auditable]
 		public virtual string QuantityColumn { get; set; }
 
+		[Property, Description("Код доставки"), Auditable]
+		public virtual string SupplierDeliveryIdColumn { get; set; }
+
+		[Property, Description("Служебные поля"), Auditable]
+		public virtual string ServiceFields { get; set; }
+
 		[Property, Description("Стартовая строка"), Auditable]
 		public virtual int? StartLine { get; set; }
 

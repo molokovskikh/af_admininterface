@@ -160,6 +160,24 @@ ${app.Asset("smart.order.settings.js")}
 								</td>
 							</tr>
 						</table>
+						<div>
+							<div>
+								${app.Label("drugstore.SmartOrderRules.SupplierDeliveryIdColumn")}
+								<div>
+									сопоставляется с полем "код доставки" в личном кабинете по прайс-листу для автозаказа,
+									выбранные адреса доставки используются для формирования заявок,
+									таким образом на основании одной дефектуры можно сформировать заявки на несколько адресов доставки
+								</div>
+								${app.Edit("drugstore.SmartOrderRules.SupplierDeliveryIdColumn")}
+							</div>
+							<div>
+								${app.Label("drugstore.SmartOrderRules.ServiceFields")}
+								<div>
+									перечисляются через запятую и отображаются в отчете по обработке дефектуры
+								</div>
+								${app.Edit("drugstore.SmartOrderRules.ServiceFields")}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
