@@ -23,26 +23,11 @@ namespace AdminInterface.MonoRailExtentions
 {
 	public class AdminInterfaceController : BaseController
 	{
-		private List<MonorailMailer> mailers = new List<MonorailMailer>();
-
 		public AdminInterfaceController()
 		{
 			BeforeAction += (action, context, controller, controllerContext) => {
 				controllerContext.PropertyBag["admin"] = Admin;
 			};
-			AfterAction += (action, context, controller, controllerContext) => {
-				SendMails();
-			};
-		}
-
-		public bool IsProduction
-		{
-			get
-			{
-				return Context.UnderlyingContext != null
-					&& Context.UnderlyingContext.Application != null
-					&& ((WebApplication)Context.UnderlyingContext.ApplicationInstance).Environment == "production";
-			}
 		}
 
 		public DefaultValues Defaults
@@ -68,7 +53,7 @@ namespace AdminInterface.MonoRailExtentions
 		public MonorailMailer Mail()
 		{
 			var m = this.Mailer();
-			mailers.Add(m);
+			Mailers.Add(m);
 			return m;
 		}
 
@@ -94,22 +79,6 @@ namespace AdminInterface.MonoRailExtentions
 				PropertyBag["Items"] = filter.Find();
 			else
 				PropertyBag["Items"] = new List<TItem>();
-		}
-
-		public void SendMails()
-		{
-			if (Context.LastException == null) {
-				foreach (var mailer in mailers) {
-					try {
-						mailer.Send();
-					}
-					catch (Exception e) {
-						if (!IsProduction)
-							throw;
-						Logger.Error("Ошибка при отправке уведомления", e);
-					}
-				}
-			}
 		}
 	}
 }
