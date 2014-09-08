@@ -110,7 +110,7 @@ end
 	%>
 	<% end %>
 
-		${WriteInputGroupHeader("Опции выставки счета")}
+		${WriteInputGroupHeader("Опции выставления счета")}
 					
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", "Выставлять счет:"),
 									app.Edit("Instance.AutoInvoice"))}

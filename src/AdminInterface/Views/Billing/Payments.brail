@@ -420,7 +420,7 @@ function RefreshTotalSum() {
 		${FormHelper.HiddenField("Instance.Id")}
 		<table style="width: 100%">
 
-			${WriteInputGroupHeader("Опции выставки счета")}
+			${WriteInputGroupHeader("Опции выставления счета")}
 		
 			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", "Выставлять счет:"), 
 				app.Edit("Instance.AutoInvoice"))}
