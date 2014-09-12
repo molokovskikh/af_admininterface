@@ -43,21 +43,7 @@ namespace AdminInterface.Queries
 				.OrderByDescending(o => o.WriteTime)
 				.ToList();
 		}
-
-		public IList<AuditRecord> ExecuteUser(User user, ISession session)
-		{
-			var userAudit = session.Query<AuditRecord>()
-				.Where(l => (l.ObjectId == user.Id && l.Type == LogObjectType.User))
-				.Where(l => Types.Contains(l.MessageType))
-				.OrderByDescending(l => l.WriteTime)
-				.Fetch(l => l.Administrator)
-				.ToList();
-			return userAudit.Concat(
-				ForPayer(user.Payer, session)
-					.Where(u => !(u.ShowOnlyPayer && u.Type == LogObjectType.User && u.ObjectId == user.Id)))
-				.OrderByDescending(o => o.WriteTime).ToList();
-		}
-
+		
 		public IList<AuditRecord> Execute(Service service, ISession session)
 		{
 			var serviceAudit = session.Query<AuditRecord>()

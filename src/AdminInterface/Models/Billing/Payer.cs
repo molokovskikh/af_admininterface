@@ -270,10 +270,8 @@ namespace AdminInterface.Models.Billing
 		public virtual IEnumerable<AuditLogRecord> GetAuditLogs()
 		{
 			var messages = ArHelper.WithSession(s => {
-				var usersAuditLogs = Users.SelectMany(u => new MessageQuery(LogMessageType.User, LogMessageType.System).ExecuteUser(u, s));
 				var service = Clients.Select(c => (Service)c).Concat(Suppliers.Select(sup => (Service)sup)).Concat(Addresses.Select(a => (Service)a.Client)).Distinct();
-				var serviceMessages = service.SelectMany(ser => new MessageQuery(LogMessageType.User, LogMessageType.System).Execute(ser, s));
-				return usersAuditLogs.Concat(serviceMessages);
+				return service.SelectMany(ser => new MessageQuery(LogMessageType.User, LogMessageType.System).Execute(ser, s));
 			});
 			return messages.Select(m => new AuditLogRecord {
 				ObjectId = m.ObjectId,
