@@ -197,7 +197,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["client"] = client;
 			PropertyBag["user"] = user;
 			PropertyBag["address"] = client.AddAddress("");
-			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.Base);
+			PropertyBag["permissions"] = UserPermission.FindPermissionsForDrugstore(DbSession);
 			PropertyBag["regions"] = regions;
 			PropertyBag["clientContacts"] = new[] { new Contact(ContactType.Phone, string.Empty), new Contact(ContactType.Email, string.Empty) };
 			PropertyBag["options"] = new AdditionalSettings();

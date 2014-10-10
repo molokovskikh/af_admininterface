@@ -18,7 +18,8 @@ namespace AdminInterface.Models.Security
 		[Description("Права доступа")] Base = 0,
 		AnalitFExcel = 1,
 		AnalitFPrint = 2,
-		SupplierInterface = 3
+		SupplierInterface = 3,
+		DrugstoreInterface = 4
 	}
 
 	[ActiveRecord(Schema = "usersettings")]
@@ -56,6 +57,13 @@ namespace AdminInterface.Models.Security
 		{
 			return session.Query<UserPermission>()
 				.Where(p => p.Type == type)
+				.ToArray();
+		}
+
+		public static UserPermission[] FindPermissionsForDrugstore(ISession session)
+		{
+			return session.Query<UserPermission>()
+				.Where(p => p.Type == UserPermissionTypes.Base || p.Type == UserPermissionTypes.DrugstoreInterface)
 				.ToArray();
 		}
 

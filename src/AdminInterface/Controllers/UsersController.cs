@@ -110,7 +110,7 @@ namespace AdminInterface.Controllers
 					PropertyBag["address"] = new Address { LegalEntity = organizations.First() };
 				}
 				PropertyBag["Organizations"] = organizations;
-				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.Base);
+				PropertyBag["permissions"] = UserPermission.FindPermissionsForDrugstore(DbSession);
 			}
 			else {
 				PropertyBag["singleRegions"] = true;
@@ -496,7 +496,7 @@ namespace AdminInterface.Controllers
 				var setting = user.Client.Settings;
 				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask);
 				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion);
-				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.Base);
+				PropertyBag["permissions"] = UserPermission.FindPermissionsForDrugstore(DbSession);
 				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel);
 				PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint);
 				RenderView("DrugstoreSettings");
