@@ -237,6 +237,7 @@ namespace Functional.Drugstore
 
 			var types = new[] {
 				UserPermissionTypes.Base,
+				UserPermissionTypes.DrugstoreInterface,
 				UserPermissionTypes.AnalitFExcel,
 				UserPermissionTypes.AnalitFPrint
 			};
@@ -264,6 +265,10 @@ namespace Functional.Drugstore
 			session.Refresh(client);
 			session.Refresh(user);
 			Assert.AreEqual(2, client.Users.Count);
+
+			//Поправка при нечетном total
+			if (total % 2 != 0)
+				total++;
 
 			Assert.AreEqual(total / 2, client.Users[0].AssignedPermissions.Count);
 			Assert.AreEqual(total / 2, client.Users[1].AssignedPermissions.Count);
