@@ -37,15 +37,7 @@ Global(
 	Project : "AdminInterface",
 	DeployAlias : "FutureAdm",
 	HumanReadableName : "Административный интерфейс",
-	AdditionalAssemblies : ("Common.Web.UI",),
-	Config: {
-		"packages:update": {
-			@Hints: (
-				"Backbone.js 0.0 c [0.0,0.5.3]",
-				"jQuery 0.0 c [0.0,1.6.4]",
-			)
-		}
-	}
+	AdditionalAssemblies : ("Common.Web.UI",)
 )
 
 #если мы запускаем тесты на сервере не надо загружать проект что бы
