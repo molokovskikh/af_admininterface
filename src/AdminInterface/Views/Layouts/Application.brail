@@ -52,6 +52,8 @@
 
 		${app.CSS("/App_Themes/Main/Main.css")}
 		<% OutputSubView("/SubViews/DefaultJs") %>
+		${app.Asset("globalize/globalize.js")}
+		${app.Asset("jquery.validate.globalize.js")}
 	</head>
 	<body>
 	<% unless ?ShowHeader: %>
