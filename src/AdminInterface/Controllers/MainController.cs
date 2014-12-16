@@ -64,7 +64,7 @@ namespace AdminInterface.Controllers
 
 
 			statuses.OrderProcStatus = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("offdc.adc.analit.net", "OrderProcService"));
-			statuses.PriceProcessorMasterStatus = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("fms.adc.analit.net", "PriceProcessorService"));
+			statuses.PriceProcessorMasterStatus = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("priceprocessor.adc.analit.net", "PriceProcessor"));
 			PropertyBag["StatusServices"] = statuses;
 #else
 			statuses.OrderProcStatus = "";
