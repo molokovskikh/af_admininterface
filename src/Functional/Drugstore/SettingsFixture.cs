@@ -581,34 +581,6 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			AssertText("* не указан ассортиментный прайс-лист для конвертации");
 		}
 
-		[Test]
-		public void Show_smart_order_rule_parser_configuration()
-		{
-			var supplier = DataMother.CreateSupplier(s => {
-				s.Name = "Поставщик для тестирования";
-				s.FullName = "Поставщик для тестирования";
-				s.AddPrice("Ассортиментный прайс", PriceType.Assortment);
-			});
-			session.Save(new ParseAlgorithm("DbfSource"));
-			Save(supplier);
-
-			Css("#drugstore_EnableSmartOrder").Checked = true;
-			SearchV2(Css("#drugstore_SmartOrderRules_ParseAlgorithm"), "DbfSource");
-			Assert.AreEqual("true", IsVisible("#drugstore_SmartOrderRules_CodeColumn"));
-			Assert.AreEqual("false", IsVisible("#drugstore_SmartOrderRules_StartLine"));
-			Click("Сохранить");
-			Assert.AreEqual(Error("#drugstore_SmartOrderRules_QuantityColumn"), "Это поле необходимо заполнить.");
-			Assert.AreEqual(Error("#drugstore_SmartOrderRules_ProductColumn"), "Это поле необходимо заполнить.");
-			SearchV2(Css("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Поставщик для тестирования");
-			Css("#drugstore_SmartOrderRules_ProductColumn").TypeText("F1");
-			Css("#drugstore_SmartOrderRules_QuantityColumn").TypeText("F2");
-			Click("Сохранить");
-			AssertText("Сохранено");
-
-			session.Refresh(settings.SmartOrderRules);
-			Assert.AreEqual(settings.SmartOrderRules.ProductColumn, "F1");
-		}
-
 		private string IsVisible(string selector)
 		{
 			return browser.Eval(String.Format("$(\"{0}\").is(\":visible\");", selector));
