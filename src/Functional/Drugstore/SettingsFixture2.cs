@@ -33,7 +33,6 @@ namespace Functional.Drugstore
 				s.FullName = "Поставщик для тестирования";
 				s.AddPrice("Ассортиментный прайс", PriceType.Assortment);
 			});
-			session.Save(new ParseAlgorithm("DbfSource"));
 			Save(supplier);
 
 			//отключаем

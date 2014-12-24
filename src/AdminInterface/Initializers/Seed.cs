@@ -42,6 +42,11 @@ namespace AdminInterface.Initializers
 						s.Save(supplier);
 					}
 					SecurityContext.GetAdministrator = origin;
+
+					if (!s.Query<ParseAlgorithm>().Any(p => p.Name == "DbfSource")) {
+						s.Save(new ParseAlgorithm("DbfSource"));
+					}
+
 					return admin;
 				});
 			}
