@@ -50,6 +50,7 @@ namespace AdminInterface.Models.Security
 		{
 			return session.Query<UserPermission>()
 				.Where(p => p.AvailableFor == availability && p.AssignDefaultValue)
+				.OrderBy(p => p.OrderIndex).ThenBy(p => p.Name)
 				.ToArray();
 		}
 
@@ -57,6 +58,7 @@ namespace AdminInterface.Models.Security
 		{
 			return session.Query<UserPermission>()
 				.Where(p => p.Type == type)
+				.OrderBy(p => p.OrderIndex).ThenBy(p => p.Name)
 				.ToArray();
 		}
 
@@ -64,6 +66,7 @@ namespace AdminInterface.Models.Security
 		{
 			return session.Query<UserPermission>()
 				.Where(p => p.Type == UserPermissionTypes.Base || p.Type == UserPermissionTypes.DrugstoreInterface)
+				.OrderBy(p => p.OrderIndex).ThenBy(p => p.Name)
 				.ToArray();
 		}
 
