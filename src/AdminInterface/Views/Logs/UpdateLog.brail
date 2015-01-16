@@ -140,7 +140,7 @@
 			<% if filter.ShowLog(): %>
 			<td>
 				<% if log.HaveLog: %>
-				<a id="ShowLogLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, 'ShowDownloadLog?updateLogEntityId=${log.Id}', 'DownloadLog');">
+				<a id="ShowLogLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, 'ShowDownloadLog?updateLogEntityId=${log.Id}&type=${log.Type}', 'DownloadLog');">
 					Лог
 				</a>
 				<% else: %>

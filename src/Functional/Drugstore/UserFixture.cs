@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.ActiveRecordExtentions;
@@ -36,6 +37,28 @@ namespace Functional.Drugstore
 
 			Open(client);
 			AssertText("Клиент");
+		}
+
+		[Test(Description = "Проверка отображения логов analitf-net")]
+		public void Check_AnalitfNet_logs()
+		{
+			var clientLog = new ClientAppLog();
+			clientLog.Text = "bla bla1";
+			clientLog.CreatedOn = DateTime.Now;
+			clientLog.User = client.Users.First();
+			clientLog.Version = "1.11";
+			session.Save(clientLog);
+			var requestLog = new RequestLog();
+			requestLog.Error = "bla bla2";
+			requestLog.User = client.Users.First();
+			requestLog.Version = "1.11";
+			requestLog.CreatedOn = DateTime.Now;
+			session.Save(requestLog);
+			session.Flush();
+			Open("Logs/NewUpdateLog?clientCode={0}", client.Id);
+			AssertText("История обновлений клиента");
+			AssertText("bla bla1");
+			AssertText("bla bla2");
 		}
 
 		[Test]

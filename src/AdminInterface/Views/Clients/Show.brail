@@ -103,6 +103,9 @@ ${app.Asset("Client.js")}
 					<a href="${siteroot}/Logs/UpdateLog?clientCode=${Client.Id}" target="_blank">История обновлений</a>
 				</li>
 				<li>
+					<a href="${siteroot}/Logs/NewUpdateLog?clientCode=${Client.Id}" target="_blank">История обновлений Analitf-net</a>
+				</li>
+				<li>
 					<a href="${siteroot}/Logs/Documents?filter.Client.Id=${Client.Id}" target="_blank">История документов</a>
 				</li>
 				<li>

@@ -33,6 +33,7 @@
 			<% end %>
 			<% if user.Client: %>
 			<li><a href="${siteroot}/Logs/UpdateLog?userId=${user.Id}" target="_blank">История обновлений</a></li>
+			<li><a href="${siteroot}/Logs/NewUpdateLog?userId=${user.Id}" target="_blank">История обновлений Analitf-Net</a></li>
 			<li><a href="${siteroot}/Logs/Documents?filter.User.Id=${user.Id}" target="_blank">История документов</a></li>
 			<li><a href="${siteroot}/Logs/Orders?filter.User.Id=${user.Id}" target="_blank">История заказов</a></li>
 			<li><a href="${siteroot}/Users/${user.Id}/SearchOffers" target="_blank">Поиск предложений</a></li>

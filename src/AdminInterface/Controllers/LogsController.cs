@@ -177,17 +177,85 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 			this.RenderFile(file.GetStorageFileName(Config), file.Filename);
 		}
 
-		public void ShowDownloadLog(uint updateLogEntityId)
+		/// <summary>
+		/// Получение детальной информации о логе в html виде, для таблицы логов
+		/// </summary>
+		/// <param name="updateLogEntityId">Идентификатор лога</param>
+		/// <param name="type">Тип лога, указывающий от какой версии клиента он пришел</param>
+		public void ShowDownloadLog(uint updateLogEntityId, uint type)
 		{
 			CancelLayout();
 
 			PropertyBag["updateLogEnriryId"] = updateLogEntityId;
-			PropertyBag["log"] = DbSession.Load<UpdateLogEntity>(updateLogEntityId).Log;
+			string log;
+			if(type == 1)
+				log = DbSession.Load<ClientAppLog>(updateLogEntityId).Text;
+			else 
+				log = DbSession.Load<UpdateLogEntity>(updateLogEntityId).Log;
+			PropertyBag["log"] = log;
 		}
 
 		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId)
 		{
+			//Эти данные вообще нафиг не нужны - все итак возьмется из фильтра
 			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today, DateTime.Today.AddDays(1));
+		}
+
+		/// <summary>
+		/// Запрос для сортировки
+		/// </summary>
+		/// <param name="updateType"></param>
+		/// <param name="regionMask"></param>
+		/// <param name="clientCode"></param>
+		/// <param name="userId"></param>
+		public void NewUpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId)
+		{
+			//Эти данные вообще нафиг не нужны - все итак возьмется из фильтра
+			NewUpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today, DateTime.Today.AddDays(1));
+		}
+
+		/// <summary>
+		/// История обновлений для пользователей новой версии analit-f
+		/// </summary>
+		/// <param name="updateType"></param>
+		/// <param name="regionMask"></param>
+		/// <param name="clientCode"></param>
+		/// <param name="userId"></param>
+		/// <param name="beginDate"></param>
+		/// <param name="endDate"></param>
+		public void NewUpdateLog(UpdateType? updateType, ulong? regionMask, uint? clientCode, uint? userId,
+				DateTime beginDate, DateTime endDate)
+		{
+			var filter = new UpdateFilter();
+			filter.BeginDate = beginDate;
+			filter.EndDate = endDate;
+
+			if (updateType.HasValue) {
+				filter.UpdateType = updateType;
+				filter.RegionMask = Admin.RegionMask;
+
+				if (regionMask.HasValue)
+					filter.RegionMask &= regionMask.Value;
+			}
+			if (clientCode.HasValue)
+				filter.Client = DbSession.Load<Client>(clientCode.Value);
+			else if (userId.HasValue)
+				filter.User = DbSession.Load<User>(userId.Value);
+
+			BindObjectInstance(filter, "filter");
+
+			if (filter.Client != null)
+				filter.Client = DbSession.Load<Client>(filter.Client.Id);
+
+			if (filter.User != null)
+				filter.User = DbSession.Load<User>(filter.User.Id);
+
+			PropertyBag["beginDate"] = filter.BeginDate;
+			PropertyBag["endDate"] = filter.EndDate;
+			PropertyBag["filter"] = filter;
+			
+			PropertyBag["logEntities"] = filter.FindNewAppLogs(DbSession);
+			RenderView("UpdateLog");
 		}
 
 		public void UpdateLog(UpdateType? updateType, ulong? regionMask, uint? clientCode, uint? userId,
@@ -220,7 +288,7 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 			PropertyBag["beginDate"] = filter.BeginDate;
 			PropertyBag["endDate"] = filter.EndDate;
 			PropertyBag["filter"] = filter;
-			PropertyBag["logEntities"] = filter.Find();
+			PropertyBag["logEntities"] = filter.Find(DbSession);
 		}
 
 		public void Statistics([SmartBinder] StatisticsFilter filter)
