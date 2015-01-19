@@ -46,7 +46,7 @@ namespace AdminInterface.Controllers.Filters
 				{ "Addition", "Addition" },
 				{ "AppVersion", "AppVersion" }
 			};
-			logger = LogManager.GetLogger(typeof (UpdateFilter));
+			logger = LogManager.GetLogger(typeof(UpdateFilter));
 		}
 
 		public IList<UpdateLogView> Find(ISession s)
@@ -204,7 +204,6 @@ namespace AdminInterface.Controllers.Filters
 
 		/// <summary>
 		/// Поиск логов для нового приложения analit-f
-		/// Ищет клиентские логи, парсит их, разбивая на сообщения и сортирует по дате.
 		/// </summary>
 		/// <returns></returns>
 		public IList<UpdateLogView> FindNewAppLogs(ISession DbSession)
@@ -218,34 +217,19 @@ namespace AdminInterface.Controllers.Filters
 			var logs = DbSession.Query<ClientAppLog>().Where(i => (i.User.Client == Client || i.User == User)
 				&& i.CreatedOn > BeginDate.AddMonths(-1) && i.CreatedOn < EndDate.AddMonths(1)).ToList();
 			foreach (var log in logs) {
-				var view = CreateViewFromClientAppLog(log, additionLength);
-				//Если это не одно сообщение в логе, а несколько, то разбиваем его на части
-				//Для разбивки цепляемся за дату - каждое отдельное сообщение начинается с даты
-				var dateRexeg = new Regex(@"[0-9]{2}.[0-9]{2}.[0-9]{4} [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}");
-				var allText = log.Text.TrimStart();
-				var matches = dateRexeg.Matches(allText);
-				if (matches.Count > 0) //тут 0 из-за того, что дата лога не соответсвует дате записей - даже если запись одна, ее нужно парсить
-					for (var i = 0; i < matches.Count; i++) {
-						try {
-							view = CreateViewFromClientAppLog(log, additionLength);
-							var begin = matches[i].Index + matches[i].Value.Length;
-							var end = i + 1 == matches.Count ? allText.Length - 1 : matches[i + 1].Index;
-							var text = allText.Substring(begin, end - begin);
-							view.Addition = text;
-							if (text.Length > additionLength)
-								view.Addition = text.Substring(0, additionLength) + "...";
-							view.RequestTime = DateTime.Parse(matches[i].Value.Substring(0, matches[i].Value.Length - 4));
-								//убираем милисекунды
-							if (view.RequestTime > BeginDate && view.RequestTime < EndDate)
-								result.Add(view);
-						}
-						catch(Exception e) {
-							//Ошибка парсинга
-							logger.Error(String.Format("Ошибка при парсинге клиентского лога для пользователя {0}",log.User),e);
-						}
-					}
-				else if (view.RequestTime > BeginDate && view.RequestTime < EndDate) //Фактически этот вариант не должен случаться никогда, так как у всех логов есть внутри дата
-					result.Add(view);
+				var view = new UpdateLogView();
+				view.Id = log.Id;
+				view.ClientId = log.User.Client.Id;
+				view.ClientName = log.User.Client.Name;
+				view.AppVersion = log.Version;
+				view.RequestTime = log.CreatedOn;
+				view.Addition = log.Text;
+				view.Type = 1;
+				if (log.Text.Length > additionLength) {
+					view.Addition = log.Text.Substring(0, additionLength) + "...";
+					view.HaveLog = true;
+				}
+				result.Add(view);
 			}
 
 			//Теперь имщем серверные записи

@@ -1,4 +1,4 @@
-﻿<tr class=details>
+﻿<tr class="details">
 	<td />
 	<td colspan='100'>
 		<div id='DownloadLog${updateLogEntityId}'>
