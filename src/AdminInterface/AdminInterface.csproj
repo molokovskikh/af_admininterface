@@ -195,7 +195,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-	<Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Components\Bredcrumbs.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\ActsController.cs" />
@@ -210,6 +209,8 @@
     <Compile Include="Controllers\PricesController.cs" />
     <Compile Include="Initializers\Seed.cs" />
     <Compile Include="Models\Core.cs" />
+    <Compile Include="Models\Logs\ClientAppLog.cs" />
+    <Compile Include="Models\Logs\RequestLog.cs" />
     <Compile Include="Models\Markup.cs" />
     <Compile Include="Models\ProducerSynonym.cs" />
     <Compile Include="Models\ProductSynonym.cs" />
@@ -217,6 +218,7 @@
     <Compile Include="Models\Suppliers\RegionalData.cs" />
     <Compile Include="Models\WaybillExcludeFile.cs" />
     <Compile Include="Models\WaybillSource.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\AnalysisOfWorkDrugstores.cs" />
     <Compile Include="Queries\ClientAddressFilter.cs" />
     <Compile Include="Queries\ClientConditionsMonitoring.cs" />

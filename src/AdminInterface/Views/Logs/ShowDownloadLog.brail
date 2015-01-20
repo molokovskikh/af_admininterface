@@ -1,8 +1,8 @@
-﻿<tr class=details>
+﻿<tr class="details">
 	<td />
 	<td colspan='100'>
 		<div id='DownloadLog${updateLogEntityId}'>
-			<pre class='Log'>${log.Replace('\\', '\\\\')}</pre>
+			<pre class='Log'>!{log.Replace('\\', '\\\\')}</pre>
 		</div>
 	</td>
 </tr>
