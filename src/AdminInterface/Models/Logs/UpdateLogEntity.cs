@@ -28,6 +28,17 @@ namespace AdminInterface.Models.Logs
 		[Description("Частичное кумулятивное")] LimitedCumulative = 18,
 		[Description("Частичное асинхронное кумулятивное")] LimitedCumulativeAsync = 19,
 		[Description("Запрос вложений мини-почты")] RequestAttachments = 20,
+
+		//Обновления для нового приложения
+		[Description("Отсутствует")] NoType = 0,
+		[Description("Загрузка накладных")] Waybills = 40,
+		[Description("Загрузка накладных")] WaybillsСontroller = 40,
+		[Description("Загрузка истории заказов")] HistoryController = 41,
+		[Description("Автозаказ")] SmartOrder = 42,
+		[Description("Автозаказ")] BatchController = 42,
+		[Description("Отправка заказов")] OrdersController = 43,
+		[Description("Обратная связь (письмо)")] FeedbackController = 44,
+		[Description("Загрузка вложений минипочты или сертификатов")] DownloadController = 45,
 	}
 
 	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs")]
