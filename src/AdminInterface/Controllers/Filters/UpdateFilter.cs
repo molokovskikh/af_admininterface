@@ -262,7 +262,7 @@ namespace AdminInterface.Controllers.Filters
 
 			//Сортировки нет, так как я нашел серьезный баг в сортировке стандартных логов, который годами не замечался
 			//Из чего я делаю вывод, что сортировка тут вовсе не нужна - по крайней мере пока
-			result = result.OrderBy(i => i.RequestTime).ToList();
+			result = result.OrderByDescending(i => i.RequestTime).ToList();
 			return result;
 		}
 	}
