@@ -34,5 +34,11 @@ namespace AdminInterface.Models.Logs
 	
 		[Property]
 		public virtual string Version { get; set; }
+
+		[Property]
+		public virtual bool IsConfirmed { get; set; }
+		
+		[Property]
+		public virtual string UpdateType { get; set; }
 	}
 }

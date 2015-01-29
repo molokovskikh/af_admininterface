@@ -70,18 +70,18 @@ namespace AdminInterface.Controllers.Filters
 
 			if (UpdateType == Models.Logs.UpdateType.AccessError) {
 				projectionsList.Add(Projections.ProjectionList().Add(Projections.Alias(Projections.SubQuery(DetachedCriteria.For<UpdateLogEntity>("ule")
-					.Add(Expression.EqProperty("ue.User", "ule.User"))
-					.Add(Expression.Eq("ule.Commit", true))
-					.Add(Expression.In("ule.UpdateType", new object[] {
+					.Add(Restrictions.EqProperty("ue.User", "ule.User"))
+					.Add(Restrictions.Eq("ule.Commit", true))
+					.Add(Restrictions.In("ule.UpdateType", new object[] {
 						Models.Logs.UpdateType.Accumulative,
 						Models.Logs.UpdateType.Cumulative,
 						Models.Logs.UpdateType.LimitedCumulative,
 						Models.Logs.UpdateType.AutoOrder,
 						Models.Logs.UpdateType.LoadingDocuments
 					}))
-					.Add(Expression.GtProperty("ule.RequestTime", "ue.RequestTime"))
+					.Add(Restrictions.GtProperty("ule.RequestTime", "ue.RequestTime"))
 					.SetProjection(Projections.ProjectionList()
-						.Add(Projections.Conditional(Expression.Gt(
+						.Add(Projections.Conditional(Restrictions.Gt(
 							Projections.Count(Projections.Property("ule.Id")), 0),
 							Projections.Constant(1),
 							Projections.Constant(0))))),
@@ -221,10 +221,14 @@ namespace AdminInterface.Controllers.Filters
 				view.Id = log.Id;
 				view.ClientId = log.User.Client.Id;
 				view.ClientName = log.User.Client.Name;
+				view.UserId = log.User.Id;
+				view.UserName = log.User.Name;
 				view.AppVersion = log.Version;
 				view.RequestTime = log.CreatedOn;
 				view.Addition = log.Text;
+				view.Commit = true;
 				view.Type = 1;
+				view.UpdateType = Models.Logs.UpdateType.NoType;
 				if (log.Text.Length > additionLength) {
 					view.Addition = log.Text.Substring(0, additionLength) + "...";
 					view.HaveLog = true;
@@ -238,18 +242,27 @@ namespace AdminInterface.Controllers.Filters
 				var view = new UpdateLogView();
 				view.Id = log.Id;
 				view.ClientId = log.User.Client.Id;
+				view.UserId = log.User.Id;
+				view.UserName = log.User.Name;
 				view.ClientName = log.User.Client.Name;
 				view.AppVersion = log.Version;
 				view.RequestTime = log.CreatedOn;
 				view.Addition = log.Error;
+				view.Commit = log.IsConfirmed;
 				view.HaveLog = false;
 				view.Type = 2;
+				view.UpdateType = Models.Logs.UpdateType.NoType;
+				//Парсим тип из строки
+				UpdateType type = view.UpdateType;
+				if (Enum.TryParse(log.UpdateType, true, out type))
+					view.UpdateType = type;
+
 				result.Add(view);
 			}
 
 			//Сортировки нет, так как я нашел серьезный баг в сортировке стандартных логов, который годами не замечался
 			//Из чего я делаю вывод, что сортировка тут вовсе не нужна - по крайней мере пока
-			result = result.OrderBy(i => i.RequestTime).ToList();
+			result = result.OrderByDescending(i => i.RequestTime).ToList();
 			return result;
 		}
 	}
