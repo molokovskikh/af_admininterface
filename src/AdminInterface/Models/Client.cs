@@ -224,7 +224,7 @@ namespace AdminInterface.Models
 				session.CreateSQLQuery(@"
 update usersettings.UserUpdateInfo uui
 	join Customers.Users u on uui.UserId = u.Id
-set uui.AFCopyId = '' 
+set uui.AFCopyId = ''
 where u.ClientId = :clientcode")
 					.SetParameter("clientcode", Id)
 					.ExecuteUpdate());
@@ -417,7 +417,9 @@ select mup.UserId, mup.PriceId, mup.RegionId from
 				return;
 
 			new AuditRecord("Сообщение в биллинг: " + billingMessage, this).Save();
-			var user = Users.First();
+			var user = Users.FirstOrDefault();
+			if (user == null)
+				return;
 			billingMessage = String.Format("О регистрации клиента: {0} ( {1} ), пользователь: {2} ( {3} ): {4}", Id, Name, user.Id, user.Name, billingMessage);
 			Payers.Single().AddComment(billingMessage);
 		}
