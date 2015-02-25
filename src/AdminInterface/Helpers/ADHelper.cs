@@ -16,8 +16,8 @@ using log4net;
 namespace AdminInterface.Helpers
 {
 	/*
-	 * заметки на полях обращение к конкретному хосту 
-	 * LDAP://acdcserv/OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net 
+	 * заметки на полях обращение к конкретному хосту
+	 * LDAP://acdcserv/OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net
 	 * Поиск на конкретном хосте
 	 * using (var searcher = new DirectorySearcher(new DirectoryEntry("LDAP://acdcserv")))
 	 * searcher.Filter = string.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
@@ -319,8 +319,8 @@ namespace AdminInterface.Helpers
 		public static void CreateUserInAD(string login, string password, uint clientCode)
 		{
 #if !DEBUG
-			var root = new DirectoryEntry("LDAP://acdcserv/OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net");
-			var userGroup = new DirectoryEntry("LDAP://acdcserv/CN=Базовая группа клиентов - получателей данных,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net");
+			var root = new DirectoryEntry("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net");
+			var userGroup = new DirectoryEntry("LDAP://CN=Базовая группа клиентов - получателей данных,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net");
 			var user = root.Children.Add("CN=" + login, "user");
 			user.Properties["samAccountName"].Value = login;
 			user.Properties["description"].Value = clientCode.ToString();
