@@ -103,7 +103,12 @@ namespace Integration.Controllers
 			var user = Registred();
 			var logs = session.Query<PasswordChangeLogEntity>().Where(l => l.TargetUserName == user.Login).ToList();
 			Assert.That(logs.Count, Is.EqualTo(1));
-			Assert.That(logs.Single().SentTo, Is.EqualTo("11@33.ru, hgf@jhgj.ut, 4411@33.ru, hffty@jhg.ru"));
+			//Сначала рассылалось все как на контные имейлы, так и на имеелы из специального поля
+			//Ситуация поменялась - теперь мы отправляет только на имейлы из поля
+			//Но проверка все ще нужна - теперь мы хотим убедиться, что на контактные имейлы ничего не приходит
+			//p.s. Так как тут проверяется лог, а не почта - это еще ничего не доказывает, так что это скорее пустой звук,
+			//нежели проверка
+			Assert.That(logs.Single().SentTo, Is.EqualTo("11@33.ru, hgf@jhgj.ut"));
 			Assert.That(user.Accounting, Is.Not.Null);
 		}
 

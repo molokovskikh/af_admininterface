@@ -277,20 +277,15 @@ namespace AdminInterface.Controllers
 				DbSession.Save(new AuditRecord(message, user.Client) { MessageType = LogMessageType.System });
 			}
 
-			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
-				(contacts.Any(contact => contact.Type == ContactType.Email));
+			var haveMails = !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim());
 			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
 			if (sendClientCard && (haveMails || !string.IsNullOrEmpty(user.EmailForCard))) {
-				var contactEmails = contacts
-					.Where(c => c.Type == ContactType.Email)
-					.Implode(c => c.ContactText);
 				var smtpId = ReportHelper.SendClientCard(user,
 					password.Password,
 					false,
 					Defaults,
-					contactEmails,
 					mails);
-				passwordChangeLog.SetSentTo(smtpId, new[] { mails, contactEmails }.Where(s => !String.IsNullOrWhiteSpace(s)).Implode());
+				passwordChangeLog.SetSentTo(smtpId, new[] { mails }.Where(s => !String.IsNullOrWhiteSpace(s)).Implode());
 				DbSession.Save(passwordChangeLog);
 
 				Notify("Пользователь создан");
