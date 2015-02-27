@@ -46,6 +46,10 @@
 
 		<div class=block>
 			<h3>
+				<input id="sendSms" name="sendSms" type="checkbox" checked="checked" />
+				<label>Отправить пароль при помощи SMS:</label>
+			</h3>
+			<h3>
 				<input id="sendClientCard" name="sendClientCard" type="checkbox" checked="checked" />
 				<label>Отправлять регистрационную карту на E-mail:</label>
 			</h3>

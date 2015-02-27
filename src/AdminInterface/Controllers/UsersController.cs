@@ -202,7 +202,8 @@ namespace AdminInterface.Controllers
 			uint clientId,
 			string mails,
 			string jsonSource,
-			User userJson)
+			User userJson,
+			bool sendSms = false)
 		{
 			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
 			DbSession.Get<Client>(clientId);
@@ -247,6 +248,7 @@ namespace AdminInterface.Controllers
 				user.WorkRegionMask = BitConverter.ToUInt64(userJson.RegionSettings.Select(Convert.ToByte).ToArray(), 0);
 				mails = user.EmailForCard;
 			}
+
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 			DbSession.Save(passwordChangeLog);
 			user.UpdateContacts(contacts);
@@ -277,6 +279,15 @@ namespace AdminInterface.Controllers
 				DbSession.Save(new AuditRecord(message, user.Client) { MessageType = LogMessageType.System });
 			}
 
+			var hasPhone = contacts.Any(i => i.Type == ContactType.Phone);
+			if (sendSms && hasPhone) {
+				var phoneNumbers = contacts.Where(i => i.Type == ContactType.Phone).ToList();
+				var sms = "Ваш логин от analit: " + user.Login + " , ваш пароль: " + password;
+				//var helper = new SmsHelper();
+				//helper.SendMessage("+79671526606", sms);
+				foreach (var phone in phoneNumbers) {
+				}
+			}
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
 				(contacts.Any(contact => contact.Type == ContactType.Email));
 			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
