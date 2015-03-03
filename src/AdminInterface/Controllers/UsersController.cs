@@ -99,6 +99,10 @@ namespace AdminInterface.Controllers
 
 			var service = Service.FindAndCheck<Service>(clientId);
 			var user = new User(service);
+			//Для вьюшки - по умолчанию должен быть True. 
+			//Но в модели мы это не можем разместить, так как по здравому смыслу он по-умолчанию false.
+			//Так мы избежим лишних действий по созданию прав на директории
+			user.FtpAccess = true; 
 			var rejectWaibillParams = new RejectWaibillParams().Get(clientId, DbSession);
 			user.SendWaybills = rejectWaibillParams.SendWaybills;
 			user.SendRejects = rejectWaibillParams.SendRejects;
@@ -202,7 +206,8 @@ namespace AdminInterface.Controllers
 			uint clientId,
 			string mails,
 			string jsonSource,
-			User userJson)
+			User userJson,
+			bool ftpAcсess = false)
 		{
 			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
 			DbSession.Get<Client>(clientId);
@@ -238,6 +243,7 @@ namespace AdminInterface.Controllers
 
 			service.AddUser(user);
 			user.Setup();
+			user.SetFtpAccess(ftpAcсess);
 			var password = user.CreateInAd(Session);
 			if (string.IsNullOrEmpty(jsonSource)) {
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
@@ -518,7 +524,8 @@ namespace AdminInterface.Controllers
 		public void SaveSettings(
 			[ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom, user.ShowUsers")] User user,
 			[DataBind("WorkRegions")] ulong[] workRegions,
-			[DataBind("OrderRegions")] ulong[] orderRegions)
+			[DataBind("OrderRegions")] ulong[] orderRegions,
+			bool ftpAcсess = false)
 		{
 			var oldFirstTable = DbSession.OldValue(user, u => u.SubmitOrders)
 				&& DbSession.OldValue(user, u => u.IgnoreCheckMinOrder);
@@ -538,6 +545,8 @@ namespace AdminInterface.Controllers
 
 			user.ShowUsers = user.ShowUsers.Where(u => u != null).ToList();
 			user.PrepareSave(DbSession);
+			//Изменяем доступ на фтп
+			user.SetFtpAccess(ftpAcсess);
 			DbSession.Save(user);
 			Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new { id = user.Id });

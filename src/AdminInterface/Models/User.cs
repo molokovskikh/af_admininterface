@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -109,6 +110,7 @@ namespace AdminInterface.Models
 			AssignedPermissions = new List<UserPermission>();
 			AvaliableAddresses = new List<Address>();
 			ShowUsers = new List<User>();
+			FtpAccess = false;
 		}
 
 		public User(Payer payer, Service rootService)
@@ -140,6 +142,9 @@ namespace AdminInterface.Models
 
 		[PrimaryKey(PrimaryKeyType.Native)]
 		public virtual uint Id { get; set; }
+
+		[Property]
+		public virtual bool FtpAccess { get; set; }
 
 		[Property(NotNull = true), Description("Имя"), Auditable]
 		public virtual string Login { get; set; }
@@ -834,6 +839,23 @@ WHERE
 		}
 
 		public virtual string EditComment { get; set; }
+
+		/// <summary>
+		/// Изменение доступа на FTP для пользователя.
+		/// Сделано отдельным методом, так как не может быть записано в свойство автоматически, из-за того что требуется изменять права на папки
+		/// </summary>
+		/// <param name="value">True, если даем доступ. False, если забираем</param>
+		public virtual void SetFtpAccess(bool value = true)
+		{
+			if (RootService.Type == ServiceType.Drugstore)
+				return;
+			if (FtpAccess == value)
+				return;
+			var supplier = RootService as Supplier;
+			supplier.SetFtpAccessControl(Login, value);
+			FtpAccess = value;
+			ActiveRecordMediator.Save(this);
+		}
 	}
 
 	public class ModelAction
