@@ -26,6 +26,7 @@ using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
 using log4net;
+using NPOI.SS.Formula.Functions;
 
 namespace AdminInterface.Models.Suppliers
 {
@@ -300,19 +301,25 @@ namespace AdminInterface.Models.Suppliers
 			Payer.AddComment(billingMessage);
 		}
 
-		public virtual void CreateDirs()
-		{
-			CreateDirs(ConfigurationManager.AppSettings["OptBox"]);
-		}
-
 		public virtual IEnumerable<ContactGroup> GetAditionalContactGroups()
 		{
 			return _defaultGroups.Select(type => new ContactGroup(type));
 		}
 
-		public virtual void CreateDirs(string root)
+		/// <summary>
+		/// Получение пути к папке поставщика на ftp
+		/// </summary>
+		/// <returns></returns>
+		public virtual string GetRootPath()
 		{
+			var root = ConfigurationManager.AppSettings["OptBox"];
 			var supplierRoot = Path.Combine(root, Id.ToString().PadLeft(3, '0'));
+			return supplierRoot;
+		}
+
+		public virtual void CreateDirs()
+		{
+			var supplierRoot = GetRootPath();
 			var dirs = new[] { "Orders", "Waybills", "Reports", "Rejects" };
 			try {
 				if (!Directory.Exists(supplierRoot))
@@ -324,7 +331,7 @@ namespace AdminInterface.Models.Suppliers
 				}
 
 				foreach (var user in Users)
-					SetAccessControl(user.Login, supplierRoot);
+					user.SetFtpAccess(true);
 			}
 			catch (Exception e) {
 				LogManager.GetLogger(GetType()).Error(String.Format(@"
@@ -336,8 +343,15 @@ namespace AdminInterface.Models.Suppliers
 			}
 		}
 
-		public virtual void SetAccessControl(string username, string root)
+		/// <summary>
+		/// Добавление пользователю прав на папку поставщика
+		/// </summary>
+		/// <param name="username">Логин пользователя</param>
+		/// <param name="type">Если true, то даем права. Иначе забираем.</param>
+		public virtual void SetFtpAccessControl(string username, bool type = true)
 		{
+			var accessType = type ? AccessControlType.Allow : AccessControlType.Deny;
+			var root = GetRootPath();
 			if (!ADHelper.IsLoginExists(username))
 				return;
 
@@ -351,17 +365,17 @@ namespace AdminInterface.Models.Suppliers
 						FileSystemRights.Read,
 						InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 						PropagationFlags.None,
-						AccessControlType.Allow));
+						accessType));
 					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
 						FileSystemRights.Write,
 						InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 						PropagationFlags.None,
-						AccessControlType.Allow));
+						accessType));
 					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
 						FileSystemRights.ListDirectory,
 						InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 						PropagationFlags.None,
-						AccessControlType.Allow));
+						accessType));
 
 					Directory.SetAccessControl(root, rootDirectorySecurity);
 					var orders = Path.Combine(root, "Orders");
@@ -371,7 +385,7 @@ namespace AdminInterface.Models.Suppliers
 							FileSystemRights.DeleteSubdirectoriesAndFiles,
 							InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 							PropagationFlags.None,
-							AccessControlType.Allow));
+							accessType));
 						Directory.SetAccessControl(orders, ordersDirectorySecurity);
 					}
 #endif
