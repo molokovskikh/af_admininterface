@@ -1,11 +1,11 @@
-	<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.managep" CodeBehind="managep.aspx.cs"
+п»ї	<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.managep" CodeBehind="managep.aspx.cs"
 	Theme="Main" MasterPageFile="~/Main.Master" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
 	<form id="form1" runat="server">
 		<asp:ScriptManager ID="ScriptManager1" runat="server" AjaxFrameworkMode="Disabled" EnableScriptLocalization="False" EnableScriptGlobalization="False" EnablePageMethods="False" EnablePartialRendering="False" EnableSecureHistoryState="False">
 			<Scripts>
-				<asp:ScriptReference Path="~/Assets/Javascripts/jquery-1.6.4.min.js" />
+				<asp:ScriptReference Path="~/Assets/Javascripts/jquery-1.9.1.min.js" />
 				<asp:ScriptReference Path="~/Assets/Javascripts/jquery-ui-1.10.2.min.js" />
 			</Scripts>
 		</asp:ScriptManager>
@@ -16,7 +16,7 @@
 			$(function () {
 				$('.PriceTypeList').change(function () {
 					$('#messageDiv').html('');
-					$('#messageDiv').append("Все клиенты будут отключены от VIP прайсов");
+					$('#messageDiv').append("Р’СЃРµ РєР»РёРµРЅС‚С‹ Р±СѓРґСѓС‚ РѕС‚РєР»СЋС‡РµРЅС‹ РѕС‚ VIP РїСЂР°Р№СЃРѕРІ");
 					if ($(this).val() == 2) {
 						$('#messageDiv').css("display", "block");
 					} else {
@@ -37,15 +37,15 @@
 			<div runat="server" id="messageDiv" class="Warning" style="display: none; padding: 10px 10px 10px 50px;" ClientIDMode="Static"></div>
 			<div class="block">
 				<ul class="navigation-menu">
-					<li><asp:HyperLink runat="server" ID="HandlersLink">Настройка форматеров и отправщиков доступных поставщику</asp:HyperLink></li>
-					<li><asp:HyperLink runat="server" ID="WaybillExcludeFiles">Файлы, исключенные из разбора в качестве накладных</asp:HyperLink></li>
-					<li><asp:HyperLink runat="server" ID="WaybillSourceSettings">Настройки передачи документов</asp:HyperLink></li>
-					<li><asp:HyperLink runat="server" ID="AddRegion">Подключить регион</asp:HyperLink></li>
+					<li><asp:HyperLink runat="server" ID="HandlersLink">РќР°СЃС‚СЂРѕР№РєР° С„РѕСЂРјР°С‚РµСЂРѕРІ Рё РѕС‚РїСЂР°РІС‰РёРєРѕРІ РґРѕСЃС‚СѓРїРЅС‹С… РїРѕСЃС‚Р°РІС‰РёРєСѓ</asp:HyperLink></li>
+					<li><asp:HyperLink runat="server" ID="WaybillExcludeFiles">Р¤Р°Р№Р»С‹, РёСЃРєР»СЋС‡РµРЅРЅС‹Рµ РёР· СЂР°Р·Р±РѕСЂР° РІ РєР°С‡РµСЃС‚РІРµ РЅР°РєР»Р°РґРЅС‹С…</asp:HyperLink></li>
+					<li><asp:HyperLink runat="server" ID="WaybillSourceSettings">РќР°СЃС‚СЂРѕР№РєРё РїРµСЂРµРґР°С‡Рё РґРѕРєСѓРјРµРЅС‚РѕРІ</asp:HyperLink></li>
+					<li><asp:HyperLink runat="server" ID="AddRegion">РџРѕРґРєР»СЋС‡РёС‚СЊ СЂРµРіРёРѕРЅ</asp:HyperLink></li>
 				</ul>
 			</div>
 			<div class="BorderedBlock">
 				<h3 class="Header">
-					Прайс листы
+					РџСЂР°Р№СЃ Р»РёСЃС‚С‹
 				</h3>
 				<div class="ContentBlock">
 					<asp:GridView ID="PricesGrid" runat="server" AutoGenerateColumns="False" DataMember="Prices"
@@ -53,83 +53,83 @@
 						<Columns>
 							<asp:TemplateField>
 								<HeaderTemplate>
-									<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить" />
+									<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Р”РѕР±Р°РІРёС‚СЊ" />
 								</HeaderTemplate>
 								<ItemTemplate>
-									<asp:Button ID="DeleteButton" runat="server" Visible='<%# CanDelete(Eval("PriceCode")) %>' CommandName="Delete" Text="Удалить" />
-									<asp:HyperLink ID="ToolTip" CssClass="ToolTip" title='<%# GetNoDeleteReason(Eval("PriceCode")) %>' runat="server" Visible='<%# !CanDelete(Eval("PriceCode")) %>' Text='Запрет удалять' NavigateUrl='#' />
+									<asp:Button ID="DeleteButton" runat="server" Visible='<%# CanDelete(Eval("PriceCode")) %>' CommandName="Delete" Text="РЈРґР°Р»РёС‚СЊ" />
+									<asp:HyperLink ID="ToolTip" CssClass="ToolTip" title='<%# GetNoDeleteReason(Eval("PriceCode")) %>' runat="server" Visible='<%# !CanDelete(Eval("PriceCode")) %>' Text='Р—Р°РїСЂРµС‚ СѓРґР°Р»СЏС‚СЊ' NavigateUrl='#' />
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField>
 								<ItemTemplate>
-									<asp:HyperLink runat="server" Text='Редактировать' NavigateUrl='<%# String.Format("~/Prices/{0}/Edit", Eval("PriceCode")) %>' />
+									<asp:HyperLink runat="server" Text='Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ' NavigateUrl='<%# String.Format("~/Prices/{0}/Edit", Eval("PriceCode")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField  HeaderText="Наименование">
+							<asp:TemplateField  HeaderText="РќР°РёРјРµРЅРѕРІР°РЅРёРµ">
 								<ItemTemplate>
 									<asp:HyperLink runat="server" Text='<%# Eval("PriceName") %>' NavigateUrl='<%# Eval("CostType").Equals(DBNull.Value) ? "" : String.Format("managecosts.aspx?pc={0}", Eval("PriceCode")) %>'  />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField  HeaderText="Дата прайс листа">
+							<asp:TemplateField  HeaderText="Р”Р°С‚Р° РїСЂР°Р№СЃ Р»РёСЃС‚Р°">
 								<ItemTemplate>
 									<asp:Label runat="server"><%# Eval("CostType").Equals(1) || Eval("CostType").Equals(DBNull.Value) ? "-" : Eval("PriceDate") %></asp:Label>
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Наценка">
+							<asp:TemplateField HeaderText="РќР°С†РµРЅРєР°">
 								<ItemTemplate>
 									<asp:TextBox ID="UpCostText" runat="server" Text='<%# Eval("UpCost") %>' />
 									<asp:RegularExpressionValidator ID="UpCostValidator" runat="server" ErrorMessage="*"
 										ValidationExpression="^([-+])?\d+(\,\d+)?$" ControlToValidate="UpCostText"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Тип ценовых колонок">
+							<asp:TemplateField HeaderText="РўРёРї С†РµРЅРѕРІС‹С… РєРѕР»РѕРЅРѕРє">
 								<ItemTemplate>
 									<asp:DropDownList ID="CostType" runat="server" SelectedValue='<%# Eval("CostType") %>' DataSource='<%# GetCostTypeSource(Eval("CostType")) %>' DataTextField="Value" DataValueField="Key" />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Тип прайса">
+							<asp:TemplateField HeaderText="РўРёРї РїСЂР°Р№СЃР°">
 								<ItemTemplate>
 									<asp:DropDownList ID="PriceTypeList" runat="server" SelectedValue='<%# Eval("PriceType") %>' ClientIDMode="Inherit" CssClass="PriceTypeList">
-										<asp:ListItem Value="0">Обычный</asp:ListItem>
-										<asp:ListItem Value="1">Ассортиментный</asp:ListItem>
+										<asp:ListItem Value="0">РћР±С‹С‡РЅС‹Р№</asp:ListItem>
+										<asp:ListItem Value="1">РђСЃСЃРѕСЂС‚РёРјРµРЅС‚РЅС‹Р№</asp:ListItem>
 										<asp:ListItem Value="2">VIP</asp:ListItem>
 									</asp:DropDownList>
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Адм.">
+							<asp:TemplateField HeaderText="РђРґРј.">
 								<ItemTemplate>
 									<asp:CheckBox ID="EnableCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("AgencyEnabled")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="В работе">
+							<asp:TemplateField HeaderText="Р’ СЂР°Р±РѕС‚Рµ">
 								<ItemTemplate>
 									<asp:CheckBox ID="InWorkCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("Enabled")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Матрица">
+							<asp:TemplateField HeaderText="РњР°С‚СЂРёС†Р°">
 								<ItemTemplate>
 									<asp:CheckBox ID="BuyingMatrix" runat="server" Checked='<%# Convert.ToBoolean(Eval("BuyingMatrix")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Локальный">
+							<asp:TemplateField HeaderText="Р›РѕРєР°Р»СЊРЅС‹Р№">
 								<ItemTemplate>
-									<asp:CheckBox ID="IsLocal" ToolTip="Заказы, сделанные по прайс-листам, помеченным, как &quot;Локальный&quot; не участвуют в построении отчетов на основе Заказов" runat="server" Checked='<%# Convert.ToBoolean(Eval("IsLocal")) %>' />
+									<asp:CheckBox ID="IsLocal" ToolTip="Р—Р°РєР°Р·С‹, СЃРґРµР»Р°РЅРЅС‹Рµ РїРѕ РїСЂР°Р№СЃ-Р»РёСЃС‚Р°Рј, РїРѕРјРµС‡РµРЅРЅС‹Рј, РєР°Рє &quot;Р›РѕРєР°Р»СЊРЅС‹Р№&quot; РЅРµ СѓС‡Р°СЃС‚РІСѓСЋС‚ РІ РїРѕСЃС‚СЂРѕРµРЅРёРё РѕС‚С‡РµС‚РѕРІ РЅР° РѕСЃРЅРѕРІРµ Р—Р°РєР°Р·РѕРІ" runat="server" Checked='<%# Convert.ToBoolean(Eval("IsLocal")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
 						</Columns>
 						<EmptyDataTemplate>
-							<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить прайс лист" />
+							<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Р”РѕР±Р°РІРёС‚СЊ РїСЂР°Р№СЃ Р»РёСЃС‚" />
 						</EmptyDataTemplate>
 					</asp:GridView>
 				</div>
 			</div>
 			<div class="BorderedBlock">
 				<h3 class="Header">
-					Региональная настройка
+					Р РµРіРёРѕРЅР°Р»СЊРЅР°СЏ РЅР°СЃС‚СЂРѕР№РєР°
 				</h3>
 				<div class="ContentBlock">
 					<label for="RegionDD">
-						Домашний регион:
+						Р”РѕРјР°С€РЅРёР№ СЂРµРіРёРѕРЅ:
 					</label>
 					<asp:DropDownList ID="HomeRegion" runat="server" DataTextField="Region" DataMember="Regions"
 						DataValueField="RegionCode">
@@ -140,10 +140,10 @@
 						<Columns>
 							<asp:TemplateField>
 								<ItemTemplate>
-									<asp:Button runat="server" CommandName="Disable" CommandArgument='<%# Eval("Id") %>' Text="Отключить" />
+									<asp:Button runat="server" CommandName="Disable" CommandArgument='<%# Eval("Id") %>' Text="РћС‚РєР»СЋС‡РёС‚СЊ" />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:BoundField DataField="Name" HeaderText="Подключенные регионы" />
+							<asp:BoundField DataField="Name" HeaderText="РџРѕРґРєР»СЋС‡РµРЅРЅС‹Рµ СЂРµРіРёРѕРЅС‹" />
 						</Columns>
 					</asp:GridView>
 				</div>
@@ -151,39 +151,39 @@
 					<asp:GridView ID="RegionalSettingsGrid" runat="server" AutoGenerateColumns="False"
 						DataMember="RegionSettings" OnRowCreated="RegionalSettingsGrid_RowCreated">
 						<Columns>
-							<asp:BoundField DataField="Region" HeaderText="Регион" />
-							<asp:TemplateField HeaderText="Включен">
+							<asp:BoundField DataField="Region" HeaderText="Р РµРіРёРѕРЅ" />
+							<asp:TemplateField HeaderText="Р’РєР»СЋС‡РµРЅ">
 								<ItemTemplate>
 									<asp:CheckBox ID="EnabledCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("Enabled")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Склад">
+							<asp:TemplateField HeaderText="РЎРєР»Р°Рґ">
 								<ItemTemplate>
 									<asp:CheckBox ID="StorageCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("Storage")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Email Администратора">
+							<asp:TemplateField HeaderText="Email РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°">
 								<ItemTemplate>
 									<asp:TextBox ID="AdministratorEmailText" runat="server" Text='<%# Eval("AdminMail") %>' />
 									<asp:RegularExpressionValidator ID="AdministratorEmailValidator" runat="server" ControlToValidate="AdministratorEmailText"
 										ErrorMessage="*" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Email в регионе">
+							<asp:TemplateField HeaderText="Email РІ СЂРµРіРёРѕРЅРµ">
 								<ItemTemplate>
 									<asp:TextBox ID="RegionalEmailText" runat="server" Text='<%# Eval("TmpMail") %>' />
 									<asp:RegularExpressionValidator ID="RegionalEmailValidator" runat="server" ControlToValidate="RegionalEmailText"
 										ErrorMessage="*" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Телефон в регионе">
+							<asp:TemplateField HeaderText="РўРµР»РµС„РѕРЅ РІ СЂРµРіРёРѕРЅРµ">
 								<ItemTemplate>
 									<asp:TextBox ID="SupportPhoneText" runat="server" Text='<%# Eval("SupportPhone") %>' />
 									<asp:RegularExpressionValidator ID="PhoneValidator" runat="server" ControlToValidate="SupportPhoneText"
 										ErrorMessage="*" ValidationExpression="(\d{3,4})-(\d{6,7})"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:HyperLinkField HeaderText="Информация" Text="Информация" DataNavigateUrlFormatString="EditRegionalInfo.aspx?id={0}"
+							<asp:HyperLinkField HeaderText="РРЅС„РѕСЂРјР°С†РёСЏ" Text="РРЅС„РѕСЂРјР°С†РёСЏ" DataNavigateUrlFormatString="EditRegionalInfo.aspx?id={0}"
 								DataNavigateUrlFields="RowID" />
 						</Columns>
 					</asp:GridView>
@@ -191,7 +191,7 @@
 			</div>
 			<div class="BorderedBlock">
 				<h3 class="Header">
-					Настройка отправки заказов
+					РќР°СЃС‚СЂРѕР№РєР° РѕС‚РїСЂР°РІРєРё Р·Р°РєР°Р·РѕРІ
 				</h3>
 				<div class="ContentBlock">
 					<asp:GridView id="OrderSendRules" runat="server" AutoGenerateColumns="false" 
@@ -199,50 +199,50 @@
 						onrowcommand="OrderSettings_RowCommand" 
 						onrowdeleting="OrderSettings_RowDeleting" onrowdatabound="OrderSettings_RowDataBound">
 						<EmptyDataTemplate>
-							<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить настройку отправки заказа" />
+							<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Р”РѕР±Р°РІРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєСѓ РѕС‚РїСЂР°РІРєРё Р·Р°РєР°Р·Р°" />
 						</EmptyDataTemplate>
 						<Columns>
 							<asp:TemplateField>
 								<HeaderTemplate>
-									<asp:Button ID="AddButton" CommandName="Add" runat="server" Text="Добавить" />
+									<asp:Button ID="AddButton" CommandName="Add" runat="server" Text="Р”РѕР±Р°РІРёС‚СЊ" />
 								</HeaderTemplate>
 								<ItemTemplate>
-									<asp:Button ID="DeleteButton" CommandName="Delete" runat="server" Text="Удалить" />
+									<asp:Button ID="DeleteButton" CommandName="Delete" runat="server" Text="РЈРґР°Р»РёС‚СЊ" />
 								</ItemTemplate>
 								<ItemStyle Width="10%" />
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Отправщик">
+							<asp:TemplateField HeaderText="РћС‚РїСЂР°РІС‰РёРє">
 								<ItemTemplate>
 									<asp:DropDownList ID="Sender" runat="server" DataTextField="ClassName" DataValueField="Id" />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Форматер">
+							<asp:TemplateField HeaderText="Р¤РѕСЂРјР°С‚РµСЂ">
 								<ItemTemplate>
 									<asp:DropDownList ID="Formater" runat="server" DataTextField="ClassName" DataValueField="Id" />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Регион">
+							<asp:TemplateField HeaderText="Р РµРіРёРѕРЅ">
 								<ItemTemplate>
 									<asp:DropDownList ID="Region" runat="server" DataTextField="Region" DataValueField="RegionCode" />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Отправлять дубль заказа в zakaz_copy@analit.net">
+							<asp:TemplateField HeaderText="РћС‚РїСЂР°РІР»СЏС‚СЊ РґСѓР±Р»СЊ Р·Р°РєР°Р·Р° РІ zakaz_copy@analit.net">
 								<ItemTemplate>
 									<asp:CheckBox ID="SendDebugMessage" runat="server" Checked='<%# Convert.ToBoolean(Eval("SendDebugMessage")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Задерживать отправку sms оповещения об ошибке на заданное число секунд">
+							<asp:TemplateField HeaderText="Р—Р°РґРµСЂР¶РёРІР°С‚СЊ РѕС‚РїСЂР°РІРєСѓ sms РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± РѕС€РёР±РєРµ РЅР° Р·Р°РґР°РЅРЅРѕРµ С‡РёСЃР»Рѕ СЃРµРєСѓРЅРґ">
 								<ItemTemplate>
 									<asp:TextBox ID="SmsSendDelay" runat="server" Text='<%# Eval("ErrorNotificationDelay") %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:HyperLinkField Text="Свойства" DataNavigateUrlFields="id" DataNavigateUrlFormatString="~/SenderProperties.aspx?ruleid={0}" />
+							<asp:HyperLinkField Text="РЎРІРѕР№СЃС‚РІР°" DataNavigateUrlFields="id" DataNavigateUrlFormatString="~/SenderProperties.aspx?ruleid={0}" />
 						</Columns>
 					</asp:GridView>
 				</div>
 			</div>
 			<div class="Submit">
-				<asp:Button ID="SaveButton" runat="server" Text="Применить" OnClick="SaveButton_Click" />
+				<asp:Button ID="SaveButton" runat="server" Text="РџСЂРёРјРµРЅРёС‚СЊ" OnClick="SaveButton_Click" />
 			</div>
 		</div>
 	</form>
