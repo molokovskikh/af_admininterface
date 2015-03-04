@@ -206,7 +206,8 @@ namespace AdminInterface.Controllers
 			uint clientId,
 			string mails,
 			string jsonSource,
-			User userJson)
+			User userJson,
+			bool ftpAcсess = false)
 		{
 			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
 			DbSession.Get<Client>(clientId);
@@ -242,6 +243,7 @@ namespace AdminInterface.Controllers
 
 			service.AddUser(user);
 			user.Setup();
+			user.SetFtpAccess(ftpAcсess);
 			var password = user.CreateInAd(Session);
 			if (string.IsNullOrEmpty(jsonSource)) {
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
@@ -251,7 +253,6 @@ namespace AdminInterface.Controllers
 				user.WorkRegionMask = BitConverter.ToUInt64(userJson.RegionSettings.Select(Convert.ToByte).ToArray(), 0);
 				mails = user.EmailForCard;
 			}
-			user.SetFtpAccess(user.FtpAccess);
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 			DbSession.Save(passwordChangeLog);
 			user.UpdateContacts(contacts);
@@ -523,7 +524,8 @@ namespace AdminInterface.Controllers
 		public void SaveSettings(
 			[ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom, user.ShowUsers")] User user,
 			[DataBind("WorkRegions")] ulong[] workRegions,
-			[DataBind("OrderRegions")] ulong[] orderRegions)
+			[DataBind("OrderRegions")] ulong[] orderRegions,
+			bool ftpAcсess = false)
 		{
 			var oldFirstTable = DbSession.OldValue(user, u => u.SubmitOrders)
 				&& DbSession.OldValue(user, u => u.IgnoreCheckMinOrder);
@@ -543,6 +545,8 @@ namespace AdminInterface.Controllers
 
 			user.ShowUsers = user.ShowUsers.Where(u => u != null).ToList();
 			user.PrepareSave(DbSession);
+			//Изменяем доступ на фтп
+			user.SetFtpAccess(ftpAcсess);
 			DbSession.Save(user);
 			Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new { id = user.Id });
