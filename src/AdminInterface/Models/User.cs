@@ -215,6 +215,9 @@ namespace AdminInterface.Models
 		[Property, Description("Проверять текущие цены и остатки пред отправкой заказов"), Auditable]
 		public virtual bool UseAdjustmentOrders { get; set; }
 
+		[Property, Description("AnalitF.net - Использовать форму автозаказа с возможностью редактирования"), Auditable]
+		public virtual bool UseBatch2 { get; set; }
+
 /*
 		[Property, Description("Не проверять УИН"), Auditable]
 		public virtual bool DoNotCheckUin { get; set; }

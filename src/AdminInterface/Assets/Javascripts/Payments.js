@@ -191,7 +191,7 @@ $(function () {
 
 		if (count > 5 && $(this).hasClass("autocollapsible")) {
 			triggers.addClass("ShowHiden");
-			folder.addClass("hidden")
+			folder.addClass("hidden");
 		}
 		else {
 			triggers.addClass("HideVisible");

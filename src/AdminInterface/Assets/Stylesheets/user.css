@@ -64,7 +64,8 @@ a.disabled,
 /*легенда*/
 div.LegendMarker.disabled,
 /*что бы избежать конфликтов*/
-table.style td.disabled
+table.style td.disabled,
+table.style tr.disabled
 {
 	background-color: #ff9d5b;
 }

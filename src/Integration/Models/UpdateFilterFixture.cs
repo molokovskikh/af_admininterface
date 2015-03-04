@@ -30,7 +30,7 @@ namespace Integration.Models
 			filter.BeginDate = DateTime.Today.AddDays(-1);
 			filter.EndDate = DateTime.Today;
 			filter.UpdateType = UpdateType.Accumulative;
-			var results = filter.Find();
+			var results = filter.Find(session);
 			Assert.That(results.Count, Is.GreaterThan(0));
 			Assert.That(results.Any(r => r.Id == update1.Id), Is.False, "нашли запись обновления в воронеже, {0}", update1.Id);
 			Assert.That(results.Any(r => r.Id == update2.Id), Is.True, "не нашли запись обновления в челябинске, {0} {1}", update2.Id, results.Implode(r => r.Id));
@@ -43,7 +43,7 @@ namespace Integration.Models
 			Save(new UpdateLogEntity(user2) {
 				UpdateType = UpdateType.AccessError,
 			});
-			results = filter.Find();
+			results = filter.Find(session);
 			Assert.IsTrue(results.Any(r => r.OkUpdate));
 		}
 	}

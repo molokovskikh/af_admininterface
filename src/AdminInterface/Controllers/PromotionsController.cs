@@ -356,14 +356,12 @@ namespace AdminInterface.Controllers
 			};
 
 			PropertyBag["promotion"] = promotion;
-			ActiveRecordMediator.Evict(promotion);
-			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.PromotionOwnerSupplier.MaskRegion).OrderBy(reg => reg.Name);
+			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.PromotionOwnerSupplier.MaskRegion);
 
 			if (IsPost) {
 				promotion.RegionMask = promoRegions.Aggregate(0UL, (v, a) => a + v);
 
 				BindObjectInstance(promotion, "promotion");
-
 				if (IsValid(promotion)) {
 					var file = Request.Files["inputfile"] as HttpPostedFile;
 					if (file != null && file.ContentLength > 0) {
@@ -375,7 +373,7 @@ namespace AdminInterface.Controllers
 						promotion.PromoFile = file.FileName;
 					}
 
-					DbSession.Update(promotion);
+					DbSession.Save(promotion);
 
 					if (file != null && file.ContentLength > 0) {
 						var newLocalPromoFile = GetPromoFile(promotion);
@@ -384,13 +382,9 @@ namespace AdminInterface.Controllers
 						}
 					}
 
-					RedirectToAction("EditCatalogs", new string[] { "id=" + promotion.Id });
+					RedirectToAction("EditCatalogs", new[] { "id=" + promotion.Id });
 				}
-				else
-					ActiveRecordMediator.Evict(promotion);
 			}
-			else
-				ActiveRecordMediator.Evict(promotion);
 		}
 
 		private string GetPromoFile(SupplierPromotion promotion)

@@ -32,7 +32,8 @@ namespace Functional
 			Open(_user, "Edit");
 			ClickLink("Настройка");
 
-			browser.FindElementByName("user.AssignedPermissions[3].Id").Click();
+			var el = browser.FindElementByCssSelector("#UserSettingsForm input[value='55']");
+			el.Click();
 
 			ClickButton("Сохранить");
 			AssertText("Сохранено");

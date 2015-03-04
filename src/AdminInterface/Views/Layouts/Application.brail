@@ -42,16 +42,18 @@
 		${app.Asset("form.css")}
 		${app.Asset("columns.css")}
 
+		${app.Asset("jquery.maskedinput.js")}
 		${app.JS("calendar.js",
 			"calendar-ru_win_.js",
 			"calendar-setup.js",
 			"date-ru-RU.js",
 			"jquery.contact.validation.js",
-			"jquery.maskedinput-1.2.2.min.js",
 			"Common.js")}
 
 		${app.CSS("/App_Themes/Main/Main.css")}
 		<% OutputSubView("/SubViews/DefaultJs") %>
+		${app.Asset("globalize/globalize.js")}
+		${app.Asset("jquery.validate.globalize.js")}
 	</head>
 	<body>
 	<% unless ?ShowHeader: %>

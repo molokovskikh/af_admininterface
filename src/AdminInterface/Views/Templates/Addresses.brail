@@ -9,7 +9,7 @@
 	<h3>Доступ к адресам доставки</h3>
 	<div>
 		<%if addresses.Count > 0: %>
-		<table id="AvaliableAddresses">
+		<table id="AvaliableAddresses" class="style">
 			<thead>
 				<tr>
 					<th>Адрес</th>

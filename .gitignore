@@ -17,3 +17,4 @@ src/*.properties
 bower_components
 node_modules
 *.gen.*
+AssemblyInfo.cs
