@@ -144,6 +144,12 @@ namespace AdminInterface.Models.Security
 					return true;
 				}
 			}
+			if (Type == PermissionType.EditSettings) {
+				var controllers = new[] {
+					"CostOptimization",
+				};
+				return controllers.Any(c => String.Equals(c, controller, StringComparison.CurrentCultureIgnoreCase));
+			}
 			return false;
 		}
 

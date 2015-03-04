@@ -106,6 +106,7 @@
     <Compile Include="Billing\AccountingFixture.cs" />
     <Compile Include="Billing\EditFixture.cs" />
     <Compile Include="Billing\InvoiceGroupsFixture.cs" />
+    <Compile Include="CostOptimization.cs" />
     <Compile Include="DebugFixture.cs" />
     <Compile Include="Drugstore\OrderFixture.cs" />
     <Compile Include="Billing\PayerSecurityFixture.cs" />

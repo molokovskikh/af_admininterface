@@ -14,7 +14,7 @@
 		checkEmptyTable($(this));
 	});
 
-	$("a.new").live('click', function () {
+	$("table").on("click", "a.new", function () {
 		var table = $(this).parents("table").first();
 		var body = table.children("tbody");
 		var index = 0;
@@ -36,7 +36,7 @@
 		body.append("<tr><td><a class='delete' href='javascript:'>Удалить</a></td><td><input name='items[" + index + "].Name' type='text'></input></td></tr>");
 	});
 
-	$("a.delete").live('click', function () {
+	$("table").on("click", "a.delete", function () {
 		var element = $(this);
 		var table = element.parents("table").first();
 		element.parents("tr").first().remove();

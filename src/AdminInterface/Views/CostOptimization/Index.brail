@@ -1,0 +1,159 @@
+﻿${app.Asset("select2.js")}
+${app.Asset("Select2-locales/select2_locale_ru.js")}
+${app.Asset("select2.css")}
+
+<style>
+	.select2-container {
+		width: 30em;
+	}
+</style>
+
+<script>
+	$(function () {
+		$("#supplier").select2({
+			placeholder: "Выбор поставщика",
+			ajax: {
+				url: "/CostOptimization/Concurrents",
+				data: function (term, page) {
+					return { q: term, regionId: $("#supplierRegionId").val() };
+				},
+				results: function (data) {
+					return { results: data };
+				}
+			},
+			formatResult: function (result, container, query, escapeMarkup) {
+				var markup = [];
+				var text = result.name;
+				Select2.util.markMatch(text, query.term, markup, escapeMarkup);
+				markup.push(" - " + result.regionName);
+				return markup.join("");
+			},
+			formatSelection: function (item) {
+				$("#supplierId").val(item.id);
+				return item.name + " - " + item.regionName;
+			}
+		});
+
+		$("#client").select2({
+			placeholder: "Выбор аптеки",
+			ajax: {
+				url: "/CostOptimization/Clients",
+				data: function (term, page) {
+					return { q: term, regionId: $("#clientRegionId").val() };
+				},
+				results: function (data) {
+					return { results: data };
+				}
+			},
+			formatResult: function (result, container, query, escapeMarkup) {
+				var markup = [];
+				var text = result.name;
+				Select2.util.markMatch(text, query.term, markup, escapeMarkup);
+				markup.push(" - " + result.regionName);
+				return markup.join("");
+			},
+			formatSelection: function (item) {
+				$("#clientId").val(item.id);
+				return item.name + " - " + item.regionName;
+			}
+		});
+	});
+</script>
+
+<% component CaptureFor, {"id" : "Title"}: %>
+	Оптимизация цен - Исключения
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : []} %>
+
+<% if admin.CanViewSuppliers: %>
+
+<h3>Поставщики</h3>
+
+<div class="block">
+	<h4>Исключить поставщика</h4>
+	<form method="post" id="add-supplier" action="${UrlHelper.For({@controller: @CostOptimization, @action: @AddConcurrent})}">
+		<p>
+			<label>Фильтр</label><br>
+			${FormHelper.Select("supplierRegionId", regions, {@value: @Id, @firstoption: "Все"})}<br>
+		</p>
+		<p>
+			<input name="supplierId" id="supplierId" type="hidden">
+			<div id="supplier"></div>
+		</p>
+		<input type="submit" value="Сохранить">
+	</form>
+</div>
+
+<table class="DataTable">
+	<thead>
+		<tr>
+			<th width="1%"></th>
+			<th>Код</th>
+			<th>Имя</th>
+			<th>Регион</th>
+		</tr>
+	</thead>
+	<tbody>
+	<% for supplier in concurrents: %>
+		<tr>
+			<td>
+				<form method="post" action="${UrlHelper.For({@controller: @CostOptimization, @action: @DeleteConcurrent})}">
+					${FormHelper.HiddenField("id", supplier.Id)}
+					${FormHelper.Submit("Удалить")}
+				</form>
+			</td>
+			<td>!{supplier.Id}</td>
+			<td>!{supplier.HomeRegion.Name}</td>
+			<td>!{supplier.Name}</td>
+		</tr>
+	<% end %>
+		</tbody>
+</table>
+
+<% end %>
+
+<% if admin.CanViewDrugstores: %>
+<h3>Клиенты</h3>
+
+<div class="block">
+	<h4>Исключить аптеку</h4>
+	<form method="post" action="${UrlHelper.For({@controller: @CostOptimization, @action: @AddClient})}">
+		<p>
+			<label>Фильтр</label><br>
+			${FormHelper.Select("clientRegionId", regions, {@value: @Id, @firstoption: "Все"})}<br>
+		</p>
+		<p>
+			<input name="clientId" id="clientId" type="hidden">
+			<div id="client"></div>
+		</p>
+		<input type="submit" value="Сохранить">
+	</form>
+</div>
+
+<table class="DataTable">
+	<thead>
+		<tr>
+			<th width="1%"></th>
+			<th>Код</th>
+			<th>Имя</th>
+			<th>Регион</th>
+		</tr>
+	</thead>
+	<tbody>
+	<% for client in clients: %>
+		<tr>
+			<td>
+				<form method="post" action="${UrlHelper.For({@controller: @CostOptimization, @action: @DeleteClient})}">
+					${FormHelper.HiddenField("id", client.Id)}
+					${FormHelper.Submit("Удалить")}
+				</form>
+			</td>
+			<td>!{client.Id}</td>
+			<td>!{client.HomeRegion.Name}</td>
+			<td>!{client.Name}</td>
+		</tr>
+	<% end %>
+	</tbody>
+</table>
+<% end %>

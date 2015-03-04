@@ -200,6 +200,7 @@
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\BalanceOperationsController.cs" />
+    <Compile Include="Controllers\CostOptimizationController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\Filters\StatisticsFilter.cs" />
     <Compile Include="Controllers\MailsModeringController.cs" />
@@ -209,6 +210,7 @@
     <Compile Include="Controllers\PricesController.cs" />
     <Compile Include="Initializers\Seed.cs" />
     <Compile Include="Models\Core.cs" />
+    <Compile Include="Models\CostOptimization.cs" />
     <Compile Include="Models\Logs\ClientAppLog.cs" />
     <Compile Include="Models\Logs\RequestLog.cs" />
     <Compile Include="Models\Markup.cs" />
@@ -536,8 +538,6 @@
     <Content Include="JavaScript\Common.js" />
     <Content Include="Assets\Javascripts\filter.coffee" />
     <Content Include="JavaScript\contact.registrator.js" />
-    <Content Include="JavaScript\jquery.maskedinput-1.2.2.js" />
-    <Content Include="JavaScript\jquery.maskedinput-1.2.2.min.js" />
     <Content Include="JavaScript\jquery.tmpl.js" />
     <Content Include="JavaScript\jquery.tmpl.min.js" />
     <Content Include="JavaScript\jquery.contact.validation.js" />
@@ -559,6 +559,7 @@
     <None Include="Views\BalanceOperations\Edit.brail" />
     <None Include="Views\BalanceOperations\Show.brail" />
     <Content Include="Views\Billing\AdditionalSupplierInfo.brail" />
+    <Content Include="Views\CostOptimization\Index.brail" />
     <None Include="Views\LegalEntity\Show.brail" />
     <Content Include="Views\Logs\Converted.brail" />
     <Content Include="Views\Logs\ShowStatDetails.brail">

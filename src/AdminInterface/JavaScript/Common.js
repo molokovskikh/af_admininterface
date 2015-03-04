@@ -21,11 +21,11 @@
 		}
 	});
 
-	$(".ShowHiden").live('click', function () {
+	$("div.collapsible, div.autocollapsible").on("click", ".ShowHiden", function () {
 		ShowHidden(this);
 	});
 
-	$(".HideVisible").live('click', function () {
+	$("div.collapsible, div.autocollapsible").on("click", ".HideVisible", function () {
 		HideVisible(this);
 	});
 
