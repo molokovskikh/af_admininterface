@@ -295,7 +295,7 @@ namespace AdminInterface.Models
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Account Accounting { get; set; }
 
-		[BelongsTo(Cascade = CascadeEnum.SaveUpdate, Lazy = FetchWhen.Immediate)]
+		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
 		public virtual Service RootService { get; set; }
 
 		public virtual IList<int> RegionSettings { get; set; }
