@@ -206,7 +206,8 @@ namespace AdminInterface.Controllers
 			uint clientId,
 			string mails,
 			string jsonSource,
-			User userJson)
+			User userJson,
+			bool ftpAcсess = false)
 		{
 			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
 			DbSession.Get<Client>(clientId);
@@ -242,6 +243,7 @@ namespace AdminInterface.Controllers
 
 			service.AddUser(user);
 			user.Setup();
+			user.SetFtpAccess(ftpAcсess);
 			var password = user.CreateInAd(Session);
 			if (string.IsNullOrEmpty(jsonSource)) {
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
@@ -251,7 +253,6 @@ namespace AdminInterface.Controllers
 				user.WorkRegionMask = BitConverter.ToUInt64(userJson.RegionSettings.Select(Convert.ToByte).ToArray(), 0);
 				mails = user.EmailForCard;
 			}
-			user.SetFtpAccess(user.FtpAccess);
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 			DbSession.Save(passwordChangeLog);
 			user.UpdateContacts(contacts);
@@ -282,20 +283,15 @@ namespace AdminInterface.Controllers
 				DbSession.Save(new AuditRecord(message, user.Client) { MessageType = LogMessageType.System });
 			}
 
-			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
-				(contacts.Any(contact => contact.Type == ContactType.Email));
+			var haveMails = !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim());
 			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
 			if (sendClientCard && (haveMails || !string.IsNullOrEmpty(user.EmailForCard))) {
-				var contactEmails = contacts
-					.Where(c => c.Type == ContactType.Email)
-					.Implode(c => c.ContactText);
 				var smtpId = ReportHelper.SendClientCard(user,
 					password.Password,
 					false,
 					Defaults,
-					contactEmails,
 					mails);
-				passwordChangeLog.SetSentTo(smtpId, new[] { mails, contactEmails }.Where(s => !String.IsNullOrWhiteSpace(s)).Implode());
+				passwordChangeLog.SetSentTo(smtpId, new[] { mails }.Where(s => !String.IsNullOrWhiteSpace(s)).Implode());
 				DbSession.Save(passwordChangeLog);
 
 				Notify("Пользователь создан");
@@ -528,7 +524,8 @@ namespace AdminInterface.Controllers
 		public void SaveSettings(
 			[ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom, user.ShowUsers")] User user,
 			[DataBind("WorkRegions")] ulong[] workRegions,
-			[DataBind("OrderRegions")] ulong[] orderRegions)
+			[DataBind("OrderRegions")] ulong[] orderRegions,
+			bool ftpAcсess = false)
 		{
 			var oldFirstTable = DbSession.OldValue(user, u => u.SubmitOrders)
 				&& DbSession.OldValue(user, u => u.IgnoreCheckMinOrder);
@@ -548,6 +545,8 @@ namespace AdminInterface.Controllers
 
 			user.ShowUsers = user.ShowUsers.Where(u => u != null).ToList();
 			user.PrepareSave(DbSession);
+			//Изменяем доступ на фтп
+			user.SetFtpAccess(ftpAcсess);
 			DbSession.Save(user);
 			Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new { id = user.Id });

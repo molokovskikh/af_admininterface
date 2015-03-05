@@ -1,6 +1,6 @@
 ﻿<script>
 	$(function () {
-		$("a.new").live('click', function () {
+		$("table").on("click", "a.new", function () {
 			var index = $(".DataTable tbody").children().length;
 			if (index == 1 && $(".DataTable thead").children().length == 0) {
 				$(".DataTable").children().remove();
@@ -12,7 +12,7 @@
 			$(".DataTable tbody").append("<tr><td><a class='delete' href='javascript:'>Удалить</a></td><td><input name='recipients[" + index + "].Name' type='text'></input></td></tr>");
 		});
 
-		$("a.delete").live('click', function () {
+		$("table").on("click", "a.delete", function () {
 			$(this).parents("tr").remove();
 			var index = $(".DataTable tbody").children().length;
 			if (index == 0) {
@@ -27,7 +27,7 @@
 	{
 		width: 600px;
 	}
-	
+
 	input[type=text]
 	{
 		width: 400px;

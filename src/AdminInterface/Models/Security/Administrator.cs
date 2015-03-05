@@ -216,6 +216,16 @@ namespace AdminInterface.Models.Security
 			get { return HavePermision(PermissionType.ChangePayment); }
 		}
 
+		public bool CanViewDrugstores
+		{
+			get { return HavePermision(PermissionType.ViewDrugstore); }
+		}
+
+		public bool CanViewSuppliers
+		{
+			get { return HavePermision(PermissionType.ViewSuppliers); }
+		}
+
 		public void CheckClientPermission(Client client)
 		{
 			CheckRegion(client.HomeRegion.Id);

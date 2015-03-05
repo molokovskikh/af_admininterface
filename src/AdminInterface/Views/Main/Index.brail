@@ -58,9 +58,10 @@
 						<li>${app.LinkTo("Статистика", "Main", "Stat")}</li>
 						<li>${app.LinkTo("Модерирование минипочты", "MailsModering", "ShowMails")}</li>
 						<li>${app.LinkTo("Новости", "News", "Index")}</li>
+						<li>${app.LinkTo("Оптимизация цен - Исключения", "CostOptimization", "Index")}</li>
 					</ul>
 				</div>
-				
+
 				<div class="block">
 					<h3>Биллинг</h3>
 					<ul class="navigation">

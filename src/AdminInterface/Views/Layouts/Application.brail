@@ -12,11 +12,11 @@
 			<% end %>
 		</title>
 
-		${app.Asset("jquery-1.6.2.js")}
+		${app.Asset("jquery-1.9.1.js")}
 		${app.Asset("underscore.js")}
 		${app.Asset("backbone.js")}
 		${app.Asset("jquery-ui-1.10.2.js")}
-		${app.Asset("knockout-2.1.0.js")}
+		${app.Asset("knockout-3.2.0.js")}
 		${app.Asset("search.editor.js")}
 
 		${app.Asset("confirmation.js")}
@@ -42,12 +42,12 @@
 		${app.Asset("form.css")}
 		${app.Asset("columns.css")}
 
+		${app.Asset("jquery.maskedinput.js")}
 		${app.JS("calendar.js",
 			"calendar-ru_win_.js",
 			"calendar-setup.js",
 			"date-ru-RU.js",
 			"jquery.contact.validation.js",
-			"jquery.maskedinput-1.2.2.min.js",
 			"Common.js")}
 
 		${app.CSS("/App_Themes/Main/Main.css")}

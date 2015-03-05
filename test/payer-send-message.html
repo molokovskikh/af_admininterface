@@ -1,9 +1,9 @@
-<html>
+﻿<html>
 	<head>
 			<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-			<script src="../packages/jQuery.1.6.4/Content/Scripts/jQuery-1.6.4.js"></script>
+			<script src="../packages/jQuery.1.9.1/Content/Scripts/jquery-1.9.1.js"></script>
 			<script src="../bower_components/qunit/qunit/qunit.js"></script>
-			<script src="../packages/Underscore.js.1.1.7/Content/Scripts/underscore.js"></script>
+			<script src="../packages/underscore.js.1.1.7/Content/Scripts/underscore.js"></script>
 			<script src="../packages/Backbone.js.0.5.3/Content/Scripts/backbone.js"></script>
 			<script src="../src/AdminInterface/Assets/Javascripts/payer-send-message.js"></script>
 			<script src="payer-send-message.js"></script>
@@ -16,15 +16,15 @@
 		<div id="qunit-testrunner-toolbar"></div>
 		<h2 id="qunit-userAgent"></h2>
 		<ol id="qunit-tests"></ol>
-		<div id="qunit-fixture">test markup, will be hidden</div>
+		<div id="qunit-fixture">
+			<div id=users>
+				<a data-id=1 href="javascript:">1</a>
+			</div>
+			<input type=checkbox id="userMessage_SendToMinimail">
+			<select id=messageReceiverComboBox>
+				<option value=1>1</option>
+				<option>Все</option>
+			</select>
+		</div>
 	</body>
-	<div id=users>
-		<a data-id=1 href="javascript:">1</a>
-	</div>
-	<input type=checkbox id="userMessage_SendToMinimail">
-	<select id=messageReceiverComboBox>
-		<option value=1>1</option>
-		<option>Все</option>
-	</select>
-
 </html>
