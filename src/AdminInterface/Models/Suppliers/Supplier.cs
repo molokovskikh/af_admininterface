@@ -330,8 +330,9 @@ namespace AdminInterface.Models.Suppliers
 						Directory.CreateDirectory(directoryToCreate);
 				}
 
-				foreach (var user in Users)
-					user.SetFtpAccess(true);
+				foreach (var user in Users) {
+					user.SetFtpAccess();
+				}
 			}
 			catch (Exception e) {
 				LogManager.GetLogger(GetType()).Error(String.Format(@"

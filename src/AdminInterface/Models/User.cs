@@ -23,6 +23,7 @@ using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
+using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Criterion;
 using AdminInterface.Security;
@@ -31,6 +32,8 @@ using Common.Web.Ui.Models;
 using System.ComponentModel;
 using AdminInterface.Models.Billing;
 using NHibernate.Linq;
+using NHibernate.Proxy;
+using NPOI.SS.Formula.Functions;
 
 namespace AdminInterface.Models
 {
@@ -96,7 +99,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Пользователь")]
-	public class User : IEnablable, IDisabledByParent, IChangesNotificationAware, IMultiAuditable
+	public class User : ActiveRecordBase, IEnablable, IDisabledByParent, IChangesNotificationAware, IMultiAuditable
 	{
 		private string _name;
 		private bool _enabled;
@@ -143,7 +146,7 @@ namespace AdminInterface.Models
 		[PrimaryKey(PrimaryKeyType.Native)]
 		public virtual uint Id { get; set; }
 
-		[Property]
+		[Property, Description("Доступ к фтп поставщика"), Auditable]
 		public virtual bool FtpAccess { get; set; }
 
 		[Property(NotNull = true), Description("Имя"), Auditable]
@@ -578,6 +581,11 @@ namespace AdminInterface.Models
 					session.Save(Client.Settings);
 				}
 			}
+
+			//Проверяем поле доступа к фтп и изменяем доступ в случае необходимости
+			var oldFtpAccess = session.OldValue(this, u => u.FtpAccess);
+			if(oldFtpAccess != FtpAccess)
+				SetFtpAccess(FtpAccess);
 		}
 
 		public virtual void AddContactGroup()
@@ -847,14 +855,21 @@ WHERE
 		/// <param name="value">True, если даем доступ. False, если забираем</param>
 		public virtual void SetFtpAccess(bool value = true)
 		{
-			if (RootService.Type == ServiceType.Drugstore)
+			if (RootService.Type != ServiceType.Supplier)
 				return;
-			if (FtpAccess == value)
-				return;
-			var supplier = RootService as Supplier;
+
+			//Магия проксирования хибера не позволяет просто взять и привести типы 
+			//Прокси сервиса не приводится к поставщику
+			var serv = RootService;
+			var proxy = RootService as INHibernateProxy;
+			if (proxy != null) {
+				var session = proxy.HibernateLazyInitializer.Session;
+				serv = (Service)session.PersistenceContext.Unproxy(proxy);
+			}
+
+			var supplier = (Supplier)serv;
 			supplier.SetFtpAccessControl(Login, value);
 			FtpAccess = value;
-			ActiveRecordMediator.Save(this);
 		}
 	}
 
