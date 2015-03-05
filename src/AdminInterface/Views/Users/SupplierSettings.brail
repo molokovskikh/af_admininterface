@@ -25,7 +25,13 @@
 				<% end %>
 			</div>
 		</div>
-
+	<div class=block>
+		<h3>Дополнительные настройки</h3>
+		<div>
+			<input name="FtpAcсess" type="checkbox"  ${"checked" if user.FtpAccess}/>
+			<label>Доступ к FTP</label>
+		</div>
+	</div>
 		<% OutputSubView("/SubViews/UserRegions") %>
 
 		<div class=save>

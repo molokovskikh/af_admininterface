@@ -160,6 +160,7 @@ namespace AdminInterface.Controllers
 			supplier.AddBillingComment(comment);
 
 			Mailer.SupplierRegistred(supplier, comment);
+			//Создание директорий для поставщика на фтп
 			supplier.CreateDirs();
 
 			var log = new PasswordChangeLogEntity(user.Login);
