@@ -1,5 +1,5 @@
 ﻿$(function () {
-	$("input[type=button].cancel-search").on("click", function () {
+	$("body").on("click", "dir.search input[type=button].cancel-search", function () {
 		var editorData = $(this).data("search-editor");
 		if (!editorData)
 			return;
@@ -12,7 +12,7 @@
 		}
 	});
 
-	$("input[type=button].search").on("click", function () {
+	$("body").on("click", "div.search input[type=button].search", function () {
 		var editorData = $(this).data("search-editor");
 		var url = $(this).data("url") || editorData.url;
 		if (editorData)

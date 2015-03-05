@@ -26,7 +26,7 @@ $ ->
 		url = ""
 		handleDialog = ->
 			equal $(".ui-dialog").css("display"), "block"
-			$(".ui-dialog input[name=FreePeriodEnd").val("21.03.2012")
+			$(".ui-dialog input[name=FreePeriodEnd]").val("21.03.2012")
 			$(".ui-dialog button:contains('Отменить')").click()
 
 		done = (url) ->
