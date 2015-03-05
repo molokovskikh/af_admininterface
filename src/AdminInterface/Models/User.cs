@@ -32,6 +32,7 @@ using Common.Web.Ui.Models;
 using System.ComponentModel;
 using AdminInterface.Models.Billing;
 using NHibernate.Linq;
+using NHibernate.Proxy;
 using NPOI.SS.Formula.Functions;
 
 namespace AdminInterface.Models
@@ -295,7 +296,7 @@ namespace AdminInterface.Models
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Account Accounting { get; set; }
 
-		[BelongsTo(Cascade = CascadeEnum.SaveUpdate, Lazy = FetchWhen.Immediate)]
+		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
 		public virtual Service RootService { get; set; }
 
 		public virtual IList<int> RegionSettings { get; set; }
@@ -856,7 +857,17 @@ WHERE
 		{
 			if (RootService.Type != ServiceType.Supplier)
 				return;
-			var supplier = (Supplier)RootService;
+
+			//Магия проксирования хибера не позволяет просто взять и привести типы 
+			//Прокси сервиса не приводится к поставщику
+			var serv = RootService;
+			var proxy = RootService as INHibernateProxy;
+			if (proxy != null) {
+				var session = proxy.HibernateLazyInitializer.Session;
+				serv = (Service)session.PersistenceContext.Unproxy(proxy);
+			}
+
+			var supplier = (Supplier)serv;
 			supplier.SetFtpAccessControl(Login, value);
 			FtpAccess = value;
 		}
