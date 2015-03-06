@@ -99,7 +99,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Пользователь")]
-	public class User : ActiveRecordBase, IEnablable, IDisabledByParent, IChangesNotificationAware, IMultiAuditable
+	public class User : IEnablable, IDisabledByParent, IChangesNotificationAware, IMultiAuditable
 	{
 		private string _name;
 		private bool _enabled;
