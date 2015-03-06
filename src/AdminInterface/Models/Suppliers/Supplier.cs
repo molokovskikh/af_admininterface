@@ -5,6 +5,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Threading;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Audit;
@@ -345,38 +346,50 @@ namespace AdminInterface.Models.Suppliers
 		}
 
 		/// <summary>
-		/// Добавление пользователю прав на папку поставщика
+		/// Установка пользователю прав на папку поставщика
 		/// </summary>
 		/// <param name="username">Логин пользователя</param>
 		/// <param name="type">Если true, то даем права. Иначе забираем.</param>
 		public virtual void SetFtpAccessControl(string username, bool type = true)
 		{
-			var accessType = type ? AccessControlType.Allow : AccessControlType.Deny;
-			var root = GetRootPath();
 			if (!ADHelper.IsLoginExists(username))
 				return;
 
+			if(type)
+				AddFtpAccess(username);
+			else
+				RemoveFtpAccess(username);
+		}
+
+		/// <summary>
+		/// Добавление прав пользователя к папке поставщика
+		/// </summary>
+		/// <param name="username">Логин пользователя</param>
+		/// <param name="login"></param>
+		public virtual void AddFtpAccess(string login)
+		{
+			var root = GetRootPath();
 			var index = 0;
 			while (true) {
 				try {
 #if !DEBUG
-					username = String.Format(@"ANALIT\{0}", username);
+					var username = String.Format(@"ANALIT\{0}", login);
 					var rootDirectorySecurity = Directory.GetAccessControl(root);
 					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
 						FileSystemRights.Read,
 						InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 						PropagationFlags.None,
-						accessType));
+						AccessControlType.Allow));
 					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
 						FileSystemRights.Write,
 						InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 						PropagationFlags.None,
-						accessType));
+						AccessControlType.Allow));
 					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
 						FileSystemRights.ListDirectory,
 						InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 						PropagationFlags.None,
-						accessType));
+						AccessControlType.Allow));
 
 					Directory.SetAccessControl(root, rootDirectorySecurity);
 					var orders = Path.Combine(root, "Orders");
@@ -386,7 +399,7 @@ namespace AdminInterface.Models.Suppliers
 							FileSystemRights.DeleteSubdirectoriesAndFiles,
 							InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 							PropagationFlags.None,
-							accessType));
+							AccessControlType.Allow));
 						Directory.SetAccessControl(orders, ordersDirectorySecurity);
 					}
 #endif
@@ -394,6 +407,48 @@ namespace AdminInterface.Models.Suppliers
 				}
 				catch (Exception e) {
 					LogManager.GetLogger(GetType()).Error("Ошибка при назначении прав, пробую еще раз", e);
+					index++;
+					Thread.Sleep(500);
+					if (index > 3)
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Удаление прав пользователя к папке поставщика
+		/// </summary>
+		/// <param name="username">Логин пользователя</param>
+		/// <param name="login"></param>
+		public virtual void RemoveFtpAccess(string login)
+		{
+			var root = GetRootPath();
+			var index = 0;
+			while (true) {
+				try {
+#if !DEBUG
+					var accessControl = Directory.GetAccessControl(root);
+					AuthorizationRuleCollection rules = accessControl.GetAccessRules(true, true, typeof(SecurityIdentifier));
+					foreach (FileSystemAccessRule rule in rules) {
+						var name = rule.IdentityReference.Translate(typeof(NTAccount)).Value;
+						if (name.Contains(login))
+							accessControl.RemoveAccessRule(rule);
+					}
+					Directory.SetAccessControl(root, accessControl);
+
+					var orders = Path.Combine(root, "Orders");
+					accessControl = Directory.GetAccessControl(orders);
+					rules = accessControl.GetAccessRules(true, true, typeof(SecurityIdentifier));
+					foreach (FileSystemAccessRule rule in rules) {
+						var name = rule.IdentityReference.Translate(typeof(NTAccount)).Value;
+						if (name.Contains(login))
+							accessControl.RemoveAccessRule(rule);
+					}
+#endif
+					break;
+				}
+				catch (Exception e) {
+					LogManager.GetLogger(GetType()).Error("Ошибка при удалении прав, пробую еще раз", e);
 					index++;
 					Thread.Sleep(500);
 					if (index > 3)
