@@ -48,8 +48,8 @@ namespace AdminInterface.Controllers
 		public void Build([ARDataBind("buildFilter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] DocumentBuilderFilter filter, DateTime actDate)
 		{
 			var sourceInvoices = filter.Find<Invoice>();
-			var invoices = ArHelper.WithSession(s => sourceInvoices
-				.Where(i => !s.Query<Act>().Any(a => a.Payer == i.Payer && a.Period == i.Period)).ToList());
+			var invoices = sourceInvoices
+				.Where(i => !DbSession.Query<Act>().Any(a => a.Payer == i.Payer && a.Period == i.Period)).ToList();
 			var createdTime = DateTime.Now;
 			foreach (var act in Act.Build(invoices, actDate)) {
 				DbSession.Save(act);

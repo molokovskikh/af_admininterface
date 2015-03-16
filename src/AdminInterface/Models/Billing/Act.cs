@@ -62,7 +62,7 @@ namespace AdminInterface.Models.Billing
 		{
 			Payer = payer;
 			Recipient = payer.Recipient;
-			PayerName = payer.Name;
+			PayerName = payer.JuridicalName;
 			Customer = payer.Customer;
 		}
 
