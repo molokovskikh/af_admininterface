@@ -253,6 +253,7 @@ namespace AdminInterface.Controllers
 			}
 
 			if (!IsValid(forValidation) || equalClientInRegion) {
+				DbSession.Delete(currentPayer);
 				RegisterClient();
 				PropertyBag["clientContacts"] = clientContacts;
 				PropertyBag["client"] = client;
