@@ -4,7 +4,7 @@
 $(function () {
 	$.validator.addMethod("phone", function (value, element) {
 		if (value.toString().length > 0) {
-			return /^(\d{3,4})-(\d{6,7})(\*\d{3})?$/.test(value);
+			return /^(\d{3})-(\d{7})(\*\d{3})?$/.test(value) || /^(\d{4})-(\d{6})(\*\d{3})?$/.test(value);
 		}
 		return true;
 	}, "Некорректный телефонный номер, номер должен быть указан в формате xxx-xxxxxx.");
