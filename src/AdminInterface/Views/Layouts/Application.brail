@@ -47,7 +47,7 @@
 			"calendar-ru_win_.js",
 			"calendar-setup.js",
 			"date-ru-RU.js",
-			"jquery.contact.validation.js",
+			"jquery.contact.validation.js?v2",
 			"Common.js")}
 
 		${app.CSS("/App_Themes/Main/Main.css")}
