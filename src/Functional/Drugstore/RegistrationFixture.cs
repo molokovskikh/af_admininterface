@@ -616,10 +616,10 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ById("client_FullName")).TypeText(_randomClientName);
 			browser.TextField(Find.ById("client_Name")).TypeText(_randomClientName);
 			// Заполняем контактную информацию для клиента
-			Css("#ClientContactPhone").TypeText("123-456789");
+			Css("#ClientContactPhone").TypeText("123-4567890");
 			Css("#ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
 			// Заполняем контактную информацию для пользователя
-			Css("#userContactPhone").TypeText("123-456789");
+			Css("#userContactPhone").TypeText("123-4567890");
 			Css("#userContactEmail").TypeText(_randomClientName + _mailSuffix);
 			// Если это аптека, заполняем адрес доставки
 		}
