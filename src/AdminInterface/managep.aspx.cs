@@ -483,18 +483,19 @@ WHERE RowId = ?Id;
 
 			var modifiedIntersection = data.Tables["Prices"].Rows.Cast<DataRow>().Where(r => r.RowState == DataRowState.Modified);
 			var vipChangeFlag = false;
-			foreach (
-				var dataRow in modifiedIntersection.Where(dataRow => Convert.ToInt32(dataRow["PriceType"]) == (int)PriceType.Vip)) {
-				DbSession.Query<Intersection>().Where(i => i.Price.Id == Convert.ToUInt32(dataRow["PriceCode"])).ToList().ForEach(
-					inter => {
-						inter.AvailableForClient = false;
-						DbSession.Save(inter);
-					});
-				vipChangeFlag = true;
+			var modifiedVipPriced = modifiedIntersection.Where(dataRow => Convert.ToInt32(dataRow["PriceType"]) == (int)PriceType.Vip);
+			foreach (var dataRow in modifiedVipPriced) {
+				//Тут нужна доп. проверка на VIP, так как то что VIP прайс был изменен еще не означает, что там было измененно именно поле Типа.
+				//А сообщение надо выводить только в случае изменения типа прайса на VIP
+				var list = DbSession.Query<Intersection>().Where(i => i.Price.Id == Convert.ToUInt32(dataRow["PriceCode"]) && i.Price.PriceType != PriceType.Vip).ToList();
+				foreach(var inter in list) {
+					inter.AvailableForClient = false;
+					DbSession.Save(inter);
+					vipChangeFlag = true;
+				}
 			}
-			if (vipChangeFlag) {
+			if (vipChangeFlag)
 				message = "Все клиенты были отключены от VIP прайсов";
-			}
 
 			var connection = (MySqlConnection)DbSession.Connection;
 
