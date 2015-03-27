@@ -24,7 +24,7 @@ namespace Functional.ForTesting
 					break;
 				}
 				case ContactType.Phone: {
-					validText = "123-456789";
+					validText = "123-4567890";
 					invalidText = "435265";
 					validatorErrorMessage = "Некорректный телефонный номер";
 					break;
