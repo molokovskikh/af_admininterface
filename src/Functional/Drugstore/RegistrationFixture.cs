@@ -51,7 +51,7 @@ namespace Functional.Drugstore
 			Css("#client_Name").TypeText(_randomClientName);
 			browser.Button("RegisterButton").Click();
 			AssertText("Это поле необходимо заполнить.");
-			Css("#ClientContactPhone").TypeText("123-456789");
+			Css("#ClientContactPhone").TypeText("123-4567890");
 			Css("#ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
 			ClickRegisterAndCheck(browser);
 		}
@@ -316,23 +316,23 @@ namespace Functional.Drugstore
 			browser.Link("clientaddPhoneLink").Click();
 			browser.Link("clientaddPhoneLink").Click();
 			Thread.Sleep(500);
-			browser.TextField(Find.ByName("clientContacts[0].ContactText")).TypeText("111-111111");
+			browser.TextField(Find.ByName("clientContacts[0].ContactText")).TypeText("111-1111111");
 			browser.TextField(Find.ByName("clientContacts[0].Comment")).TypeText("some comment");
-			browser.TextField(Find.ByName("clientContacts[2].ContactText")).TypeText("211-111111");
-			browser.TextField(Find.ByName("clientContacts[3].ContactText")).TypeText("311-111111");
+			browser.TextField(Find.ByName("clientContacts[2].ContactText")).TypeText("211-1111111");
+			browser.TextField(Find.ByName("clientContacts[3].ContactText")).TypeText("311-1111111");
 			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
-			AssertText("111-111111 - some comment, 211-111111, 311-111111");
+			AssertText("111-1111111 - some comment, 211-1111111, 311-1111111");
 
 			var client = session.Load<Client>(clientCode);
 			var contacts = client.ContactGroupOwner.ContactGroups.Where(g => g.Type == ContactGroupType.General).ToList()[1].Contacts;
 			Assert.That(contacts.Count, Is.EqualTo(4));
-			Assert.That(contacts[0].ContactText, Is.EqualTo("111-111111"));
+			Assert.That(contacts[0].ContactText, Is.EqualTo("111-1111111"));
 			Assert.That(contacts[0].Comment, Is.EqualTo("some comment"));
-			Assert.That(contacts[1].ContactText, Is.EqualTo("211-111111"));
-			Assert.That(contacts[2].ContactText, Is.EqualTo("311-111111"));
+			Assert.That(contacts[1].ContactText, Is.EqualTo("211-1111111"));
+			Assert.That(contacts[2].ContactText, Is.EqualTo("311-1111111"));
 			Assert.That(contacts[3].Type, Is.EqualTo(ContactType.Email));
 		}
 
@@ -342,8 +342,8 @@ namespace Functional.Drugstore
 			SetupGeneralInformation();
 			browser.Link("useraddPhoneLink").Click();
 			Thread.Sleep(500);
-			browser.TextField(Find.ByName("userContacts[0].ContactText")).TypeText("111-111111");
-			browser.TextField(Find.ByName("userContacts[2].ContactText")).TypeText("222-111111");
+			browser.TextField(Find.ByName("userContacts[0].ContactText")).TypeText("111-1111111");
+			browser.TextField(Find.ByName("userContacts[2].ContactText")).TypeText("222-1111111");
 			browser.TextField(Find.ByName("userContacts[2].Comment")).TypeText("comment for user phone");
 			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
@@ -352,9 +352,9 @@ namespace Functional.Drugstore
 			var user = client.Users[0];
 			var contacts = client.Users[0].ContactGroup.Contacts;
 			Assert.That(contacts.Count, Is.EqualTo(3));
-			Assert.That(contacts[0].ContactText, Is.EqualTo("111-111111"));
+			Assert.That(contacts[0].ContactText, Is.EqualTo("111-1111111"));
 			Assert.That(contacts[1].Comment, Is.EqualTo("comment for user phone"));
-			Assert.That(contacts[1].ContactText, Is.EqualTo("222-111111"));
+			Assert.That(contacts[1].ContactText, Is.EqualTo("222-1111111"));
 			Assert.That(contacts[2].Type, Is.EqualTo(ContactType.Email));
 
 			Open(user, "Edit");

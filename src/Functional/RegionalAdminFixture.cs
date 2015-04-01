@@ -29,7 +29,7 @@ namespace Functional
 			var managerName = String.Format("adminName{0}", id);
 			browser.TextField(Find.ByName("administrator.UserName")).TypeText(login);
 			browser.TextField(Find.ByName("administrator.ManagerName")).TypeText(managerName);
-			browser.TextField(Find.ByName("administrator.PhoneSupport")).TypeText("123-123123");
+			browser.TextField(Find.ByName("administrator.PhoneSupport")).TypeText("123-1231230");
 			browser.TextField(Find.ByName("administrator.InternalPhone")).TypeText("123");
 			browser.TextField(Find.ByName("administrator.Email")).TypeText(String.Format("{0}@admin.net", id));
 			browser.SelectList(Find.ByName("administrator.Department")).Select("IT");
@@ -64,7 +64,7 @@ namespace Functional
 			ClickSaveAndCheckRequired(browser);
 			browser.TextField(Find.ByName("administrator.ManagerName")).TypeText(managerName);
 			ClickSaveAndCheckRequired(browser);
-			browser.TextField(Find.ByName("administrator.PhoneSupport")).TypeText("123-123123");
+			browser.TextField(Find.ByName("administrator.PhoneSupport")).TypeText("123-1231230");
 			browser.TextField(Find.ByName("administrator.Email")).TypeText("kvasovtest@analit.net");
 			ClickButton("Сохранить");
 			CheckRegistrationCard(browser, id, login, managerName);
@@ -127,7 +127,7 @@ namespace Functional
 		{
 			var admin = OpenAdmin();
 
-			browser.TextField(Find.ByName("administrator.PhoneSupport")).TypeText("123-123123");
+			browser.TextField(Find.ByName("administrator.PhoneSupport")).TypeText("123-1231230");
 			var id = Convert.ToUInt32(browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).GetAttributeValue("value"));
 			var permissionType = (PermissionType)Enum.ToObject(typeof(PermissionType), id);
 
