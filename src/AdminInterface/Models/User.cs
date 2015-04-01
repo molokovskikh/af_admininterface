@@ -116,6 +116,12 @@ namespace AdminInterface.Models
 			FtpAccess = false;
 		}
 
+
+		public virtual bool UserHasPermission(uint id)
+		{
+			return AssignedPermissions.SingleOrDefault(p => p.Id == id) != null;
+		}
+
 		public User(Payer payer, Service rootService)
 			: this(rootService)
 		{
