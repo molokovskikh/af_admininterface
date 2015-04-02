@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Dynamic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -91,18 +92,24 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Get)]
-		public void Add(uint clientId)
+		public void Add(uint clientId, User client = null)
 		{
 			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
 			DbSession.Get<Client>(clientId);
 			DbSession.Get<Supplier>(clientId);
 
-			var service = Service.FindAndCheck<Service>(clientId);
-			var user = new User(service);
-			//Для вьюшки - по умолчанию должен быть True. 
-			//Но в модели мы это не можем разместить, так как по здравому смыслу он по-умолчанию false.
-			//Так мы избежим лишних действий по созданию прав на директории
-			user.FtpAccess = true; 
+			var service = client == null ? Service.FindAndCheck<Service>(clientId) : client.RootService;
+			var user = client ?? new User(service);
+			PropertyBag["UserMessage"] = "Текст сообщения";
+
+			if (client == null) {
+				PropertyBag["UseDefPermession"] = true;
+				PropertyBag["SendToEmail"] = true;
+				//Для вьюшки - по умолчанию должен быть True. 
+				//Но в модели мы это не можем разместить, так как по здравому смыслу он по-умолчанию false.
+				//Так мы избежим лишних действий по созданию прав на директории
+				user.FtpAccess = true;
+			}
 			var rejectWaibillParams = new RejectWaibillParams().Get(clientId, DbSession);
 			user.SendWaybills = rejectWaibillParams.SendWaybills;
 			user.SendRejects = rejectWaibillParams.SendRejects;
@@ -135,7 +142,7 @@ namespace AdminInterface.Controllers
 			else
 				payers = new List<Payer> { DbSession.Load<Supplier>(service.Id).Payer };
 
-			if(payers.Count == 1) {
+			if (payers.Count == 1) {
 				user.Payer = payers.First();
 				PropertyBag["onePayer"] = true;
 			}
@@ -147,6 +154,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["UserRegistration"] = true;
 			PropertyBag["defaultSettings"] = Defaults;
 		}
+
 
 		public NameValueCollection GetCollectionFromJson(string text, string objName)
 		{
@@ -177,7 +185,7 @@ namespace AdminInterface.Controllers
 					value = string.Empty;
 				result.Add(objName + "." + obj.Key, value);
 			}
-			return result;
+			return result; //0
 		}
 
 		public void BindObjectInstanceForUser(User instance, string prefix, string jsonSource)
@@ -220,18 +228,21 @@ namespace AdminInterface.Controllers
 			BindObjectInstance(address, "address", AutoLoadBehavior.NewInstanceIfInvalidKey);
 
 			if (!IsValid(user)) {
-				Add(service.Id);
-				PropertyBag["user"] = user;
+				Add(clientId, user);
+				PropertyBag["UserMessage"] = comment;
+				PropertyBag["SendToEmail"] = sendClientCard;
+				PropertyBag["emailForSend"] = mails;
+				PropertyBag["InputPersonsList"] = persons;
+				PropertyBag["InputContactsList"] = contacts;
+				PropertyBag["SelectedRegions"] = regionSettings;
 				return;
 			}
 
 			if (String.IsNullOrEmpty(address.Value))
 				address = null;
 
-			if (service.IsClient()
-				&& ((Client)service).Payers.Count > 1) {
-				if ((user.AvaliableAddresses.Any() && user.AvaliableAddresses.Select(s => s.LegalEntity).All(l => l.Payer.Id != user.Payer.Id))
-					|| (address != null && address.LegalEntity.Payer.Id != user.Payer.Id)) {
+			if (service.IsClient() && ((Client)service).Payers.Count > 1) {
+				if ((user.AvaliableAddresses.Any() && user.AvaliableAddresses.Select(s => s.LegalEntity).All(l => l.Payer.Id != user.Payer.Id)) || (address != null && address.LegalEntity.Payer.Id != user.Payer.Id)) {
 					Add(service.Id);
 					PropertyBag["user"] = user;
 					PropertyBag["address"] = address;
@@ -525,8 +536,7 @@ namespace AdminInterface.Controllers
 			[DataBind("WorkRegions")] ulong[] workRegions,
 			[DataBind("OrderRegions")] ulong[] orderRegions)
 		{
-			var oldFirstTable = DbSession.OldValue(user, u => u.SubmitOrders)
-				&& DbSession.OldValue(user, u => u.IgnoreCheckMinOrder);
+			var oldFirstTable = DbSession.OldValue(user, u => u.SubmitOrders) && DbSession.OldValue(user, u => u.IgnoreCheckMinOrder);
 			if (oldFirstTable != user.FirstTable) {
 				if (user.FirstTable) {
 					user.Accounting.Payment = 0;
@@ -538,7 +548,7 @@ namespace AdminInterface.Controllers
 				}
 			}
 			user.WorkRegionMask = workRegions.Aggregate(0UL, (v, a) => a + v);
-			if(user.Client != null)
+			if (user.Client != null)
 				user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
 
 			user.ShowUsers = user.ShowUsers.Where(u => u != null).ToList();
@@ -579,11 +589,7 @@ namespace AdminInterface.Controllers
 			uint id;
 			UInt32.TryParse(text, out id);
 			var result = DbSession.Query<User>()
-				.Where(u =>
-					u.Login.Contains(text) ||
-						u.Name.Contains(text) ||
-						u.Id == id ||
-						(u.RootService != null && u.RootService.Name.Contains(text)))
+				.Where(u => !(!u.Login.Contains(text) && !u.Name.Contains(text) && u.Id != id && (u.RootService == null || !u.RootService.Name.Contains(text))))
 				.OrderBy(u => u.Id)
 				.Take(50)
 				.Fetch(u => u.RootService)

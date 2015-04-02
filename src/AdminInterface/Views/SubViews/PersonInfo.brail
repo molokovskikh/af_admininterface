@@ -41,13 +41,20 @@
 </script>
 
 <div class="contextual">
-	<a id="addPersonLink" class="icon icon-add" href="javascript:" onclick="addPersonRow(--insertId, '', '')">Добавить</a>
+	<a id="addPersonLink" class="icon icon-add" href="javascript:" onclick="addPersonRow(--insertId, '')">Добавить</a>
 </div>
 <h3>Контактные лица</h3>
 <table width="100%" cellspacing="5">
 	<tr>
 		<td>
 			<table name="HolderPerson" id="PersonHolder" style="width: 100%">
+				<% if IsDefined(@InputPersonsList) :%>
+					<% for i, person in enumerate(InputPersonsList): %>
+					<script type="text/javascript">
+						addPersonRow(--insertId, '${person.Name}');
+					</script>
+					<%end%>
+				<%end%>
 			</table>
 		</td>
 	</tr>

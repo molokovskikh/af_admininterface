@@ -29,6 +29,13 @@ ${app.Asset("contact-editor.css")}
     <tr>
         <td>
             <table name="ContactHolder" id="ContactHolder" style="width: 100%">
+							<% if IsDefined(@InputContactsList) :%>
+								<% for i, contact in enumerate(InputContactsList): %>
+								<script type="text/javascript">
+									addContactRow(--insertId,'${contact.ContactText}', '${contact.Comment}', '${contact.Type}');
+								</script>
+								<%end%>
+							<%end%>
             </table>
         </td>
     </tr>

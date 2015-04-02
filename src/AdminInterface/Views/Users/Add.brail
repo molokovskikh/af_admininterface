@@ -16,6 +16,17 @@
 		else
 			$(this).prop("checked", false);
 	}
+
+
+	function SetRegionState(regionId,check)
+	{
+		var elemId = 'browseRegion'+regionId;
+		if(regionId == '${maxRegion}')
+			elemId = 'browseRegion{maxRegion}';
+		
+		var regionEdit = document.getElementById(elemId);
+		regionEdit.checked = check == 'True' ? true : false;
+	}
 </script>
 
 <div style="width: 800px;">
@@ -42,11 +53,18 @@
 			<%end %>
 		</div>
 
-		${ForHelper.Editor("user.Accounting")}
+		<div class=block>
+			<h3>Биллинг</h3>
+			${app.Edit("user.Accounting.IsFree")}<br>
+			${app.Label("user.Accounting.FreePeriodEnd")}<br>
+			${app.Edit("user.Accounting.FreePeriodEnd")}<br>
+			Сообщение<br>
+			<textarea cols=60 rows=4 name=comment>${UserMessage}</textarea>
+		</div>
 
 		<div class=block>
 			<h3>
-				<input id="sendClientCard" name="sendClientCard" type="checkbox" checked="checked" />
+				<input id="sendClientCard" name="sendClientCard" type="checkbox" ${"checked" if (SendToEmail)} />
 				<label>Отправлять регистрационную карту на E-mail:</label>
 			</h3>
 			<label for="To">
@@ -103,10 +121,18 @@
 				Права доступа
 			</h3>
 			<div>
-				<% for i, permission in enumerate(Permissions): %>
-					<input type=checkbox name=user.AssignedPermissions[${i}].Id value=${permission.Id}  ${"checked" if (permission.AssignDefaultValue)}>
-					${permission.Name}
-					<br>
+			    <% if IsDefined(@UseDefPermession) :%>
+					<% for i, permission in enumerate(Permissions): %>
+						<input type=checkbox name=user.AssignedPermissions[${i}].Id value=${permission.Id}  ${"checked" if (permission.AssignDefaultValue)}>
+						${permission.Name}
+						<br>
+					<% end %>
+					<% else: %>
+						<% for i, permission in enumerate(Permissions): %>
+						<input type=checkbox name=user.AssignedPermissions[${i}].Id value=${permission.Id}  ${"checked" if user.UserHasPermission(permission.Id)}>
+							${permission.Name}
+						<br>
+					<% end %>
 				<% end %>
 			</div>
 		</div>
@@ -141,7 +167,13 @@
 			<h3>Региональная настройка</h3>
 			<% OutputSubView("/SubViews/Regions") %>
 		</div>
-
+		<%if IsDefined(@SelectedRegions): %>
+			<% for i, selectRegion in enumerate(SelectedRegions): %>
+				<script type="text/javascript">
+						SetRegionState("${selectRegion.Id}", '${selectRegion.IsAvaliableForBrowse}');
+				</script>
+			<% end %>
+		<% end %>
 		<div class=save>
 			<input type=submit value="Создать">
 		</div>
