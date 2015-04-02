@@ -70,7 +70,7 @@ namespace Functional.Drugstore
 			Css("#ClientContactEmail").TypeText(_randomClientName + "test.test");
 			browser.Button("RegisterButton").Click();
 			AssertText("Некорректный адрес электронной почты");
-			Css("#ClientContactPhone").TypeText("123-456789");
+			Css("#ClientContactPhone").TypeText("123-4567890");
 			Css("#ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
 			ClickRegisterAndCheck(browser);
 		}

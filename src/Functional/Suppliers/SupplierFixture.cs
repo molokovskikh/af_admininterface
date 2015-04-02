@@ -139,6 +139,23 @@ namespace Functional.Suppliers
 		[Test]
 		public void Vip_Price()
 		{
+			var client = DataMother.CreateTestClientWithUser(supplier.PricesRegions.First());
+			session.Save(client);
+
+			//Тут нужно понимать, что предупреждалка после обновления страницы, появляется только в том, случае
+			//Если клиенты действительно были отключены от вип прайса, что случается не всегда
+			//Поэтому необходимо добавить интерсекции
+			var intersection = new Intersection();
+			intersection.Price = supplier.Prices.First();
+			intersection.Client = client;
+			intersection.Region = supplier.PricesRegions.First();
+			var payer = new Payer("dasdas", "dasdasda");
+			session.Save(payer);
+			var legal = new LegalEntity("DASDA", "DASD", payer);
+			session.Save(legal);
+			intersection.Org = legal;
+			session.Save(intersection);
+
 			Open(supplier);
 			Click("Настройка");
 			Css("#MainContentPlaceHolder_PricesGrid_PriceTypeList_0").SelectByValue(((int)PriceType.Vip).ToString());
