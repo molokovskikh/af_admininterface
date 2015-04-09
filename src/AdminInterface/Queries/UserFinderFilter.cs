@@ -20,12 +20,9 @@ namespace AdminInterface.ManagerReportsFilters
 {
 	public enum ExcludesTypes
 	{
-		[Description("Показывать всех")]
-		All,
-		[Description("Скрытых в интерфейсе поставщика")]
-		Hidden,
-		[Description("Не имеющих права заказа")]
-		NoOrderPermission,
+		[Description("Показывать всех")] All,
+		[Description("Скрытых в интерфейсе поставщика")] Hidden,
+		[Description("Не имеющих права заказа")] NoOrderPermission,
 	}
 
 	public class UserFinderFilter : Sortable, IPaginable
@@ -58,6 +55,7 @@ namespace AdminInterface.ManagerReportsFilters
 				{ "Id", "Id" },
 				{ "Name", "Name" },
 				{ "RegistrationDate", "Registration.RegistrationDate" },
+				{ "ClientRegistrant", "c.Registration.Registrant" },
 				{ "ClientId", "c.Id" },
 				{ "ClientName", "c.Name" }
 			};
@@ -160,6 +158,7 @@ namespace AdminInterface.ManagerReportsFilters
 					.Add(Projections.Property<User>(u => u.Id).As("Id"))
 					.Add(Projections.Property<User>(u => u.Name).As("Name"))
 					.Add(Projections.Property<User>(u => u.Registration.RegistrationDate).As("RegistrationDate"))
+					.Add(Projections.Property("c.Registration.Registrant").As("ClientRegistrant"))
 					.Add(Projections.Property("rootUser.Enabled").As("UserEnabled"))
 					.Add(Projections.Property("s.Id").As("ClientId"))
 					.Add(Projections.Property("s.Name").As("ClientName"))
