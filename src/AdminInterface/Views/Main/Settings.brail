@@ -46,6 +46,9 @@ ${app.Asset("MainSettings.js")}
 		<li>
 			<a id="deletingMinimails" href="#">Удаление минипочты</a>
 		</li>
+		<li>
+			<a id="newSupplierMail" href="#">Шаблон письма новому поставщику</a>
+		</li>
 	</ul>
 </div>
 
@@ -55,6 +58,25 @@ ${app.Asset("MainSettings.js")}
 		${FormHelper.TextArea("Defaults.DeletingMiniMailText", { @class: @allWidth, @rows: "10" })}
 		${app.GetValidationError(Defaults, "DeletingMiniMailText")}
 	</fieldset>
+</div>
+
+<div id="newSupplierMail-tab" class="tab">
+<fieldset class="tabFieldset">
+	<legend>Шаблон письма новому поставщику</legend>
+	${app.GetLabel("Defaults.NewSupplierMailSubject")} <br/>
+	${app.Edit("Defaults.NewSupplierMailSubject", {@class: @width600px})} <br/><br/>
+	${app.GetLabel("Defaults.NewSupplierMailText")} <br/>
+	${FormHelper.TextArea("Defaults.NewSupplierMailText", {@class: @tinymceAddressesHelpText, @id: @NewSupplierMailText})}
+	${app.GetValidationError("Defaults.NewSupplierMailText")}
+
+</fieldset>
+<fieldset class="tabFieldset">
+    <a id="addAttachLink" href="javascript:" onclick="addAttachRow(1)">Добавить файл</a>
+	<legend>Вложения</legend>
+		<table id='attachTable'>
+			<tr><td><input type="file" size="60"/></td></tr>
+	    </table>
+</fieldset>
 </div>
 
 <div id="processingNotices-tab" class="tab">

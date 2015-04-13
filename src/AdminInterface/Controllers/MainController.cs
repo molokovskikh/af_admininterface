@@ -149,6 +149,8 @@ namespace AdminInterface.Controllers
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 				BindObjectInstance(defaults, ParamStore.Form, "defaults");
 				if (IsValid(defaults)) {
+					NewSupplierMessage message = new NewSupplierMessage();
+					message.Save(defaults);
 					Notify("Сохранено");
 					RedirectToUrl(Request.UrlReferrer + pageTab);
 				}

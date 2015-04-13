@@ -30,6 +30,7 @@ namespace AdminInterface
 		public string ErrorFilesPath { get; set; }
 		public string RedmineUrl { get; set; }
 		public string RedmineAssignedTo { get; set; }
+		public string NewSupplierMailFilePath { get; set; }
 	}
 
 	public class Global : WebApplication

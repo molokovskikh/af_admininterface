@@ -12,6 +12,11 @@ tinyMCE.init({
 	editor_selector: "tinymce"
 });
 
+function addAttachRow(rowId) 
+{
+	$("#attachTable").append("<tr><td><input type='file' size='60'/></td></tr>");
+}
+
 $(function () {
 	$('#generalSettings').click(function () {
 		$('#activeTabName').val('#tab-generalSettings');
@@ -32,3 +37,4 @@ $(function () {
 		$('#activeTabName').val('#tab-deletingMinimails');
 	});
 });
+

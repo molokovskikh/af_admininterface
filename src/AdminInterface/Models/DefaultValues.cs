@@ -74,6 +74,12 @@ namespace AdminInterface.Models
 		[Property, ValidateNonEmpty]
 		public string AddressesHelpText { get; set; }
 
+		[Property, ValidateNonEmpty, Description("Тело письма")]
+		public string NewSupplierMailText { get; set; }
+
+		[Property, ValidateNonEmpty, Description("Тема письма")]
+		public string NewSupplierMailSubject { get; set; }
+
 		[Property, ValidateNonEmpty]
 		public string TechOperatingModeTemplate { get; set; }
 
