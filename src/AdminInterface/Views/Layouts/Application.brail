@@ -54,6 +54,22 @@
 		<% OutputSubView("/SubViews/DefaultJs") %>
 		${app.Asset("globalize/globalize.js")}
 		${app.Asset("jquery.validate.globalize.js")}
+		${app.Asset("jqwidgets/styles/jqx.base.css")}
+		${app.Asset("jqwidgets/styles/jqx.darkblue.css")}
+		${app.Asset("jqwidgets/jqxcore.js")}
+		${app.Asset("jqwidgets/jqxbuttons.js")}
+		${app.Asset("jqwidgets/jqxfileupload.js")}
+		${app.Asset("jqwidgets/jqxdata.js")}
+		${app.Asset("jqwidgets/jqxscrollbar.js")}
+		${app.Asset("jqwidgets/jqxmenu.js")}
+		${app.Asset("jqwidgets/jqxcheckbox.js")}
+		${app.Asset("jqwidgets/jqxlistbox.js")}
+		${app.Asset("jqwidgets/jqxdropdownlist.js")}
+		${app.Asset("jqwidgets/jqxgrid.js")}
+		${app.Asset("jqwidgets/jqxgrid.sort.js")}
+		${app.Asset("jqwidgets/jqxgrid.pager.js")}
+		${app.Asset("jqwidgets/jqxgrid.selection.js")}
+		${app.Asset("jqwidgets/jqxgrid.edit.js")}
 	</head>
 	<body>
 	<% unless ?ShowHeader: %>

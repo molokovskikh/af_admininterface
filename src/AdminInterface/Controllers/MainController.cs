@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -145,12 +144,13 @@ namespace AdminInterface.Controllers
 		public void Settings(string pageTab)
 		{
 			var defaults = Defaults;
+			NewSupplierMessage newSupplierMessage = new NewSupplierMessage();
+
 			if (IsPost) {
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 				BindObjectInstance(defaults, ParamStore.Form, "defaults");
 				if (IsValid(defaults)) {
-					NewSupplierMessage message = new NewSupplierMessage();
-					message.Save(defaults);
+					newSupplierMessage.CreateEmlFile(defaults);
 					Notify("Сохранено");
 					RedirectToUrl(Request.UrlReferrer + pageTab);
 				}

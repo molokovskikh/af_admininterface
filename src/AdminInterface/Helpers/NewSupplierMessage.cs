@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
@@ -14,26 +15,25 @@ namespace AdminInterface.Helpers
 	public class NewSupplierMessage
 	{
 		private string mPickUpDir;
-		private List<string> mAttachFilePathList;
+		private const string mAttachDir = "C:\\NewSupplierEmail\\Attachments";
 
 		public NewSupplierMessage()
 		{
 			mPickUpDir = Global.Config.NewSupplierMailFilePath;
-			mAttachFilePathList = new List<string>();
 		}
 
-		public void AddAttachmentFilePath(string fileName)
-		{
-			mAttachFilePathList.Add(fileName);
-		}
-
-		public bool Save(DefaultValues defaults)
+		/// <summary>
+		/// Сформировать файл *.eml и сохранить его в директории 
+		/// указанной Global.Config.NewSupplierMailFilePath.
+		/// В директории может находится только один файл *.eml
+		/// при повторном сохранении любые файлы с разрешением *.eml удаляются.
+		/// </summary>
+		public bool CreateEmlFile(DefaultValues defaults)
 		{
 			bool saveResult = false;
 			OperationResult = null;
 
-			if (!String.IsNullOrEmpty(mPickUpDir))
-			{
+			if (!String.IsNullOrEmpty(mPickUpDir)) {
 				MailMessage mes = new MailMessage();
 				mes.From = new MailAddress("analit@analit.ru");
 				mes.To.Add("supplier@supplier.ru");
@@ -42,12 +42,13 @@ namespace AdminInterface.Helpers
 				mes.Subject = defaults.NewSupplierMailSubject;
 				mes.Body = defaults.NewSupplierMailText;
 
-				foreach (string filePath in mAttachFilePathList)
+				string[] attachments = GetAttachmentsArray();
+				foreach (string filePath in attachments)
 					if (File.Exists(filePath))
 						mes.Attachments.Add(new Attachment(filePath, MediaTypeNames.Application.Octet));
 
 				DirectoryInfo dinfo = new DirectoryInfo(mPickUpDir);
-				
+
 				if (!dinfo.Exists)
 					dinfo.Create();
 
@@ -63,11 +64,13 @@ namespace AdminInterface.Helpers
 			return saveResult;
 		}
 
+		/// <summary>
+		/// Скачать сформированный файл *.eml
+		/// </summary>
 		public void DownLoad(IResponse response)
 		{
 			string emlFilePath = GetFilePath();
-			if (emlFilePath != null && response != null)
-			{
+			if (emlFilePath != null && response != null) {
 				response.Clear();
 				response.ContentType = "text/plain";
 				response.Charset = "UTF-8";
@@ -76,12 +79,28 @@ namespace AdminInterface.Helpers
 			}
 		}
 
+		private string[] GetAttachmentsArray()
+		{
+			DirectoryInfo attachDir = new DirectoryInfo(mAttachDir);
+			string[] filePathArray = null;
+
+			if (attachDir.Exists) {
+				FileInfo[] files = attachDir.GetFiles();
+				filePathArray = new string[files.Length];
+
+				for (int i = 0; i < files.Length; i++) {
+					filePathArray[i] = files[i].FullName;
+				}
+			}
+			return filePathArray;
+		}
+
 		private string GetFilePath()
 		{
 			DirectoryInfo dir = new DirectoryInfo(mPickUpDir);
 			if (dir.Exists) {
 				FileInfo file = dir.GetFiles("*.eml").SingleOrDefault();
-				if(file != null)
+				if (file != null)
 					return file.FullName;
 			}
 			return null;

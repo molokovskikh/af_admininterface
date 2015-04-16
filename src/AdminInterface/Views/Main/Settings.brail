@@ -13,7 +13,120 @@ ${app.Asset("MainSettings.js")}
 		${app.GetValidationError(defaults, bodyField)}
 	</fieldset>
 <% end %>
+	<script type="text/javascript">
+	$(document).ready(function () {
+		//Параметры грида в котором отображаются
+		//загруженые на сервер вложения
+		var source =
+		{
+			datatype: "xml",
+			datafields: [
+				{ name: 'FileName', map: 'FileName' },
+				{ name: 'ForDelete', map: 'ForDelete' }
+			],
+			url: "http://localhost:54886/NewSupplierMailSettings/GetFiles",
+			root: "FileList",
+			record: "File",
+			id: 'FileID'
+		};
+		var localizationobj = {};
+		localizationobj.emptydatastring = "Нет загруженных вложений";
 
+		var dataAdapter = new $.jqx.dataAdapter(source, {
+			downloadComplete: function (data, status, xhr) { },
+			loadComplete: function (data) { },
+			loadError: function (xhr, status, error) { }
+		});
+		$("#jqxgrid").jqxGrid('localizestrings', localizationobj);
+		$("#jqxgrid").jqxGrid(
+		{
+			width: 600,
+			source: dataAdapter,
+			autoheight: true,
+			sortable: true,
+			altrows: true,
+			enabletooltips: true,
+			editable: true,
+			selectionmode: 'multiplecellsadvanced',
+			columns: [
+				{ text: 'Вложения', datafield: 'FileName' },
+				{ text: '', datafield: 'ForDelete', columntype: 'checkbox', width: 65 }
+			]
+		});
+
+
+		function updateAttachGrid() {
+			$("#jqxgrid").jqxGrid({ source: dataAdapter });
+		}
+
+		//контрол добавления вложений
+		$('#jqxFileUpload').jqxFileUpload({
+			theme: 'summer',
+			browseTemplate: 'success',
+			uploadTemplate: 'primary',
+			cancelTemplate: 'warning',
+			width: 600,
+			uploadUrl: 'http://localhost:54886/NewSupplierMailSettings/AddAttachment',
+			fileInputName: 'fileToUpload'
+		});
+
+		$('#jqxFileUpload').jqxFileUpload({
+			localization:
+			{
+				browseButton: 'Выбрать',
+				uploadButton: 'Загрузить',
+				cancelButton: 'Отмена',
+				uploadFileTooltip: 'Загрузить',
+				cancelFileTooltip: 'Отмена'
+			}
+		});
+		$('#jqxFileUpload').jqxFileUpload({ multipleFilesUpload: true });
+
+		//кнопка удаления вложения
+		$("#delAttachButton").jqxButton({ width: '160px', height: '25px', theme: 'darkblue' });
+		$('#delAttachButton').click(function () {
+			var rows = $('#jqxgrid').jqxGrid('getrows');
+			var result = "";
+			var delCount = 0;
+			if (rows.length > 0) {
+				for (var i = 0; i < rows.length; i++) {
+					var row = rows[i];
+					if (row.ForDelete == true) {
+						delCount++;
+						result += row.FileName + ";";
+					}
+				}
+				if (delCount > 0)
+					$.post("http://localhost:54886/NewSupplierMailSettings/DeleteAttachment", result, updateAttachGrid);
+			}
+		});
+
+		//обработка ответа сервера после добавления файла
+		//обновляем грид
+		$('#jqxFileUpload').on('uploadEnd', function (event) {
+			var args = event.args;
+			var fileName = args.file;
+			var serverResponce = args.response;
+			if (serverResponce == "Ok") {
+				updateAttachGrid();
+			}
+		});
+
+		var allowSubmit = false;
+		
+		$("#sendButton").jqxButton({ width: '160px', height: '25px', theme: 'darkblue' });
+		$('#sendButton').click(function () {
+			allowSubmit = true;
+			$("#saveSettingForm").submit();
+			allowSubmit = false;
+		});
+
+		$("#saveSettingForm").submit(function (event) {
+			if (allowSubmit != true)
+				event.preventDefault();
+		});
+	});
+</script>
 <% component CaptureFor, {"id" : "Title"}: %>
 	Настройки по умолчанию
 <% end %>
@@ -22,7 +135,7 @@ ${app.Asset("MainSettings.js")}
 
 <h3>Настройки по умолчанию</h3>
 
-<form method=post class=vertical>
+<form id="saveSettingForm" method=post class=vertical>
 	<input type=hidden value=${defaults.Id} name="Defaults.Id" />
 	<input type="hidden" name="pageTab" id="activeTabName" />
 
@@ -71,11 +184,27 @@ ${app.Asset("MainSettings.js")}
 
 </fieldset>
 <fieldset class="tabFieldset">
-    <a id="addAttachLink" href="javascript:" onclick="addAttachRow(1)">Добавить файл</a>
+    
 	<legend>Вложения</legend>
-		<table id='attachTable'>
-			<tr><td><input type="file" size="60"/></td></tr>
-	    </table>
+		<table>
+	<tr>
+		<td>
+			<div id='jqxWidget' style="font-size: 13px; font-family: Verdana; float: left;">
+				<div id="jqxgrid">
+				</div>
+			</div>
+		</td>
+	</tr>
+	<tr><td align="right"><button id='delAttachButton'>Удалить выделенные</button></td></tr>
+</table>
+<br>
+<table>
+	<tr>
+		<td>
+			<div id="jqxFileUpload"></div>
+		</td>
+	</tr>
+</table>
 </fieldset>
 </div>
 
@@ -196,5 +325,5 @@ ${app.Asset("MainSettings.js")}
 </div>
 
 <br>
-<input type=submit value="Сохранить" />
+<button id="sendButton">Сохранить</button>
 </form>
