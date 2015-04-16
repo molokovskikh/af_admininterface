@@ -65,6 +65,24 @@ namespace AdminInterface.Controllers
 				deserializedObj);
 		}
 
+		///<summary>
+		/// Установка прав на FTP доступ. Вызывается из Клиенсткого интерфейса.
+		/// </summary>
+		[AccessibleThrough(Verb.Post)]
+		public void SetFtpAccess()
+		{
+			var encode = Encoding.GetEncoding("utf-8");
+			Request.InputStream.Seek(0, SeekOrigin.Begin);
+			var responseStream = new StreamReader(Request.InputStream, encode);
+			string jsonString = responseStream.ReadLine();
+			dynamic jsonUser = JObject.Parse(jsonString);
+			uint id = jsonUser.Id;
+			bool ftpAccess = jsonUser.FtpAccess;
+			User user = DbSession.Load<User>(id);
+			user.SetFtpAccess(ftpAccess);
+			CancelView();
+		}
+
 		public static string PatchJson(string request)
 		{
 			var json = JObject.Parse(request);
