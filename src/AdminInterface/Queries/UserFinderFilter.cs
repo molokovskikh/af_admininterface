@@ -55,9 +55,9 @@ namespace AdminInterface.ManagerReportsFilters
 				{ "Id", "Id" },
 				{ "Name", "Name" },
 				{ "RegistrationDate", "Registration.RegistrationDate" },
-				{ "ClientRegistrant", "c.Registration.Registrant" },
 				{ "ClientId", "c.Id" },
-				{ "ClientName", "c.Name" }
+				{ "ClientName", "c.Name" },
+				{ "RegistrantName", "RegistrantName" }
 			};
 
 			Period = new DatePeriod(DateTime.Now.AddDays(-1), DateTime.Now);
@@ -115,17 +115,19 @@ namespace AdminInterface.ManagerReportsFilters
 			if (FinderType == RegistrationFinderType.Addresses)
 				SortKeyMap.Add("RegionName", "c.HomeRegion");
 
+			var managerNameProjection = Projections.SubQuery(DetachedCriteria.For<Administrator>()
+				.Add(Expression.EqProperty("UserName", "c.Registration.Registrant"))
+				.SetProjection(Projections.ProjectionList().Add(Property.ForName("ManagerName"))));
+
 			var userCountProjection = Projections.SubQuery(DetachedCriteria.For<Client>()
 				.CreateAlias("Users", "u", JoinType.InnerJoin)
 				.Add(Expression.EqProperty("Id", "c.Id"))
-				.SetProjection(Projections.ProjectionList()
-					.Add(Projections.Count("u.Id"))));
+				.SetProjection(Projections.ProjectionList().Add(Projections.Count("u.Id"))));
 
 			var addressCountProjection = Projections.SubQuery(DetachedCriteria.For<Client>()
 				.CreateAlias("Addresses", "a", JoinType.InnerJoin)
 				.Add(Expression.EqProperty("Id", "c.Id"))
-				.SetProjection(Projections.ProjectionList()
-					.Add(Projections.Count("a.Id"))));
+				.SetProjection(Projections.ProjectionList().Add(Projections.Count("a.Id"))));
 
 			var noOrderCriteria = DetachedCriteria.For<User>()
 				.CreateAlias("Client", "cSub", JoinType.LeftOuterJoin)
@@ -158,7 +160,6 @@ namespace AdminInterface.ManagerReportsFilters
 					.Add(Projections.Property<User>(u => u.Id).As("Id"))
 					.Add(Projections.Property<User>(u => u.Name).As("Name"))
 					.Add(Projections.Property<User>(u => u.Registration.RegistrationDate).As("RegistrationDate"))
-					.Add(Projections.Property("c.Registration.Registrant").As("ClientRegistrant"))
 					.Add(Projections.Property("rootUser.Enabled").As("UserEnabled"))
 					.Add(Projections.Property("s.Id").As("ClientId"))
 					.Add(Projections.Property("s.Name").As("ClientName"))
@@ -168,7 +169,8 @@ namespace AdminInterface.ManagerReportsFilters
 					.Add(Projections.Property("set.InvisibleOnFirm").As("InvisibleOnFirm"))
 					.Add(Projections.Alias(userCountProjection, "UserCount"))
 					.Add(Projections.Alias(addressCountProjection, "AddressCount"))
-					.Add(Projections.Alias(noOrderProjection, "NoOrder")))
+					.Add(Projections.Alias(noOrderProjection, "NoOrder"))
+					.Add(Projections.Alias(managerNameProjection, "RegistrantName")))
 					.Add(Expression.Ge("Registration.RegistrationDate", Period.Begin))
 					.Add(Expression.Le("Registration.RegistrationDate", Period.End))
 					.CreateAlias("Payer", "p", JoinType.InnerJoin)

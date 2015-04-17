@@ -40,7 +40,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
 			<th>Пользователей</th>
 			<th>Адресов</th>
-			<th>${app.Sortable("Регистрант", "ClientRegistrant")}</th>
+			<th>${app.Sortable("Регистрант", "RegistrantName")}</th>
 			<th>Показать</th>
 			<th>${app.Sortable("Регион", "RegionName")}</th>
 			<th>${app.Sortable(filter.HeadCodeName, "Id")}</th>
@@ -79,7 +79,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 				Нет
 			<%end%>
 			</td>
-			<td>${item.RegistrantFullName}</td>
+			<td>${item.RegistrantName}</td>
 			<td>
 				<%if (not item.NoOrderStyle):%>
 					${FormHelper.FormTag("${SiteRoot}/ManagerReports/ClientConditionsMonitoring", {@method : @get})}

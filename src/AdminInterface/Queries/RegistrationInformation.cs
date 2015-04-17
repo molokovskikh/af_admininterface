@@ -48,18 +48,7 @@ namespace AdminInterface.ManagerReportsFilters
 		public string ClientName { get; set; }
 		public string ClientRegistrant { get; set; }
 
-		public virtual string RegistrantFullName
-		{
-			get
-			{
-				if (!String.IsNullOrEmpty(ClientRegistrant)) {
-					Administrator admin = Administrator.GetByName(ClientRegistrant);
-					if (admin != null)
-						return admin.ManagerName;
-				}
-				return null;
-			}
-		}
+		public string RegistrantName { get; set; }
 
 		public int UserCount { get; set; }
 		public int AddressCount { get; set; }
@@ -91,8 +80,7 @@ namespace AdminInterface.ManagerReportsFilters
 		{
 			get
 			{
-				return (ObjectType == RegistrationFinderType.Users && (!UserEnabled || ServiceDisabled)) ||
-				       (ObjectType == RegistrationFinderType.Addresses && (!AdressEnabled || ClientEnabled == ClientStatus.Off));
+				return (ObjectType == RegistrationFinderType.Users && (!UserEnabled || ServiceDisabled)) || (ObjectType == RegistrationFinderType.Addresses && (!AdressEnabled || ClientEnabled == ClientStatus.Off));
 			}
 		}
 
