@@ -6,7 +6,9 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.MonoRailExtentions;
 
@@ -34,6 +36,7 @@ namespace AdminInterface.ManagerReportsFilters
 			}
 			set { _name = value; }
 		}
+
 		public bool IsUpdate { get; set; }
 		public DateTime RegistrationDate { get; set; }
 		public bool AdressEnabled { get; set; }
@@ -43,6 +46,9 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public uint ClientId { get; set; }
 		public string ClientName { get; set; }
+		public string ClientRegistrant { get; set; }
+
+		public string RegistrantName { get; set; }
 
 		public int UserCount { get; set; }
 		public int AddressCount { get; set; }
@@ -74,8 +80,7 @@ namespace AdminInterface.ManagerReportsFilters
 		{
 			get
 			{
-				return (ObjectType == RegistrationFinderType.Users && (!UserEnabled || ServiceDisabled)) ||
-					(ObjectType == RegistrationFinderType.Addresses && (!AdressEnabled || ClientEnabled == ClientStatus.Off));
+				return (ObjectType == RegistrationFinderType.Users && (!UserEnabled || ServiceDisabled)) || (ObjectType == RegistrationFinderType.Addresses && (!AdressEnabled || ClientEnabled == ClientStatus.Off));
 			}
 		}
 
