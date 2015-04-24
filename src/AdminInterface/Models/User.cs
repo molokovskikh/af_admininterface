@@ -60,14 +60,16 @@ namespace AdminInterface.Models
 
 	public class LoginNotFoundException : Exception
 	{
-		public LoginNotFoundException(string message) : base(message)
+		public LoginNotFoundException(string message)
+			: base(message)
 		{
 		}
 	}
 
 	public class CantChangePassword : Exception
 	{
-		public CantChangePassword(string message) : base(message)
+		public CantChangePassword(string message)
+			: base(message)
 		{
 		}
 	}
@@ -120,6 +122,11 @@ namespace AdminInterface.Models
 		public virtual bool UserHasPermission(uint id)
 		{
 			return AssignedPermissions.SingleOrDefault(p => p.Id == id) != null;
+		}
+
+		public virtual bool HasAvaliableAddress(uint id)
+		{
+			return AvaliableAddresses.SingleOrDefault(p => p.Id == id) != null;
 		}
 
 		public User(Payer payer, Service rootService)
@@ -232,10 +239,10 @@ namespace AdminInterface.Models
 		[Property, Description("AnalitF.net - Использовать форму автозаказа с возможностью редактирования"), Auditable]
 		public virtual bool UseBatch2 { get; set; }
 
-/*
-		[Property, Description("Не проверять УИН"), Auditable]
-		public virtual bool DoNotCheckUin { get; set; }
-*/
+		/*
+				[Property, Description("Не проверять УИН"), Auditable]
+				public virtual bool DoNotCheckUin { get; set; }
+		*/
 
 		[BelongsTo("ClientId", /*NotNull = true, */Lazy = FetchWhen.OnInvoke), Description("Клиент"), Auditable]
 		public virtual Client Client { get; set; }
@@ -336,10 +343,7 @@ namespace AdminInterface.Models
 
 		public virtual List<User> CanInheritPricesFrom
 		{
-			get
-			{
-				return Client.Users.Where(u => u.Id != Id).OrderBy(u => u.LoginAndName).ToList();
-			}
+			get { return Client.Users.Where(u => u.Id != Id).OrderBy(u => u.LoginAndName).ToList(); }
 		}
 
 		[Style]
@@ -357,13 +361,7 @@ namespace AdminInterface.Models
 		[Style]
 		public virtual bool CanNotOrder
 		{
-			get
-			{
-				return Client == null ||
-					Client.Settings.ServiceClient ||
-					OrderRegionMask == 0 ||
-					AvaliableAddresses.Count == 0;
-			}
+			get { return Client == null || Client.Settings.ServiceClient || OrderRegionMask == 0 || AvaliableAddresses.Count == 0; }
 		}
 
 		public virtual IList<AuditRecord> GetAuditRecord(ISession session, MessageQuery query)
@@ -577,8 +575,7 @@ namespace AdminInterface.Models
 		public virtual void PrepareSave(ISession session)
 		{
 			if (Client != null) {
-				if (AssignedPermissions.FirstOrDefault(p => p.Shortcut == "ConfigureMatrixAssortment") != null &&
-					Client.Settings.BuyingMatrix == null) {
+				if (AssignedPermissions.FirstOrDefault(p => p.Shortcut == "ConfigureMatrixAssortment") != null && Client.Settings.BuyingMatrix == null) {
 					var matrix = new Matrix();
 					session.Save(matrix);
 					Client.Settings.BuyingMatrix = matrix;
@@ -590,7 +587,7 @@ namespace AdminInterface.Models
 
 			//Проверяем поле доступа к фтп и изменяем доступ в случае необходимости
 			var oldFtpAccess = session.OldValue(this, u => u.FtpAccess);
-			if(oldFtpAccess != FtpAccess)
+			if (oldFtpAccess != FtpAccess)
 				SetFtpAccess(FtpAccess);
 		}
 

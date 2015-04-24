@@ -198,6 +198,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["client"] = client;
 			PropertyBag["user"] = user;
 			PropertyBag["address"] = client.AddAddress("");
+			PropertyBag["account"] = user.Accounting;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsForDrugstore(DbSession);
 			PropertyBag["regions"] = regions;
 			PropertyBag["clientContacts"] = new[] { new Contact(ContactType.Phone, string.Empty), new Contact(ContactType.Email, string.Empty) };
@@ -236,10 +237,11 @@ namespace AdminInterface.Controllers
 			client.Settings.OrderRegionMask = regionSettings.GetOrderMask();
 			var user = new User(client);
 			var address = new Address();
+			Account account = user.Accounting;
 
 			BindObjectInstance(client.Settings, "client.Settings");
 			BindObjectInstance(user, "user");
-			BindObjectInstance(user.Accounting, "user.Accounting");
+			BindObjectInstance(account, "account");
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			BindObjectInstance(address, "address");
 
@@ -260,6 +262,7 @@ namespace AdminInterface.Controllers
 				PropertyBag["user"] = user;
 				PropertyBag["address"] = address;
 				PropertyBag["options"] = options;
+				PropertyBag["account"] = account;
 				if (equalClientInRegion)
 					Error(string.Format("В данном регионе уже существует клиент с таким именем {0}", name));
 				return;

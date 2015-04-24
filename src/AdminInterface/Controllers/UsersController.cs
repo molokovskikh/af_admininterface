@@ -119,6 +119,8 @@ namespace AdminInterface.Controllers
 			var service = client == null ? Service.FindAndCheck<Service>(clientId) : client.RootService;
 			var user = client ?? new User(service);
 			PropertyBag["UserMessage"] = "Текст сообщения";
+			PropertyBag["deliveryAddress"] = "";
+			PropertyBag["account"] = user.Accounting;
 
 			if (client == null) {
 				PropertyBag["UseDefPermession"] = true;
@@ -127,10 +129,11 @@ namespace AdminInterface.Controllers
 				//Но в модели мы это не можем разместить, так как по здравому смыслу он по-умолчанию false.
 				//Так мы избежим лишних действий по созданию прав на директории
 				user.FtpAccess = true;
+				var rejectWaibillParams = new RejectWaibillParams().Get(clientId, DbSession);
+				user.SendWaybills = rejectWaibillParams.SendWaybills;
+				user.SendRejects = rejectWaibillParams.SendRejects;
 			}
-			var rejectWaibillParams = new RejectWaibillParams().Get(clientId, DbSession);
-			user.SendWaybills = rejectWaibillParams.SendWaybills;
-			user.SendRejects = rejectWaibillParams.SendRejects;
+
 			PropertyBag["client"] = service;
 			if (service.IsClient()) {
 				PropertyBag["drugstore"] = ((Client)service).Settings;
@@ -240,19 +243,24 @@ namespace AdminInterface.Controllers
 			var service = Service.FindAndCheck<Service>(clientId);
 			var user = new User(service);
 			var address = new Address();
+			
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+			Account account = user.Accounting;
 
 			BindObjectInstanceForUser(user, "user", jsonSource);
 			BindObjectInstance(address, "address", AutoLoadBehavior.NewInstanceIfInvalidKey);
+			BindObjectInstance(account, "account", AutoLoadBehavior.NewInstanceIfInvalidKey);
 
 			if (!IsValid(user)) {
 				Add(clientId, user);
+				PropertyBag["account"] = account;
 				PropertyBag["UserMessage"] = comment;
 				PropertyBag["SendToEmail"] = sendClientCard;
 				PropertyBag["emailForSend"] = mails;
 				PropertyBag["InputPersonsList"] = persons;
 				PropertyBag["InputContactsList"] = contacts;
 				PropertyBag["SelectedRegions"] = regionSettings;
+				PropertyBag["deliveryAddress"] = address.Value ?? "";
 				return;
 			}
 
