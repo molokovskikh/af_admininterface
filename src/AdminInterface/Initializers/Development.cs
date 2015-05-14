@@ -25,6 +25,7 @@ namespace AdminInterface.Initializers
 			config.CertificatesPath = Path.Combine(dataPath, config.CertificatesPath);
 			config.AttachmentsPath = Path.Combine(dataPath, config.AttachmentsPath);
 			config.DocsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Docs");
+			config.NewSupplierMailFilePath = Path.Combine(dataPath, config.NewSupplierMailFilePath);
 
 			config.PrinterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.PrinterPath);
 

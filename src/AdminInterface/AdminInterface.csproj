@@ -201,7 +201,7 @@
     <Compile Include="Controllers\MailsModeringController.cs" />
     <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Controllers\LegalEntityController.cs" />
-    <Compile Include="Controllers\NewSupplierMailSettings.cs" />
+    <Compile Include="Controllers\NewSupplierAttachmentsController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
     <Compile Include="Helpers\NewSupplierMessage.cs" />

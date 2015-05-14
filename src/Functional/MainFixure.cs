@@ -43,7 +43,9 @@ namespace Functional
 				ProcessingAboutFirmSubject = "temp",
 				ProcessingAboutNamesBody = "temp",
 				ProcessingAboutNamesSubject = "temp",
-				DeletingMiniMailText = "temp"
+				DeletingMiniMailText = "temp",
+				NewSupplierMailSubject = "Аналитфармация",
+				NewSupplierMailText = "Письмо новому поставщику"
 			};
 			session.Save(defaults);
 		}

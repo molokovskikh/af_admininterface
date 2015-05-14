@@ -31,7 +31,6 @@ namespace AdminInterface
 		public string RedmineUrl { get; set; }
 		public string RedmineAssignedTo { get; set; }
 		public string NewSupplierMailFilePath { get; set; }
-		public string NewSupplierAttachmentsPath { get; set; }
 	}
 
 	public class Global : WebApplication

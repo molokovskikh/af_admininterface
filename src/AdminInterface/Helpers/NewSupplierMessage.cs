@@ -7,6 +7,7 @@ using System.Net.Mail;
 using System.Net.Mime;
 using System.Text;
 using System.Web;
+using System.Xml.Linq;
 using AdminInterface.Models;
 using Castle.MonoRail.Framework;
 
@@ -14,15 +15,27 @@ namespace AdminInterface.Helpers
 {
 	public class NewSupplierMessage
 	{
-		private string mPickUpDir;
-		private const string mAttachDir = "C:\\NewSupplierEmail\\Attachments";
+		private readonly string mPickUpDir;
+		private readonly string mAttachDir;
+
+		private enum AttachmentFileNameFormat
+		{
+			FullName,
+			ShortName
+		}
 
 		public NewSupplierMessage()
 		{
 			mPickUpDir = Global.Config.NewSupplierMailFilePath;
+			if (!Directory.Exists(mPickUpDir))
+				Directory.CreateDirectory(mPickUpDir);
+
+			mAttachDir = Path.Combine(Global.Config.NewSupplierMailFilePath, "Attachments");
+			if (!Directory.Exists(mAttachDir))
+				Directory.CreateDirectory(mAttachDir);
 		}
 
-		/// <summary>
+		/// <summary>л
 		/// Сформировать файл *.eml и сохранить его в директории 
 		/// указанной Global.Config.NewSupplierMailFilePath.
 		/// В директории может находится только один файл *.eml
@@ -31,7 +44,6 @@ namespace AdminInterface.Helpers
 		public bool CreateEmlFile(DefaultValues defaults)
 		{
 			bool saveResult = false;
-			OperationResult = null;
 
 			if (!String.IsNullOrEmpty(mPickUpDir)) {
 				MailMessage mes = new MailMessage();
@@ -42,7 +54,7 @@ namespace AdminInterface.Helpers
 				mes.Subject = defaults.NewSupplierMailSubject;
 				mes.Body = defaults.NewSupplierMailText;
 
-				string[] attachments = GetAttachmentsArray();
+				string[] attachments = GetAttachmentsArray(AttachmentFileNameFormat.FullName);
 				foreach (string filePath in attachments)
 					if (File.Exists(filePath))
 						mes.Attachments.Add(new Attachment(filePath, MediaTypeNames.Application.Octet));
@@ -79,7 +91,57 @@ namespace AdminInterface.Helpers
 			}
 		}
 
-		private string[] GetAttachmentsArray()
+		public void AddAttachment(byte[] content, string fileName)
+		{
+			if (content == null || content.Length == 0 || String.IsNullOrEmpty(fileName))
+				return;
+
+			if (Directory.Exists(mAttachDir)) {
+				fileName = Path.GetFileName(fileName);
+				string savePath = Path.Combine(mAttachDir, fileName);
+				File.WriteAllBytes(savePath, content);
+			}
+		}
+
+		public bool DeleteAttachments(params string[] attachFiles)
+		{
+			int errorCount = 0;
+			foreach (var filePath in attachFiles) {
+				var file = new FileInfo(Path.Combine(mAttachDir, filePath));
+				if (!file.Exists) {
+					++errorCount;
+					continue;
+				}
+
+				try {
+					file.Delete();
+				}
+				catch {
+					++errorCount;
+				}
+			}
+			return errorCount > 0;
+		}
+
+		public string GetAttachmentsList()
+		{
+			string[] attachments = GetAttachmentsArray(AttachmentFileNameFormat.ShortName);
+			string result = null;
+
+			if (attachments.Length > 0) {
+				XElement rootEl = new XElement("FileList");
+				int id = 0;
+
+				foreach (string fileName in attachments)
+					rootEl.Add(new XElement("File", new XElement("FileID", ++id),
+						new XElement("FileName", fileName),
+						new XElement("ForDelete", false)));
+				result = rootEl.ToString(SaveOptions.DisableFormatting);
+			}
+			return result;
+		}
+
+		private string[] GetAttachmentsArray(AttachmentFileNameFormat format)
 		{
 			DirectoryInfo attachDir = new DirectoryInfo(mAttachDir);
 			string[] filePathArray = null;
@@ -89,7 +151,7 @@ namespace AdminInterface.Helpers
 				filePathArray = new string[files.Length];
 
 				for (int i = 0; i < files.Length; i++) {
-					filePathArray[i] = files[i].FullName;
+					filePathArray[i] = format == AttachmentFileNameFormat.FullName ? files[i].FullName : files[i].Name;
 				}
 			}
 			return filePathArray;
@@ -105,7 +167,5 @@ namespace AdminInterface.Helpers
 			}
 			return null;
 		}
-
-		public string OperationResult { get; set; }
 	}
 }

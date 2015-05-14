@@ -24,7 +24,7 @@ ${app.Asset("MainSettings.js")}
 				{ name: 'FileName', map: 'FileName' },
 				{ name: 'ForDelete', map: 'ForDelete' }
 			],
-			url: "http://localhost:54886/NewSupplierMailSettings/GetFiles",
+			url: "/NewSupplierAttachments/GetAttachmentsList",
 			root: "FileList",
 			record: "File",
 			id: 'FileID'
@@ -66,7 +66,7 @@ ${app.Asset("MainSettings.js")}
 			uploadTemplate: 'primary',
 			cancelTemplate: 'warning',
 			width: 600,
-			uploadUrl: 'http://localhost:54886/NewSupplierMailSettings/AddAttachment',
+			uploadUrl: "/NewSupplierAttachments/AddAttachment",
 			fileInputName: 'fileToUpload'
 		});
 
@@ -97,7 +97,7 @@ ${app.Asset("MainSettings.js")}
 					}
 				}
 				if (delCount > 0)
-					$.post("http://localhost:54886/NewSupplierMailSettings/DeleteAttachment", result, updateAttachGrid);
+					$.post("/NewSupplierAttachments/DeleteAttachment", result, updateAttachGrid);
 			}
 		});
 
@@ -107,7 +107,7 @@ ${app.Asset("MainSettings.js")}
 			var args = event.args;
 			var fileName = args.file;
 			var serverResponce = args.response;
-			if (serverResponce == "Ok") {
+			if (serverResponce == "AddAttachOk") {
 				updateAttachGrid();
 			}
 		});
