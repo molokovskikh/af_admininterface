@@ -20,7 +20,7 @@
 				<% for i, address in enumerate(addresses): %>
 					<tr class="${app.Style(address)}">
 						<td>
-							<input type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id} ${"checked" if address.AvaliableFor(user)} ${"disabled" if not address.Enabled and not address.AvaliableFor(user)} />
+							<input type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id} ${"checked" if address.AvaliableFor(user) or user.HasAvaliableAddress(address.Id)} ${"disabled" if not address.Enabled and not address.AvaliableFor(user)} />
 							${address.Value}
 						</td>
 						<td>

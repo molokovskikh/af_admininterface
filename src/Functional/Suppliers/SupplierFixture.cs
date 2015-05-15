@@ -8,6 +8,7 @@ using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
@@ -20,7 +21,7 @@ using PriceType = AdminInterface.Models.Suppliers.PriceType;
 
 namespace Functional.Suppliers
 {
-	public class SupplierFixture : WatinFixture2
+	public class SupplierFixture : FunctionalFixture
 	{
 		private User user;
 		private Supplier supplier;
@@ -124,11 +125,7 @@ namespace Functional.Suppliers
 		public void Change_Payer()
 		{
 			Open(supplier);
-			browser.TextField(Find.ByClass("term")).AppendText("Тестовый");
-			browser.Button(Find.ByClass("search")).Click();
-			var bloack = browser.Div(Find.ByClass("search"));
-			var selectList = bloack.SelectLists.First();
-			Assert.IsNotNull(selectList, bloack.InnerHtml);
+			var selectList = SearchV2Root(Css("#ChangePayer"), "Тестовый");
 			Assert.That(selectList.Options.Count, Is.GreaterThan(0));
 			var option = selectList.Options.First();
 			selectList.SelectByValue(option.Value);
@@ -193,7 +190,7 @@ namespace Functional.Suppliers
 			Click("Применить");
 			session.Refresh(supplier);
 			var source = session.CreateSQLQuery(@"
-Select fs.RequestInterval 
+Select fs.RequestInterval
 From farm.Sources fs
 	Join PriceItems pi on pi.SourceId = fs.Id
 	Join PricesCosts pc on pc.PriceItemId = pi.Id

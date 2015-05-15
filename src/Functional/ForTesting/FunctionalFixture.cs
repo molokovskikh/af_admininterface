@@ -26,25 +26,29 @@ namespace Functional.ForTesting
 			return browser.Element(Find.ByText(title).And(Find.ByClass("search-title"))).Parent;
 		}
 
-		protected SelectList SearchV2(Element element, string term)
+		protected SelectList SearchV2Root(Element root, string term)
 		{
-			element = element.Parent;
-			var searchInput = element.Css(".term");
+			var searchInput = root.Css(".term");
 			//значит у нас есть значение и его нужно перевыбрать
 			if (searchInput == null) {
-				element.Css("[type=button]").Click();
-				WaitForCss(".term", element);
-				searchInput = element.Css(".term");
+				root.Css("[type=button]").Click();
+				WaitForCss(".term", root);
+				searchInput = root.Css(".term");
 			}
 			searchInput.TypeText(term);
 			//иногда javascript на странице не замечает введенного текста, принудительно обновлеям
 			browser.Eval("$(\".term\").change();");
-			Click((IElementContainer)element, "Найти");
+			Click((IElementContainer)root, "Найти");
 			new TryFuncUntilTimeOut(3.Second()) {
 				SleepTime = 50.Millisecond(),
 				ExceptionMessage = () => String.Format("не удалось ничего найти '{0}'", term)
-			}.Try(() => element.CssSelect("select") != null);
-			return (SelectList)element.CssSelect("select");
+			}.Try(() => root.CssSelect("select") != null);
+			return (SelectList)root.CssSelect("select");
+		}
+
+		protected SelectList SearchV2(Element element, string term)
+		{
+			return SearchV2Root(element.Parent, term);
 		}
 
 		protected SelectList Search(string term, string title = null)
