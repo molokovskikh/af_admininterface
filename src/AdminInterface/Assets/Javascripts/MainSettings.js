@@ -32,3 +32,4 @@ $(function () {
 		$('#activeTabName').val('#tab-deletingMinimails');
 	});
 });
+

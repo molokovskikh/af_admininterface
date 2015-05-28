@@ -83,8 +83,9 @@
 				<div class="block">
 					<h3>Регистрация</h3>
 					<ul class="navigation">
-						<li>${app.LinkTo("Клиент", "Register", "RegisterClient")}</li>
+						<li>${app.LinkTo("Аптека", "Register", "RegisterClient")}</li>
 						<li>${app.LinkTo("Поставщик", "Register", "RegisterSupplier")}</li>
+						<li><a href="/Register/SendMailForNewSupplier">Письмо новому поставщику</a></li>
 						<li>${app.LinkTo("Плательщик", "Register", "RegisterPayer")}</li>
 					</ul>
 				</div>

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Text;
+using System.Web.UI;
 using AdminInterface.Helpers;
 using AdminInterface.Mailers;
 using AdminInterface.Models;
@@ -10,7 +13,6 @@ using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
-using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -21,6 +23,7 @@ using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using NHibernate;
 using NHibernate.Linq;
+using DataBinder = Castle.Components.Binder.DataBinder;
 
 namespace AdminInterface.Controllers
 {
@@ -203,6 +206,14 @@ namespace AdminInterface.Controllers
 			PropertyBag["regions"] = regions;
 			PropertyBag["clientContacts"] = new[] { new Contact(ContactType.Phone, string.Empty), new Contact(ContactType.Email, string.Empty) };
 			PropertyBag["options"] = new AdditionalSettings();
+		}
+
+		[AccessibleThrough(Verb.Get)]
+		public void SendMailForNewSupplier()
+		{
+			NewSupplierMessage message = new NewSupplierMessage();
+			message.DownLoad(Response);
+			CancelView();
 		}
 
 		[AccessibleThrough(Verb.Post)]

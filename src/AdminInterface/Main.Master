@@ -11,6 +11,7 @@
 	<link rel="stylesheet" type="text/css" href="~/Assets/Stylesheets/ValidationStyles.css" />
 	<link rel="stylesheet" type="text/css" href="~/Assets/Stylesheets/Form.css" />
 	<link rel="Stylesheet" type="text/css" href="~/Assets/Stylesheets/Common.css" />
+	<link rel="stylesheet" href="../../jqwidgets/styles/jqx.base.css" type="text/css" />
 </head>
 <body>
 	<div>
