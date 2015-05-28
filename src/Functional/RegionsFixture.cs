@@ -5,6 +5,8 @@ using System.Text;
 using AdminInterface.Models;
 using NHibernate.Linq;
 using NUnit.Framework;
+using OpenQA.Selenium;
+using Test.Support.Selenium;
 using Test.Support.Web;
 using WatiN.Core;
 using WatiN.Core.Native.Windows;
@@ -12,7 +14,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional
 {
 	[TestFixture]
-	public class RegionsFixture : WatinFixture2
+	public class RegionsFixture : SeleniumFixture
 	{
 		[Test]
 		public void RegionListTest()
@@ -30,9 +32,9 @@ namespace Functional
 			WaitForText("Телефон по умолчанию");
 			AssertText("Временной сдвиг относительно Москвы");
 			Css("#ShowRegionsLink").Click();
-			WaitForText(@"Регионы работы
- по умолчанию");
-			browser.TextField(Find.ById("region_DefaultPhone")).Value = "123-1233210";
+			WaitForText("Показываемые Регионы");
+			Css("#region_DefaultPhone").Clear();
+			Css("#region_DefaultPhone").SendKeys("123-1233210");
 			ClickButton("Сохранить");
 			WaitForText("Сохранено");
 			ClickLink("Регионы");
@@ -42,6 +44,7 @@ namespace Functional
 		[Test]
 		public void SaveMarkupTest()
 		{
+			//Хрень, а не тест - при многократном запуске перестанет работать
 			var markup = new Markup() {
 				Begin = 150,
 				End = 170,
@@ -55,16 +58,19 @@ namespace Functional
 			ClickLink("Регионы");
 			AssertText("Регионы");
 			Click("Воронеж");
-			var field = browser.TextField(Find.ByValue("111,00"));
-			var id = field.Id;
-			field.Value = "112";
+			var field = Css("input[value='111,00']") as IWebElement;
+			var id = field.GetAttribute("id");
+			field.Clear();
+			field.SendKeys("112");
+			Console.WriteLine(id);
+			Console.WriteLine(markup.Id);
 			Click("Сохранить");
 			AssertText("Сохранено");
 			session.Clear();
-			field = browser.TextField(id);
+			field = Css("#" + id);
 			var savedMarkup = session.Query<Markup>().FirstOrDefault(m => m.Id == markup.Id);
 			Assert.That(savedMarkup.Value, Is.EqualTo(112));
-			Assert.That(field.Value, Is.EqualTo("112,00"));
+			Assert.That(field.GetAttribute("value"), Is.EqualTo("112,00"));
 			Assert.That(savedMarkup.Begin, Is.EqualTo(150));
 			Assert.That(savedMarkup.End, Is.EqualTo(170));
 		}
