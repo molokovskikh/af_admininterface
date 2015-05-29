@@ -48,8 +48,13 @@ task @ready:
 
 task @default, [@Build]
 
-task @Build, [@BuildWebSite, @BuildBackground, @BuildPrinter]
+task @Build, [@BuildWebSite, @BuildBackground, @BuildPrinter,@CopyJWidgets]
 
+task @CopyJWidgets:
+	packagepath = "packages/jQWidgets_Framework.3.7.1/content/jqwidgets/*";
+	assetpath = "output/AdminInterface/Assets/Javascripts/jqwidgets"
+	if Exist(packagepath):
+		Cp(packagepath, assetpath, true)
 task @BuildPrinter:
 	oldProject = Globals.Project
 	Globals.Project = @Printer
