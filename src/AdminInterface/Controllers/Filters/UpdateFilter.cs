@@ -210,7 +210,7 @@ namespace AdminInterface.Controllers.Filters
 		{
 			var result = new List<UpdateLogView>();
 			//длина отображаемого сообщения
-			var additionLength = 150; 
+			var additionLength = 150;
 			//Сначала находим клиентские записи
 			//Забираем данные за месяц от указанной даты, так как мы не знаем когда клиент нам их отправил,
 			//а указана лишь дата получения
@@ -228,7 +228,7 @@ namespace AdminInterface.Controllers.Filters
 				view.Addition = log.Text;
 				view.Commit = true;
 				view.Type = 1;
-				view.UpdateType = Models.Logs.UpdateType.NoType;
+				view.UpdateType = Models.Logs.UpdateType.Logs;
 				if (log.Text.Length > additionLength) {
 					view.Addition = log.Text.Substring(0, additionLength) + "...";
 					view.HaveLog = true;
@@ -249,9 +249,11 @@ namespace AdminInterface.Controllers.Filters
 				view.RequestTime = log.CreatedOn;
 				view.Addition = log.Error;
 				view.Commit = log.IsConfirmed;
+				view.ResultSize = (uint)log.Size.GetValueOrDefault();
 				view.HaveLog = false;
 				view.Type = 2;
-				view.UpdateType = Models.Logs.UpdateType.NoType;
+				//если тип не указан это накопительное обновление
+				view.UpdateType = Models.Logs.UpdateType.Update;
 				//Парсим тип из строки
 				UpdateType type = view.UpdateType;
 				if (Enum.TryParse(log.UpdateType, true, out type))
