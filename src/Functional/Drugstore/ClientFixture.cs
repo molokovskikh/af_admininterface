@@ -6,11 +6,41 @@ using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support.Selenium;
 using WatiN.Core;
 using Test.Support.Web;
 
 namespace Functional.Drugstore
 {
+	public class ClientFixture2 : SeleniumFixture
+	{
+		private Client client;
+
+		[SetUp]
+		public void Setup()
+		{
+			client = DataMother.CreateTestClientWithUser();
+			Open(client);
+			AssertText("Клиент");
+		}
+
+		[Test]
+		public void Create_delete_legal_entity_test()
+		{
+			Click("Новое юр. лицо");
+			Css("#JuridicalOrganization_Name").SendKeys("new_JuridicalOrganization_name");
+			Css("#JuridicalOrganization_FullName").SendKeys("new_JuridicalOrganization_FullName");
+			Click("Создать");
+			AssertText("Юридическое лицо создано");
+			Refresh();
+			Open(client);
+			session.Refresh(client);
+			var organ = session.QueryOver<LegalEntity>().Where(e => e.Name == "new_JuridicalOrganization_name").List().Last();
+			Css(string.Format("#deleteButton{0}", organ.Id)).Click();
+			AssertText("Удалено");
+		}
+	}
+
 	public class ClientFixture : WatinFixture2
 	{
 		private Client client;
@@ -173,22 +203,6 @@ namespace Functional.Drugstore
 			Click("Сохранить");
 			AssertText("Test_JuridicalOrganization");
 			AssertText("Сохранено");
-		}
-
-		[Test]
-		public void Create_delete_legal_entity_test()
-		{
-			Click("Новое юр. лицо");
-			Css("#JuridicalOrganization_Name").AppendText("new_JuridicalOrganization_name");
-			Css("#JuridicalOrganization_FullName").AppendText("new_JuridicalOrganization_FullName");
-			Click("Создать");
-			AssertText("Юридическое лицо создано");
-			Refresh();
-			Open(client);
-			session.Refresh(client);
-			var organ = session.QueryOver<LegalEntity>().Where(e => e.Name == "new_JuridicalOrganization_name").List().Last();
-			browser.Button(string.Format("deleteButton{0}", organ.Id)).Click();
-			AssertText("Удалено");
 		}
 
 		[Test]
