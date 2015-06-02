@@ -33,6 +33,8 @@ namespace AdminInterface.Controllers.Filters
 
 		public UpdateFilter()
 		{
+			BeginDate = DateTime.Today;
+			EndDate = DateTime.Today.AddDays(1);
 			SortDirection = "Desc";
 			SortKeyMap = new Dictionary<string, string> {
 				{ "RequestTime", "RequestTime" },
@@ -210,12 +212,12 @@ namespace AdminInterface.Controllers.Filters
 		{
 			var result = new List<UpdateLogView>();
 			//длина отображаемого сообщения
-			var additionLength = 150; 
+			var additionLength = 150;
 			//Сначала находим клиентские записи
 			//Забираем данные за месяц от указанной даты, так как мы не знаем когда клиент нам их отправил,
 			//а указана лишь дата получения
 			var logs = DbSession.Query<ClientAppLog>().Where(i => (i.User.Client == Client || i.User == User)
-				&& i.CreatedOn > BeginDate.AddMonths(-1) && i.CreatedOn < EndDate.AddMonths(1)).ToList();
+				&& i.CreatedOn > BeginDate && i.CreatedOn < EndDate).ToList();
 			foreach (var log in logs) {
 				var view = new UpdateLogView();
 				view.Id = log.Id;
@@ -228,7 +230,7 @@ namespace AdminInterface.Controllers.Filters
 				view.Addition = log.Text;
 				view.Commit = true;
 				view.Type = 1;
-				view.UpdateType = Models.Logs.UpdateType.NoType;
+				view.UpdateType = Models.Logs.UpdateType.Logs;
 				if (log.Text.Length > additionLength) {
 					view.Addition = log.Text.Substring(0, additionLength) + "...";
 					view.HaveLog = true;
@@ -249,9 +251,11 @@ namespace AdminInterface.Controllers.Filters
 				view.RequestTime = log.CreatedOn;
 				view.Addition = log.Error;
 				view.Commit = log.IsConfirmed;
+				view.ResultSize = (uint)log.Size.GetValueOrDefault();
 				view.HaveLog = false;
 				view.Type = 2;
-				view.UpdateType = Models.Logs.UpdateType.NoType;
+				//если тип не указан это накопительное обновление
+				view.UpdateType = Models.Logs.UpdateType.Update;
 				//Парсим тип из строки
 				UpdateType type = view.UpdateType;
 				if (Enum.TryParse(log.UpdateType, true, out type))

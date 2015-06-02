@@ -24,11 +24,6 @@ namespace AdminInterface.Controllers
 	]
 	public class LogsController : AdminInterfaceController
 	{
-		public LogsController()
-		{
-			SetBinder(new ARDataBinder());
-		}
-
 		public void Resend(uint[] ids, bool? statMode)
 		{
 			List<DocumentSendLog> logs;
@@ -201,57 +196,15 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today, DateTime.Today.AddDays(1));
 		}
 
-		/// <summary>
-		/// Запрос для сортировки
-		/// </summary>
-		/// <param name="updateType"></param>
-		/// <param name="regionMask"></param>
-		/// <param name="clientCode"></param>
-		/// <param name="userId"></param>
-		public void NewUpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId)
-		{
-			//Эти данные вообще нафиг не нужны - все итак возьмется из фильтра
-			NewUpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today, DateTime.Today.AddDays(1));
-		}
 
 		/// <summary>
 		/// История обновлений для пользователей новой версии analit-f
 		/// </summary>
-		/// <param name="updateType"></param>
-		/// <param name="regionMask"></param>
-		/// <param name="clientCode"></param>
-		/// <param name="userId"></param>
-		/// <param name="beginDate"></param>
-		/// <param name="endDate"></param>
-		public void NewUpdateLog(UpdateType? updateType, ulong? regionMask, uint? clientCode, uint? userId,
-				DateTime beginDate, DateTime endDate)
+		public void NewUpdateLog()
 		{
+			SetSmartBinder();
 			var filter = new UpdateFilter();
-			filter.BeginDate = beginDate;
-			filter.EndDate = endDate;
-
-			if (updateType.HasValue) {
-				filter.UpdateType = updateType;
-				filter.RegionMask = Admin.RegionMask;
-
-				if (regionMask.HasValue)
-					filter.RegionMask &= regionMask.Value;
-			}
-			if (clientCode.HasValue)
-				filter.Client = DbSession.Load<Client>(clientCode.Value);
-			else if (userId.HasValue)
-				filter.User = DbSession.Load<User>(userId.Value);
-
 			BindObjectInstance(filter, "filter");
-
-			if (filter.Client != null)
-				filter.Client = DbSession.Load<Client>(filter.Client.Id);
-
-			if (filter.User != null)
-				filter.User = DbSession.Load<User>(filter.User.Id);
-
-			PropertyBag["beginDate"] = filter.BeginDate;
-			PropertyBag["endDate"] = filter.EndDate;
 			PropertyBag["filter"] = filter;
 			
 			PropertyBag["logEntities"] = filter.FindNewAppLogs(DbSession);

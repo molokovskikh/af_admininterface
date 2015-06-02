@@ -1,4 +1,4 @@
-﻿ <% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), 
+﻿ <% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
 									  ("Информация о клиенте", "")]} %>
 <script>
 	$(function () {
@@ -103,7 +103,7 @@ ${app.Asset("Client.js")}
 					<a href="${siteroot}/Logs/UpdateLog?clientCode=${Client.Id}" target="_blank">История обновлений</a>
 				</li>
 				<li>
-					<a href="${siteroot}/Logs/NewUpdateLog?clientCode=${Client.Id}" target="_blank">История обновлений Analitf-net</a>
+					<a href="${siteroot}/Logs/NewUpdateLog?filter.Client.Id=${Client.Id}" target="_blank">История обновлений Analitf-net</a>
 				</li>
 				<li>
 					<a href="${siteroot}/Logs/Documents?filter.Client.Id=${Client.Id}" target="_blank">История документов</a>
@@ -124,7 +124,7 @@ ${app.Asset("Client.js")}
 				<% haveUin = Client.HaveUin() %>
 				<% if haveUin: %>
 					Причина:<input class="required" type="text" name="reason">
-				<% else: %> 
+				<% else: %>
 					<span style="color:Green;">Идентификатор не присвоен</span>
 				<% end %>
 				<input type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
@@ -260,7 +260,7 @@ ${app.Asset("Client.js")}
 				</div>
 			${FormHelper.EndFormTag()}
 		</div>
-		
+
 		<div class=block>
 			<div class=contextual>
 				<a href="${siteroot}/deliveries/add?clientId=${client.Id}" class="icon icon-add">Новый адрес доставки</a>
@@ -285,7 +285,7 @@ ${app.Asset("Client.js")}
 				</table>
 			<% end %>
 		</div>
-		
+
 		<%
 			component ContactViewer, {"ContactGroups" : ContactGroups}:
 				section ContactGroupHeaderLink:
@@ -300,10 +300,10 @@ ${app.Asset("Client.js")}
 				end
 			end
 		%>
-		
+
 		<% OutputSubView("LegendView", {@showAddressLegend: true}) %>
 	</div>
-	
+
 	<div class="TwoColumn" style="margin-left: 10px">
 		<div class="block">
 			<% OutputSubView("/Templates/Messages", {@hiddenId: "<input type=hidden value=${client.Id} name=clientCode />"}) %>

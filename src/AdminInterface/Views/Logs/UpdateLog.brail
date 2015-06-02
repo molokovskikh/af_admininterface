@@ -10,6 +10,7 @@
 
 	<% component CaptureFor, {"id" : "PostToServer"}: %>
 		${FormHelper.HiddenField("clientCode", filter.Client.Id)}
+		${FormHelper.HiddenField("filter.Client.Id")}
 	<% end %>
 
 <% else: %>
@@ -22,6 +23,7 @@
 
 		<% component CaptureFor, {"id" : "PostToServer"}: %>
 			${FormHelper.HiddenField("userId", filter.User.Id)}
+			${FormHelper.HiddenField("filter.User.Id")}
 		<% end %>
 
 	<% end %>

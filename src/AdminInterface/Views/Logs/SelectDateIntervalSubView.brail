@@ -20,11 +20,19 @@
 			</tr>
 			<tr>
 				<td>
-					${FormHelper.HiddenField("endDate", endDate.ToShortDateString())}
+					<% if IsDefined("filter"): %>
+						${FormHelper.HiddenField("filter.BeginDate")}
+					<% else: %>
+						${FormHelper.HiddenField("endDate", endDate.ToShortDateString())}
+					<% end %>
 					<div class="calendar" style="width:100%; border: none;" id="beginDateCalendarHolder"></div>
 				</td>
 				<td>
-					${FormHelper.HiddenField("beginDate", beginDate.ToShortDateString())}
+					<% if IsDefined("filter"): %>
+						${FormHelper.HiddenField("filter.EndDate")}
+					<% else: %>
+						${FormHelper.HiddenField("beginDate", beginDate.ToShortDateString())}
+					<% end %>
 					<div class="calendar" style="width:100%; border: none;" id="endDateCalendarHolder"></div>
 				</td>
 			</tr>

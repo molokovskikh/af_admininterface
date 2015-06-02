@@ -39,6 +39,8 @@ namespace AdminInterface.Models.Logs
 		[Description("Отправка заказов")] OrdersController = 45,
 		[Description("Обратная связь (письмо)")] FeedbackController = 46,
 		[Description("Загрузка вложений минипочты или сертификатов")] DownloadController = 47,
+		[Description("Загрузка журнала")] Logs = 48,
+		[Description("Накопительное")] Update = 49,
 	}
 
 	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs")]
