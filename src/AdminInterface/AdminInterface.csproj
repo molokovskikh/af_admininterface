@@ -548,7 +548,9 @@
     <Content Include="Images\logo.gif" />
     <Content Include="ManageCosts.aspx" />
     <Content Include="managep.aspx" />
-    <Content Include="packages.config" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Scripts\jquery-1.7-vsdoc.js" />
     <Content Include="Scripts\jquery-1.7.js" />
     <Content Include="Scripts\jquery-1.7.min.js" />
