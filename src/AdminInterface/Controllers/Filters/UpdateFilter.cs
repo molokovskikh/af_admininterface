@@ -33,6 +33,8 @@ namespace AdminInterface.Controllers.Filters
 
 		public UpdateFilter()
 		{
+			BeginDate = DateTime.Today;
+			EndDate = DateTime.Today.AddDays(1);
 			SortDirection = "Desc";
 			SortKeyMap = new Dictionary<string, string> {
 				{ "RequestTime", "RequestTime" },
@@ -215,7 +217,7 @@ namespace AdminInterface.Controllers.Filters
 			//Забираем данные за месяц от указанной даты, так как мы не знаем когда клиент нам их отправил,
 			//а указана лишь дата получения
 			var logs = DbSession.Query<ClientAppLog>().Where(i => (i.User.Client == Client || i.User == User)
-				&& i.CreatedOn > BeginDate.AddMonths(-1) && i.CreatedOn < EndDate.AddMonths(1)).ToList();
+				&& i.CreatedOn > BeginDate && i.CreatedOn < EndDate).ToList();
 			foreach (var log in logs) {
 				var view = new UpdateLogView();
 				view.Id = log.Id;
