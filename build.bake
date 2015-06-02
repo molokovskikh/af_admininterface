@@ -48,7 +48,16 @@ task @ready:
 
 task @default, [@Build]
 
-task @Build, [@BuildWebSite, @BuildBackground, @BuildPrinter]
+task @Build, [@BuildWebSite, @BuildBackground, @BuildPrinter,@CopyJWidgets]
+
+task @CopyJWidgets:
+	packagepath = FileSet("**.*", BaseDirectory: "packages/jQWidgets_Framework.3.7.1/content/jqwidgets")
+	assetpath = "output/AdminInterface/Assets/Javascripts/jqwidgets"
+	Cp(packagepath, assetpath, true)
+	packagepathcss = FileSet("**.*", BaseDirectory: "packages/jQWidgets_Framework.3.7.1/content/jqwidgets/styles/")
+	assetpathcss = "output/AdminInterface/Assets/Stylesheets/jqwidgets/styles"
+	Cp(packagepathcss, assetpathcss, true)
+	
 
 task @BuildPrinter:
 	oldProject = Globals.Project

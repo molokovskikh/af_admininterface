@@ -85,7 +85,7 @@
 					<ul class="navigation">
 						<li>${app.LinkTo("Аптека", "Register", "RegisterClient")}</li>
 						<li>${app.LinkTo("Поставщик", "Register", "RegisterSupplier")}</li>
-						<li><a href="/Register/SendMailForNewSupplier">Письмо новому поставщику</a></li>
+						<li>${app.LinkTo("Письмо новому поставщику", "Register", "SendMailForNewSupplier")}</li>
 						<li>${app.LinkTo("Плательщик", "Register", "RegisterPayer")}</li>
 					</ul>
 				</div>
