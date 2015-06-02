@@ -98,9 +98,7 @@ namespace AdminInterface.Models.Security
 			}
 			if (Type == PermissionType.RegisterSupplier) {
 				if (controller.ToLower() == "register"
-					&& (action.ToLower() == "RegisterSupplier".ToLower() 
-					|| action.ToLower() == "SendMailForNewSupplier".ToLower()
-					|| action.ToLower() == "SearchPayers".ToLower()))
+					&& (action.ToLower() == "RegisterSupplier".ToLower() || action.ToLower() == "SendMailForNewSupplier".ToLower() || action.ToLower() == "SearchPayers".ToLower()))
 					return true;
 			}
 			if (Type == PermissionType.ViewSuppliers) {
