@@ -6,6 +6,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NHibernate.Linq;
@@ -327,7 +328,9 @@ namespace Functional.Drugstore
 			AssertText("111-1111111 - some comment, 211-1111111, 311-1111111");
 
 			var client = session.Load<Client>(clientCode);
-			var contacts = client.ContactGroupOwner.ContactGroups.Where(g => g.Type == ContactGroupType.General).ToList()[1].Contacts;
+			var contacts = client.ContactGroupOwner.ContactGroups
+				.First(g => g.Type == ContactGroupType.General && !g.Specialized)
+				.Contacts;
 			Assert.That(contacts.Count, Is.EqualTo(4));
 			Assert.That(contacts[0].ContactText, Is.EqualTo("111-1111111"));
 			Assert.That(contacts[0].Comment, Is.EqualTo("some comment"));
@@ -378,8 +381,9 @@ namespace Functional.Drugstore
 			browser.Button("RegisterButton").Click();
 
 			var client = GetRegistredClient();
-			var contacts = client.ContactGroupOwner.ContactGroups[1].Contacts;
-			Assert.That(contacts.Count, Is.EqualTo(3));
+			var contacts = client.ContactGroupOwner.ContactGroups
+				.First(g => g.Type == ContactGroupType.General && !g.Specialized).Contacts;
+			Assert.That(contacts.Count, Is.EqualTo(3), contacts.Implode());
 			Assert.That(contacts[0].Type, Is.EqualTo(ContactType.Phone));
 			Assert.That(contacts[1].ContactText, Is.EqualTo("qwerty1@qq.qq"));
 			Assert.That(contacts[1].Comment, Is.Null);

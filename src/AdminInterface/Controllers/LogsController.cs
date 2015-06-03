@@ -185,7 +185,7 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 			string log;
 			if(type == 1)
 				log = DbSession.Load<ClientAppLog>(updateLogEntityId).Text;
-			else 
+			else
 				log = DbSession.Load<UpdateLogEntity>(updateLogEntityId).Log;
 			PropertyBag["log"] = log;
 		}
@@ -202,11 +202,14 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 		/// </summary>
 		public void NewUpdateLog()
 		{
-			SetSmartBinder();
+			SetSmartBinder(AutoLoadBehavior.NullIfInvalidKey);
+			//по умолчанию биндер будет пытаться проверить наши обекты, в данном контексте делать этого не следует
+			Binder.Validator = null;
+
 			var filter = new UpdateFilter();
 			BindObjectInstance(filter, "filter");
 			PropertyBag["filter"] = filter;
-			
+
 			PropertyBag["logEntities"] = filter.FindNewAppLogs(DbSession);
 			RenderView("UpdateLog");
 		}

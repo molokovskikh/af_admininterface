@@ -13,11 +13,6 @@ namespace AdminInterface.Models.Validators
 {
 	public class NameExistsValidator : AbstractValidator
 	{
-		public NameExistsValidator()
-		{
-			RunWhen = RunWhen.Insert | RunWhen.Update;
-		}
-
 		public override bool IsValid(object instance, object fieldValue)
 		{
 			var isValid = true;
@@ -47,14 +42,12 @@ namespace AdminInterface.Models.Validators
 
 		public NameExistsValidatorAttribute()
 		{
-			RunWhen = RunWhen.Insert | RunWhen.Update;
 			validator = new NameExistsValidator();
 		}
 
 		public NameExistsValidatorAttribute(String errorMessage)
 			: base(errorMessage)
 		{
-			RunWhen = RunWhen.Insert | RunWhen.Update;
 			validator = new NameExistsValidator();
 		}
 

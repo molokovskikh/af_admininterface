@@ -55,7 +55,7 @@ namespace Functional.Drugstore
 			requestLog.CreatedOn = DateTime.Now;
 			session.Save(requestLog);
 			session.Flush();
-			Open("Logs/NewUpdateLog?clientCode={0}", client.Id);
+			Open("Logs/NewUpdateLog?filter.Client.Id={0}", client.Id);
 			AssertText("История обновлений клиента");
 			AssertText("bla bla1");
 			AssertText("bla bla2");
