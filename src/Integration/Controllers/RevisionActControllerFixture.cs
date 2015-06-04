@@ -32,6 +32,7 @@ namespace Integration.Controllers
 		public void Send_revision_act_with_comment()
 		{
 			controller.Mail(payer.Id, DateTime.Today.AddMonths(3), DateTime.Today, "test@analit.net", "Тестовое примечание");
+			controller.SendMails();
 
 			var message = Emails.First();
 			Assert.That(message.Body, Is.StringContaining("Тестовое примечание"));

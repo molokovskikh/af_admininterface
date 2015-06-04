@@ -176,6 +176,7 @@ namespace Integration.Controllers
 				JuridicalName = "Тестовый плательщик"
 			};
 			controller.Registered(newPayer, new PaymentOptions(), false, "");
+			controller.SendMails();
 
 			Assert.That(newPayer.Id, Is.Not.EqualTo(0));
 			Assert.That(newPayer.JuridicalOrganizations.Count, Is.EqualTo(1));

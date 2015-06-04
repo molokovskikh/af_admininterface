@@ -25,10 +25,9 @@ namespace Integration.Controllers
 			supplier = DataMother.CreateSupplier();
 			session.Save(supplier);
 			client = DataMother.TestClient();
-			session.SaveOrUpdate(client);
+			session.Save(client);
 			controller = new BillingController();
-			controller.DbSession = session;
-			PrepareController(controller);
+			Prepare(controller);
 		}
 
 		[Test]
@@ -45,6 +44,7 @@ namespace Integration.Controllers
 		public void Update_supplier_status()
 		{
 			controller.UpdateClientStatus(supplier.Id, false, null);
+			controller.SendMails();
 			Flush();
 
 			session.Refresh(supplier);
@@ -60,10 +60,12 @@ namespace Integration.Controllers
 		public void UpdateSupplierStatusWithComment()
 		{
 			controller.UpdateClientStatus(supplier.Id, false, "тестовое отключение поставщика");
+			controller.SendMails();
 			var message = Emails.Last();
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), Emails.Implode(n => n.Subject));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение поставщика"));
 			controller.UpdateClientStatus(supplier.Id, true, null);
+			controller.SendMails();
 			message = Emails.Last();
 			Assert.That(message.Subject, Is.EqualTo("Возобновлена работа поставщика"));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение поставщика"));
@@ -73,10 +75,12 @@ namespace Integration.Controllers
 		public void UpdateClientStatusWithComment()
 		{
 			controller.UpdateClientStatus(client.Id, false, "тестовое отключение клиента");
+			controller.SendMails();
 			var message = Emails.Last();
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа клиента"), Emails.Implode(n => n.Subject));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение клиента"));
 			controller.UpdateClientStatus(client.Id, true, null);
+			controller.SendMails();
 			message = Emails.Last();
 			Assert.That(message.Subject, Is.EqualTo("Возобновлена работа клиента"), Emails.Implode(n => n.Subject));
 			Assert.That(message.Body, Is.StringContaining("Причина отключения: тестовое отключение клиента"));

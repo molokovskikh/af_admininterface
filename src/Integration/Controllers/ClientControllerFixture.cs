@@ -104,6 +104,7 @@ namespace Integration.Controllers
 			var newClient = DataMother.CreateTestClientWithAddressAndUser();
 
 			controller.MoveUserOrAddress(newClient.Id, oldUser.Id, address.Id, newClient.Orgs().First().Id, false);
+			controller.SendMails();
 			session.Flush();
 
 			session.Refresh(oldClient);
@@ -171,6 +172,7 @@ namespace Integration.Controllers
 				address.Id,
 				dst.Orgs().First().Id,
 				true);
+			controller.SendMails();
 			session.Flush();
 
 			session.Refresh(dst);

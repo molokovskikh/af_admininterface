@@ -19,6 +19,7 @@ namespace Integration
 		{
 			IntegrationFixture.DoNotUserTransaction = true;
 			Global.Config.DocsPath = "../../../AdminInterface/Docs/";
+			Global.Config.RegisterListEmail = "kvasovtest@analit.net";
 
 			ForTest.InitialzeAR();
 		}
