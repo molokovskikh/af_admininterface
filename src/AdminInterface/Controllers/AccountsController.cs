@@ -79,7 +79,7 @@ namespace AdminInterface.Controllers
 			DbSession.Save(supplier);
 			DbSession.Flush();
 			if (oldStatus != !status) {
-				this.Mailer().EnableChanged(supplier, comment).Send();
+				Mail().EnableChanged(supplier, comment);
 			}
 		}
 
@@ -93,7 +93,7 @@ namespace AdminInterface.Controllers
 			DbSession.Save(user);
 			DbSession.Flush();
 			if (enabled != oldStatus)
-				this.Mailer().EnableChanged(user, comment).Send();
+				Mail().EnableChanged(user, comment);
 			if (enabled.HasValue && !enabled.Value) {
 				// Если это отключение, то проходим по адресам и
 				// отключаем адрес, который доступен только отключенным пользователям
@@ -154,7 +154,7 @@ namespace AdminInterface.Controllers
 			}
 
 			if (account.IsChanged(a => a.Payment))
-				this.Mailer().AccountChanged(account).Send();
+				Mail().AccountChanged(account);
 
 			DbSession.Save(account);
 
@@ -170,7 +170,7 @@ namespace AdminInterface.Controllers
 			DbSession.SaveOrUpdate(address.Client);
 			DbSession.Flush();
 			if (enabled != oldStatus)
-				this.Mailer().EnableChanged(address, comment).Send();
+				Mail().EnableChanged(address, comment);
 			CancelView();
 		}
 

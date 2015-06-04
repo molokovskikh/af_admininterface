@@ -59,7 +59,7 @@ namespace Integration
 		public void DeleteNewsNotifyTest()
 		{
 			var mailer = ForTest.TestMailer(m => message = m);
-			mailer.RegisterOrDeleteNews(news, "testmail@test.te", "Скрыта новость").Send();
+			mailer.RegisterOrDeleteNews(news, "Скрыта новость").Send();
 			Assert.That(message, Is.Not.Null);
 			Assert.That(message.Body, Is.StringEnding(String.Format(@"Дата изменения: {1}<br>
 Сотрудник: test<br>
@@ -71,7 +71,7 @@ namespace Integration
 Тема: {3}</br>
 Адресат: {2}</br>
 Текст: {4}</br>", news.Id, DateTime.Now, news.DestinationType.GetDescription(), news.Header, news.Body)));
-			Assert.That(message.To[0].ToString(), Is.EqualTo("testmail@test.te"));
+			Assert.That(message.To[0].ToString(), Is.EqualTo("AFNews@subscribe.analit.net"));
 			Assert.That(message.Subject, Is.EqualTo("Скрыта новость"));
 		}
 

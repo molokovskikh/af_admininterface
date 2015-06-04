@@ -311,7 +311,7 @@ namespace AdminInterface.Controllers
 			new Mailer(DbSession).ClientRegistred(client, comment, Defaults);
 
 			if (!options.FillBillingInfo)
-				this.Mailer().NotifyBillingAboutClientRegistration(client);
+				Mail().NotifyBillingAboutClientRegistration(client);
 
 			if (options.FillBillingInfo) {
 				Redirect("Register", "RegisterPayer", new {
@@ -492,9 +492,9 @@ WHERE   pricesdata.firmcode = s.Id
 			var supplier = payer.Suppliers.FirstOrDefault();
 			var client = payer.Clients.FirstOrDefault();
 			if (client != null)
-				this.Mailer().NotifyBillingAboutClientRegistration(client).Send();
+				Mail().NotifyBillingAboutClientRegistration(client);
 			else
-				this.Mailer().PayerRegistred(payer).Send();
+				Mail().PayerRegistred(payer);
 
 			if (showRegistrationCard && client != null && client.Users.Count > 0) {
 				Redirect("main", "report", new {

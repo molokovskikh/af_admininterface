@@ -520,11 +520,6 @@ namespace AdminInterface.Models.Billing
 			session.Delete(this);
 		}
 
-		public virtual void NotifyAboutDelete(MonorailMailer mailer, string deleteComment)
-		{
-			mailer.PayerDelete(this, deleteComment).Send();
-		}
-
 		public virtual IEnumerable<ModelAction> Actions
 		{
 			get

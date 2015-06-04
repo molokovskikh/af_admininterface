@@ -53,6 +53,7 @@ namespace AdminInterface.MonoRailExtentions
 		public MonorailMailer Mail()
 		{
 			var m = this.Mailer();
+			m.Config = Config;
 			Mailers.Add(m);
 			return m;
 		}

@@ -238,7 +238,7 @@ namespace AdminInterface.Controllers
 			ActiveRecordMediator<Service>.Save(service);
 			DbSession.Flush();
 			if (oldDisabled != service.Disabled) {
-				this.Mailer().EnableChanged(service, addComment).Send();
+				Mail().EnableChanged(service, addComment);
 			}
 			CancelView();
 		}

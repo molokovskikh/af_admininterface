@@ -98,7 +98,7 @@ namespace AdminInterface.Controllers
 			var oldLegalEntity = address.OldValue(a => a.LegalEntity);
 			if (address.Payer != address.LegalEntity.Payer) {
 				address.Payer = address.LegalEntity.Payer;
-				this.Mailer().AddressMoved(address, address.Client, oldLegalEntity).Send();
+				Mail().AddressMoved(address, address.Client, oldLegalEntity);
 			}
 
 			DbSession.Save(address);

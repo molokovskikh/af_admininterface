@@ -33,6 +33,8 @@ namespace AdminInterface.Mailers
 	{
 		private static ILog _log = LogManager.GetLogger(typeof(MonorailMailer));
 
+		public AppConfig Config;
+
 		public MonorailMailer(IEmailSender sender) : base(sender)
 		{
 		}
@@ -51,7 +53,7 @@ namespace AdminInterface.Mailers
 		public MonorailMailer EnableChanged(IEnablable item, string comment = null)
 		{
 			Template = "EnableChanged";
-			To = "RegisterList@subscribe.analit.net";
+			To = Config != null ? Config.RegisterListEmail : "RegisterList@subscribe.analit.net";
 			From = "register@analit.net";
 			var lastDisable = "неизвестно";
 			var reasonDisable = "неизвестно";
@@ -334,9 +336,9 @@ namespace AdminInterface.Mailers
 			PropertyBag["changes"] = changes;
 		}
 
-		public MonorailMailer RegisterOrDeleteNews(News news, string to, string messageSubject)
+		public MonorailMailer RegisterOrDeleteNews(News news, string messageSubject)
 		{
-			To = to;
+			To = "AFNews@subscribe.analit.net";
 			IsBodyHtml = true;
 			Template = "RegisterNews";
 			Subject = messageSubject;

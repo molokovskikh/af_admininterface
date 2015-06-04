@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
@@ -210,7 +211,7 @@ namespace AdminInterface.Controllers
 			try {
 				var notifyPayer = payer;
 				payer.Delete(DbSession);
-				notifyPayer.NotifyAboutDelete(this.Mailer(), deleteComment);
+				Mail().PayerDelete(notifyPayer, deleteComment);
 				Notify("Удалено");
 				Redirect("Billing", "Search");
 			}

@@ -509,14 +509,10 @@ group by s.Id")
 			DbSession.Save(log);
 
 			if (address != null)
-				this.Mailer()
-					.AddressMoved(address, oldClient, address.OldValue(a => a.LegalEntity))
-					.Send();
+				Mail().AddressMoved(address, oldClient, address.OldValue(a => a.LegalEntity));
 
 			if (user != null)
-				this.Mailer()
-					.UserMoved(user, oldClient, user.OldValue(u => u.Payer))
-					.Send();
+				Mail().UserMoved(user, oldClient, user.OldValue(u => u.Payer));
 
 			if (moveAddress) {
 				Notify("Адрес доставки успешно перемещен");
@@ -534,7 +530,7 @@ group by s.Id")
 				&& oldClient.Addresses.Count == 0
 				&& oldClient.Enabled) {
 				oldClient.Disabled = true;
-				this.Mailer().EnableChanged(oldClient).Send();
+				Mail().EnableChanged(oldClient);
 				DbSession.Save(AuditRecord.StatusChange(oldClient));
 			}
 			DbSession.Save(oldClient);

@@ -2,13 +2,14 @@
 using System.Linq;
 using AdminInterface.Mailers;
 using AdminInterface.Models;
+using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Controllers;
 using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
-	public class NewsController : BaseController
+	public class NewsController : AdminInterfaceController
 	{
 		public void Index()
 		{
@@ -25,7 +26,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(news, "news");
 				if (IsValid(news)) {
 					DbSession.Save(news);
-					new MonorailMailer().RegisterOrDeleteNews(news, "AFNews@subscribe.analit.net", "Зарегистрирована новость").Send();
+					Mail().RegisterOrDeleteNews(news, "Зарегистрирована новость");
 					Notify("Сохранено");
 					RedirectToAction("Index");
 					return;
@@ -54,7 +55,7 @@ namespace AdminInterface.Controllers
 			news.Deleted = true;
 			PropertyBag["news"] = news;
 			DbSession.Save(news);
-			new MonorailMailer().RegisterOrDeleteNews(news, "AFNews@subscribe.analit.net", "Скрыта новость").Send();
+			Mail().RegisterOrDeleteNews(news, "Скрыта новость");
 			Notify("Удалено");
 			RedirectToReferrer();
 		}
@@ -69,7 +70,7 @@ namespace AdminInterface.Controllers
 			news.Deleted = false;
 			PropertyBag["news"] = news;
 			DbSession.Save(news);
-			new MonorailMailer().RegisterOrDeleteNews(news, "AFNews@subscribe.analit.net", "Восстановлена новость").Send();
+			Mail().RegisterOrDeleteNews(news, "Восстановлена новость");
 			Notify("Восстановлено");
 			RedirectToReferrer();
 		}

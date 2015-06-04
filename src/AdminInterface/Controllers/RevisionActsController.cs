@@ -62,7 +62,7 @@ namespace AdminInterface.Controllers
 				end = DateTime.Now;
 
 			var act = BuildRevisionAct(begin.Value, end.Value, payer);
-			this.Mailer().RevisionAct(act, emails, message).Send();
+			Mail().RevisionAct(act, emails, message);
 
 			Notify("Отправлено");
 			RedirectToReferrer();
