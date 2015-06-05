@@ -43,5 +43,8 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public virtual long? Size { get; set; }
+
+		[Property]
+		public virtual DateTime? LastSync { get; set; }
 	}
 }

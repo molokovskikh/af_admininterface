@@ -217,7 +217,7 @@ namespace AdminInterface.Controllers.Filters
 			//Забираем данные за месяц от указанной даты, так как мы не знаем когда клиент нам их отправил,
 			//а указана лишь дата получения
 			var logs = DbSession.Query<ClientAppLog>().Where(i => (i.User.Client == Client || i.User == User)
-				&& i.CreatedOn > BeginDate && i.CreatedOn < EndDate).ToList();
+				&& i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1)).ToList();
 			foreach (var log in logs) {
 				var view = new UpdateLogView();
 				view.Id = log.Id;
@@ -239,7 +239,8 @@ namespace AdminInterface.Controllers.Filters
 			}
 
 			//Теперь имщем серверные записи
-			var rlogs = DbSession.Query<RequestLog>().Where(i => (i.User.Client == Client || i.User == User) && i.CreatedOn > BeginDate && i.CreatedOn < EndDate).ToList();
+			var rlogs = DbSession.Query<RequestLog>()
+				.Where(i => (i.User.Client == Client || i.User == User) && i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1)).ToList();
 			foreach (var log in rlogs) {
 				var view = new UpdateLogView();
 				view.Id = log.Id;
@@ -254,8 +255,8 @@ namespace AdminInterface.Controllers.Filters
 				view.ResultSize = (uint)log.Size.GetValueOrDefault();
 				view.HaveLog = false;
 				view.Type = 2;
-				//если тип не указан это накопительное обновление
-				view.UpdateType = Models.Logs.UpdateType.Update;
+				//если тип не указан это накопительное или кумулятивное обновление
+				view.UpdateType = log.LastSync == null ? Models.Logs.UpdateType.FullUpdate : Models.Logs.UpdateType.Update;
 				//Парсим тип из строки
 				UpdateType type = view.UpdateType;
 				if (Enum.TryParse(log.UpdateType, true, out type))

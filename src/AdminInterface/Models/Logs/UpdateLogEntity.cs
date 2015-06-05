@@ -41,6 +41,7 @@ namespace AdminInterface.Models.Logs
 		[Description("Загрузка вложений минипочты или сертификатов")] DownloadController = 47,
 		[Description("Загрузка журнала")] Logs = 48,
 		[Description("Накопительное")] Update = 49,
+		[Description("Кумулятивное")] FullUpdate = 50,
 	}
 
 	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs")]
