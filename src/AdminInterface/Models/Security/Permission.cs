@@ -74,9 +74,7 @@ namespace AdminInterface.Models.Security
 				return true;
 
 			if (controller.ToLower() == "register" && action.ToLower() == "registerpayer")
-				return Type == PermissionType.RegisterDrugstore
-						|| Type == PermissionType.RegisterSupplier
-						|| Type == PermissionType.Billing;
+				return Type == PermissionType.RegisterDrugstore || Type == PermissionType.RegisterSupplier || Type == PermissionType.Billing;
 
 			if (Type == PermissionType.Billing) {
 				var billingControllers = new[] {
