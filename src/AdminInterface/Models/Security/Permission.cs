@@ -67,13 +67,16 @@ namespace AdminInterface.Models.Security
 
 		public bool HaveAccessTo(string controller, string action)
 		{
+			if (controller.ToLower() == "register" && action.ToLower() == "sendmailfornewsupplier")
+				return true;
+
 			if (controller.ToLower() == "main")
 				return true;
 
 			if (controller.ToLower() == "register" && action.ToLower() == "registerpayer")
 				return Type == PermissionType.RegisterDrugstore
-					|| Type == PermissionType.RegisterSupplier
-					|| Type == PermissionType.Billing;
+						|| Type == PermissionType.RegisterSupplier
+						|| Type == PermissionType.Billing;
 
 			if (Type == PermissionType.Billing) {
 				var billingControllers = new[] {
@@ -98,7 +101,7 @@ namespace AdminInterface.Models.Security
 			}
 			if (Type == PermissionType.RegisterSupplier) {
 				if (controller.ToLower() == "register"
-					&& (action.ToLower() == "RegisterSupplier".ToLower() || action.ToLower() == "SendMailForNewSupplier".ToLower() || action.ToLower() == "SearchPayers".ToLower()))
+					&& (action.ToLower() == "RegisterSupplier".ToLower() || action.ToLower() == "SearchPayers".ToLower()))
 					return true;
 			}
 			if (Type == PermissionType.ViewSuppliers) {
@@ -127,7 +130,6 @@ namespace AdminInterface.Models.Security
 				if (controller.ToLower() == "register"
 					&& (action.ToLower() == "RegisterClient".ToLower()
 						|| action.ToLower() == "SearchSuppliers".ToLower()
-						|| action.ToLower() == "SendMailForNewSupplier".ToLower()
 						|| action.ToLower() == "SearchPayers".ToLower()))
 					return true;
 			}
@@ -139,8 +141,8 @@ namespace AdminInterface.Models.Security
 				var controllers = new[] { "MailsModering" };
 				return controllers.Any(c => c.ToLower() == controller.ToLower());
 			}
-			if(Type == PermissionType.CallHistory) {
-				if(controller.ToLower() == "callhistory"
+			if (Type == PermissionType.CallHistory) {
+				if (controller.ToLower() == "callhistory"
 					&& action.ToLower() == "callhistoryexport") {
 					return true;
 				}
