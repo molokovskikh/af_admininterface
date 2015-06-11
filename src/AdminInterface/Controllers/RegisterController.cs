@@ -208,14 +208,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["options"] = new AdditionalSettings();
 		}
 
-		[AccessibleThrough(Verb.Get)]
-		public void SendMailForNewSupplier()
-		{
-			NewSupplierMessage message = new NewSupplierMessage();
-			message.DownLoad(Response);
-			CancelView();
-		}
-
 		[AccessibleThrough(Verb.Post)]
 		public void RegisterClient([DataBind("client")] Client client,
 			ulong homeRegion,
