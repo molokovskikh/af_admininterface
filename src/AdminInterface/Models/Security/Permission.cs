@@ -67,7 +67,7 @@ namespace AdminInterface.Models.Security
 
 		public bool HaveAccessTo(string controller, string action)
 		{
-			if (controller.ToLower() == "register" && action.ToLower() == "sendmailfornewsupplier")
+			if (controller.ToLower() == "MailForSupplier" && action.ToLower() == "sendmailfornewsupplier")
 				return true;
 
 			if (controller.ToLower() == "main")
