@@ -526,6 +526,7 @@
     <Content Include="Assets\Stylesheets\columns.css" />
     <Content Include="Assets\Stylesheets\user.css" />
     <Content Include="EditRegionalInfo.aspx" />
+    <Content Include="favicon.ico" />
     <Content Include="Images\email.png" />
     <Content Include="Images\group.png" />
     <Content Include="Images\kfm_home.png" />

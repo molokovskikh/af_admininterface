@@ -23,6 +23,7 @@ using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using NHibernate;
 using NHibernate.Linq;
+using NPOI.SS.Formula.Functions;
 using DataBinder = Castle.Components.Binder.DataBinder;
 
 namespace AdminInterface.Controllers
@@ -34,9 +35,10 @@ namespace AdminInterface.Controllers
 	public class MailForSupplierController : AdminInterfaceController
 	{
 		[AccessibleThrough(Verb.Get)]
-		public void SendMailForNewSupplier()
+		public void SendMailForNewSupplier(string name = null)
 		{
-			NewSupplierMessage message = new NewSupplierMessage();
+			NewSupplierMessage message = new NewSupplierMessage(name);
+			message.CreateEmlFile(Defaults);
 			message.DownLoad(Response);
 			CancelView();
 		}
