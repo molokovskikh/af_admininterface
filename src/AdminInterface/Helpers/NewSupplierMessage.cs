@@ -10,6 +10,7 @@ using System.Web;
 using System.Xml.Linq;
 using AdminInterface.Models;
 using Castle.MonoRail.Framework;
+using LumiSoft.Net.Mime.vCard;
 
 namespace AdminInterface.Helpers
 {
@@ -17,6 +18,7 @@ namespace AdminInterface.Helpers
 	{
 		private readonly string mPickUpDir;
 		private readonly string mAttachDir;
+		protected string RecepientName;
 
 		private enum AttachmentFileNameFormat
 		{
@@ -24,8 +26,9 @@ namespace AdminInterface.Helpers
 			ShortName
 		}
 
-		public NewSupplierMessage()
+		public NewSupplierMessage(string recepientName = null)
 		{
+			RecepientName = recepientName;
 			mPickUpDir = Global.Config.NewSupplierMailFilePath;
 			if (!Directory.Exists(mPickUpDir))
 				Directory.CreateDirectory(mPickUpDir);
@@ -47,8 +50,8 @@ namespace AdminInterface.Helpers
 
 			if (!String.IsNullOrEmpty(mPickUpDir)) {
 				MailMessage mes = new MailMessage();
-				mes.From = new MailAddress("analit@analit.ru");
-				mes.To.Add("supplier@supplier.ru");
+				mes.From = new MailAddress("farm@analit.net");
+				mes.To.Add(RecepientName ?? "supplier@supplier.ru");
 				mes.SubjectEncoding = Encoding.UTF8;
 				mes.IsBodyHtml = true;
 				mes.Subject = defaults.NewSupplierMailSubject;

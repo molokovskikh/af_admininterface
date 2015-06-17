@@ -20,3 +20,17 @@ function YesNoDialog(headerText, dialogText, successFunction) {
 		}
 	});
 }
+
+$(window).on("load", function () {
+	var link = $("a.sendMailForNewSupplier");
+	link.on("click", function () {
+		var address = prompt("Введите адрес электронной почты клиента");
+		if (address.trim() == "")
+			return;
+
+		var href = link.attr("href");
+		href += "?name=" + address;
+		window.location.href = href;
+		return false;
+	})
+})
