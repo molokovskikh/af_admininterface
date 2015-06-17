@@ -24,9 +24,9 @@ function YesNoDialog(headerText, dialogText, successFunction) {
 $(window).on("load", function () {
 	var link = $("a.sendMailForNewSupplier");
 	link.on("click", function () {
-		var address = prompt("Введите адрес электронной почты клиента");
-		if (address.trim() == "")
-			return;
+		var address = prompt("Введите адрес электронной почты клиента","");
+		if (!address)
+			return false;
 
 		var href = link.attr("href");
 		href += "?name=" + address;
