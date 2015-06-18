@@ -50,6 +50,7 @@ namespace AdminInterface.Helpers
 
 			if (!String.IsNullOrEmpty(mPickUpDir)) {
 				MailMessage mes = new MailMessage();
+				mes.Headers.Add("X-Unsent", "1");
 				mes.From = new MailAddress("farm@analit.net");
 				mes.To.Add(RecepientName ?? "supplier@supplier.ru");
 				mes.SubjectEncoding = Encoding.UTF8;
