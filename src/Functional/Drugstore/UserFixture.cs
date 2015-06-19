@@ -51,9 +51,11 @@ namespace Functional.Drugstore
 			requestLog.Version = "1.11";
 			session.Save(requestLog);
 			Open("Logs/NewUpdateLog?filter.Client.Id={0}", client.Id);
-			AssertText("История обновлений клиента");
-			AssertText("bla bla1");
+			AssertText("История обновлений AnalitF.net");
 			AssertText("bla bla2");
+			Click("Лог");
+			WaitAjax();
+			AssertText("bla bla1");
 		}
 
 		[Test]

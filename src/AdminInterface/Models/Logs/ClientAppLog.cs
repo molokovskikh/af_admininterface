@@ -40,11 +40,13 @@ namespace AdminInterface.Models.Logs
 		public virtual RequestLog ToRequestLog()
 		{
 			return new RequestLog {
+				Id = Id,
 				User = User,
 				CreatedOn = CreatedOn,
 				Version = Version,
 				IsConfirmed = true,
 				UpdateType = "Logs",
+				HaveLog = true,
 			};
 		}
 	}

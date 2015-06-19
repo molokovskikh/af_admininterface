@@ -284,11 +284,6 @@ namespace Functional.Billing
 			AssertText("TestComment");
 		}
 
-		public void WaitAjax()
-		{
-			Wait(() => Convert.ToInt32(browser.Eval("$.active")) == 0, "");
-		}
-
 		[Test]
 		public void Change_client_status()
 		{

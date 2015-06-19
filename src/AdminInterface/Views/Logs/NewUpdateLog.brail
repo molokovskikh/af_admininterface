@@ -45,7 +45,7 @@
 		<thead>
 			<tr>
 				<th>
-					${app.Sortable("Дата", "RequestTime")}
+					${app.Sortable("Дата", "CreatedOn")}
 				</th>
 				<% if filter.ShowRegion(): %>
 				<th>
@@ -54,7 +54,7 @@
 				<% end %>
 				<% if filter.ShowClient(): %>
 				<th>
-					${app.Sortable("Клиент", "ClientName")}
+					${app.Sortable("Клиент", "Client")}
 				</th>
 				<% end %>
 				<% if filter.ShowUpdateType(): %>
@@ -64,16 +64,16 @@
 				<% end %>
 				<% if filter.ShowUser(): %>
 				<th>
-					${app.Sortable("Пользователь", "Login")}
+					${app.Sortable("Пользователь", "User")}
 				</th>
 				<% end %>
 				<% if filter.ShowUpdateSize(): %>
 				<th>
-					${app.Sortable("Размер приготовленных данных", "ResultSize")}
+					${app.Sortable("Размер приготовленных данных", "Size")}
 				</th>
 				<% end %>
 				<th>
-					${app.Sortable("Версия", "AppVersion")}
+					${app.Sortable("Версия", "Version")}
 				</th>
 				<th>
 					${app.Sortable("OC", "OSVersion")}
@@ -115,7 +115,7 @@
 				<% end %>
 				<% if filter.ShowUpdateSize(): %>
 				<td>
-					${ViewHelper.ConvertToUserFriendlySize(log.Size)}
+					${ViewHelper.ConvertToUserFriendlySize(log.Size or 0)}
 				</td>
 				<% end %>
 				<td>

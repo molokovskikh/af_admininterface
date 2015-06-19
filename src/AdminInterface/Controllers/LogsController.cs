@@ -210,13 +210,16 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 		{
 			CancelLayout();
 
-			var log = DbSession.Load<RequestLog>(id);
+			var log = DbSession.Get<RequestLog>(id);
 			var text = "";
-			if (log.RequestToken != null) {
+			if (log != null && log.RequestToken != null) {
 				text = DbSession.Query<ClientAppLog>()
 					.Where(x => x.RequestToken == log.RequestToken)
 					.Select(x => x.Text)
 					.FirstOrDefault();
+			}
+			else {
+				text = DbSession.Get<ClientAppLog>(id).Text;
 			}
 			PropertyBag["id"] = id;
 			PropertyBag["log"] = text;
