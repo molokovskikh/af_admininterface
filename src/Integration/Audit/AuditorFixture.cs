@@ -5,6 +5,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Queries;
 using Castle.ActiveRecord;
+using Common.Tools;
 using Common.Web.Ui.Models.Audit;
 using Integration.ForTesting;
 using NHibernate;
@@ -30,7 +31,7 @@ namespace Integration
 			session.Clear();
 			AuditRecord.UpdateLogs(newClient.Id, user);
 			var logs = session.Query<AuditRecord>().Where(l => l.ObjectId == user.Id && l.Type == LogObjectType.User).ToList();
-			Assert.That(logs[0].Message,
+			Assert.That(logs.Implode(m => m.Message),
 				Is.StringContaining(String.Format("$$$Изменено 'Комментарий' было '{0}' стало '{1}'", oldName, user.Name)));
 			Assert.That(logs[0].Service.Id, Is.EqualTo(newClient.Id));
 		}
@@ -46,7 +47,7 @@ namespace Integration
 
 			Flush();
 			var logs = session.Query<AuditRecord>().Where(l => l.ObjectId == user.Id && l.Type == LogObjectType.User).ToList();
-			Assert.That(logs[0].Message,
+			Assert.That(logs.Implode(x => x.Message),
 				Is.StringContaining(String.Format("$$$Изменено 'Комментарий' было '{0}' стало '{1}'", oldName, user.Name)));
 			Assert.That(logs[0].Service.Id, Is.EqualTo(client.Id));
 			session.Clear();
@@ -56,7 +57,7 @@ namespace Integration
 			};
 			AuditRecord.UpdateLogs(newClient.Id, address);
 			logs = session.Query<AuditRecord>().Where(l => l.ObjectId == user.Id && l.Type == LogObjectType.User).ToList();
-			Assert.That(logs[0].Message,
+			Assert.That(logs.Implode(x => x.Message),
 				Is.StringContaining(String.Format("$$$Изменено 'Комментарий' было '{0}' стало '{1}'", oldName, user.Name)));
 			Assert.That(logs[0].Service.Id, Is.EqualTo(client.Id));
 		}

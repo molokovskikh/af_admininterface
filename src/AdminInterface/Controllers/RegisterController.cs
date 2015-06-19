@@ -369,7 +369,7 @@ namespace AdminInterface.Controllers
 			DbSession.Save(client);
 			DbSession.Flush();
 
-			client.MaintainIntersection();
+			client.MaintainIntersection(DbSession);
 			client.Addresses.Each(a => a.MaintainInscribe());
 		}
 
@@ -377,20 +377,20 @@ namespace AdminInterface.Controllers
 		{
 			var command = @"
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(:ClientCode, null);
-SET @NewPriceCode = Last_Insert_ID(); 
+SET @NewPriceCode = Last_Insert_ID();
 
 INSERT INTO farm.formrules() VALUES();
 SET @NewFormRulesId = Last_Insert_ID();
-INSERT INTO farm.sources() VALUES(); 
+INSERT INTO farm.sources() VALUES();
 SET @NewSourceId = Last_Insert_ID();
 
 INSERT INTO usersettings.PriceItems(FormRuleId, SourceId) VALUES(@NewFormRulesId, @NewSourceId);
 SET @NewPriceItemId = Last_Insert_ID();
 
 INSERT INTO PricesCosts (PriceCode, PriceItemId) SELECT @NewPriceCode, @NewPriceItemId;
-SET @NewPriceCostId = Last_Insert_ID(); 
+SET @NewPriceCostId = Last_Insert_ID();
 
-INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 
+INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 
 INSERT
 INTO pricesregionaldata

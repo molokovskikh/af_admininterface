@@ -25,7 +25,7 @@ namespace Integration.Models
 				Payer = client.Payers.First()
 			};
 			session.Save(org);
-			Maintainer.LegalEntityCreated(org);
+			Maintainer.LegalEntityCreated(session, org);
 			var count = ArHelper.WithSession(s =>
 				s.CreateSQLQuery(@"select count(*) from Customers.Intersection where LegalEntityId = :LegalEntityId")
 					.SetParameter("LegalEntityId", org.Id)
@@ -53,7 +53,7 @@ namespace Integration.Models
 			Save(org);
 			Flush();
 
-			Maintainer.LegalEntityCreated(org);
+			Maintainer.LegalEntityCreated(session, org);
 
 			intersection = session.Query<Intersection>().Single(i => i.Client == client && i.Price == price && i.Org == org);
 			Assert.That(intersection.Cost.Id, Is.EqualTo(notBaseCost.Id), "идентификатор intersection {0}", intersection.Id);
@@ -116,7 +116,7 @@ namespace Integration.Models
 			var user = client.Users[0];
 			var price = supplier.AddPrice("Тестовый");
 			session.Flush();
-			client.MaintainIntersection();
+			client.MaintainIntersection(session);
 
 			var count = session.CreateSQLQuery("select count(*) from Customers.UserPrices where userId = :userId and priceId = :priceId")
 				.SetParameter("userId", user.Id)

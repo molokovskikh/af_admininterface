@@ -103,7 +103,7 @@ namespace Integration.Models
 
 			Flush();
 
-			client.MaintainIntersection();
+			client.MaintainIntersection(session);
 			var newPricesCount = user.GetUserPriceCount();
 			Assert.That(newPricesCount, Is.EqualTo(pricesCount));
 		}

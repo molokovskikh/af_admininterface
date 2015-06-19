@@ -48,8 +48,9 @@ namespace Integration.ForTesting
 			client.Payers.Each(p => p.Save());
 			session.Save(client);
 			client.Users.Each(u => u.Setup());
+			session.Flush();
 
-			client.MaintainIntersection();
+			client.MaintainIntersection(session);
 
 			return client;
 		}
@@ -62,8 +63,7 @@ namespace Integration.ForTesting
 		public Client CreateTestClientWithAddress()
 		{
 			return TestClient(c => {
-				var address = new Address {
-					Client = c,
+				var address = new Address(c) {
 					Value = "тестовый адрес"
 				};
 				c.AddAddress(address);
@@ -91,16 +91,12 @@ namespace Integration.ForTesting
 			session.Save(client);
 			payer.Recipient = session.Query<Recipient>().First();
 			payer.SaveAndFlush();
+			session.Flush();
 			payer.Refresh();
 			return payer;
 		}
 
-		public Client CreateTestClientWithAddressAndUser()
-		{
-			return CreateTestClientWithAddressAndUser(1UL);
-		}
-
-		public Client CreateTestClientWithAddressAndUser(ulong regionaMask)
+		public Client CreateTestClientWithAddressAndUser(ulong regionaMask = 1UL)
 		{
 			var client = TestClient(c => {
 				c.MaskRegion = regionaMask;
@@ -112,8 +108,7 @@ namespace Integration.ForTesting
 			};
 			client.AddUser(user);
 			user.Setup();
-			var address = new Address {
-				Client = client,
+			var address = new Address(client) {
 				Value = "тестовый адрес"
 			};
 			client.AddAddress(address);
@@ -123,6 +118,7 @@ namespace Integration.ForTesting
 			client.Addresses[0].Save();
 			client.Name += client.Id;
 			session.Save(client);
+			session.Flush();
 			client.Addresses.Single().MaintainIntersection();
 			session.Refresh(client);
 			return client;

@@ -391,7 +391,7 @@ namespace AdminInterface.Controllers
 				var payer = DbSession.Load<Payer>(payerId);
 				legalEntity.Payer = payer;
 				DbSession.Save(legalEntity);
-				Maintainer.LegalEntityCreated(legalEntity);
+				Maintainer.LegalEntityCreated(DbSession, legalEntity);
 
 				Notify("Юридическое лицо создано");
 			}

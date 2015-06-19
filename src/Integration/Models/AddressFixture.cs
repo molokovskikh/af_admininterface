@@ -1,8 +1,5 @@
 using System;
 using System.Linq;
-using AdminInterface.Models;
-using Common.Web.Ui.ActiveRecordExtentions;
-using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -23,32 +20,28 @@ namespace Integration.Models
 			var address = client.Addresses.First();
 			var legalEntity = recepient.Orgs().First();
 
-			address.MoveToAnotherClient(recepient, legalEntity);
+			address.MoveToAnotherClient(session, recepient, legalEntity);
 
-			ArHelper.WithSession(s => {
-				s.CreateSQLQuery(@"update Customers.AddressIntersection ai
+			session.CreateSQLQuery(@"update Customers.AddressIntersection ai
 join Customers.Intersection i on ai.IntersectionId = i.Id
 set ai.SupplierDeliveryId = '123'
 where i.PriceId = :priceId and ai.AddressId = :addressId ")
-					.SetParameter("addressId", address.Id)
-					.SetParameter("priceId", price.Id)
-					.ExecuteUpdate();
-			});
+				.SetParameter("addressId", address.Id)
+				.SetParameter("priceId", price.Id)
+				.ExecuteUpdate();
 
 			Assert.That(address.Client, Is.EqualTo(recepient));
 			Assert.That(address.Payer, Is.EqualTo(legalEntity.Payer));
 			Assert.That(address.LegalEntity, Is.EqualTo(legalEntity));
-			ArHelper.WithSession(s => {
-				var supplierDeliveryId = s.CreateSQLQuery(@"
+			var supplierDeliveryId = session.CreateSQLQuery(@"
 select ai.SupplierDeliveryId
 from Customers.AddressIntersection ai
 join Customers.Intersection i on ai.IntersectionId = i.Id
 where i.PriceId = :priceId and ai.AddressId = :addressId ")
-					.SetParameter("addressId", address.Id)
-					.SetParameter("priceId", price.Id)
-					.UniqueResult<string>();
-				Assert.That(supplierDeliveryId, Is.EqualTo("123"));
-			});
+				.SetParameter("addressId", address.Id)
+				.SetParameter("priceId", price.Id)
+				.UniqueResult<string>();
+			Assert.That(supplierDeliveryId, Is.EqualTo("123"));
 		}
 	}
 }

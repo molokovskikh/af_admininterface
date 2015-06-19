@@ -11,23 +11,16 @@ namespace AdminInterface.Models
 	{
 		public static void MaintainIntersection(Supplier supplier, ISession session)
 		{
-			MaintainIntersection("AND s.Id = :supplierId",
-				q => q.SetParameter("supplierId", supplier.Id), session);
+			MaintainIntersection(session, "AND s.Id = :supplierId", q => q.SetParameter("supplierId", supplier.Id));
 		}
 
-		public static void MaintainIntersection(Client client, LegalEntity legalEntity)
+		public static void MaintainIntersection(ISession session, Client client, LegalEntity legalEntity)
 		{
-			MaintainIntersection("AND drugstore.Id = :clientId AND le.Id = :legalEntityId",
-				q => q.SetParameter("clientId", client.Id)
-					.SetParameter("legalEntityId", legalEntity.Id));
+			MaintainIntersection(session, "AND drugstore.Id = :clientId AND le.Id = :legalEntityId",
+				q => q.SetParameter("clientId", client.Id).SetParameter("legalEntityId", legalEntity.Id));
 		}
 
-		public static void MaintainIntersection(string filter, Action<IQuery> prepare)
-		{
-			ArHelper.WithSession(s => MaintainIntersection(filter, prepare, s));
-		}
-
-		public static void MaintainIntersection(string filter, Action<IQuery> prepare, ISession session)
+		public static void MaintainIntersection(ISession session, string filter, Action<IQuery> prepare)
 		{
 			var query = session.CreateSQLQuery(String.Format(@"
 set @skip = 0;
@@ -85,10 +78,10 @@ group by pd.pricecode, regions.regioncode, drugstore.Id, le.Id;
 			query.ExecuteUpdate();
 		}
 
-		public static void LegalEntityCreated(LegalEntity legalEntity)
+		public static void LegalEntityCreated(ISession session, LegalEntity legalEntity)
 		{
 			foreach (var client in legalEntity.Payer.Clients) {
-				MaintainIntersection(client, legalEntity);
+				MaintainIntersection(session, client, legalEntity);
 			}
 		}
 	}

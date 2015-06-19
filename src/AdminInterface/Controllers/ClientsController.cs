@@ -316,7 +316,7 @@ where Phone like :phone")
 			DbSession.Save(drugstore);
 			DbSession.Flush();
 			if (oldMaskRegion != client.MaskRegion)
-				client.MaintainIntersection();
+				client.MaintainIntersection(DbSession);
 
 			Notify("Сохранено");
 			RedirectTo(client);
@@ -503,7 +503,7 @@ group by s.Id")
 			if (user != null)
 				log = user.MoveToAnotherClient(newClient, legalEntity);
 			if (address != null)
-				log = address.MoveToAnotherClient(newClient, legalEntity);
+				log = address.MoveToAnotherClient(DbSession, newClient, legalEntity);
 
 			query.Execute(DbSession);
 			DbSession.Save(log);

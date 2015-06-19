@@ -4,6 +4,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Services;
+using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using MySql.Data.MySqlClient;
@@ -47,7 +48,7 @@ namespace Integration
 			_client = DataMother.TestClient();
 
 			var emails = _service.GetEmailsForNotification(_client);
-			Assert.True(emails.Contains(_email));
+			Assert.True(emails.Contains(_email), "client {0} emails {1}", _client.Id, emails.Implode());
 		}
 
 		[Test]
