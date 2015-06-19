@@ -8,6 +8,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support;
@@ -18,7 +19,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional.Drugstore
 {
 	[TestFixture]
-	public class DocumentLogFixture : WatinFixture2
+	public class DocumentLogFixture : FunctionalFixture
 	{
 		private Client client;
 		private Supplier supplier;

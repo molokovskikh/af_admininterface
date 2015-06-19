@@ -6,12 +6,13 @@ using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
 using AdminInterface.Models.Telephony;
+using Functional.ForTesting;
 using WatiN.Core.Native.Windows;
 
 namespace Functional
 {
 	[TestFixture]
-	public class BindPhoneToClientFixture : WatinFixture2
+	public class BindPhoneToClientFixture : FunctionalFixture
 	{
 		private Client client;
 

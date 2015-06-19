@@ -16,7 +16,7 @@ using PriceType = AdminInterface.Models.Suppliers.PriceType;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class ClientFixture : IntegrationFixture
+	public class ClientFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void ResetUinTest()

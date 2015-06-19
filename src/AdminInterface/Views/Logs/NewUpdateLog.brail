@@ -1,0 +1,160 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	История обновлений AnalitF.net
+<% end %>
+
+<% if filter.Client: %>
+	<% component CaptureFor, {"id" : "Title"}: %>
+			История обновлений AnalitF.net клиента !{filter.Client.Name}
+	<% end %>
+<% end %>
+
+<% if filter.User: %>
+	<% component CaptureFor, {"id" : "Title"}: %>
+				История обновлений AnalitF.net пользователя !{filter.User.Login}
+	<% end %>
+<% end %>
+
+<% component CaptureFor, {"id" : "PostToServer"}: %>
+	${FormHelper.HiddenField("filter.Client.Id")}
+	${FormHelper.HiddenField("filter.User.Id")}
+<% end %>
+
+<% if not filter.UpdateType: %>
+<% OutputSubView("SelectDateIntervalSubView") %>
+<% else: %>
+
+<% component Bubble, {@bredcrumbs: []} %>
+
+	${app.BeginFormFor("filter")}
+	${FormHelper.HiddenField("filter.SortBy")}
+	${FormHelper.HiddenField("filter.SortDirection")}
+	${FormHelper.HiddenField("filter.BeginDate")}
+	${FormHelper.HiddenField("filter.EndDate")}
+	${app.FilterFor("filter.UpdateType")}
+	${app.EndFormFor("filter")}
+
+<% end %>
+
+<div class="block">
+	Всего обновлений ${logEntities.Count}
+</div>
+
+<div>
+	<table class="DataTable">
+		<% if logEntities.Count: %>
+		<thead>
+			<tr>
+				<th>
+					${app.Sortable("Дата", "RequestTime")}
+				</th>
+				<% if filter.ShowRegion(): %>
+				<th>
+					${app.Sortable("Регион", "Region")}
+				</th>
+				<% end %>
+				<% if filter.ShowClient(): %>
+				<th>
+					${app.Sortable("Клиент", "ClientName")}
+				</th>
+				<% end %>
+				<% if filter.ShowUpdateType(): %>
+				<th>
+					${app.Sortable("Тип обновления", "UpdateType")}
+				</th>
+				<% end %>
+				<% if filter.ShowUser(): %>
+				<th>
+					${app.Sortable("Пользователь", "Login")}
+				</th>
+				<% end %>
+				<% if filter.ShowUpdateSize(): %>
+				<th>
+					${app.Sortable("Размер приготовленных данных", "ResultSize")}
+				</th>
+				<% end %>
+				<th>
+					${app.Sortable("Версия", "AppVersion")}
+				</th>
+				<th>
+					${app.Sortable("OC", "OSVersion")}
+				</th>
+				<th>
+					${app.Sortable("Адрес клиента", "RemoteHost")}
+				</th>
+				<th>
+					${app.Sortable("Сервер", "LocalHost")}
+				</th>
+				<th>
+					${app.Sortable("Дополнительно", "Addition")}
+				</th>
+				<% if filter.ShowLog(): %>
+				<th>Лог</th>
+				<% end %>
+			</tr>
+		</thead>
+		<tbody class="HighLightCurrentRow">
+			<% for i, log in enumerate(logEntities): %>
+			<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${log.Id}" align="center">
+				<td class="${'NotCommitedUpdate' if not log.IsConfirmed}" style="width:1%;">
+					${log.CreatedOn}
+				</td>
+				<% if filter.ShowClient(): %>
+				<td>
+					${app.LinkTo(log.User.Clien)}
+				</td>
+				<% end %>
+				<% if filter.ShowUpdateType(): %>
+				<td>
+					${BindingHelper.GetDescription(log.UpdateTypeEnum)}
+				</td>
+				<% end %>
+				<% if filter.ShowUser(): %>
+				<td>
+					${app.LinkTo(log.User)}
+				</td>
+				<% end %>
+				<% if filter.ShowUpdateSize(): %>
+				<td>
+					${ViewHelper.ConvertToUserFriendlySize(log.Size)}
+				</td>
+				<% end %>
+				<td>
+					!{log.Version}
+				</td>
+				<td>
+					!{log.OSVersion}
+				</td>
+				<td>
+					!{log.RemoteHost}
+				</td>
+				<td>
+					${log.LocalHost}
+				</td>
+				<td style="text-align:center;">
+					!{log.Error}
+				</td>
+					<% if filter.ShowLog(): %>
+				<td>
+					<% if log.HaveLog: %>
+					<a id="ShowLogLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, 'ShowClientLog?id=${log.Id}', 'DownloadLog');">
+						Лог
+					</a>
+					<% else: %>
+					-
+					<% end %>
+				</td>
+				<% end %>
+			</tr>
+			<%
+			end
+		else:
+	%>
+			<tr class="EmptyData">
+				<td style="width:1%;">
+					За указанный период клиент не обновлялся
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<% end %>
+</div>

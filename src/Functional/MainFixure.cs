@@ -10,7 +10,7 @@ using WatiN.Core.Native.Windows;
 
 namespace Functional
 {
-	public class MainFixure : WatinFixture2
+	public class MainFixure : FunctionalFixture
 	{
 		[Test]
 		public void Open_main_view()

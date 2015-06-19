@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Models;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
@@ -10,7 +11,7 @@ using WatiN.Core;
 namespace Functional.Suppliers
 {
 	[TestFixture]
-	public class RegistrationFixture : WatinFixture2
+	public class RegistrationFixture : FunctionalFixture
 	{
 		[Test]
 		public void AddPhoneAndEmailTest()

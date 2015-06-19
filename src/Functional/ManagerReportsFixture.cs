@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
@@ -13,7 +14,7 @@ using WatiN.Core;
 namespace Functional
 {
 	[TestFixture]
-	public class ManagerReportsFixture : SeleniumFixture
+	public class ManagerReportsFixture : AdmSeleniumFixture
 	{
 		[Test]
 		public void BaseShowTest()

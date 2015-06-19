@@ -15,7 +15,7 @@ using Test.Support.log4net;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class DocumentFilterFixture : Test.Support.IntegrationFixture
+	public class DocumentFilterFixture : AdmIntegrationFixture
 	{
 		private Supplier _supplier;
 		private DocumentReceiveLog _documentLog;

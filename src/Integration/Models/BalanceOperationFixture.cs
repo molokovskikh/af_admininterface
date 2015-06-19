@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class BalanceOperationFixture : Test.Support.IntegrationFixture
+	public class BalanceOperationFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Update_payer_balance()

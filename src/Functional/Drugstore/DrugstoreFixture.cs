@@ -16,7 +16,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional.Drugstore
 {
 	[TestFixture]
-	public class DrugstoreFixture : WatinFixture2
+	public class DrugstoreFixture : FunctionalFixture
 	{
 		private Client testClient;
 

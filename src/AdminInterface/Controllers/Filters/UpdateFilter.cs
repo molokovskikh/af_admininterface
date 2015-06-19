@@ -180,107 +180,35 @@ namespace AdminInterface.Controllers.Filters
 			return ShowUpdateType();
 		}
 
-
-		/// <summary>
-		/// Создает объект лога для вывода на экран из специфического объекта лога нового клиентского приложения
-		/// </summary>
-		/// <param name="log">Объект лога клиентского приложения</param>
-		/// <param name="additionLength">Максимальная длина описания</param>
-		/// <returns></returns>
-		public UpdateLogView CreateViewFromClientAppLog(ClientAppLog log, int additionLength)
-		{
-			var view = new UpdateLogView();
-			view.Id = log.Id;
-			view.ClientId = log.User.Client.Id;
-			view.ClientName = log.User.Client.Name;
-			view.AppVersion = log.Version;
-			view.RequestTime = log.CreatedOn;
-			view.Addition = log.Text;
-			view.Type = 1;
-			if (log.Text.Length > additionLength) {
-				view.Addition = log.Text.Substring(0, additionLength) + "...";
-				view.HaveLog = true;
-			}
-			return view;
-		}
-
 		/// <summary>
 		/// Поиск логов для нового приложения analit-f
 		/// </summary>
 		/// <returns></returns>
-		public IList<UpdateLogView> FindNewAppLogs(ISession DbSession)
+		public IList<RequestLog> FindNewAppLogs(ISession DbSession)
 		{
-			var result = new List<UpdateLogView>();
-			//длина отображаемого сообщения
-			var additionLength = 150;
-			//Сначала находим клиентские записи
-			//Забираем данные за месяц от указанной даты, так как мы не знаем когда клиент нам их отправил,
-			//а указана лишь дата получения
 			var logs = DbSession.Query<ClientAppLog>().Where(i => (i.User.Client == Client || i.User == User)
 				&& i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1)).ToList();
-			foreach (var log in logs) {
-				var view = new UpdateLogView();
-				view.Id = log.Id;
-				view.ClientId = log.User.Client.Id;
-				view.ClientName = log.User.Client.Name;
-				view.UserId = log.User.Id;
-				view.UserName = log.User.Name;
-				view.AppVersion = log.Version;
-				view.RequestTime = log.CreatedOn;
-				view.Addition = log.Text;
-				view.Commit = true;
-				view.Type = 1;
-				view.UpdateType = Models.Logs.UpdateType.Logs;
-				if (log.Text.Length > additionLength) {
-					view.Addition = log.Text.Substring(0, additionLength) + "...";
-					view.HaveLog = true;
-				}
-				result.Add(view);
-			}
 
-			//Теперь имщем серверные записи
-			var rlogs = DbSession.Query<RequestLog>()
-				.Where(i => (i.User.Client == Client || i.User == User) && i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1)).ToList();
-			foreach (var log in rlogs) {
-				var view = new UpdateLogView();
-				view.Id = log.Id;
-				view.ClientId = log.User.Client.Id;
-				view.UserId = log.User.Id;
-				view.UserName = log.User.Name;
-				view.ClientName = log.User.Client.Name;
-				view.AppVersion = log.Version;
-				view.RequestTime = log.CreatedOn;
-				view.Addition = log.Error;
-				view.Commit = log.IsConfirmed;
-				view.ResultSize = (uint)log.Size.GetValueOrDefault();
-				view.HaveLog = false;
-				view.Type = 2;
-				//если тип не указан это накопительное или кумулятивное обновление
-				view.UpdateType = log.LastSync == null ? Models.Logs.UpdateType.FullUpdate : Models.Logs.UpdateType.Update;
-				//Парсим тип из строки
-				UpdateType type = view.UpdateType;
-				if (Enum.TryParse(log.UpdateType, true, out type))
-					view.UpdateType = type;
+			var results = DbSession.Query<RequestLog>()
+				.Where(i => (i.User.Client == Client || i.User == User) && i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
+				.OrderByDescending(r => r.CreatedOn)
+				.ToList();
 
-				result.Add(view);
-			}
+			var connectedLogs = logs
+				.Where(l => l.RequestToken != null && results.Any(x => x.RequestToken == l.RequestToken))
+				.ToArray();
 
-			//Сортировки нет, так как я нашел серьезный баг в сортировке стандартных логов, который годами не замечался
-			//Из чего я делаю вывод, что сортировка тут вовсе не нужна - по крайней мере пока
-			result = result.OrderByDescending(i => i.RequestTime).ToList();
-			return result;
+			results.Each(x => x.HaveLog = connectedLogs.Any(y => y.RequestToken == x.RequestToken));
+
+			return results.Concat(logs.Except(connectedLogs)
+				.Select(x => x.ToRequestLog()))
+				.OrderByDescending(x => x.CreatedOn)
+				.ToList();
 		}
 	}
 
 	public class UpdateLogView
 	{
-		/// <summary>
-		///0 -лог аналитf
-		///1 - клиентские логи новой версии
-		///2 - серверные логи новой версии
-		/// </summary>
-		public int Type = 0;
-
 		private string _username;
 
 		public uint Id { get; set; }

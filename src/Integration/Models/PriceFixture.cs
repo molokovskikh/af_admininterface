@@ -16,7 +16,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class PriceFixture : Test.Support.IntegrationFixture
+	public class PriceFixture : AdmIntegrationFixture
 	{
 		[Test(Description = "при обновлении свойств Enabled AgencyEnabled должно устанавливаться свойство ForceReplication")]
 		public void ChangePriceEnabledAndForceReplication()

@@ -12,7 +12,7 @@ using Test.Support.log4net;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class UpdateFilterFixture : Test.Support.IntegrationFixture
+	public class UpdateFilterFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Load_updates_by_filter()
@@ -45,6 +45,25 @@ namespace Integration.Models
 			});
 			results = filter.Find(session);
 			Assert.IsTrue(results.Any(r => r.OkUpdate));
+		}
+
+		[Test]
+		public void Connect_client_app_logs()
+		{
+			var user = DataMother.CreateTestClientWithUser().Users[0];
+			var clientLog = new ClientAppLog(user);
+			clientLog.RequestToken = Guid.NewGuid().ToString();
+			session.Save(clientLog);
+			var requestLog = new RequestLog(user);
+			requestLog.RequestToken = clientLog.RequestToken;
+			session.Save(requestLog);
+
+			var filter = new UpdateFilter {
+				User = user
+			};
+			var logs = filter.FindNewAppLogs(session);
+			Assert.AreEqual(logs.Count, 1, logs.Implode());
+			Assert.IsTrue(logs[0].HaveLog);
 		}
 	}
 }

@@ -12,7 +12,7 @@ using Test.Support.Web;
 
 namespace Functional.Billing
 {
-	public class PaymentFixture : WatinFixture2
+	public class PaymentFixture : FunctionalFixture
 	{
 		private Payer payer;
 		private Payment payment;

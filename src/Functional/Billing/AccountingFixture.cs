@@ -12,7 +12,7 @@ using WatiN.Core.Native.Windows;
 
 namespace Functional.Billing
 {
-	public class AccountingFixture : WatinFixture2
+	public class AccountingFixture : FunctionalFixture
 	{
 		private Client client;
 

@@ -4,6 +4,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Selenium;
@@ -12,7 +13,7 @@ using Test.Support.Web;
 
 namespace Functional.Drugstore
 {
-	public class ClientFixture2 : SeleniumFixture
+	public class ClientFixture2 : AdmSeleniumFixture
 	{
 		private Client client;
 
@@ -41,7 +42,7 @@ namespace Functional.Drugstore
 		}
 	}
 
-	public class ClientFixture : WatinFixture2
+	public class ClientFixture : FunctionalFixture
 	{
 		private Client client;
 

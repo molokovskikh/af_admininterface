@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Models;
 using Common.Web.Ui.NHibernateExtentions;
+using Functional.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support.Selenium;
@@ -10,7 +11,7 @@ using Test.Support.Suppliers;
 namespace Functional
 {
 	[TestFixture]
-	public class CostOptimization : SeleniumFixture
+	public class CostOptimization : AdmSeleniumFixture
 	{
 		[Test]
 		public void Create_exclude()

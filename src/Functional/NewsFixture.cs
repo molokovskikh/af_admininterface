@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace Functional
 {
-	public class NewsFixture : WatinFixture2
+	public class NewsFixture : FunctionalFixture
 	{
 		[Test]
 		public void View_news()

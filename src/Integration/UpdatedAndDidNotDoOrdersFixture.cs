@@ -15,7 +15,7 @@ using Test.Support.log4net;
 namespace Integration
 {
 	[TestFixture]
-	public class UpdatedAndDidNotDoOrdersFixture : IntegrationFixture
+	public class UpdatedAndDidNotDoOrdersFixture : AdmIntegrationFixture
 	{
 		private User user;
 		private Client client;

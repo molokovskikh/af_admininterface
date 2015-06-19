@@ -11,7 +11,7 @@ using NUnit.Framework;
 namespace Integration.Tasks
 {
 	[TestFixture]
-	public class SendInvoiceTaskFixture : Test.Support.IntegrationFixture
+	public class SendInvoiceTaskFixture : AdmIntegrationFixture
 	{
 		private SendInvoiceTask task;
 

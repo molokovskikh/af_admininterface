@@ -14,7 +14,7 @@ using Test.Support.log4net;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class PayerFilterFixture : Test.Support.IntegrationFixture
+	public class PayerFilterFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void SearchPayerForDrugstoreWithoutSuppliers()

@@ -15,7 +15,7 @@ using Test.Support.log4net;
 
 namespace Integration
 {
-	public class ManagerReportFixture : IntegrationFixture
+	public class ManagerReportFixture : AdmIntegrationFixture
 	{
 		private Client _client;
 

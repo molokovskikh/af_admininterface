@@ -14,7 +14,7 @@ using Test.Support.log4net;
 namespace Integration
 {
 	[TestFixture]
-	public class BaseFiltersFixture : IntegrationFixture
+	public class BaseFiltersFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Base_filter_test()

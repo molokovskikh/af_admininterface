@@ -15,7 +15,7 @@ using Test.Support.Web;
 
 namespace Functional.Drugstore
 {
-	public class MailsFixture : WatinFixture2
+	public class MailsFixture : FunctionalFixture
 	{
 		private Client client;
 		private User user;

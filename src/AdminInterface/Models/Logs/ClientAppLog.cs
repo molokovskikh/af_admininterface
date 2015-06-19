@@ -1,12 +1,5 @@
-﻿using Castle.ActiveRecord;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
-using Common.Web.Ui.ActiveRecordExtentions;
-using Common.Web.Ui.Helpers;
-using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
@@ -16,6 +9,12 @@ namespace AdminInterface.Models.Logs
 	[ActiveRecord(Table = "ClientAppLogs", Schema = "logs")]
 	public class ClientAppLog
 	{
+		public ClientAppLog(User user)
+		{
+			CreatedOn = DateTime.Now;
+			User = user;
+		}
+
 		public ClientAppLog()
 		{
 		}
@@ -23,16 +22,30 @@ namespace AdminInterface.Models.Logs
 		[PrimaryKey("Id")]
 		public uint Id { get; set; }
 
-		[Property]
+		[Property(Lazy = true)]
 		public virtual string Text { get; set; }
 
-		[BelongsTo("UserId"), Description("Клиент")]
+		[BelongsTo("UserId")]
 		public virtual User User { get; set; }
 
 		[Property]
 		public virtual DateTime CreatedOn { get; set; }
-	
+
 		[Property]
 		public virtual string Version { get; set; }
+
+		[Property]
+		public virtual string RequestToken { get; set; }
+
+		public virtual RequestLog ToRequestLog()
+		{
+			return new RequestLog {
+				User = User,
+				CreatedOn = CreatedOn,
+				Version = Version,
+				IsConfirmed = true,
+				UpdateType = "Logs",
+			};
+		}
 	}
 }

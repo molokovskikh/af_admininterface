@@ -12,7 +12,7 @@ using Test.Support;
 namespace Integration.MonoRailExtentions
 {
 	[TestFixture]
-	public class ValidatorToNHibernateIntegrationFixture : IntegrationFixture
+	public class ValidatorToNHibernateIntegrationFixture : AdmIntegrationFixture
 	{
 		private StaticValidatorAccessor accessor;
 		private ValidatorRunner validator;

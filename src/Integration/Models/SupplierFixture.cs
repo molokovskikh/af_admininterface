@@ -10,7 +10,7 @@ using Test.Support.log4net;
 
 namespace Integration.Models
 {
-	public class SupplierFixture : IntegrationFixture
+	public class SupplierFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Delete_supplier()

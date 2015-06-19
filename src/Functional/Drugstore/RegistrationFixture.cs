@@ -20,7 +20,7 @@ using WatiN.CssSelectorExtensions;
 namespace Functional.Drugstore
 {
 	[TestFixture]
-	public class RegistrationFixture : WatinFixture2
+	public class RegistrationFixture : FunctionalFixture
 	{
 		private string _randomClientName;
 		private string _mailSuffix;

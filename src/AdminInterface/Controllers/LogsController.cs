@@ -176,18 +176,12 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 		/// Получение детальной информации о логе в html виде, для таблицы логов
 		/// </summary>
 		/// <param name="updateLogEntityId">Идентификатор лога</param>
-		/// <param name="type">Тип лога, указывающий от какой версии клиента он пришел</param>
-		public void ShowDownloadLog(uint updateLogEntityId, uint type)
+		public void ShowDownloadLog(uint updateLogEntityId)
 		{
 			CancelLayout();
 
-			PropertyBag["updateLogEnriryId"] = updateLogEntityId;
-			string log;
-			if(type == 1)
-				log = DbSession.Load<ClientAppLog>(updateLogEntityId).Text;
-			else
-				log = DbSession.Load<UpdateLogEntity>(updateLogEntityId).Log;
-			PropertyBag["log"] = log;
+			PropertyBag["id"] = updateLogEntityId;
+			PropertyBag["log"] = DbSession.Load<UpdateLogEntity>(updateLogEntityId).Log;
 		}
 
 		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId)
@@ -195,7 +189,6 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 			//Эти данные вообще нафиг не нужны - все итак возьмется из фильтра
 			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today, DateTime.Today.AddDays(1));
 		}
-
 
 		/// <summary>
 		/// История обновлений для пользователей новой версии analit-f
@@ -211,7 +204,23 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 			PropertyBag["filter"] = filter;
 
 			PropertyBag["logEntities"] = filter.FindNewAppLogs(DbSession);
-			RenderView("UpdateLog");
+		}
+
+		public void ShowClientLog(uint id)
+		{
+			CancelLayout();
+
+			var log = DbSession.Load<RequestLog>(id);
+			var text = "";
+			if (log.RequestToken != null) {
+				text = DbSession.Query<ClientAppLog>()
+					.Where(x => x.RequestToken == log.RequestToken)
+					.Select(x => x.Text)
+					.FirstOrDefault();
+			}
+			PropertyBag["id"] = id;
+			PropertyBag["log"] = text;
+			RenderView("ShowDownloadLog");
 		}
 
 		public void UpdateLog(UpdateType? updateType, ulong? regionMask, uint? clientCode, uint? userId,

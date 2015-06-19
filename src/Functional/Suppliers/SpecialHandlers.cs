@@ -7,7 +7,7 @@ using Test.Support.Web;
 
 namespace Functional.Suppliers
 {
-	public class SpecialHandlers : WatinFixture2
+	public class SpecialHandlers : FunctionalFixture
 	{
 		private User user;
 		private Supplier supplier;

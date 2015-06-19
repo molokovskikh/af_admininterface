@@ -13,7 +13,7 @@ using NUnit.Framework;
 
 namespace Integration
 {
-	public class RegionalBaseCostsFixture : IntegrationFixture
+	public class RegionalBaseCostsFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void SetRegionalCostToIntersectionTest()

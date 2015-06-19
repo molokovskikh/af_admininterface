@@ -21,7 +21,7 @@ namespace Integration
 			IList<BaseItemForTable> result = new List<BaseItemForTable>();
 			using (new SessionScope()) {
 				ArHelper.WithSession(s => {
-					client = DataMother.CreateClientAndUsers();
+					client = new DataMother(s).CreateClientAndUsers();
 
 					var filter = new AnalysisOfWorkDrugstoresFilter(1000);
 					filter.Session = s;

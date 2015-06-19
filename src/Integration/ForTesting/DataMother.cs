@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using AdminInterface.Controllers;
+using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
-using AdminInterface.Models.Suppliers;
-using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
-using Common.Tools;
-using Common.Web.Ui.ActiveRecordExtentions;
-using Common.Web.Ui.Helpers;
-using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;
-using System.Linq;
+using AdminInterface.Models.Suppliers;
+using Common.Tools;
+using Common.Web.Ui.Models;
 using NHibernate;
-using Test.Support.log4net;
+using NHibernate.Linq;
 using DocumentType = AdminInterface.Models.Logs.DocumentType;
 
 namespace Integration.ForTesting
@@ -27,10 +22,10 @@ namespace Integration.ForTesting
 			this.session = session;
 		}
 
-		public static Client TestClient(Action<Client> action = null)
+		public Client TestClient(Action<Client> action = null)
 		{
 			var payer = CreatePayer();
-			var homeRegion = ActiveRecordBase<Region>.Find(1UL);
+			var homeRegion = session.Load<Region>(1UL);
 			var client = new Client(payer, homeRegion) {
 				Status = ClientStatus.On,
 				Type = ServiceType.Drugstore,
@@ -43,8 +38,7 @@ namespace Integration.ForTesting
 
 			client.Settings.WorkRegionMask = homeRegion.Id;
 			client.Settings.OrderRegionMask = homeRegion.Id;
-			var values = (DefaultValues)ActiveRecordMediator.FindFirst(typeof(DefaultValues));
-			values.Apply(client);
+			session.Query<DefaultValues>().First().Apply(client);
 
 			if (action != null)
 				action(client);
@@ -52,7 +46,7 @@ namespace Integration.ForTesting
 			client.Payers.Each(p => p.Clients.Add(client));
 
 			client.Payers.Each(p => p.Save());
-			ActiveRecordMediator.SaveAndFlush(client);
+			session.Save(client);
 			client.Users.Each(u => u.Setup());
 
 			client.MaintainIntersection();
@@ -65,7 +59,7 @@ namespace Integration.ForTesting
 			return new Payer("Тестовый плательщик", "Тестовое юр.лицо");
 		}
 
-		public static Client CreateTestClientWithAddress()
+		public Client CreateTestClientWithAddress()
 		{
 			return TestClient(c => {
 				var address = new Address {
@@ -76,7 +70,7 @@ namespace Integration.ForTesting
 			});
 		}
 
-		public static Client CreateTestClientWithUser(Region region = null)
+		public Client CreateTestClientWithUser(Region region = null)
 		{
 			return TestClient(c => {
 				if (region != null)
@@ -88,25 +82,25 @@ namespace Integration.ForTesting
 			});
 		}
 
-		public static Payer CreatePayerForBillingDocumentTest()
+		public Payer CreatePayerForBillingDocumentTest()
 		{
 			var client = CreateTestClientWithAddressAndUser();
 			var payer = client.Payers.First();
 			payer.Users.Each(u => u.Accounting.BeAccounted = true);
 			payer.Addresses.Each(a => a.Accounting.BeAccounted = true);
-			ActiveRecordMediator.Save(client);
-			payer.Recipient = ActiveRecordLinqBase<Recipient>.Queryable.First();
+			session.Save(client);
+			payer.Recipient = session.Query<Recipient>().First();
 			payer.SaveAndFlush();
 			payer.Refresh();
 			return payer;
 		}
 
-		public static Client CreateTestClientWithAddressAndUser()
+		public Client CreateTestClientWithAddressAndUser()
 		{
 			return CreateTestClientWithAddressAndUser(1UL);
 		}
 
-		public static Client CreateTestClientWithAddressAndUser(ulong regionaMask)
+		public Client CreateTestClientWithAddressAndUser(ulong regionaMask)
 		{
 			var client = TestClient(c => {
 				c.MaskRegion = regionaMask;
@@ -124,17 +118,17 @@ namespace Integration.ForTesting
 			};
 			client.AddAddress(address);
 			client.Users[0].Name += client.Users[0].Id;
-			ActiveRecordMediator.Save(client.Users[0]);
+			session.Save(client.Users[0]);
 			client.Addresses[0].Value += client.Addresses[0].Id;
 			client.Addresses[0].Save();
 			client.Name += client.Id;
-			ActiveRecordMediator.SaveAndFlush(client);
+			session.Save(client);
 			client.Addresses.Single().MaintainIntersection();
-			ActiveRecordMediator.Refresh(client);
+			session.Refresh(client);
 			return client;
 		}
 
-		public static DocumentReceiveLog CreateTestDocumentLog(Supplier supplier, Client client)
+		public DocumentReceiveLog CreateTestDocumentLog(Supplier supplier, Client client)
 		{
 			var documentLogEntity = new DocumentReceiveLog {
 				Addition = "Test document log entity",
@@ -146,15 +140,15 @@ namespace Integration.ForTesting
 				FileName = "TestFile.txt",
 				LogTime = DateTime.Now,
 			};
-			ActiveRecordMediator.Create(documentLogEntity);
+			session.Save(documentLogEntity);
 			client.Users.Select(u => new DocumentSendLog {
 				Received = documentLogEntity,
 				ForUser = u
-			}).Each(ActiveRecordMediator.Save);
+			}).Each(x => session.Save(x));
 			return documentLogEntity;
 		}
 
-		public static FullDocument CreateTestDocument(Supplier supplier, Client client, DocumentReceiveLog documentLogEntity)
+		public FullDocument CreateTestDocument(Supplier supplier, Client client, DocumentReceiveLog documentLogEntity)
 		{
 			var document = new FullDocument {
 				ClientCode = client.Id,
@@ -180,7 +174,7 @@ namespace Integration.ForTesting
 			document.Lines = new List<DocumentLine> {
 				documentLine
 			};
-			ActiveRecordMediator.Save(document);
+			session.Save(document);
 
 			return document;
 		}
@@ -195,7 +189,7 @@ namespace Integration.ForTesting
 			return updateEntity;
 		}
 
-		public static Client CreateClientAndUsers()
+		public Client CreateClientAndUsers()
 		{
 			return TestClient(c => {
 				c.AddUser(new User(c) {
@@ -240,19 +234,19 @@ namespace Integration.ForTesting
 				Enumerable.Empty<BalanceOperation>());
 		}
 
-		public static User CreateSupplierUser()
+		public User CreateSupplierUser()
 		{
 			var supplier = CreateSupplier();
 			var user = new User(supplier.Payer, supplier);
-			ArHelper.WithSession(s => user.AssignDefaultPermission(s));
+			user.AssignDefaultPermission(session);
 			user.Setup();
 			return user;
 		}
 
-		public static Supplier CreateSupplier(Action<Supplier> action = null)
+		public Supplier CreateSupplier(Action<Supplier> action = null)
 		{
 			var payer = new Payer("Тестовый плательщик");
-			var homeRegion = ActiveRecordBase<Region>.Find(1UL);
+			var homeRegion = session.Load<Region>(1UL);
 			var supplier = new Supplier(homeRegion, payer) {
 				Name = "Тестовый поставщик",
 				FullName = "Тестовый поставщик",
@@ -286,7 +280,7 @@ namespace Integration.ForTesting
 			return account;
 		}
 
-		public static Product Product()
+		public Product Product()
 		{
 			var catalogName = new CatalogName("Тестовое наименование");
 			var catalogForm = new CatalogForm("Тестовая форма выпуска");
@@ -295,16 +289,16 @@ namespace Integration.ForTesting
 			};
 			var product = new Product(catalog);
 
-			ActiveRecordMediator.Save(catalogForm);
-			ActiveRecordMediator.SaveAndFlush(catalogName);
+			session.Save(catalogForm);
+			session.Save(catalogName);
 			catalog.NameId = catalogName.Id;
 			catalog.FormId = catalogForm.Id;
-			ActiveRecordMediator.Save(catalog);
-			ActiveRecordMediator.Save(product);
+			session.Save(catalog);
+			session.Save(product);
 			return product;
 		}
 
-		public static Certificate Certificate(Catalog catalog)
+		public Certificate Certificate(Catalog catalog)
 		{
 			var serial = DateTime.Today.ToShortDateString();
 
@@ -318,24 +312,22 @@ namespace Integration.ForTesting
 			certificate.Files.Add(certificateFile);
 
 
-			ActiveRecordMediator.Save(certificateFile);
-			ActiveRecordMediator.Save(certificate);
+			session.Save(certificateFile);
+			session.Save(certificate);
 
 			return certificate;
 		}
 
-		public static uint CreateCatelogProduct()
+		public uint CreateCatelogProduct()
 		{
-			return ArHelper.WithSession(s => {
-				return Convert.ToUInt32(s.CreateSQLQuery(@"
+			return Convert.ToUInt32(session.CreateSQLQuery(@"
 insert into Catalogs.CatalogNames(Name) values ('Тестовое наименование');
 set @Nameid = last_insert_id();
 insert into Catalogs.CatalogForms(Form) values ('Тестовая форма выпуска');
 set @FormId = last_insert_id();
 insert into Catalogs.Catalog(NameId, FormId) values (@NameId, @FormId);
 select last_insert_id();")
-					.UniqueResult());
-			});
+				.UniqueResult());
 		}
 
 		public Supplier CreateMatrix()

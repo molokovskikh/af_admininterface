@@ -12,7 +12,7 @@ using Test.Support;
 namespace Integration.Queries
 {
 	[TestFixture]
-	public class ParsedWaybillsFilterFixture : IntegrationFixture
+	public class ParsedWaybillsFilterFixture : AdmIntegrationFixture
 	{
 		private Supplier supplier;
 		[SetUp]

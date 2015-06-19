@@ -13,7 +13,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional.Billing
 {
 	[TestFixture]
-	public class PayerFixture : WatinFixture2
+	public class PayerFixture : FunctionalFixture
 	{
 		[Test]
 		public void Show_balance_summary()

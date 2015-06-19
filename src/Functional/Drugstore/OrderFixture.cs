@@ -13,7 +13,7 @@ using Test.Support.Web;
 
 namespace Functional.Drugstore
 {
-	public class OrderFixture : WatinFixture2
+	public class OrderFixture : FunctionalFixture
 	{
 		private Client client;
 		private User user;

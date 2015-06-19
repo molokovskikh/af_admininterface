@@ -230,7 +230,7 @@ namespace Functional.Suppliers
 		[Test]
 		public void Set_price_as_join_matrix()
 		{
-			var matrixSupplier = dataMother.CreateMatrix();
+			var matrixSupplier = DataMother.CreateMatrix();
 			var matrixPrice = matrixSupplier.Prices[1];
 
 			var price = supplier.Prices.First();

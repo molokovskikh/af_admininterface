@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace Integration
 {
 	[TestFixture]
-	public class SendPaymentNotificationFixture : Test.Support.IntegrationFixture
+	public class SendPaymentNotificationFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Send_notification_for_debtors()

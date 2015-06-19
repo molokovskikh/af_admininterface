@@ -11,7 +11,7 @@ using WatiN.Core.DialogHandlers;
 
 namespace Functional.Billing
 {
-	public class RevisionActFixture : WatinFixture2
+	public class RevisionActFixture : FunctionalFixture
 	{
 		private Payer payer;
 

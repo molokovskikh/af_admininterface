@@ -9,7 +9,7 @@ using Test.Support.Web;
 namespace Functional.Billing
 {
 	[TestFixture]
-	public class ActsFixture : WatinFixture2
+	public class ActsFixture : FunctionalFixture
 	{
 		private Act act;
 

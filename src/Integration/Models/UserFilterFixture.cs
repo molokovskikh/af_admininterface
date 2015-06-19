@@ -17,7 +17,7 @@ using Test.Support.log4net;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class UserFilterFixture : Test.Support.IntegrationFixture
+	public class UserFilterFixture : AdmIntegrationFixture
 	{
 		private UserFilter filter;
 		private Random random;

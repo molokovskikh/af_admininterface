@@ -13,12 +13,12 @@ namespace Functional.ForTesting
 {
 	public class FunctionalFixture : WatinFixture2
 	{
-		protected DataMother dataMother;
+		public DataMother DataMother;
 
 		[SetUp]
 		public void Setup()
 		{
-			dataMother = new DataMother(session);
+			DataMother = new DataMother(session);
 		}
 
 		protected Element SearchRoot(string title)

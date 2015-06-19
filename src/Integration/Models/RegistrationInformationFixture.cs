@@ -11,7 +11,7 @@ using Test.Support.log4net;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class RegistrationInformationFixture : Test.Support.IntegrationFixture
+	public class RegistrationInformationFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void BaseTest()

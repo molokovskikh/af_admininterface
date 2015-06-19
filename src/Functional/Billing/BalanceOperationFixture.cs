@@ -12,7 +12,7 @@ using WatiN.CssSelectorExtensions;
 namespace Functional.Billing
 {
 	[TestFixture]
-	public class BalanceOperationFixture : WatinFixture2
+	public class BalanceOperationFixture : FunctionalFixture
 	{
 		private Payer payer;
 		private Client client;

@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class ActFixture : Test.Support.IntegrationFixture
+	public class ActFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Do_not_build_duplicate_document()

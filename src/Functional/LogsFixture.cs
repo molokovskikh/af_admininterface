@@ -4,6 +4,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
@@ -12,7 +13,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional
 {
 	[TestFixture]
-	public class LogsFixture : WatinFixture2
+	public class LogsFixture : FunctionalFixture
 	{
 		[Test]
 		public void ShowTest()

@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class WorkingPricesInheritanceFixture : Test.Support.IntegrationFixture
+	public class WorkingPricesInheritanceFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Inherit_working_prices()

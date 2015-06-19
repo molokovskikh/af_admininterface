@@ -9,7 +9,7 @@ using Test.Support;
 namespace Integration.Queries
 {
 	[TestFixture]
-	public class UpdateOrdersFixture : IntegrationFixture
+	public class UpdateOrdersFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Update_orders()

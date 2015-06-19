@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 namespace Integration.Models
 {
-	public class AccountingFixture : Test.Support.IntegrationFixture
+	public class AccountingFixture : AdmIntegrationFixture
 	{
 		private Client client;
 		private Account userAccount;

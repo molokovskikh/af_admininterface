@@ -10,7 +10,7 @@ using Test.Support.log4net;
 namespace Integration
 {
 	[TestFixture]
-	public class DocumentBuildFilterFixture : IntegrationFixture
+	public class DocumentBuildFilterFixture : AdmIntegrationFixture
 	{
 		private Payer payer;
 		private DocumentBuilderFilter filter;

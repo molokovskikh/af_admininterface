@@ -1,11 +1,12 @@
 ﻿using AdminInterface.Helpers;
+using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support;
 
 namespace Integration
 {
 	[TestFixture]
-	public class DbLogHelperFixture : IntegrationFixture
+	public class DbLogHelperFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Set_up_transaction_parameters()

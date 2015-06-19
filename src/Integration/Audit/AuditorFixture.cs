@@ -14,7 +14,7 @@ using NUnit.Framework;
 namespace Integration
 {
 	[TestFixture]
-	public class AuditorFixture : Test.Support.IntegrationFixture
+	public class AuditorFixture : AdmIntegrationFixture
 	{
 		[Test(Description = "Проверяет корректную работу обновления логов")]
 		public void UpdateLogTest()

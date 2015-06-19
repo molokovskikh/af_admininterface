@@ -7,7 +7,7 @@ using Test.Support.Web;
 namespace Functional
 {
 	[TestFixture]
-	public class MessagesFixture : WatinFixture2
+	public class MessagesFixture : FunctionalFixture
 	{
 		[Test]
 		public void Try_to_view_statistics()

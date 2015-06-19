@@ -17,7 +17,7 @@ using PriceType = AdminInterface.Models.Suppliers.PriceType;
 namespace Integration
 {
 	[TestFixture]
-	public class NotificationServiceFixture : IntegrationFixture
+	public class NotificationServiceFixture : AdmIntegrationFixture
 	{
 		private Supplier _supplier;
 		private DefaultValues _defaults;

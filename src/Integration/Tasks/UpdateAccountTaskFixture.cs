@@ -13,7 +13,7 @@ using Test.Support.log4net;
 namespace Integration.Tasks
 {
 	[TestFixture]
-	public class UpdateAccountTaskFixture : Test.Support.IntegrationFixture
+	public class UpdateAccountTaskFixture : AdmIntegrationFixture
 	{
 		private Client client;
 		private User user;

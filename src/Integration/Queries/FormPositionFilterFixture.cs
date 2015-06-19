@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AdminInterface.Queries;
+using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support;
 using Test.Support.Suppliers;
@@ -10,7 +11,7 @@ using Test.Support.Suppliers;
 namespace Integration
 {
 	[TestFixture]
-	public class FormPositionFilterFixture : IntegrationFixture
+	public class FormPositionFilterFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void FindTest()

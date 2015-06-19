@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models.Security;
 using Common.Tools;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
@@ -12,7 +13,7 @@ using WatiN.Core;
 namespace Functional.Billing
 {
 	[TestFixture]
-	public class PayerSecurityFixture : WatinFixture2
+	public class PayerSecurityFixture : FunctionalFixture
 	{
 		private List<Administrator> administrators;
 		private Permission permission;

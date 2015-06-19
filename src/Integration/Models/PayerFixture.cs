@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class PayerFixture : Test.Support.IntegrationFixture
+	public class PayerFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Search_payer()

@@ -12,7 +12,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional
 {
 	[TestFixture]
-	public class PromotionsFixture : WatinFixture2
+	public class PromotionsFixture : FunctionalFixture
 	{
 		private PromotionOwnerSupplier _supplier;
 		private Catalog _catalog;

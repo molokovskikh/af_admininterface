@@ -13,7 +13,7 @@ using Test.Support.log4net;
 namespace Integration
 {
 	[TestFixture]
-	public class WhoWasNotUpdatedFilterFixture : IntegrationFixture
+	public class WhoWasNotUpdatedFilterFixture : AdmIntegrationFixture
 	{
 		private User user;
 		private User user1;

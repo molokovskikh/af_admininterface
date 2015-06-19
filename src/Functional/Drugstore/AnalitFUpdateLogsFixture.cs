@@ -16,7 +16,7 @@ using Document = Common.Web.Ui.Models.Document;
 
 namespace Functional.Drugstore
 {
-	public class AnalitFUpdateLogsFixture : WatinFixture2
+	public class AnalitFUpdateLogsFixture : FunctionalFixture
 	{
 		private Client client;
 		private UpdateLogEntity updateLog;

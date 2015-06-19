@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class BalanceSummaryFixture : Test.Support.IntegrationFixture
+	public class BalanceSummaryFixture : AdmIntegrationFixture
 	{
 		private Payer payer;
 

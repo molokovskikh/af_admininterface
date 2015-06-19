@@ -1,22 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using AddUser;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
-using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework.Config;
+using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support;
 using Test.Support.Suppliers;
 
-
 namespace Integration
 {
-	public class ManagepFixture : Test.Support.IntegrationFixture
+	public class ManagepFixture : AdmIntegrationFixture
 	{
 		private TestSupplier _supplier;
 		[SetUp]

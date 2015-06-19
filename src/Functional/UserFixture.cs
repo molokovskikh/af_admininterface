@@ -14,7 +14,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional
 {
 	[TestFixture]
-	public class UserFixture : WatinFixture2
+	public class UserFixture : FunctionalFixture
 	{
 		private Client client;
 		private User user;

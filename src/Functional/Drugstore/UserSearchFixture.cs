@@ -9,25 +9,26 @@ using WatiN.Core;
 using Test.Support.Web;
 using Common.Web.Ui.Helpers;
 using Common.Tools;
+using Functional.ForTesting;
 using WatiN.Core.Native.Windows;
 
 namespace Functional.Drugstore
 {
-	public class UserSearchFixture : WatinFixture2
+	public class UserSearchFixture : FunctionalFixture
 	{
-		private void TestSearchResultsByUserInfo(Browser browser, string columnName, SearchUserBy searchBy)
+		private void TestSearchResultsByUserInfo(string columnName, SearchUserBy searchBy)
 		{
 			var sql = String.Format(@"select max({0}) from Customers.Users", columnName);
-			TestSearchResults(browser, columnName, searchBy, sql, new Client());
+			TestSearchResults(searchBy, sql, new Client());
 		}
 
-		private void TestSearchResultsByClientInfo(Browser browser, string columnName, SearchUserBy searchBy)
+		private void TestSearchResultsByClientInfo(string columnName, SearchUserBy searchBy)
 		{
 			var sql = String.Format(@"select max({0}) from Customers.Clients", columnName);
-			TestSearchResults(browser, columnName, searchBy, sql, new Client());
+			TestSearchResults(searchBy, sql, new Client());
 		}
 
-		private void TestSearchResults(Browser browser, string columnName, SearchUserBy searchBy, string sql, Client client)
+		private void TestSearchResults(SearchUserBy searchBy, string sql, Client client)
 		{
 			var text = session.CreateSQLQuery(sql).UniqueResult().ToString();
 			AssetSearch(searchBy, text, client);
@@ -104,7 +105,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void SearchByUserName()
 		{
-			TestSearchResultsByUserInfo(browser, "Name", SearchUserBy.ByUserName);
+			TestSearchResultsByUserInfo("Name", SearchUserBy.ByUserName);
 		}
 
 		[Test]
@@ -119,7 +120,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void SearchByClientId()
 		{
-			TestSearchResultsByClientInfo(browser, "Id", SearchUserBy.ByClientId);
+			TestSearchResultsByClientInfo("Id", SearchUserBy.ByClientId);
 		}
 
 		[Test]

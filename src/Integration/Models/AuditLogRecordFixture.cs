@@ -4,17 +4,15 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Queries;
-using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Models.Audit;
 using Integration.ForTesting;
 using NUnit.Framework;
-using IntegrationFixture = Test.Support.IntegrationFixture;
 
 namespace Integration.Models
 {
 	[TestFixture]
-	public class AuditLogRecordFixture : IntegrationFixture
+	public class AuditLogRecordFixture : AdmIntegrationFixture
 	{
 		private MonorailMailer mailer;
 		private Client _client;

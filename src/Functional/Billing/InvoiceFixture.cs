@@ -17,7 +17,7 @@ using WatiN.CssSelectorExtensions;
 namespace Functional.Billing
 {
 	[TestFixture]
-	public class InvoiceFixture : WatinFixture2
+	public class InvoiceFixture : FunctionalFixture
 	{
 		private Payer payer;
 		private Invoice invoice;

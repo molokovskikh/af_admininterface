@@ -15,7 +15,7 @@ using Castle.ActiveRecord;
 namespace Functional
 {
 	[TestFixture]
-	public class RegionalAdminFixture : WatinFixture2
+	public class RegionalAdminFixture : FunctionalFixture
 	{
 		[Test]
 		public void Create_regional_admin()

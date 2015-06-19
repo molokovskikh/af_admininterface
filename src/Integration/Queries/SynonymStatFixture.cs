@@ -2,13 +2,14 @@
 using System.Linq;
 using System.Linq.Expressions;
 using AdminInterface.Queries;
+using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support;
 
 namespace Integration.Queries
 {
 	[TestFixture]
-	public class SynonymStatFixture : IntegrationFixture
+	public class SynonymStatFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Find()

@@ -17,7 +17,7 @@ using System.Threading;
 
 namespace Functional.Drugstore
 {
-	public class AddressFixture : WatinFixture2
+	public class AddressFixture : FunctionalFixture
 	{
 		private Client client;
 

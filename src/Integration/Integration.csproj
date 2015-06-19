@@ -115,6 +115,7 @@
   <ItemGroup>
     <Compile Include="Controllers\NewSupplierAttachmentsControllerFixture.cs" />
     <Compile Include="Controllers\RegisterFromClientInterfaceFixture.cs" />
+    <Compile Include="ForTesting\AdmIntegrationFixture.cs" />
     <Compile Include="Helpers\ADHelperFixture.cs" />
     <Compile Include="AnalysisOfWorkDrugstoresFixture.cs" />
     <Compile Include="Helpers\AppHelperFixture.cs" />

@@ -13,7 +13,7 @@ using AdminInterface.Helpers;
 namespace Functional
 {
 	[TestFixture, Ignore("Чинить")]
-	public class UpdateLogFixture : WatinFixture2
+	public class UpdateLogFixture : FunctionalFixture
 	{
 		[Test]
 		public void ViewAccumulativeUpdateLog()

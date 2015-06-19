@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using AdminInterface.Models;
+using Functional.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
 using OpenQA.Selenium;
-using Test.Support.Selenium;
-using Test.Support.Web;
-using WatiN.Core;
-using WatiN.Core.Native.Windows;
 
 namespace Functional
 {
 	[TestFixture]
-	public class RegionsFixture : SeleniumFixture
+	public class RegionsFixture : AdmSeleniumFixture
 	{
 		[Test]
 		public void RegionListTest()

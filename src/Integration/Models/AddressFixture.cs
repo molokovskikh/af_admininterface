@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class AddressFixture : Test.Support.IntegrationFixture
+	public class AddressFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Move_address()

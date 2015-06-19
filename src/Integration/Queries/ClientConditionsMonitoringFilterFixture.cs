@@ -17,7 +17,7 @@ using PriceType = AdminInterface.Models.Suppliers.PriceType;
 namespace Integration
 {
 	[TestFixture]
-	public class ClientConditionsMonitoringFilterFixture : IntegrationFixture
+	public class ClientConditionsMonitoringFilterFixture : AdmIntegrationFixture
 	{
 		private Supplier supplier;
 		private Client client;

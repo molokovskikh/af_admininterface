@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace Integration
 {
 	[TestFixture]
-	public class InvoiceFilterFixture : Test.Support.IntegrationFixture
+	public class InvoiceFilterFixture : AdmIntegrationFixture
 	{
 		private Payer payer;
 

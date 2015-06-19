@@ -2,6 +2,7 @@
 using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using OpenQA.Selenium;
@@ -9,7 +10,7 @@ using Test.Support.Selenium;
 
 namespace Functional.Drugstore
 {
-	public class SettingsFixture2 : SeleniumFixture
+	public class SettingsFixture2 : AdmSeleniumFixture
 	{
 		private Client client;
 		private DrugstoreSettings settings;

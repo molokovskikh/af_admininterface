@@ -11,7 +11,7 @@ using Test.Support.Web;
 namespace Functional.Billing
 {
 	[TestFixture]
-	public class ReferenceFixture : WatinFixture2
+	public class ReferenceFixture : FunctionalFixture
 	{
 		[SetUp]
 		public void Setup()

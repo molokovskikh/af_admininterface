@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Integration.NHibernateExtentions
 {
 	[TestFixture]
-	public class StateExtentionFixture : Test.Support.IntegrationFixture
+	public class StateExtentionFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void If_property_changed_should_be_true()

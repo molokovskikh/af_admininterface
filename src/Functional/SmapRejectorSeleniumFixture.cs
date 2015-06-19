@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using AdminInterface.Models.Logs;
 using Common.Web.Ui.Models.Audit;
+using Functional.ForTesting;
 using NUnit.Framework;
 using Test.Support.Selenium;
 
 namespace Functional
 {
 	[TestFixture]
-	public class SmapRejectorSeleniumFixture : SeleniumFixture
+	public class SmapRejectorSeleniumFixture : AdmSeleniumFixture
 	{
 		private RejectedEmail spam;
 

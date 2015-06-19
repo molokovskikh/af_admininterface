@@ -16,7 +16,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class UserFixture : Test.Support.IntegrationFixture
+	public class UserFixture : AdmIntegrationFixture
 	{
 		private User user;
 		private Client client;

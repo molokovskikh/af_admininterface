@@ -14,7 +14,7 @@ using Test.Support;
 namespace Integration
 {
 	[TestFixture]
-	public class NewsFixture : IntegrationFixture
+	public class NewsFixture : AdmIntegrationFixture
 	{
 		private MailMessage message;
 		private News news;

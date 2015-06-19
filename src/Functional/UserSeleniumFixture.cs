@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AdminInterface.Models;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using OpenQA.Selenium;
@@ -10,7 +11,7 @@ using Test.Support.Selenium;
 
 namespace Functional
 {
-	public class UserSeleniumFixture : SeleniumFixture
+	public class UserSeleniumFixture : AdmSeleniumFixture
 	{
 		private Client _client;
 		private User _user;

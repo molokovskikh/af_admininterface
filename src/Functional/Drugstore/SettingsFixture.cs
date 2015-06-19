@@ -37,7 +37,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Set_buying_matrix_configuration()
 		{
-			dataMother.CreateMatrix();
+			DataMother.CreateMatrix();
 
 			Css("#drugstore_EnableBuyingMatrix").Click();
 
@@ -64,7 +64,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Set_offers_matrix()
 		{
-			dataMother.CreateMatrix();
+			DataMother.CreateMatrix();
 
 			Css("#drugstore_EnableOfferMatrix").Click();
 			var select = Search("Фармаимпекс", "Ассортиментный прайс для матрицы закупок");
@@ -87,7 +87,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Add_offer_matrix_exclude()
 		{
-			var supplier = dataMother.CreateMatrix();
+			var supplier = DataMother.CreateMatrix();
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
 
 			Css("#drugstore_EnableOfferMatrix").Click();
@@ -499,7 +499,7 @@ namespace Functional.Drugstore
 			AssertText("Сохранено");
 			var sql = @"
 select
-count(*) 
+count(*)
 from
 Customers.Intersection i
 where i.ClientId = :ClientId and i.RegionId = :RegionId

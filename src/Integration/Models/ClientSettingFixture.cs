@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class ClientSettingFixture : Test.Support.IntegrationFixture
+	public class ClientSettingFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Set_replication_if_matrix_settings_changed()

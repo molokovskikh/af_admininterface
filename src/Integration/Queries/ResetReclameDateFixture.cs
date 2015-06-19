@@ -6,7 +6,7 @@ using Test.Support;
 namespace Integration.Queries
 {
 	[TestFixture]
-	public class ResetReclameDateFixture : IntegrationFixture
+	public class ResetReclameDateFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Reset_reclame_date()

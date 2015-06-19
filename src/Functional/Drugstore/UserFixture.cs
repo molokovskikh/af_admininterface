@@ -21,7 +21,7 @@ using WatiN.Core.Native.Windows;
 
 namespace Functional.Drugstore
 {
-	public class UserFixture : WatinFixture2
+	public class UserFixture : FunctionalFixture
 	{
 		private Client client;
 		private User user;
@@ -42,19 +42,14 @@ namespace Functional.Drugstore
 		[Test(Description = "Проверка отображения логов analitf-net")]
 		public void Check_AnalitfNet_logs()
 		{
-			var clientLog = new ClientAppLog();
+			var clientLog = new ClientAppLog(client.Users.First());
 			clientLog.Text = "bla bla1";
-			clientLog.CreatedOn = DateTime.Now;
-			clientLog.User = client.Users.First();
 			clientLog.Version = "1.11";
 			session.Save(clientLog);
-			var requestLog = new RequestLog();
+			var requestLog = new RequestLog(client.Users.First());
 			requestLog.Error = "bla bla2";
-			requestLog.User = client.Users.First();
 			requestLog.Version = "1.11";
-			requestLog.CreatedOn = DateTime.Now;
 			session.Save(requestLog);
-			session.Flush();
 			Open("Logs/NewUpdateLog?filter.Client.Id={0}", client.Id);
 			AssertText("История обновлений клиента");
 			AssertText("bla bla1");
@@ -764,7 +759,7 @@ namespace Functional.Drugstore
 		[
 			Test,
 			NUnit.Framework.Description(@"
-После перемещения пользователя должны быть созданы записи в UserPrices 
+После перемещения пользователя должны быть созданы записи в UserPrices
 для тех регионов, которых не было у старого клиента, но они есть у нового")
 		]
 		public void After_user_moving_must_be_entries_in_UserPrices()

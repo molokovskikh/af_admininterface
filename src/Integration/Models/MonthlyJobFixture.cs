@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class ActiveRecordJobFixture : Test.Support.IntegrationFixture
+	public class ActiveRecordJobFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Load_active_record_job()

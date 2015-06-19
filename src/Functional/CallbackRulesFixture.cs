@@ -12,7 +12,7 @@ using WatiN.Core;
 namespace Functional
 {
 	[TestFixture, Ignore("Временно до починки")]
-	public class CallbackRulesFixture : WatinFixture2
+	public class CallbackRulesFixture : FunctionalFixture
 	{
 		private const string CallbackLinkText = "Правила обратного звонка";
 

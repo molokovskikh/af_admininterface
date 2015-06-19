@@ -128,6 +128,7 @@
     <Compile Include="Drugstore\MailsFixture.cs" />
     <Compile Include="Drugstore\SettingsFixture.cs" />
     <Compile Include="Drugstore\SettingsFixture2.cs" />
+    <Compile Include="ForTesting\AdmSeleniumFixture.cs" />
     <Compile Include="ForTesting\ContactInformationHelper.cs" />
     <Compile Include="Drugstore\DocumentLogFixture.cs" />
     <Compile Include="Drugstore\DrugstoreFixture.cs" />

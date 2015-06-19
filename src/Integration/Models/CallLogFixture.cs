@@ -1,12 +1,13 @@
 ﻿using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
+using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support;
 
 namespace Integration.Models
 {
 	[TestFixture]
-	public class CallLogFixture : IntegrationFixture
+	public class CallLogFixture : AdmIntegrationFixture
 	{
 		[SetUp]
 		public void Setup()

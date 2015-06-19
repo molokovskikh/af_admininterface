@@ -569,6 +569,7 @@
     <Content Include="Views\Logs\ShowStatDetails.brail">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Views\Logs\NewUpdateLog.brail" />
     <None Include="Views\Logs\OrdersTable.brail" />
     <None Include="Views\Logs\Statistics.brail" />
     <Content Include="Views\Mail\DeletePayer.brail" />

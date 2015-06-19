@@ -6,6 +6,7 @@ using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Documents;
 using AdminInterface.Models.Suppliers;
+using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
@@ -15,7 +16,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional
 {
 	[TestFixture]
-	public class MailsModeringFixture : WatinFixture2
+	public class MailsModeringFixture : FunctionalFixture
 	{
 		protected Supplier Supplier;
 		protected Client Client;

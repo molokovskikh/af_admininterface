@@ -14,7 +14,7 @@ using WatiN.Core.Native.Windows;
 namespace Functional.Billing
 {
 	[TestFixture]
-	public class SupplierBillingFixture : WatinFixture2
+	public class SupplierBillingFixture : FunctionalFixture
 	{
 		[Test]
 		public void Show_supplier_on_off_logs()

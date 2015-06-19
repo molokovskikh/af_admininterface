@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace Integration.Models
 {
-	public class OffersFixture : Test.Support.IntegrationFixture
+	public class OffersFixture : AdmIntegrationFixture
 	{
 		[Test, Ignore("В локальной базе нет предложений, нужно добавить код для создания предложений")]
 		public void Search_should_return_offers()

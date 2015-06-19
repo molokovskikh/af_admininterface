@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace Integration
 {
 	[TestFixture]
-	public class PaymentFilterFixture : Test.Support.IntegrationFixture
+	public class PaymentFilterFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Search_by_payer_name()

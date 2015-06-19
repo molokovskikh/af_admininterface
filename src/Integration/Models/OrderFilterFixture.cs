@@ -10,7 +10,7 @@ using Test.Support.log4net;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class OrderFilterFixture : Test.Support.IntegrationFixture
+	public class OrderFilterFixture : AdmIntegrationFixture
 	{
 		private User _user;
 		private ClientOrder _order;

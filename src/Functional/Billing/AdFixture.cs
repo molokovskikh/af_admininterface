@@ -10,7 +10,7 @@ using Test.Support.Web;
 
 namespace Functional.Billing
 {
-	public class AdFixture : WatinFixture2
+	public class AdFixture : FunctionalFixture
 	{
 		private Advertising ad;
 		private Payer payer;

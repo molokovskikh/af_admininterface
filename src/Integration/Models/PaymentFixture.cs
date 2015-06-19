@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class PaymentFixture : Test.Support.IntegrationFixture
+	public class PaymentFixture : AdmIntegrationFixture
 	{
 		[Test]
 		public void Parse_payments()
