@@ -232,7 +232,7 @@ namespace Functional.Drugstore
 			var directory = Path.GetDirectoryName(preparedDataPath);
 			if (!Directory.Exists(directory))
 				Directory.CreateDirectory(directory);
-			using (var file = File.Create(preparedDataPath)) {
+			using (File.Create(preparedDataPath)) {
 				Refresh();
 				Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.True);
 				ClickButton("Удалить подготовленные данные");
