@@ -19,6 +19,7 @@ namespace AdminInterface.Initializers
 			var config = Global.Config;
 			var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
 
+			config.UserPreparedDataDirectory = Path.Combine(dataPath, config.UserPreparedDataDirectory);
 			config.AptBox = Path.Combine(dataPath, config.AptBox);
 			config.OptBox = Path.Combine(dataPath, config.OptBox);
 			config.PromotionsPath = Path.Combine(dataPath, config.PromotionsPath);
@@ -33,7 +34,8 @@ namespace AdminInterface.Initializers
 				dataPath,
 				config.AttachmentsPath,
 				config.CertificatesPath,
-				config.PromotionsPath);
+				config.PromotionsPath,
+				config.UserPreparedDataDirectory);
 
 			new Seed().Run();
 		}

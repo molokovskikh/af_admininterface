@@ -225,28 +225,22 @@ namespace Functional.Drugstore
 		[Test]
 		public void Delete_user_prepared_data()
 		{
-			var preparedDataPath = String.Format(@"C:\Windows\Temp\{0}_123456.zip", user.Id);
+			var preparedDataPath = Path.Combine(DataRoot, "Result", String.Format(@"C:\Windows\Temp\{0}_123456.zip", user.Id));
 
 			ClickLink(user.Login);
 			Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.False);
 			var directory = Path.GetDirectoryName(preparedDataPath);
 			if (!Directory.Exists(directory))
 				Directory.CreateDirectory(directory);
-			var file = File.Create(preparedDataPath);
-
-			Refresh();
-
-			Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.True);
-			ClickButton("Удалить подготовленные данные");
-			AssertText("Ошибка удаления подготовленных данных, попробуйте позднее.");
-			file.Close();
+			using (var file = File.Create(preparedDataPath)) {
+				Refresh();
+				Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.True);
+				ClickButton("Удалить подготовленные данные");
+				AssertText("Ошибка удаления подготовленных данных, попробуйте позднее.");
+			}
 			ClickButton("Удалить подготовленные данные");
 			AssertText("Подготовленные данные удалены");
-			try {
-				File.Delete(file.Name);
-			}
-			catch {
-			}
+			File.Delete(preparedDataPath);
 		}
 
 		[Test]

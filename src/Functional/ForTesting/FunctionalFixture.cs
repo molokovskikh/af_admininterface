@@ -14,10 +14,12 @@ namespace Functional.ForTesting
 	public class FunctionalFixture : WatinFixture2
 	{
 		public DataMother DataMother;
+		public string DataRoot;
 
 		[SetUp]
 		public void Setup()
 		{
+			DataRoot = "../../../AdminInterface/Data/";
 			DataMother = new DataMother(session);
 		}
 

@@ -151,12 +151,9 @@ namespace Functional.Drugstore
 			line.Certificate = DataMother.Certificate(line.CatalogProduct.Catalog);
 			session.Save(line);
 
-			var dir = "../../../AdminInterface/Data/Certificates/";
-			if (!Directory.Exists(dir))
-				Directory.CreateDirectory(dir);
-
+			var dir = Directory.CreateDirectory(Path.Combine(DataRoot, "Certificates"));
 			var filename = line.Certificate.Files[0].Filename;
-			File.WriteAllText(Path.Combine(dir, filename), "");
+			File.WriteAllText(Path.Combine(dir.FullName, filename), "");
 
 			Open("Logs/Documents?filter.Client.Id={0}", client.Id);
 			AssertText("Тестовый поставщик");
