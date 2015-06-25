@@ -1,10 +1,8 @@
-Для подсветки пользователей отключенных биллингом раньше использовался стиль DisabledByBilling
-теперь следует переходить к стилю disabled-by-billing и использовать Styler для посветки строк.
-User.css ~43 строка
+Библиотеки
 
-библиотеки
-
-библиотеки получаются из nuget для установки - bake packages:install
+* для генерации регистрационной карты используется
+MICROSOFT® REPORT VIEWER 2012 RUNTIME
+https://www.microsoft.com/en-US/Download/details.aspx?id=35747
 
 javascript тесты
 
@@ -26,3 +24,7 @@ grunt
 
 что бы скомпилировать coffeescript
 grunt coffee
+
+Для подсветки пользователей отключенных биллингом раньше использовался стиль DisabledByBilling
+теперь следует переходить к стилю disabled-by-billing и использовать Styler для посветки строк.
+User.css ~43 строка
