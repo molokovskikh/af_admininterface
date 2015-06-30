@@ -804,7 +804,8 @@
     <Service Include="{967B4E0D-AD0C-4609-AB67-0FA40C0206D8}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ClientCard.rdlc">
+    <EmbeddedResource Include="ClientCard.rdlc" />
+    <EmbeddedResource Include="ClientCardDrugstore.rdlc">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Mail;
+using System.Text;
+using System.Web.UI;
 using AddUser;
 using AdminInterface.Models;
 using AdminInterface.Properties;
@@ -20,12 +22,16 @@ namespace AdminInterface.Helpers
 			string clientType,
 			string clientLogin,
 			string clientPassword,
+			string addresses,
 			DateTime operationDate,
 			bool isRegistration,
 			DefaultValues defaults)
 		{
+			var resource = "AdminInterface.ClientCard.rdlc";
+			if (addresses != null)
+				resource = "AdminInterface.ClientCardDrugstore.rdlc";
 			var report = new LocalReport {
-				ReportEmbeddedResource = "AdminInterface.ClientCard.rdlc",
+				ReportEmbeddedResource = resource,
 			};
 			var deviceInfo =
 				@"<DeviceInfo>
@@ -55,6 +61,7 @@ namespace AdminInterface.Helpers
 				new ReportParameter("ClientPassword", clientPassword),
 				new ReportParameter("OperationDate", operationDate.ToString()),
 				new ReportParameter("IsRegistration", isRegistration.ToString()),
+				new ReportParameter("Addresses", addresses ?? ""),
 				new ReportParameter("Phones", phones)
 			});
 
@@ -74,8 +81,15 @@ namespace AdminInterface.Helpers
 			params string[] mails)
 		{
 			string body;
-			if (user.RootService is Client)
+			string addresses = null;
+			if (user.RootService is Client) {
 				body = Settings.Default.RegistrationCardEmailBodyForDrugstore;
+				var sb = new StringBuilder();
+				foreach (var address in user.AvaliableAddresses)
+					sb.AppendFormat("{0}\n", address.Name);
+				sb.Append("  ");
+				addresses = sb.ToString();
+			}
 			else
 				body = Settings.Default.RegistrationCardEmailBodyForSupplier;
 
@@ -86,6 +100,7 @@ namespace AdminInterface.Helpers
 				user.RootService.GetHumanReadableType(),
 				user.Login,
 				password,
+				addresses,
 				DateTime.Now,
 				isRegistration,
 				defaults))
