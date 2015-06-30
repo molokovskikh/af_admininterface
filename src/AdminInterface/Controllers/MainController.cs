@@ -2,6 +2,7 @@
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
@@ -171,9 +172,17 @@ namespace AdminInterface.Controllers
 		public void Report(uint id, bool isPasswordChange, string passwordId)
 		{
 			CancelLayout();
-
+			var user = DbSession.Load<User>(id);
+			var addresses = new StringBuilder();
+			if (user.RootService is Client) {
+				foreach (var address in user.AvaliableAddresses)
+					addresses.AppendFormat("<div>{0}</div>", address.Name);
+				addresses.Append("  ");
+			}
+			
 			PropertyBag["now"] = DateTime.Now;
-			PropertyBag["user"] = DbSession.Load<User>(id);
+			PropertyBag["user"] = user;
+			PropertyBag["addresses"] = addresses.ToString();
 			PropertyBag["IsPasswordChange"] = isPasswordChange;
 			PropertyBag["defaults"] = Defaults;
 			PropertyBag["password"] = Session[passwordId];

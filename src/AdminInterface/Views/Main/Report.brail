@@ -102,6 +102,25 @@
             <tr>
                 <td align="center" height="120">
                     <font face="Arial" size="2">
+					<% if addresses: %>
+                    <table id="Table7" bordercolor="#000000" cellspacing="0" cellpadding="0" width="95%"
+                        border="1">
+                        <tr>
+                            <td align="center" height="30">
+                                <font face="Verdana" size="1"><strong>Доступные адреса для заказа:</strong></font></td>
+                        </tr>
+                        <tr>
+                            <td valign="top" height="60" style="text-align:left; ">
+                                <font size="1" face="Verdana">
+									</a>
+									${addresses}
+                            </td>
+                        </tr>
+                    </table>
+					<% end %>
+					<div style="height:10px"></div>
+					  </font>
+					  <font face="Arial" size="2">
                     <table id="Table7" bordercolor="#000000" cellspacing="0" cellpadding="0" width="95%"
                         border="1">
                         <tr>
@@ -120,10 +139,11 @@
 										<% end %>
                                     </ul>
                                     e-mail: <a>tech@analit.net</a>
-                                </font>
+                              
                             </td>
                         </tr>
                     </table>
+					  </font>
 				</td>
             </tr>
             <tr>
