@@ -85,8 +85,16 @@ namespace AdminInterface.Helpers
 			if (user.RootService is Client) {
 				body = Settings.Default.RegistrationCardEmailBodyForDrugstore;
 				var sb = new StringBuilder();
-				foreach (var address in user.AvaliableAddresses)
+				var i = 0;
+				foreach (var address in user.AvaliableAddresses) {
 					sb.AppendFormat("{0}\n", address.Name);
+					//Отображаем только 15 адресов, так как остальные просто не влезут
+					if (++i >= 15) {
+						if (user.AvaliableAddresses.Count > 15)
+							sb.AppendLine("...");
+						break;
+					}
+				}
 				sb.Append("  ");
 				addresses = sb.ToString();
 			}
