@@ -1,39 +1,33 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Configuration;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Audit;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
-using AdminInterface.Models.Validators;
 using AdminInterface.Queries;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
-using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
-using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Criterion;
-using AdminInterface.Security;
-using System.Web;
-using Common.Web.Ui.Models;
-using System.ComponentModel;
-using AdminInterface.Models.Billing;
 using NHibernate.Linq;
 using NHibernate.Proxy;
-using NPOI.SS.Formula.Functions;
+using AppHelper = Common.Web.Ui.Helpers.AppHelper;
 
 namespace AdminInterface.Models
 {
@@ -49,6 +43,42 @@ namespace AdminInterface.Models
 		[Property]
 		public uint DestinationVersion { get; set; }
 	}
+
+	[ActiveRecord(Schema = "Customers", Table = "analitfnetdatas")]
+	public class AFNetConfig
+	{
+		private string binUpdateChannel;
+
+		[PrimaryKey("UserId", Generator = PrimaryKeyType.Foreign)]
+		public uint UserId { get; set; }
+
+		[Property(Access = PropertyAccess.FieldCamelcase), Description("Канал обновления")]
+		public string BinUpdateChannel
+		{
+			get
+			{
+				if (String.IsNullOrEmpty(binUpdateChannel))
+					return "rtm";
+				return binUpdateChannel;
+			}
+			set { binUpdateChannel = value; }
+		}
+
+		[OneToOne]
+		public virtual User User { get; set; }
+
+		public KeyValuePair<string, string>[] Channels
+		{
+			get {
+				return new[] {
+					new KeyValuePair<string, string>("alpha", "Без тестирования"),
+					new KeyValuePair<string, string>("beta", "Внутреннее тестирование"),
+					new KeyValuePair<string, string>("rtm", "Для клиентов"),
+				};
+			}
+		}
+	}
+
 
 	public enum UserADStatus
 	{
@@ -108,6 +138,7 @@ namespace AdminInterface.Models
 
 		public User()
 		{
+			CheckClientToken = true;
 			SendWaybills = false;
 			SendRejects = true;
 			Enabled = true;
@@ -236,10 +267,8 @@ namespace AdminInterface.Models
 		[Property, Description("Проверять текущие цены и остатки пред отправкой заказов"), Auditable]
 		public virtual bool UseAdjustmentOrders { get; set; }
 
-		/*
-				[Property, Description("Не проверять УИН"), Auditable]
-				public virtual bool DoNotCheckUin { get; set; }
-		*/
+		[Property, Description("Проверять УИН приложения"), Auditable]
+		public virtual bool CheckClientToken { get; set; }
 
 		[BelongsTo("ClientId", /*NotNull = true, */Lazy = FetchWhen.OnInvoke), Description("Клиент"), Auditable]
 		public virtual Client Client { get; set; }
@@ -261,6 +290,9 @@ namespace AdminInterface.Models
 
 		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual UserUpdateInfo UserUpdateInfo { get; set; }
+
+		[OneToOne(Cascade = CascadeEnum.All)]
+		public virtual AFNetConfig AFNetConfig { get; set; }
 
 		[
 			HasAndBelongsToMany(typeof(UserPermission),
@@ -877,7 +909,7 @@ WHERE
 	{
 		public ModelAction(object entity, string action, string name, bool disabled = false)
 		{
-			Controller = Common.Web.Ui.Helpers.AppHelper.GetControllerName(entity);
+			Controller = AppHelper.GetControllerName(entity);
 			Id = ((dynamic)entity).Id;
 			Action = action;
 			Name = name;

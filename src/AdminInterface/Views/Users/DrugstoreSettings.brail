@@ -50,6 +50,19 @@ ${app.Asset("UserScripts.js")}
 
 		<div class=block>
 			<h3>
+				AnalitF.net
+			</h3>
+			<div>
+				${app.Edit("user.CheckClientToken")}<br>
+				<% if user.AFNetConfig: %>
+				${app.Label("user.AFNetConfig.BinUpdateChannel")}:
+				${FormHelper.Select("user.AFNetConfig.BinUpdateChannel", user.AFNetConfig.Channels, {@value: @Key, @text: @Value})}<br>
+				<% end %>
+			</div>
+		</div>
+
+		<div class=block>
+			<h3>
 				Права доступа
 			</h3>
 			<div>

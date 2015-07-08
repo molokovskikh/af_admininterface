@@ -125,7 +125,7 @@ namespace AdminInterface.Controllers
 			if (client == null) {
 				PropertyBag["UseDefPermession"] = true;
 				PropertyBag["SendToEmail"] = true;
-				//Для вьюшки - по умолчанию должен быть True. 
+				//Для вьюшки - по умолчанию должен быть True.
 				//Но в модели мы это не можем разместить, так как по здравому смыслу он по-умолчанию false.
 				//Так мы избежим лишних действий по созданию прав на директории
 				user.FtpAccess = true;
@@ -243,7 +243,7 @@ namespace AdminInterface.Controllers
 			var service = Service.FindAndCheck<Service>(clientId);
 			var user = new User(service);
 			var address = new Address();
-			
+
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 			Account account = user.Accounting;
 
