@@ -86,12 +86,14 @@ namespace AdminInterface.Helpers
 				body = Settings.Default.RegistrationCardEmailBodyForDrugstore;
 				var sb = new StringBuilder();
 				var i = 0;
+				var limit = 22; //Количество строк в окне адресов
 				foreach (var address in user.AvaliableAddresses) {
+					i++;
 					sb.AppendFormat("{0}\n", address.Name);
-					//Отображаем только 15 адресов, так как остальные просто не влезут
-					if (++i >= 15) {
-						if (user.AvaliableAddresses.Count > 15)
-							sb.AppendLine("...");
+					//Отображаем только limit адресов, так как остальные просто не влезут
+					if (user.AvaliableAddresses.Count > limit && i >= limit - 2) {
+						sb.AppendLine("и другие.");
+						sb.AppendLine("Полную информацию о доступных адресах можно получить, обративщись в техническую поддержку.");
 						break;
 					}
 				}
