@@ -64,6 +64,9 @@ namespace AdminInterface.Models
 			set { binUpdateChannel = value; }
 		}
 
+		[Property]
+		public virtual string ClientToken { get; set; }
+
 		[OneToOne]
 		public virtual User User { get; set; }
 
@@ -593,12 +596,15 @@ namespace AdminInterface.Models
 
 		public virtual bool HaveUin()
 		{
-			return !String.IsNullOrWhiteSpace(UserUpdateInfo.AFCopyId);
+			return !String.IsNullOrWhiteSpace(UserUpdateInfo.AFCopyId)
+				|| (AFNetConfig != null && !String.IsNullOrEmpty(AFNetConfig.ClientToken));
 		}
 
 		public virtual void ResetUin()
 		{
 			UserUpdateInfo.AFCopyId = "";
+			if (AFNetConfig != null)
+				AFNetConfig.ClientToken = null;
 		}
 
 		public virtual void PrepareSave(ISession session)

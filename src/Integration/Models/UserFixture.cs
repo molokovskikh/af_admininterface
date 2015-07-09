@@ -185,5 +185,15 @@ namespace Integration.Models
 			Assert.That(message.To[0].ToString(), Is.EqualTo("BillingList@analit.net"));
 			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Регионы работы'"));
 		}
+
+		[Test]
+		public void Reset_uin_on_analitf_net()
+		{
+			user.AFNetConfig = new AFNetConfig { User = user };
+			user.AFNetConfig.ClientToken = Guid.NewGuid().ToString();
+			Assert.IsTrue(user.HaveUin());
+			user.ResetUin();
+			Assert.IsNullOrEmpty(user.AFNetConfig.ClientToken);
+		}
 	}
 }
