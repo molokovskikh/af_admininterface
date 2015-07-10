@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Web.UI;
@@ -47,9 +48,9 @@ namespace AdminInterface.Helpers
 
 			var phones = defaults.Phones;
 			phones = "Режим работы: Понедельник – Пятница с 9.00 до 18.00 часов по московскому времени\r\n"
-				+ "Телефоны:\r\n"
-				+ phones + "\r\n"
-				+ "e-mail: tech@analit.net";
+					+ "Телефоны:\r\n"
+					+ phones + "\r\n"
+					+ "e-mail: tech@analit.net";
 
 			report.SetParameters(new List<ReportParameter> {
 				new ReportParameter("ClientCode", clientCode.ToString()),
@@ -87,13 +88,14 @@ namespace AdminInterface.Helpers
 				var sb = new StringBuilder();
 				var i = 0;
 				var limit = 22; //Количество строк в окне адресов
-				foreach (var address in user.AvaliableAddresses) {
+				var availibaleAddresses = user.AvaliableAddresses.OrderBy(a => a.Id).ToList();
+				foreach (var address in availibaleAddresses) {
 					i++;
 					sb.AppendFormat("{0}\n", address.Name);
 					//Отображаем только limit адресов, так как остальные просто не влезут
 					if (user.AvaliableAddresses.Count > limit && i >= limit - 2) {
 						sb.AppendLine("и другие.");
-						sb.AppendLine("Полную информацию о доступных адресах можно получить, обративщись в техническую поддержку.");
+						sb.AppendLine("Полную информацию о доступных адресах можно получить, обратившись в техническую поддержку.");
 						break;
 					}
 				}
@@ -114,20 +116,20 @@ namespace AdminInterface.Helpers
 				DateTime.Now,
 				isRegistration,
 				defaults))
-				using (var message = new MailMessage {
-					From = new MailAddress("tech@analit.net"),
-					Subject = "Регистрационная карта для работы в системе АналитФармация",
-					Body = defaults.AppendFooter(body),
-					Attachments = { new Attachment(stream, "Регистрационная карта.jpg") },
-				}) {
-					if (user.RootService.IsClient())
-						message.Attachments.Add(new Attachment(Path.Combine(Global.Config.DocsPath, "Инструкция по установке.doc")));
-					foreach (var mail in mails)
-						EmailHelper.BuildAttachementFromString(mail, message);
-					if (message.To.Count == 0)
-						return 0;
+			using (var message = new MailMessage {
+				From = new MailAddress("tech@analit.net"),
+				Subject = "Регистрационная карта для работы в системе АналитФармация",
+				Body = defaults.AppendFooter(body),
+				Attachments = { new Attachment(stream, "Регистрационная карта.jpg") },
+			}) {
+				if (user.RootService.IsClient())
+					message.Attachments.Add(new Attachment(Path.Combine(Global.Config.DocsPath, "Инструкция по установке.doc")));
+				foreach (var mail in mails)
+					EmailHelper.BuildAttachementFromString(mail, message);
+				if (message.To.Count == 0)
+					return 0;
 
-					return Func.Send(message);
+				return Func.Send(message);
 			}
 		}
 	}

@@ -716,7 +716,7 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
-                <Value>Адреса:</Value>
+                <Value>Доступные адреса для заказа:</Value>
                 <Style>
                   <FontFamily>Verdana</FontFamily>
                   <FontSize>7pt</FontSize>
