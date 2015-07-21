@@ -14,12 +14,13 @@
 		self.isHiddenFromSupplier(value);
 	});
 	self.payerId.subscribe(function (value) {
-		if (!parseInt(value)) {
+		var parsedValue = parseInt(value);
+		if (!parsedValue) {
 			self.orgs([]);
 			return;
 		}
 		$.get("/Clients/GetPayerOrgs",
-			{ id: value },
+			{ id: parsedValue },
 			function (data) {
 				self.orgs(data);
 			});
