@@ -67,6 +67,10 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual string ClientToken { get; set; }
 
+		//вторая версия токена приложения включает путь
+		[Property]
+		public virtual string ClientTokenV2 { get; set; }
+
 		[OneToOne]
 		public virtual User User { get; set; }
 
@@ -603,8 +607,10 @@ namespace AdminInterface.Models
 		public virtual void ResetUin()
 		{
 			UserUpdateInfo.AFCopyId = "";
-			if (AFNetConfig != null)
+			if (AFNetConfig != null) {
 				AFNetConfig.ClientToken = null;
+				AFNetConfig.ClientTokenV2 = null;
+			}
 		}
 
 		public virtual void PrepareSave(ISession session)
