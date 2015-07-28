@@ -601,7 +601,9 @@ namespace AdminInterface.Models
 		public virtual bool HaveUin()
 		{
 			return !String.IsNullOrWhiteSpace(UserUpdateInfo.AFCopyId)
-				|| (AFNetConfig != null && !String.IsNullOrEmpty(AFNetConfig.ClientToken));
+				|| (AFNetConfig != null
+					&& (!String.IsNullOrEmpty(AFNetConfig.ClientToken)
+					|| !String.IsNullOrEmpty(AFNetConfig.ClientTokenV2)));
 		}
 
 		public virtual void ResetUin()
