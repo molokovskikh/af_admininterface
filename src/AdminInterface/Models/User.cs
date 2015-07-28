@@ -603,7 +603,7 @@ namespace AdminInterface.Models
 			return !String.IsNullOrWhiteSpace(UserUpdateInfo.AFCopyId)
 				|| (AFNetConfig != null
 					&& (!String.IsNullOrEmpty(AFNetConfig.ClientToken)
-					|| !String.IsNullOrEmpty(AFNetConfig.ClientTokenV2)));
+						|| !String.IsNullOrEmpty(AFNetConfig.ClientTokenV2)));
 		}
 
 		public virtual void ResetUin()
