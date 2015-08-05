@@ -9,6 +9,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>
@@ -430,14 +431,12 @@
     <Compile Include="Helpers\Literals.cs" />
     <Compile Include="ManageCosts.aspx.cs">
       <DependentUpon>ManageCosts.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="ManageCosts.aspx.designer.cs">
       <DependentUpon>ManageCosts.aspx</DependentUpon>
     </Compile>
     <Compile Include="managep.aspx.cs">
       <DependentUpon>managep.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="managep.aspx.designer.cs">
       <DependentUpon>managep.aspx</DependentUpon>

@@ -38,6 +38,7 @@ namespace AdminInterface.Models
 		[Description("Универсальный dbf")] UniversalDbf = 4,
 		[Description("ИнфоАптека(Xml)")] InfoDrugstoreXml = 5,
 		[Description("Липецкфармация(xls)")] LipetskFarmacia = 6,
+		[Description("ФармСклад(xml)")] InInproXml = 7,
 	}
 
 	[ActiveRecord("RetClientsSet", Schema = "usersettings", Lazy = true), Auditable]
