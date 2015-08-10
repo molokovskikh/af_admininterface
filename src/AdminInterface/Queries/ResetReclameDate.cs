@@ -27,7 +27,7 @@ where u.ClientId = :clientId;
 update Customers.AnalitFNetDatas d
 join Customers.Users u on u.Id = d.UserId
 set LastReclameUpdateAt = null,
-	LastPendingReclameUpdateAt = null,
+	LastPendingReclameUpdateAt = null
 where u.ClientId = :clientId;")
 				.SetParameter("clientId", _client.Id)
 				.ExecuteUpdate();
