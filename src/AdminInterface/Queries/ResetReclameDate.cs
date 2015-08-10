@@ -18,10 +18,17 @@ namespace AdminInterface.Queries
 
 		public void Execute(ISession session)
 		{
-			session.CreateSQLQuery(@"update Usersettings.UserUpdateInfo i
+			session.CreateSQLQuery(@"
+update Usersettings.UserUpdateInfo i
 join Customers.Users u on u.Id = i.UserId
 set ReclameDate = null
-where u.ClientId = :clientId")
+where u.ClientId = :clientId;
+
+update Customers.AnalitFNetDatas d
+join Customers.Users u on u.Id = d.UserId
+set LastReclameUpdateAt = null,
+	LastPendingReclameUpdateAt = null,
+where u.ClientId = :clientId;")
 				.SetParameter("clientId", _client.Id)
 				.ExecuteUpdate();
 		}
