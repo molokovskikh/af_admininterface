@@ -278,7 +278,7 @@ namespace AdminInterface.Controllers
 			}
 
 			service.AddUser(user);
-			user.Setup();
+			user.Setup(DbSession);
 			var password = user.CreateInAd(Session);
 			if (string.IsNullOrEmpty(jsonSource)) {
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
@@ -298,7 +298,7 @@ namespace AdminInterface.Controllers
 				address = ((Client)service).AddAddress(address);
 				user.RegistredWith(address);
 				address.SaveAndFlush();
-				address.Maintain();
+				address.Maintain(DbSession);
 			}
 			DbSession.Save(service);
 

@@ -336,7 +336,7 @@ namespace Functional.Drugstore
 		public void FirstTableIndicateTest()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			var user2 = client.AddUser("testUser");
+			var user2 = client.AddUser(session, "testUser");
 			var user = client.Users[0];
 			user.SubmitOrders = true;
 			user.IgnoreCheckMinOrder = true;

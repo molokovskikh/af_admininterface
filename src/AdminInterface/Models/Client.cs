@@ -429,14 +429,14 @@ select mup.UserId, mup.PriceId, mup.RegionId from
 			Payers.Add(payer);
 		}
 
-		public virtual User AddUser(string name, string login = null)
+		public virtual User AddUser(ISession session, string name, string login = null)
 		{
 			var user = new User(this) {
 				Name = name,
 				Login = login
 			};
 			AddUser(user);
-			user.Setup();
+			user.Setup(session);
 			return user;
 		}
 

@@ -522,7 +522,7 @@ namespace AdminInterface.Models
 			return Guid.NewGuid().ToString();
 		}
 
-		public virtual void Setup()
+		public virtual void Setup(ISession session)
 		{
 			var updateLogin = String.IsNullOrEmpty(Login);
 			if (updateLogin)
@@ -534,18 +534,18 @@ namespace AdminInterface.Models
 			if (UserUpdateInfo == null)
 				UserUpdateInfo = new UserUpdateInfo(this);
 
-			var defaults = ActiveRecordMediator<DefaultValues>.FindFirst();
+			var defaults = session.Query<DefaultValues>().First();
 			TargetVersion = defaults.AnalitFVersion;
 			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;
-			ActiveRecordMediator.Save(this);
+			session.Save(this);
 			if (updateLogin)
 				Login = Id.ToString();
 			if (String.IsNullOrEmpty(Name))
 				Name = Login;
-			ActiveRecordMediator.Save(this);
+			session.Save(this);
 
 			if (Client != null)
-				AddPrices(Client);
+				AddPrices(session, Client);
 		}
 
 		public virtual void AssignDefaultPermission(ISession session, IEnumerable<UserPermission> permissions = null)
@@ -695,7 +695,7 @@ namespace AdminInterface.Models
 				.Implode();
 		}
 
-		public virtual void AddPrices(Client client)
+		public virtual void AddPrices(ISession session, Client client)
 		{
 			var sql = @"
 insert into Customers.UserPrices(PriceId, UserId, RegionId)
@@ -705,13 +705,13 @@ from Customers.Users u
 where u.Id = :UserId
 group by i.PriceId, i.RegionId";
 
-			ArHelper.WithSession(session => session.CreateSQLQuery(sql)
+			session.CreateSQLQuery(sql)
 				.SetParameter("UserId", Id)
 				.SetParameter("ClientId", client.Id)
-				.ExecuteUpdate());
+				.ExecuteUpdate();
 		}
 
-		public virtual void AddPrices(Client client, Region region)
+		public virtual void AddPrices(ISession session, Client client, Region region)
 		{
 			var sql = @"
 insert into Customers.UserPrices(PriceId, UserId, RegionId)
@@ -721,14 +721,14 @@ from Customers.Users u
 where u.Id = :UserId
 group by i.PriceId, i.RegionId";
 
-			ArHelper.WithSession(session => session.CreateSQLQuery(sql)
+			session.CreateSQLQuery(sql)
 				.SetParameter("UserId", Id)
 				.SetParameter("ClientId", client.Id)
 				.SetParameter("RegionId", region.Id)
-				.ExecuteUpdate());
+				.ExecuteUpdate();
 		}
 
-		public virtual bool HavePricesInRegion(Region region)
+		public virtual bool HavePricesInRegion(ISession session, Region region)
 		{
 			var sql = @"
 SELECT COUNT(*)
@@ -737,10 +737,10 @@ FROM
 WHERE
 	UserId = :UserId AND RegionId = :RegionId
 ";
-			return (Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(sql)
+			return (Convert.ToUInt32(session.CreateSQLQuery(sql)
 				.SetParameter("UserId", Id)
 				.SetParameter("RegionId", region.Id)
-				.UniqueResult())) > 0);
+				.UniqueResult()) > 0);
 		}
 
 		public virtual List<Region> GetRegions()
@@ -763,13 +763,13 @@ WHERE
 				ContactGroup.AddPerson(name);
 		}
 
-		public virtual AuditRecord MoveToAnotherClient(Client newOwner, LegalEntity legalEntity)
+		public virtual AuditRecord MoveToAnotherClient(ISession session, Client newOwner, LegalEntity legalEntity)
 		{
 			if (!newOwner.Orgs().Any(o => o.Id == legalEntity.Id))
 				throw new Exception(String.Format("Не могу переместить пользователя {0} т.к. юр. лицо {1} не принадлежит клиенту {2}",
 					this, legalEntity, newOwner));
 
-			var regions = Region.FindAll();
+			var regions = session.Query<Region>().ToArray();
 			// Если маски регионов не совпадают, добавляем записи в UserPrices для тех регионов,
 			// которых не было у старого клиента, но они есть у нового клиента
 			if (Client.MaskRegion != newOwner.MaskRegion) {
@@ -780,8 +780,8 @@ WHERE
 					// Если региона нет у старого клиента, но он есть у нового,
 					// и для этого пользователя нет прайсов в этом регионе добавляем прайсы для этого региона
 					if ((region.Id & newOwner.MaskRegion) > 0) {
-						if (!HavePricesInRegion(region))
-							AddPrices(newOwner, region);
+						if (!HavePricesInRegion(session, region))
+							AddPrices(session, newOwner, region);
 					}
 				}
 			}
@@ -789,9 +789,12 @@ WHERE
 			AuditRecord.UpdateLogs(newOwner.Id, this);
 			Client = newOwner;
 			RootService = newOwner;
-			Payer = legalEntity.Payer;
+			if (Payer != legalEntity.Payer) {
+				Payer = legalEntity.Payer;
+			}
 			InheritPricesFrom = null;
-			ActiveRecordMediator.Save(this);
+			ContactGroup?.MoveTo(newOwner.ContactGroupOwner);
+			session.Save(this);
 
 			return new AuditRecord(message, this);
 		}

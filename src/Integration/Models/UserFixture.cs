@@ -8,6 +8,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using Common.Tools;
+using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using Test.Support.log4net;
 using log4net.Config;
@@ -75,7 +76,7 @@ namespace Integration.Models
 		{
 			var otherClient = DataMother.TestClient();
 			var clien = DataMother.TestClient();
-			var exception = Assert.Throws<Exception>(() => user.MoveToAnotherClient(clien, otherClient.Orgs().First()));
+			var exception = Assert.Throws<Exception>(() => user.MoveToAnotherClient(session, clien, otherClient.Orgs().First()));
 			Assert.That(exception.Message, Is.StringContaining("не принадлежит клиенту test"));
 		}
 
@@ -85,12 +86,31 @@ namespace Integration.Models
 			var otherClient = DataMother.TestClient();
 			var org = otherClient.Orgs().First();
 
-			user.MoveToAnotherClient(otherClient, org);
+			user.MoveToAnotherClient(session, otherClient, org);
 
 			Assert.That(user.Client, Is.EqualTo(otherClient));
 			Assert.That(user.RootService, Is.EqualTo(otherClient));
 			Assert.That(user.Payer, Is.EqualTo(org.Payer));
 			Assert.That(user.InheritPricesFrom, Is.Null);
+		}
+
+		[Test]
+		public void Do_not_delete_user_after_move()
+		{
+			var otherClient = DataMother.TestClient();
+			var org = otherClient.Orgs().First();
+			user.UpdateContacts(new [] { new Contact(ContactType.Email, "test@analit.net"), });
+
+			user.MoveToAnotherClient(session, otherClient, org);
+			session.Flush();
+			session.Clear();
+			session.Load<Client>(client.Id).Delete(session);
+			//удаление производится с помощью sql при это состояние сесии перестанет быть актуальным
+			session.Flush();
+			session.Clear();
+			var id = user.Id;
+			user = session.Get<User>(id);
+			Assert.IsNotNull(user, $"пользователь {id} был удален");
 		}
 
 		[Test]
@@ -112,6 +132,8 @@ namespace Integration.Models
 		public void Delete_user()
 		{
 			user.Enabled = false;
+			user.UpdateContacts(new [] { new Contact(ContactType.Email, "test@analit.net"), });
+			session.Flush();
 			Assert.That(user.CanDelete(session), Is.True);
 			Flush();
 			session.Delete(user);
@@ -138,7 +160,7 @@ namespace Integration.Models
 		{
 			var parent = new User(client);
 			client.AddUser(parent);
-			parent.Setup();
+			parent.Setup(session);
 
 			var supplier = DataMother.CreateSupplier();
 			Save(supplier);

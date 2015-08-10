@@ -47,7 +47,7 @@ namespace Integration.ForTesting
 
 			client.Payers.Each(p => p.Save());
 			session.Save(client);
-			client.Users.Each(u => u.Setup());
+			client.Users.Each(u => u.Setup(session));
 			session.Flush();
 
 			client.MaintainIntersection(session);
@@ -107,7 +107,7 @@ namespace Integration.ForTesting
 				Name = "test"
 			};
 			client.AddUser(user);
-			user.Setup();
+			user.Setup(session);
 			var address = new Address(client) {
 				Value = "тестовый адрес"
 			};
@@ -119,7 +119,7 @@ namespace Integration.ForTesting
 			client.Name += client.Id;
 			session.Save(client);
 			session.Flush();
-			client.Addresses.Single().MaintainIntersection();
+			client.Addresses.Single().MaintainIntersection(session);
 			session.Refresh(client);
 			return client;
 		}
@@ -235,7 +235,7 @@ namespace Integration.ForTesting
 			var supplier = CreateSupplier();
 			var user = new User(supplier.Payer, supplier);
 			user.AssignDefaultPermission(session);
-			user.Setup();
+			user.Setup(session);
 			return user;
 		}
 

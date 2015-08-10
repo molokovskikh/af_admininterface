@@ -161,16 +161,15 @@ namespace AdminInterface.Models
 			}
 		}
 
-		public virtual void Maintain()
+		public virtual void Maintain(ISession session)
 		{
-			MaintainInscribe();
-			MaintainIntersection();
+			MaintainInscribe(session);
+			MaintainIntersection(session);
 		}
 
-		public virtual void MaintainIntersection()
+		public virtual void MaintainIntersection(ISession session)
 		{
-			ArHelper.WithSession(s => {
-				s.CreateSQLQuery(@"
+			session.CreateSQLQuery(@"
 set @skip = 1;
 
 insert into Customers.Intersection(ClientId, RegionId, PriceId, LegalEntityId, CostId, AvailableForClient, AgencyEnabled, PriceMarkup)
@@ -188,11 +187,10 @@ where a.Id = :addressId
 ;
 set @skip = 0;
 ")
-					.SetParameter("addressId", Id)
-					.SetParameter("legalEntityId", LegalEntity.Id)
-					.SetParameter("clientId", Client.Id)
-					.ExecuteUpdate();
-			});
+				.SetParameter("addressId", Id)
+				.SetParameter("legalEntityId", LegalEntity.Id)
+				.SetParameter("clientId", Client.Id)
+				.ExecuteUpdate();
 		}
 
 		public virtual void CreateFtpDirectory()
@@ -312,23 +310,23 @@ set @skip = 0;
 					this, newLegalEntity, newOwner));
 
 			Maintainer.MaintainIntersection(session, newOwner, newLegalEntity);
-			MoveAddressIntersection(newOwner, newLegalEntity,
-				Client, LegalEntity);
+			MoveAddressIntersection(session, newOwner, newLegalEntity, Client, LegalEntity);
 
 			var message = String.Format("Перемещение адреса доставки от {0} к {1}", Client, newOwner);
 			Client = newOwner;
 			Payer = newLegalEntity.Payer;
 			LegalEntity = newLegalEntity;
+			ContactGroup?.MoveTo(newOwner.ContactGroupOwner);
 			AuditRecord.UpdateLogs(newOwner.Id, this);
-			Save();
+			session.Save(this);
 
 			return new AuditRecord(message, this);
 		}
 
-		public virtual void MoveAddressIntersection(Client newClient, LegalEntity newLegalEntity,
+		public virtual void MoveAddressIntersection(ISession session, Client newClient, LegalEntity newLegalEntity,
 			Client oldClient, LegalEntity oldLegalEntity)
 		{
-			ArHelper.WithSession(session => session.CreateSQLQuery(@"
+			session.CreateSQLQuery(@"
 insert into Customers.AddressIntersection(AddressId, IntersectionId, SupplierDeliveryId, ControlMinReq, MinReq)
 select :AddressId, ni.Id, ai.SupplierDeliveryId, ai.ControlMinReq, ai.MinReq
 from Customers.Intersection ni
@@ -343,14 +341,13 @@ join Customers.Intersection i on i.Id = ai.IntersectionId
 where ai.AddressId = :AddressId
 and i.ClientId = :OldClientId
 and i.LegalEntityId = :OldLegalEntityId
-;
-")
+;")
 				.SetParameter("AddressId", Id)
 				.SetParameter("NewClientId", newClient.Id)
 				.SetParameter("OldClientId", oldClient.Id)
 				.SetParameter("NewLegalEntityId", newLegalEntity.Id)
 				.SetParameter("OldLegalEntityId", oldLegalEntity.Id)
-				.ExecuteUpdate());
+				.ExecuteUpdate();
 		}
 
 		public virtual bool CanBeMoved()
@@ -359,16 +356,14 @@ and i.LegalEntityId = :OldLegalEntityId
 				(AvaliableForUsers[0].AvaliableAddresses.Count == 1);
 		}
 
-		public virtual void MaintainInscribe()
+		public virtual void MaintainInscribe(ISession session)
 		{
 			if (Client.Settings.InvisibleOnFirm != DrugstoreType.Standart)
 				return;
 
-			ArHelper.WithSession(s => {
-				s.CreateSQLQuery("insert into inscribe(AddressId) values(:AddressId);")
-					.SetParameter("AddressId", Id)
-					.ExecuteUpdate();
-			});
+			session.CreateSQLQuery("insert into inscribe(AddressId) values(:AddressId);")
+				.SetParameter("AddressId", Id)
+				.ExecuteUpdate();
 		}
 
 		public virtual void AddBillingComment(string billingMessage)

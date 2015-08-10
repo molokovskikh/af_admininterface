@@ -67,7 +67,7 @@ namespace AdminInterface.Controllers
 			client.AddAddress(address);
 			address.UpdateContacts(contacts);
 			DbSession.Save(address);
-			address.Maintain();
+			address.Maintain(DbSession);
 
 			address.CreateFtpDirectory();
 			address.AddBillingComment(comment);
@@ -103,7 +103,8 @@ namespace AdminInterface.Controllers
 
 			DbSession.Save(address);
 			if (address.IsChanged(a => a.LegalEntity)) {
-				address.MoveAddressIntersection(address.Client, address.LegalEntity,
+				address.MoveAddressIntersection(DbSession,
+					address.Client, address.LegalEntity,
 					address.Client, oldLegalEntity);
 			}
 

@@ -45,7 +45,7 @@ namespace Integration.Models
 			user.ContactGroup = new ContactGroup(ContactGroupType.General) { ContactGroupOwner = client.ContactGroupOwner };
 			user.ContactGroup.AddContact(ContactType.Phone, phone3);
 			var newUser = new User(client);
-			newUser.Setup();
+			newUser.Setup(session);
 			client.AddUser(newUser);
 			session.SaveOrUpdate(newUser);
 			session.SaveOrUpdate(client);
@@ -186,7 +186,7 @@ namespace Integration.Models
 			session.SaveOrUpdate(user);
 
 			var user2 = new User(supplier.Payer, supplier);
-			user2.Setup();
+			user2.Setup(session);
 			session.SaveOrUpdate(user2);
 
 			Flush();

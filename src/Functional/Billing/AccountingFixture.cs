@@ -67,7 +67,7 @@ namespace Functional.Billing
 		 Ignore("Временно до починки")]
 		public void Check_address_for_accounting()
 		{
-			client.AddUser("test user");
+			client.AddUser(session, "test user");
 
 			var address = new Address { Value = "address", };
 			client.AddAddress(address);

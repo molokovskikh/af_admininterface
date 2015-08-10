@@ -157,7 +157,7 @@ namespace AdminInterface.Controllers
 			foreach (var person in userPersons)
 				user.AddContactPerson(person.Name);
 			user.AssignDefaultPermission(DbSession);
-			user.Setup();
+			user.Setup(DbSession);
 
 			var password = user.CreateInAd(Session);
 			supplier.AddBillingComment(comment);
@@ -370,7 +370,7 @@ namespace AdminInterface.Controllers
 			DbSession.Flush();
 
 			client.MaintainIntersection(DbSession);
-			client.Addresses.Each(a => a.MaintainInscribe());
+			client.Addresses.Each(a => a.MaintainInscribe(DbSession));
 		}
 
 		private void CreateSupplier(Supplier supplier)
@@ -422,7 +422,7 @@ WHERE   pricesdata.firmcode = s.Id
 			if (permissions != null)
 				permissions = permissions.Select(i => DbSession.Load<UserPermission>(i.Id)).ToArray();
 			user.AssignDefaultPermission(DbSession, permissions);
-			user.Setup();
+			user.Setup(DbSession);
 			foreach (var person in persons)
 				user.AddContactPerson(person.Name);
 			DbSession.Save(user);

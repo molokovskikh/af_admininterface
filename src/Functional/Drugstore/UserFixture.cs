@@ -68,7 +68,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Set_user_parent()
 		{
-			var mainUser = client.AddUser("test", Guid.NewGuid().ToString().GetHashCode().ToString());
+			var mainUser = client.AddUser(session, "test", Guid.NewGuid().ToString().GetHashCode().ToString());
 
 			Open("client/{0}", client.Id);
 			ClickLink(user.Login);

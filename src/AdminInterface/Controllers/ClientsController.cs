@@ -501,7 +501,7 @@ group by s.Id")
 			AuditRecord log = null;
 			var query = new UpdateOrders(newClient, user, address);
 			if (user != null)
-				log = user.MoveToAnotherClient(newClient, legalEntity);
+				log = user.MoveToAnotherClient(DbSession, newClient, legalEntity);
 			if (address != null)
 				log = address.MoveToAnotherClient(DbSession, newClient, legalEntity);
 

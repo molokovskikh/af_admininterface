@@ -69,7 +69,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Try_sort_users()
 		{
-			var user = client.AddUser("test user");
+			var user = client.AddUser(session, "test user");
 			Refresh();
 			AssertText("клиент");
 			Assert.IsTrue(browser.Link(Find.ByText("Код пользователя")).Exists);
@@ -104,7 +104,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void View_client_message_from_user()
 		{
-			client.AddUser("User2");
+			client.AddUser(session, "User2");
 			Refresh();
 
 			browser.TextField(Find.ByName("message")).TypeText("This message for client");

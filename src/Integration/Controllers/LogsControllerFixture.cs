@@ -124,7 +124,7 @@ namespace Integration.Controllers
 		{
 			var sendLog = new DocumentSendLog(_user, _document) { Committed = true };
 			session.Save(sendLog);
-			var newUser = _client.AddUser("Новый тестовый пользователь");
+			var newUser = _client.AddUser(session, "Новый тестовый пользователь");
 			session.Save(_client);
 
 			var newSendLog = new DocumentSendLog(newUser, _document) { Committed = true };

@@ -76,7 +76,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void ShowDocumentForMultiUserClient()
 		{
-			var newUser = client.AddUser("Новый тестовый пользователь");
+			var newUser = client.AddUser(session, "Новый тестовый пользователь");
 			Save(newUser);
 
 			var newSendLog = new DocumentSendLog(newUser, document);

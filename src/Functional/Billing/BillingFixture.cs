@@ -70,7 +70,7 @@ namespace Functional.Billing
 		[Test]
 		public void View_all_users()
 		{
-			var user = client.AddUser("test user for billing");
+			var user = client.AddUser(session, "test user for billing");
 			Save(user);
 
 			client.Users.Each(u => u.Enabled = false);
@@ -379,7 +379,7 @@ namespace Functional.Billing
 		private void AddUsersAdnAddresses(Client client, int countUsers)
 		{
 			for (var i = 0; i < countUsers; i++) {
-				client.AddUser("user");
+				client.AddUser(session, "user");
 				var address = client.AddAddress("address");
 				session.Save(address);
 			}
@@ -420,7 +420,7 @@ namespace Functional.Billing
 		public void Test_refresh_total_sum()
 		{
 			// Создаем 2 пользователя и 3 адреса. 2 пользователя и 2 адреса включены
-			var user = client.AddUser("test user");
+			var user = client.AddUser(session, "test user");
 			user.Accounting.ReadyForAccounting = true;
 			client.AddAddress("address");
 			client.AddAddress("address");
