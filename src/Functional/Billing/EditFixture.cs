@@ -65,15 +65,16 @@ namespace Functional.Billing
 		[Test]
 		public void Check_free_accounting()
 		{
-			Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
-			Css("input[name=accounted]").Checked = true;
-			Css("input[name=free]").Checked = true;
+			var user = _payer.Users[0];
+			Open($"Billing/Edit?BillingCode={_payer.Id}");
+			Css($"#UserRow{user.Id} input[name=accounted]").Checked = true;
+			Css($"#UserRow{user.Id} input[name=free]").Checked = true;
 			Css("input[name=FreePeriodEnd]").AppendText(DateTime.Now.AddMonths(1).ToShortDateString());
 			Css("input[name=AddComment]").AppendText("Check_free_accounting");
 
 			ConfirmDialog();
 			Wait(() => {
-				var account = _payer.Users[0].Accounting;
+				var account = user.Accounting;
 				session.Refresh(account);
 				return account.IsFree;
 			}, "Не удалось дождаться обновления учетной информации");
