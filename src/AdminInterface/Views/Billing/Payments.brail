@@ -31,12 +31,12 @@ function RefreshTotalSum() {
 	{
 		margin-bottom:10px;
 	}
-	
+
 	div.VisibleFolder
 	{
 		margin-top:10px;
 	}
-	
+
 	a.current-filter
 	{
 		color:Black;
@@ -44,7 +44,7 @@ function RefreshTotalSum() {
 		text-decoration:none;
 		cursor:default;
 	}
-	
+
 	#userMessage_Subject
 	{
 		width: 100%;
@@ -255,7 +255,7 @@ function RefreshTotalSum() {
 							</a>
 						</td>
 						<td class="can-not-order">${user.Name}</td>
-						<td>${user.Logs.AFTime if user.Logs.AFTime != null}</td>
+						<td>${?user.Logs.AppTime}</td>
 						<td>${user.RootService.Name}</td>
 						<td>${user.Registration.RegistrationDate.ToShortDateString() if user.Registration.RegistrationDate != null}</td>
 					</tr>
@@ -267,7 +267,7 @@ function RefreshTotalSum() {
 			</div>
 		</div>
 	</div>
-			
+
 		<div class="InputGroupHeader autocollapsible">
 
 			<div id="AddressListHeader" class=trigger>
@@ -421,11 +421,11 @@ function RefreshTotalSum() {
 		<table style="width: 100%">
 
 			${WriteInputGroupHeader("Опции выставления счета")}
-		
-			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", "Выставлять счет:"), 
+
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", "Выставлять счет:"),
 				app.Edit("Instance.AutoInvoice"))}
-		
-			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", "Периодичность выставления счетов:"), 
+
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", "Периодичность выставления счетов:"),
 				app.Edit("Instance.PayCycle"))}
 
 			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.EmailInvoice", "Отправлять счет по e-mail:"),
@@ -453,7 +453,7 @@ function RefreshTotalSum() {
 
 			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalanceDate", "Дата начального баланса:"),
 										FormHelper.TextFieldValue("Instance.BeginBalanceDate", value) + "<input type=\"button\" class=\"CalendarInput\" />")}
-		
+
 			${WriteInputGroupHeader("Комментарий")}
 			<tr>
 				<td colspan=2>
@@ -545,7 +545,7 @@ function RefreshTotalSum() {
 		${app.End()}
 		</div>
 	<% end %>
-	
+
 	<div class="UseCaseGroup">
 		<form id="MessagesForm" action="SendMessage" method="post">
 			${FormHelper.HiddenField("BillingCode")}

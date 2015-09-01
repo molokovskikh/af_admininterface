@@ -64,6 +64,11 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual DateTime? LastLogon { get; set; }
 
+		public virtual DateTime? AppTime
+		{
+			get { return AFTime > AFNetTime ? AFTime : AFNetTime; }
+		}
+
 		public virtual string GetLastServicesUsage()
 		{
 			var usages = new[] {
