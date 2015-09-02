@@ -15,7 +15,12 @@ namespace AdminInterface.Security
 
 			var admin = (Administrator)httpContext.Items[AdministratorKey];
 			if (admin == null) {
-				admin = Administrator.GetByName(httpContext.User.Identity.Name);
+				var username = httpContext.User.Identity.Name;
+#if DEBUG
+				if (String.IsNullOrEmpty(username))
+					username = Environment.UserName;
+#endif
+				admin = Administrator.GetByName(username);
 				if (admin != null)
 					httpContext.Items[AdministratorKey] = admin;
 			}

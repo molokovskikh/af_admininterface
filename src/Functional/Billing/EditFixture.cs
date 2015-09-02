@@ -79,7 +79,7 @@ namespace Functional.Billing
 				return account.IsFree;
 			}, "Не удалось дождаться обновления учетной информации");
 
-			var accounted = Css("input[name=accounted]");
+			var accounted = Css($"#UserRow{user.Id} input[name=accounted]");
 			Assert.IsFalse(accounted.Checked);
 			Assert.IsFalse(accounted.Enabled);
 			Assert.That(browser.Text, !Is.StringContaining("Это поле необходимо заполнить."));
