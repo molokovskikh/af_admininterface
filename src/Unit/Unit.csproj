@@ -94,6 +94,7 @@
     <Compile Include="Models\ActFixture.cs" />
     <Compile Include="Models\AdministratorFixture.cs" />
     <Compile Include="Models\AdUserInformationFixture.cs" />
+    <Compile Include="Models\AuthorizationLogEntityFixture.cs" />
     <Compile Include="Models\ClientInfoLogEntityFixture.cs" />
     <Compile Include="Models\GetPasswordChangeNotificationAddressFixture.cs" />
     <Compile Include="Models\InvoiceFixture.cs" />

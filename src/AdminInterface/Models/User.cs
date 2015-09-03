@@ -580,16 +580,10 @@ namespace AdminInterface.Models
 			}
 		}
 
-		public virtual bool IsExists
-		{
-			get { return (ADHelper.IsLoginExists(Login)); }
-		}
+		public virtual bool IsExists => ADHelper.IsLoginExists(Login);
 
 		[Style]
-		public virtual bool IsOldUserUpdate
-		{
-			get { return !(Logs.AFTime.HasValue && DateTime.Now.Subtract(Logs.AFTime.Value).Days <= 7); }
-		}
+		public virtual bool IsOldUserUpdate => !(Logs.AppTime.HasValue && DateTime.Now.Subtract(Logs.AppTime.Value).Days <= 7);
 
 		public virtual bool HavePreparedData()
 		{
