@@ -2,4 +2,5 @@
 
 npm install
 bower install
-bake packages notInteractive=true
+bake packages:install notInteractive=true
+bake packages:fix notInteractive=true
