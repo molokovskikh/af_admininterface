@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Web;
-using System.Web.Mvc;
-using System.Windows.Forms;
-using System.Xml.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.Framework;
-using NHibernate.Hql.Ast.ANTLR;
-using NPOI.SS.Formula.Functions;
 
 namespace AdminInterface.Controllers
 {
@@ -26,7 +18,7 @@ namespace AdminInterface.Controllers
 		public static readonly string DeleteAttachmentOk = "DeleteOk";
 		public static readonly string DeleteAttachmentError = "DeleteError";
 		public bool TestMode = false;
-		
+
 		[AccessibleThrough(Verb.Post)]
 		public void AddAttachment()
 		{
@@ -37,7 +29,7 @@ namespace AdminInterface.Controllers
 				if (postedFile != null) {
 					Stream stream = GetUploadFileProperty<Stream>(postedFile, "InputStream");
 					string fileName = GetUploadFileProperty<string>(postedFile, "FileName");
-					
+
 					if (stream != null && !String.IsNullOrEmpty(fileName)) {
 						BinaryReader reader = new BinaryReader(stream);
 						byte[] content = reader.ReadBytes((int)stream.Length);
