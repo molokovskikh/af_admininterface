@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Web;
 using AdminInterface;
 using AdminInterface.Controllers;
-using Castle.ActiveRecord.Framework;
-using Castle.MonoRail.Framework;
-using Castle.MonoRail.Framework.Test;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Rhino.Mocks;
@@ -40,7 +32,7 @@ namespace Integration.Controllers
 
 			if (!AddAttachment(fileName))
 				Assert.Fail("Ошибка добавления вложения");
-		
+
 			if(!GetAttachmentList())
 				Assert.Fail("Ошибка получения списка вложений");
 
@@ -75,23 +67,9 @@ namespace Integration.Controllers
 
 		private bool DeleteAttachment(string fileName)
 		{
-			byte[] data = Encoding.UTF8.GetBytes(fileName + ";");
-			
-			using (var stream = new MemoryStream()) {
-				stream.Write(data, 0, data.Length);
-				stream.Seek(0, SeekOrigin.Begin);
-				Request.Stub(r => r.InputStream).Return(stream);
-				mController.DeleteAttachment();
-			}
-			
+			Request.InputStream = new MemoryStream(Encoding.UTF8.GetBytes(fileName + ";"));
+			mController.DeleteAttachment();
 			return Response.OutputContent == NewSupplierAttachmentsController.DeleteAttachmentOk;
-		}
-
-		protected override IMockRequest BuildRequest()
-		{
-			IMockRequest request = MockRepository.GenerateStub<IMockRequest>();
-			request.Stub(r => r.Files).Return(new ListDictionary());
-			return request;
 		}
 	}
 }

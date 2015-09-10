@@ -53,6 +53,7 @@ namespace AdminInterface
 				BaseRemoteRequest.Runner = new WebRequestRunner();
 				ConfigReader.LoadSettings(Config);
 				Initialize();
+				MixedRouteHandler.ConfigRoute();
 			}
 			catch (Exception ex) {
 				Log.Fatal("Ошибка при запуске Административного интерфейса", ex);

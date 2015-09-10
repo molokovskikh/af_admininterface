@@ -63,6 +63,7 @@ namespace Integration.Controllers
 			PrepareController(controller);
 
 			Flush();
+			Request.InputStream = new MemoryStream(Encoding.UTF8.GetBytes(_json));
 			controller.Add();
 
 			var user = Registred();
@@ -70,16 +71,6 @@ namespace Integration.Controllers
 			Assert.AreEqual(user.Login, tempLogin);
 			Assert.AreEqual(user.Name, "testComment");
 			_json = ojdJson;
-		}
-
-		protected override IMockRequest BuildRequest()
-		{
-			var requestTest = new MemoryStream(Encoding.UTF8.GetBytes(_json));
-			var request = MockRepository.GenerateStub<IMockRequest>();
-			request.Stub(r => r.InputStream).Return(requestTest);
-			request.Stub(r => r.Params).Return(new NameValueCollection());
-			request.Stub(r => r.ObtainParamsNode(ParamStore.Params)).Return(new CompositeNode("root"));
-			return request;
 		}
 	}
 }

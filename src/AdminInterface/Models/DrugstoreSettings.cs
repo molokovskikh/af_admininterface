@@ -263,6 +263,8 @@ namespace AdminInterface.Models
 					BuyingMatrixPrice = null;
 				}
 			}
+			if (SmartOrderRules?.ColumnSeparator == @"\t")
+				SmartOrderRules.ColumnSeparator = "\t";
 		}
 
 		public virtual void CheckDefaults()
