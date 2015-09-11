@@ -273,7 +273,7 @@ where Phone like :phone")
 		[AccessibleThrough(Verb.Post)]
 		public void UpdateDrugstore(
 			[ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
-			[ARDataBind("drugstore.SmartOrderRules", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] SmartOrderRules smartOrderRules,
+			[ARDataBind2("drugstore.SmartOrderRules", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] SmartOrderRules smartOrderRules,
 			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "drugstore.OfferMatrixExcludes")] DrugstoreSettings drugstore,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			ulong homeRegion)
