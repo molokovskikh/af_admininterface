@@ -56,7 +56,7 @@ namespace AdminInterface.Helpers
 				mes.SubjectEncoding = Encoding.UTF8;
 				mes.IsBodyHtml = true;
 				mes.Subject = defaults.NewSupplierMailSubject;
-				mes.Body = defaults.NewSupplierMailText;
+				mes.Body = String.Format("{0}<p style=\"font-size:12.0pt; font-family:'Times New Roman',serif; \">{1}</p>", defaults.NewSupplierMailText, defaults.EmailFooter.Replace("\r\n", "<br/>"));
 
 				string[] attachments = GetAttachmentsArray(AttachmentFileNameFormat.FullName);
 				foreach (string filePath in attachments)
