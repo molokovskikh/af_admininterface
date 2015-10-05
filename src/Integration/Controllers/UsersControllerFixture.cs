@@ -68,7 +68,7 @@ namespace Integration.Controllers
 			user2.UserUpdateInfo.AFCopyId = "12345";
 			session.Save(user2.UserUpdateInfo);
 
-			controller.DoPasswordChange(user1.Id, "", false, true, false, "");
+			controller.DoPasswordChange(user1.Id, "", false, true, false, "", false, "");
 
 			Assert.That(user1.UserUpdateInfo.AFCopyId, Is.Empty);
 			Assert.That(user2.UserUpdateInfo.AFCopyId, Is.EqualTo("12345"));

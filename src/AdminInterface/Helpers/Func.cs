@@ -4,6 +4,9 @@ using System.Net.Mail;
 using System.Text;
 using log4net;
 using LumiSoft.Net.SMTP.Client;
+using System.Net;
+using System.IO;
+using System.Web;
 
 namespace AdminInterface.Helpers
 {
@@ -76,7 +79,13 @@ namespace AdminInterface.Helpers
 			return ConfigurationManager.AppSettings["DebugMail"];
 		}
 
-		public static void SendWitnStandartSender(MailMessage message)
+        private static string GetSmsUri()
+        {
+            return ConfigurationManager.AppSettings["SmsUri"];
+        }
+
+
+        public static void SendWitnStandartSender(MailMessage message)
 		{
 			try {
 #if DEBUG
@@ -115,5 +124,57 @@ namespace AdminInterface.Helpers
 			}
 			return 0;
 		}
-	}
+
+        public static int SendSms(string phone, string message)
+        {
+            string smsUri = GetSmsUri();
+            var r = WebRequest.Create(smsUri) as HttpWebRequest;
+            string data = String.Format("text={0}&dest={1}", HttpUtility.UrlEncode(message), HttpUtility.UrlEncode(phone));
+            int result = 0;
+
+#if DEBUG
+            return result;
+#endif
+
+            r.Method = "POST";
+            var encoding = Encoding.UTF8;
+            r.ContentLength = encoding.GetByteCount(data);
+            r.Credentials = CredentialCache.DefaultCredentials;
+            //r.Accept = "application/json";
+            r.ContentType = "application/x-www-form-urlencoded";
+
+            using (var requestStream = r.GetRequestStream())
+                requestStream.Write(encoding.GetBytes(data), 0, encoding.GetByteCount(data));
+
+            string responseBody = "";
+            try
+            {
+                var response = r.GetResponse() as HttpWebResponse;
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    _log.Error("Не удалось отправить SMS", new NotSupportedException(String.Format("Server response whis http-code: {0}", response.StatusCode)));
+                    return result;
+                }
+                using (var rspStm = response.GetResponseStream())
+                    using (var reader = new StreamReader(rspStm, encoding))
+                        responseBody = reader.ReadToEnd();
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Не удалось отправить SMS", ex);
+                return result;
+            }
+
+            // ожидается ответ вида OK;3517
+            var values = responseBody.Split(';');
+            if (values.Length < 2 || values[0] != "OK" || String.IsNullOrEmpty(values[1]) || !Int32.TryParse(values[1], out result))
+            {
+                _log.Error("Не удалось отправить SMS", new NotSupportedException(String.Format("Service response has wrong format: \"{0}\"", responseBody)));
+                return result;
+            }
+
+            return result;
+        }
+
+    }
 }

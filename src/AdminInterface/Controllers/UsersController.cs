@@ -235,7 +235,8 @@ namespace AdminInterface.Controllers
 			uint clientId,
 			string mails,
 			string jsonSource,
-			User userJson)
+			User userJson,
+			bool sendSms = false)
 		{
 			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
 			DbSession.Get<Client>(clientId);
@@ -289,6 +290,7 @@ namespace AdminInterface.Controllers
 				mails = user.EmailForCard;
 			}
 			user.SetFtpAccess(user.FtpAccess);
+
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 			DbSession.Save(passwordChangeLog);
 			user.UpdateContacts(contacts);
@@ -319,7 +321,16 @@ namespace AdminInterface.Controllers
 				DbSession.Save(new AuditRecord(message, user.Client) { MessageType = LogMessageType.System });
 			}
 
-			var haveMails = !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim());
+			//var hasPhone = contacts.Any(i => i.Type == ContactType.Phone);
+			//if (sendSms && hasPhone) {
+			//	var phoneNumbers = contacts.Where(i => i.Type == ContactType.Phone).ToList();
+			//	var sms = "Ваш логин от analit: " + user.Login + " , ваш пароль: " + password;
+			//	//var helper = new SmsHelper();
+			//	//helper.SendMessage("+79671526606", sms);
+			//	foreach (var phone in phoneNumbers) {
+			//	}
+			//}
+            var haveMails = !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim());
 			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
 			if (sendClientCard && (haveMails || !string.IsNullOrEmpty(user.EmailForCard))) {
 				var smtpId = ReportHelper.SendClientCard(user,
@@ -404,7 +415,8 @@ namespace AdminInterface.Controllers
 			RedirectUsingRoute("users", "Edit", new { id = user.Id });
 		}
 
-		[RequiredPermission(PermissionType.ChangePassword)]
+
+        [RequiredPermission(PermissionType.ChangePassword)]
 		public void ChangePassword(uint id)
 		{
 			var user = DbSession.Load<User>(id);
@@ -412,7 +424,8 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["user"] = user;
 			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
-		}
+		    PropertyBag["phonesForSend"] = user.GetPhonesForSendingSms(); //"79031848398";
+        }
 
 		[RequiredPermission(PermissionType.ChangePassword)]
 		public void DoPasswordChange(uint userId,
@@ -420,7 +433,9 @@ namespace AdminInterface.Controllers
 			bool isSendClientCard,
 			bool isFree,
 			bool changeLogin,
-			string reason)
+			string reason,
+            bool sendSms,
+            string phonesForSend)
 		{
 			var user = DbSession.Load<User>(userId);
 			user.CheckLogin();
@@ -433,7 +448,8 @@ namespace AdminInterface.Controllers
 			user.ResetUin();
 
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
-			if (isSendClientCard) {
+
+            if (isSendClientCard) {
 				var smtpId = ReportHelper.SendClientCard(
 					user,
 					password.Password,
@@ -443,7 +459,23 @@ namespace AdminInterface.Controllers
 				passwordChangeLog.SetSentTo(smtpId, emailsForSend);
 			}
 
-			DbSession.Save(user);
+            if (sendSms && !String.IsNullOrEmpty(phonesForSend))
+            {
+                var message = String.Format("Ваш логин от analit: {0}, ваш пароль: {1}", user.Login, password.Password);
+                var log = new List<string>();
+                foreach (var phone in phonesForSend.Split(',').Select(x => x.Trim())) {
+                    int smsId = 0;
+                    // 3517983153 -> 73517983153
+                    if (phone.Length == 10 && phone.All(char.IsDigit))
+                        smsId = Func.SendSms(message, "7" + phone);
+
+                    if (smsId > 0)
+                        log.Add(String.Format("{1}, smsId={0}", smsId, phone));
+                }
+                passwordChangeLog.SetSmsLog(String.Join("; ", log));
+            }
+
+            DbSession.Save(user);
 			DbSession.Save(AuditRecord.PasswordChange(user, isFree, reason));
 			DbSession.Save(passwordChangeLog);
 

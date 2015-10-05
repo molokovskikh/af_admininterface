@@ -295,7 +295,7 @@ namespace AdminInterface.Helpers
 		{
 			var login = user.Login;
 			var result = new ADUserInformation {
-				LastLogOnDate = user.Logs.LastLogon,
+				LastLogOnDate = user.Logs != null ? user.Logs.LastLogon : null,
 				Logs = user.Logs
 			};
 			try {
