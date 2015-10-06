@@ -11,7 +11,7 @@ namespace Unit.Models
 	[TestFixture]
 	public class UserFixture
 	{
-		//после регистрации пользователя для поставщика он должен получить максимальную маску регионов что бы 
+		//после регистрации пользователя для поставщика он должен получить максимальную маску регионов что бы
 		//иметь доступ в интерфейс поставщика
 		[Test]
 		public void Set_user_supplier_mask()
@@ -37,6 +37,18 @@ namespace Unit.Models
 
 			Assert.That(address.Accounting.IsFree, Is.True);
 			Assert.That(address.Accounting.FreePeriodEnd, Is.EqualTo(DateTime.Today.AddDays(10)));
+		}
+
+		[Test]
+		public void First_table_is_free()
+		{
+			var client = new Client(new Payer(""), Data.DefaultRegion);
+			var user = new User(client) {
+				SubmitOrders = true,
+				IgnoreCheckMinOrder = true
+			};
+			client.AddUser(user);
+			Assert.AreEqual(0 ,user.Accounting.Payment);
 		}
 
 		[Test]

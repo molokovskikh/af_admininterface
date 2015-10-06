@@ -244,10 +244,7 @@ namespace AdminInterface.Models
 		public virtual bool IgnoreCheckMinOrder { get; set; }
 
 		[Style]
-		public virtual bool FirstTable
-		{
-			get { return SubmitOrders && IgnoreCheckMinOrder; }
-		}
+		public virtual bool FirstTable => SubmitOrders && IgnoreCheckMinOrder;
 
 		[Property, Description("Передавать файлы-НАКЛАДНЫЕ на сторону аптеки"), Auditable]
 		public virtual bool SendWaybills { get; set; }

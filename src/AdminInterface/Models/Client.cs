@@ -453,6 +453,9 @@ select mup.UserId, mup.PriceId, mup.RegionId from
 
 			if (!Users.Contains(user))
 				Users.Add(user);
+
+			if (user.FirstTable)
+				user.Accounting.Payment = 0;
 			return user;
 		}
 
