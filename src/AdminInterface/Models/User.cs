@@ -588,7 +588,7 @@ namespace AdminInterface.Models
 		public virtual bool IsExists => ADHelper.IsLoginExists(Login);
 
 		[Style]
-		public virtual bool IsOldUserUpdate => !(Logs.AppTime.HasValue && DateTime.Now.Subtract(Logs.AppTime.Value).Days <= 7);
+		public virtual bool IsOldUserUpdate => !(Logs != null && Logs.AppTime.HasValue && DateTime.Now.Subtract(Logs.AppTime.Value).Days <= 7);
 
 		public virtual bool HavePreparedData()
 		{
@@ -830,7 +830,34 @@ WHERE
 			return owner.GetEmails(ContactGroupType.General).Implode();
 		}
 
-		public virtual void AddBillingComment(string billingMessage)
+        public virtual string GetPhonesForSendingSms()
+        {
+            ContactGroupOwner owner = null;
+            var groups = new ContactGroupType[0];
+            if (RootService is Client)
+            {
+                groups = new[] { ContactGroupType.OrderManagers };
+                owner = ((Client)RootService).ContactGroupOwner;
+            }
+            else if (RootService is Supplier)
+            {
+                groups = new[] { ContactGroupType.OrderManagers, ContactGroupType.ClientManagers };
+                owner = ((Supplier)RootService).ContactGroupOwner;
+            }
+
+            if (owner == null)
+                return "";
+
+            var phones = owner.GetPhones(groups);
+            if (phones.Any())
+                return phones.Select(x => x.Replace("-", "")).Implode();
+
+            // 351-7983153 -> 3517983153
+            return owner.GetPhones(ContactGroupType.General).Select(x => x.Replace("-", "")).Implode();
+        }
+
+
+        public virtual void AddBillingComment(string billingMessage)
 		{
 			if (String.IsNullOrEmpty(billingMessage))
 				return;
