@@ -132,9 +132,9 @@ namespace AdminInterface.Helpers
             string data = String.Format("text={0}&dest={1}", HttpUtility.UrlEncode(message), HttpUtility.UrlEncode(phone));
             int result = 0;
 
-//#if DEBUG
-            //return result;
-//#endif
+#if DEBUG
+            return result;
+#endif
 
             r.Method = "POST";
             var encoding = Encoding.UTF8;
