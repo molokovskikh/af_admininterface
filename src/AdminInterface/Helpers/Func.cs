@@ -132,9 +132,9 @@ namespace AdminInterface.Helpers
             string data = String.Format("text={0}&dest={1}", HttpUtility.UrlEncode(message), HttpUtility.UrlEncode(phone));
             int result = 0;
 
-#if DEBUG
-            return result;
-#endif
+//#if DEBUG
+            //return result;
+//#endif
 
             r.Method = "POST";
             var encoding = Encoding.UTF8;
@@ -150,7 +150,8 @@ namespace AdminInterface.Helpers
             try
             {
                 var response = r.GetResponse() as HttpWebResponse;
-                if (response.StatusCode != HttpStatusCode.OK)
+				// если непредусмотренный ответ
+				if (response.StatusCode != HttpStatusCode.OK || response.StatusCode != HttpStatusCode.BadRequest)
                 {
                     _log.Error("Не удалось отправить SMS", new NotSupportedException(String.Format("Server response whis http-code: {0}", response.StatusCode)));
                     return result;
@@ -158,8 +159,14 @@ namespace AdminInterface.Helpers
                 using (var rspStm = response.GetResponseStream())
                     using (var reader = new StreamReader(rspStm, encoding))
                         responseBody = reader.ReadToEnd();
-            }
-            catch (Exception ex)
+
+				if (response.StatusCode == HttpStatusCode.BadRequest)
+				{
+					_log.Error("Не удалось отправить SMS", new NotSupportedException(String.Format("Server response whis http-code: {0}, {1}", response.StatusCode, responseBody)));
+					return result;
+				}
+			}
+			catch (Exception ex)
             {
                 _log.Error("Не удалось отправить SMS", ex);
                 return result;
