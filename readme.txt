@@ -3,6 +3,8 @@
 * для генерации регистрационной карты используется
 MICROSOFT® REPORT VIEWER 2012 RUNTIME
 https://www.microsoft.com/en-US/Download/details.aspx?id=35747
+microsoft system clr types for sql server 2012
+может понадобиться https://www.microsoft.com/ru-ru/download/details.aspx?id=35580 ENU\x86\SQLSysClrTypes.msi
 
 javascript тесты
 

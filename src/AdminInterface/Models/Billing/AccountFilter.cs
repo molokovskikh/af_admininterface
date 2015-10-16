@@ -7,6 +7,8 @@ using Castle.ActiveRecord.Framework;
 using Common.MySql;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
+using NHibernate;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models.Billing
 {
@@ -34,7 +36,7 @@ namespace AdminInterface.Models.Billing
 		public DateTime EndDate { get; set; }
 		public AccountingSearchBy SearchBy { get; set; }
 
-		public IList<Account> Find(Pager pager)
+		public IList<Account> Find(ISession session, Pager pager)
 		{
 			if (String.IsNullOrEmpty(SearchText))
 				SearchText = "";
@@ -91,7 +93,7 @@ namespace AdminInterface.Models.Billing
 	left join Reports.general_reports gr on gr.GeneralReportCode = c.ObjectId and c.Type = 2
 	left join Customers.Suppliers s on s.Id = c.ObjectId and c.Type = 3";
 					where = @"(
-	(u.Id is not null and (ifnull(u.Name, '') LIKE :SearchText OR u.Id = :SearchNumber)) or 
+	(u.Id is not null and (ifnull(u.Name, '') LIKE :SearchText OR u.Id = :SearchNumber)) or
 	(a.Address LIKE :SearchText or a.Id = :SearchNumber) or
 	(p.PayerId = :SearchNumber or p.ShortName LIKE :SearchText or p.JuridicalName LIKE :SearchText) or
 	(gr.Comment LIKE :SearchText or gr.GeneralReportCode = :SearchNumber) or
@@ -102,8 +104,7 @@ namespace AdminInterface.Models.Billing
 					return Enumerable.Empty<Account>().ToList();
 			}
 
-			return ArHelper.WithSession(session => {
-				pager.Total = Convert.ToInt32(session.CreateSQLQuery(String.Format(@"
+			pager.Total = Convert.ToInt32(session.CreateSQLQuery(String.Format(@"
 SELECT count(*)
 from Billing.Accounts c
 {0}
@@ -129,8 +130,7 @@ WHERE {1} and {2}
 					.SetParameter("SearchNumber", searchNumber)
 					.List();
 				var ids = items.Cast<object>().Select(Convert.ToUInt32).ToArray();
-				return ActiveRecordLinqBase<Account>.Queryable.Where(a => ids.Contains(a.Id)).OrderByDescending(a => a.WriteTime).ToList();
-			});
+				return session.Query<Account>().Where(a => ids.Contains(a.Id)).OrderByDescending(a => a.WriteTime).ToList();
 		}
 	}
 }

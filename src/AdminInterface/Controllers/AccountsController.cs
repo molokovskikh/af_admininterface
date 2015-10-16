@@ -31,7 +31,7 @@ namespace AdminInterface.Controllers
 			if (tab.Equals("unregistredItems", StringComparison.CurrentCultureIgnoreCase))
 				PropertyBag["unaccountedItems"] = Account.GetReadyForAccounting(pager, DbSession);
 			else if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
-				PropertyBag["accountingHistoryItems"] = filter.Find(pager);
+				PropertyBag["accountingHistoryItems"] = filter.Find(DbSession, pager);
 
 			PropertyBag["currentPage"] = pager.Page;
 			PropertyBag["totalPages"] = pager.TotalPages;

@@ -34,6 +34,7 @@ namespace AdminInterface.Background
 				var usersForNotification = payers.SelectMany(p => p.Users)
 					.Where(u => u.Client != null && u.Enabled && u.Client.Enabled && !u.Accounting.IsFree);
 				foreach (var user in usersForNotification) {
+					Cacellation.ThrowIfCancellationRequested();
 					var message = UserMessage.Find(user.Id);
 					message.ShowMessageCount = 1;
 					if (IsFirstNotification())

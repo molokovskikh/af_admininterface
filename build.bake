@@ -57,7 +57,7 @@ task @CopyJWidgets:
 	packagepathcss = FileSet("**.*", BaseDirectory: "packages/jQWidgets_Framework.3.7.1/content/jqwidgets/styles/")
 	assetpathcss = "output/AdminInterface/Assets/Stylesheets/jqwidgets/styles"
 	Cp(packagepathcss, assetpathcss, true)
-	
+
 
 task @BuildPrinter:
 	oldProject = Globals.Project
@@ -79,23 +79,11 @@ task @DeployPrinter:
 	Engine.Execute("WebDeploy")
 
 task @DeployBackground, [@BuildBackground]:
-	return if Globals.Environment == @Test
-
-	Globals.Project = "AdminInterface.Background"
-	Globals.DeployTo = """\\fms\TopShelf\Services\""" + Globals.Project
-	Engine.Tasks.First({t| t.Name == "WebDeploy"}).Executed = false
-	Engine.Execute("WebDeploy")
+	return if Globals.Environment != @Production
+	DeployService(Globals, "AdminInterface.Background", "fms")
 
 task @BuildBackground:
-	oldProject = Globals.Project
-	Globals.Project = "AdminInterface.Background"
-	project = "AdminInterface.Background"
-	Engine.Tasks.First({t| t.Name == "BuildApp"}).Executed = false
-	Engine.Execute("BuildApp")
-	Rm("output/$project/_PublishedWebsites", true)
-	Cp("src/$project/app.release.config", "output/$project/$project.config")
-	Rm("output/$project/$project.*.config")
-	Globals.Project = oldProject
+	Build(Globals, "AdminInterface.Background")
 
 task @DeployApp, [@WebDeploy, @DeployBackground]
 
