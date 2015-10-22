@@ -60,8 +60,8 @@ namespace AdminInterface.Services
 
 			foreach (var email in emails)
 				Func.Mail("tech@analit.net",
-					"Аналитическая Компания Инфорум",
-					"Новый адрес доставки в системе \"АналитФАРМАЦИЯ\"",
+					"АналитФармация",
+					"Новый адрес доставки в системе АналитФармация",
 					defaults.AppendFooter(String.Format(_messageTemplateForSupplierAfterAddressRegistration,
 						orgName,
 						client.Name,
@@ -91,8 +91,8 @@ namespace AdminInterface.Services
 			foreach (var address in client.Addresses.Where(a => a.Enabled)) {
 				foreach (var email in emails) {
 					Func.Mail("tech@analit.net",
-						"Аналитическая Компания Инфорум",
-						"Новый клиент в системе \"АналитФАРМАЦИЯ\"",
+						"АналитФармация",
+						"Новый клиент в системе АналитФармация",
 						defaults.AppendFooter(String.Format(_messageTemplateForSupplierAboutDrugstoreRegistration,
 							client.FullName,
 							client.Name,

@@ -49,7 +49,7 @@
 				<div class="block">
 					<% if promotion.Id: %>
 						<a href="${siteroot}/Promotions/EditCatalogs?id=${promotion.Id}">Редактировать список препаратов</a>
-						<table id="catalogs" cellpadding="3px" cellspacing="3px" style="width: 60%;">	
+						<table id="catalogs" cellpadding="3px" cellspacing="3px" style="width: 60%;">
 							<% if promotion.Catalogs.Count: %>
 								<% for i, catalog in enumerate(promotion.Catalogs): %>
 									<tr class="PromotionCatalog">
@@ -71,7 +71,7 @@
 			<td>${app.Edit("promotion.Enabled")}</td>
 		</tr>
 		<tr>
-			<td class="DisplayName">Отключена АК Инфорум:</td>
+			<td class="DisplayName">Отключена АналитФармация:</td>
 			<td>${app.Edit("promotion.AgencyDisabled")}</td>
 		</tr>
 		<tr>

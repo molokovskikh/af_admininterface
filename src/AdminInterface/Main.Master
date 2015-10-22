@@ -22,7 +22,7 @@
 		<asp:ContentPlaceHolder ID="MainContentPlaceHolder" runat="server" />
 	</div>
 	<div class="CopyRight">
-		© АК <a href="http://www.analit.net/">"Инфорум"</a> 2004
+		© <a href="http://www.analit.net/">АналитФармация</a> 2004
 	</div>
 </body>
 </html>

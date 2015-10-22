@@ -65,7 +65,7 @@ namespace AdminInterface.Models
 				case 1:
 					return ResultCode.ToString();
 				case 2:
-					return "ok (Ftp Инфорум)";
+					return "ok (Ftp АналитФармация)";
 				case 4:
 					return "ok (Ftp Поставщика)";
 				default:

@@ -15,7 +15,7 @@ namespace AdminInterface.Models.Logs
 	{
 		[Description("Накладная")] Waybill = 1,
 		[Description("Отказ")] Reject = 2,
-		[Description("Документы от АК \"Инфорум\"")] InforoomDoc = 3
+		[Description("Документы от АналитФармация")] InforoomDoc = 3
 	}
 
 	[ActiveRecord("DocumentSendLogs", Schema = "Logs", Lazy = true)]

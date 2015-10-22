@@ -29,7 +29,7 @@
 				<tr>
 					<th>${app.Sortable("№", "Id")}</th>
 					<th>${app.Sortable("Включена", "Enabled")}</th>
-					<th>${app.Sortable("Отключена АК Инфорум", "AgencyDisabled")}</th>
+					<th>${app.Sortable("Отключена АналитФармация", "AgencyDisabled")}</th>
 					<th>${app.Sortable("Наименование", "Name")}</th>
 					<th>${app.Sortable("Поставщик", "SupplierName")}</th>
 					<th></th>
