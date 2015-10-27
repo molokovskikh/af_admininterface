@@ -7,6 +7,7 @@ using System.Text;
 using System.Web.UI;
 using AddUser;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Properties;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
@@ -71,6 +72,29 @@ namespace AdminInterface.Helpers
 			stream.Seek(0, SeekOrigin.Begin);
 			return stream;
 		}
+
+		public static string SendSms(string login, string password, string[] phonesForSend)
+		{
+			var result = "";
+			if (phonesForSend != null && phonesForSend.Length > 0)
+			{
+				var message = String.Format("Ваш логин от analit: {0}, ваш пароль: {1}", login, password);
+				var l = new List<string>();
+				foreach (var phone in phonesForSend)
+				{
+					int smsId = 0;
+					// 3517983153 -> 73517983153
+					if (phone.Length == 10 && phone.All(char.IsDigit))
+						smsId = Func.SendSms(message, "7" + phone);
+
+					if (smsId > 0)
+						l.Add(String.Format("{1}, smsId={0}", smsId, phone));
+				}
+				result = String.Join("; ", l);
+			}
+			return result;
+		}
+
 
 		public static int SendClientCard(User user,
 			string password,

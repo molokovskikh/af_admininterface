@@ -83,9 +83,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle.MonoRail.ActiveRecordSupport.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.MonoRail.Framework">
+    <Reference Include="Castle.MonoRail.Framework, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Castle.MonoRail.Framework.dll</HintPath>
+      <HintPath>..\..\packages\Castle.Monorail.2.2.3\lib\net40\Castle.MonoRail.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Castle.MonoRail.Views.Brail">
       <SpecificVersion>False</SpecificVersion>

@@ -62,7 +62,8 @@ namespace AdminInterface.Controllers
 				deserializedObj.RootService.Id,
 				string.Empty,
 				jsonText,
-				deserializedObj);
+				deserializedObj,
+				null);
 		}
 
 		///<summary>
@@ -90,7 +91,8 @@ namespace AdminInterface.Controllers
 			if (payer == null)
 				return request;
 			var id = payer.GetValue("PayerID") as JValue;
-			if (id != null) {
+			if (id != null)
+			{
 				payer.Remove("PayerID");
 				payer.Add("Id", id);
 			}
@@ -98,7 +100,8 @@ namespace AdminInterface.Controllers
 			json.Remove("Client");
 			json.Remove("AvaliableAddresses");
 			json.Remove("InheritPricesFrom");
-			foreach (var child in json.GetValue("AssignedPermissions").Children()) {
+			foreach (var child in json.GetValue("AssignedPermissions").Children())
+			{
 				((JObject)child).Remove("Name");
 				((JObject)child).Remove("Shortcut");
 				((JObject)child).Remove("AvailableFor");
@@ -122,7 +125,8 @@ namespace AdminInterface.Controllers
 			PropertyBag["deliveryAddress"] = "";
 			PropertyBag["account"] = user.Accounting;
 
-			if (client == null) {
+			if (client == null)
+			{
 				PropertyBag["UseDefPermession"] = true;
 				PropertyBag["SendToEmail"] = true;
 				//Для вьюшки - по умолчанию должен быть True.
@@ -134,17 +138,22 @@ namespace AdminInterface.Controllers
 				user.SendRejects = rejectWaibillParams.SendRejects;
 			}
 
+			PropertyBag["phonesForSend"] = user.GetPhonesForSendingSms(); //"79031848398";
+
 			PropertyBag["client"] = service;
-			if (service.IsClient()) {
+			if (service.IsClient())
+			{
 				PropertyBag["drugstore"] = ((Client)service).Settings;
 				var organizations = ((Client)service).Orgs().ToArray();
-				if (organizations.Length == 1) {
+				if (organizations.Length == 1)
+				{
 					PropertyBag["address"] = new Address { LegalEntity = organizations.First() };
 				}
 				PropertyBag["Organizations"] = organizations;
 				PropertyBag["permissions"] = UserPermission.FindPermissionsForDrugstore(DbSession);
 			}
-			else {
+			else
+			{
 				PropertyBag["singleRegions"] = true;
 				PropertyBag["registerSupplierUser"] = true;
 				PropertyBag["availibleRegions"] = ((Supplier)service).RegionMask;
@@ -163,11 +172,13 @@ namespace AdminInterface.Controllers
 			else
 				payers = new List<Payer> { DbSession.Load<Supplier>(service.Id).Payer };
 
-			if (payers.Count == 1) {
+			if (payers.Count == 1)
+			{
 				user.Payer = payers.First();
 				PropertyBag["onePayer"] = true;
 			}
-			else {
+			else
+			{
 				PropertyBag["onePayer"] = false;
 			}
 			PropertyBag["Payers"] = payers;
@@ -183,21 +194,26 @@ namespace AdminInterface.Controllers
 			JObject jsonObject = null;
 			if (text.Contains("{"))
 				jsonObject = JObject.Parse(text);
-			else {
+			else
+			{
 				result.Add(objName, text);
 				return result;
 			}
-			foreach (var obj in jsonObject) {
-				if (obj.Value.Type == JTokenType.Array && obj.Value.HasValues) {
+			foreach (var obj in jsonObject)
+			{
+				if (obj.Value.Type == JTokenType.Array && obj.Value.HasValues)
+				{
 					var arrayValues = (JArray)obj.Value;
 					var count = 0;
-					foreach (var arrayValue in arrayValues) {
+					foreach (var arrayValue in arrayValues)
+					{
 						result.Add(GetCollectionFromJson(arrayValue.ToString(), string.Format("{0}.{1}[{2}]", objName, obj.Key, count)));
 						count++;
 					}
 					continue;
 				}
-				if (obj.Value.Type == JTokenType.Object) {
+				if (obj.Value.Type == JTokenType.Object)
+				{
 					result.Add(GetCollectionFromJson(obj.Value.ToString(), objName + "." + obj.Key));
 					continue;
 				}
@@ -212,12 +228,14 @@ namespace AdminInterface.Controllers
 		public void BindObjectInstanceForUser(User instance, string prefix, string jsonSource)
 		{
 			var treeRoot = new CompositeNode("root");
-			if (jsonSource != null) {
+			if (jsonSource != null)
+			{
 				var builder = new TreeBuilder();
 				var collection = GetCollectionFromJson(jsonSource, "User");
 				treeRoot = builder.BuildSourceNode(collection);
 			}
-			else {
+			else
+			{
 				treeRoot = Request.ObtainParamsNode(ParamStore.Params);
 			}
 			Binder.BindObjectInstance(instance, prefix, treeRoot);
@@ -236,6 +254,7 @@ namespace AdminInterface.Controllers
 			string mails,
 			string jsonSource,
 			User userJson,
+			string[] phonesForSend,
 			bool sendSms = false)
 		{
 			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
@@ -252,7 +271,8 @@ namespace AdminInterface.Controllers
 			BindObjectInstance(address, "address", AutoLoadBehavior.NewInstanceIfInvalidKey);
 			BindObjectInstance(account, "account", AutoLoadBehavior.NewInstanceIfInvalidKey);
 
-			if (!IsValid(user)) {
+			if (!IsValid(user))
+			{
 				Add(clientId, user);
 				PropertyBag["account"] = account;
 				PropertyBag["UserMessage"] = comment;
@@ -262,14 +282,17 @@ namespace AdminInterface.Controllers
 				PropertyBag["InputContactsList"] = contacts;
 				PropertyBag["SelectedRegions"] = regionSettings;
 				PropertyBag["deliveryAddress"] = address.Value ?? "";
+				PropertyBag["phonesForSend"] = phonesForSend;
 				return;
 			}
 
 			if (String.IsNullOrEmpty(address.Value))
 				address = null;
 
-			if (service.IsClient() && ((Client)service).Payers.Count > 1) {
-				if ((user.AvaliableAddresses.Any() && user.AvaliableAddresses.Select(s => s.LegalEntity).All(l => l.Payer.Id != user.Payer.Id)) || (address != null && address.LegalEntity.Payer.Id != user.Payer.Id)) {
+			if (service.IsClient() && ((Client)service).Payers.Count > 1)
+			{
+				if ((user.AvaliableAddresses.Any() && user.AvaliableAddresses.Select(s => s.LegalEntity).All(l => l.Payer.Id != user.Payer.Id)) || (address != null && address.LegalEntity.Payer.Id != user.Payer.Id))
+				{
 					Add(service.Id);
 					PropertyBag["user"] = user;
 					PropertyBag["address"] = address;
@@ -281,11 +304,13 @@ namespace AdminInterface.Controllers
 			service.AddUser(user);
 			user.Setup(DbSession);
 			var password = user.CreateInAd(Session);
-			if (string.IsNullOrEmpty(jsonSource)) {
+			if (string.IsNullOrEmpty(jsonSource))
+			{
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
 				user.OrderRegionMask = regionSettings.GetOrderMask();
 			}
-			else {
+			else
+			{
 				user.WorkRegionMask = BitConverter.ToUInt64(userJson.RegionSettings.Select(Convert.ToByte).ToArray(), 0);
 				mails = user.EmailForCard;
 			}
@@ -296,7 +321,8 @@ namespace AdminInterface.Controllers
 			user.UpdateContacts(contacts);
 			user.UpdatePersons(persons);
 
-			if (service.IsClient() && address != null) {
+			if (service.IsClient() && address != null)
+			{
 				address = ((Client)service).AddAddress(address);
 				user.RegistredWith(address);
 				address.SaveAndFlush();
@@ -309,11 +335,13 @@ namespace AdminInterface.Controllers
 
 			new Mailer(DbSession).Registred(user, comment, Defaults);
 			user.AddBillingComment(comment);
-			if (address != null) {
+			if (address != null)
+			{
 				address.AddBillingComment(comment);
 				new Mailer(DbSession).Registred(address, comment, Defaults);
 			}
-			if (user.Client != null) {
+			if (user.Client != null)
+			{
 				var message = string.Format("$$$Пользователю {0} - ({1}) подключены следующие адреса доставки: \r\n {2}",
 					user.Id,
 					user.Name,
@@ -321,18 +349,12 @@ namespace AdminInterface.Controllers
 				DbSession.Save(new AuditRecord(message, user.Client) { MessageType = LogMessageType.System });
 			}
 
-			//var hasPhone = contacts.Any(i => i.Type == ContactType.Phone);
-			//if (sendSms && hasPhone) {
-			//	var phoneNumbers = contacts.Where(i => i.Type == ContactType.Phone).ToList();
-			//	var sms = "Ваш логин от analit: " + user.Login + " , ваш пароль: " + password;
-			//	//var helper = new SmsHelper();
-			//	//helper.SendMessage("+79671526606", sms);
-			//	foreach (var phone in phoneNumbers) {
-			//	}
-			//}
-            var haveMails = !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim());
+			passwordChangeLog.SmsLog = ReportHelper.SendSms(user.Login, password.Password, phonesForSend); ;
+
+			var haveMails = !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim());
 			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
-			if (sendClientCard && (haveMails || !string.IsNullOrEmpty(user.EmailForCard))) {
+			if (sendClientCard && (haveMails || !string.IsNullOrEmpty(user.EmailForCard)))
+			{
 				var smtpId = ReportHelper.SendClientCard(user,
 					password.Password,
 					false,
@@ -343,21 +365,25 @@ namespace AdminInterface.Controllers
 
 				Notify("Пользователь создан");
 
-				if (string.IsNullOrEmpty(jsonSource)) {
+				if (string.IsNullOrEmpty(jsonSource))
+				{
 					if (service.IsClient())
 						RedirectUsingRoute("Clients", "show", new { service.Id });
 					else
 						RedirectUsingRoute("Suppliers", "show", new { service.Id });
 				}
-				else {
+				else
+				{
 					Response.StatusCode = 200;
 					CancelView();
 				}
 			}
-			else if (string.IsNullOrEmpty(jsonSource)) {
+			else if (string.IsNullOrEmpty(jsonSource))
+			{
 				Redirect("main", "report", new { id = user.Id, passwordId = password.PasswordId });
 			}
-			else {
+			else
+			{
 				Response.StatusCode = 200;
 				CancelView();
 			}
@@ -401,7 +427,8 @@ namespace AdminInterface.Controllers
 			[DataBind("persons")] Person[] persons,
 			[DataBind("deletedPersons")] Person[] deletedPersons)
 		{
-			if (!IsValid(user)) {
+			if (!IsValid(user))
+			{
 				Edit(user.Id, new MessageQuery());
 				RenderView("Edit");
 				return;
@@ -416,7 +443,7 @@ namespace AdminInterface.Controllers
 		}
 
 
-        [RequiredPermission(PermissionType.ChangePassword)]
+		[RequiredPermission(PermissionType.ChangePassword)]
 		public void ChangePassword(uint id)
 		{
 			var user = DbSession.Load<User>(id);
@@ -424,8 +451,8 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["user"] = user;
 			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
-		    PropertyBag["phonesForSend"] = user.GetPhonesForSendingSms(); //"79031848398";
-        }
+			PropertyBag["phonesForSend"] = user.GetPhonesForSendingSms();
+		}
 
 		[RequiredPermission(PermissionType.ChangePassword)]
 		public void DoPasswordChange(uint userId,
@@ -434,14 +461,14 @@ namespace AdminInterface.Controllers
 			bool isFree,
 			bool changeLogin,
 			string reason,
-            bool sendSms,
-            string phonesForSend)
+						string[] phonesForSend)
 		{
 			var user = DbSession.Load<User>(userId);
 			user.CheckLogin();
 
 			var password = user.ChangePassword(Session);
-			if (changeLogin) {
+			if (changeLogin)
+			{
 				ADHelper.RenameUser(user.Login, user.Id.ToString());
 				user.Login = user.Id.ToString();
 			}
@@ -449,7 +476,8 @@ namespace AdminInterface.Controllers
 
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 
-            if (isSendClientCard) {
+			if (isSendClientCard)
+			{
 				var smtpId = ReportHelper.SendClientCard(
 					user,
 					password.Password,
@@ -459,23 +487,9 @@ namespace AdminInterface.Controllers
 				passwordChangeLog.SetSentTo(smtpId, emailsForSend);
 			}
 
-            if (sendSms && !String.IsNullOrEmpty(phonesForSend))
-            {
-                var message = String.Format("Ваш логин от analit: {0}, ваш пароль: {1}", user.Login, password.Password);
-                var log = new List<string>();
-                foreach (var phone in phonesForSend.Split(',').Select(x => x.Trim())) {
-                    int smsId = 0;
-                    // 3517983153 -> 73517983153
-                    if (phone.Length == 10 && phone.All(char.IsDigit))
-                        smsId = Func.SendSms(message, "7" + phone);
+			passwordChangeLog.SmsLog = ReportHelper.SendSms(user.Login, password.Password, phonesForSend); ;
 
-                    if (smsId > 0)
-                        log.Add(String.Format("{1}, smsId={0}", smsId, phone));
-                }
-                passwordChangeLog.SetSmsLog(String.Join("; ", log));
-            }
-
-            DbSession.Save(user);
+			DbSession.Save(user);
 			DbSession.Save(AuditRecord.PasswordChange(user, isFree, reason));
 			DbSession.Save(passwordChangeLog);
 
@@ -486,11 +500,13 @@ namespace AdminInterface.Controllers
 				Context.Request.UserHostAddress,
 				reason);
 
-			if (isSendClientCard) {
+			if (isSendClientCard)
+			{
 				Notify("Пароль успешно изменен.");
 				RedirectTo(user, "Edit");
 			}
-			else {
+			else
+			{
 				Redirect("main", "report", new { id = user.Id, isPasswordChange = true, passwordId = password.PasswordId });
 			}
 		}
@@ -508,16 +524,19 @@ namespace AdminInterface.Controllers
 
 		public void DeletePreparedData(uint id)
 		{
-			try {
+			try
+			{
 				var user = DbSession.Load<User>(id);
 				var files = Directory.GetFiles(Global.Config.UserPreparedDataDirectory)
 					.Where(f => Regex.IsMatch(Path.GetFileName(f), string.Format(@"^({0}_)\d+?\.zip", user.Id))).ToList();
-				foreach (var file in files) {
+				foreach (var file in files)
+				{
 					File.Delete(file);
 				}
 				Notify("Подготовленные данные удалены");
 			}
-			catch {
+			catch
+			{
 				Error("Ошибка удаления подготовленных данных, попробуйте позднее.");
 			}
 			RedirectToReferrer();
@@ -526,7 +545,8 @@ namespace AdminInterface.Controllers
 		public void ResetUin(uint id, string reason)
 		{
 			var user = DbSession.Load<User>(id);
-			DbLogHelper.SetupParametersForTriggerLogging(new {
+			DbLogHelper.SetupParametersForTriggerLogging(new
+			{
 				ResetIdCause = reason
 			});
 			AuditRecord.ReseteUin(user, reason).Save();
@@ -540,7 +560,8 @@ namespace AdminInterface.Controllers
 		{
 			var user = DbSession.Load<User>(userId);
 
-			if (!String.IsNullOrEmpty(message)) {
+			if (!String.IsNullOrEmpty(message))
+			{
 				new AuditRecord(message, user).Save();
 				Notify("Сохранено");
 			}
@@ -553,15 +574,18 @@ namespace AdminInterface.Controllers
 			var user = DbSession.Load<User>(id);
 			PropertyBag["user"] = user;
 			PropertyBag["maxRegion"] = UInt64.MaxValue;
-			if (user.Client == null) {
+			if (user.Client == null)
+			{
 				var supplier = DbSession.Load<Supplier>(user.RootService.Id);
-				if (supplier != null) {
+				if (supplier != null)
+				{
 					PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(supplier.RegionMask);
 				}
 				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.SupplierInterface);
 				RenderView("SupplierSettings");
 			}
-			else {
+			else
+			{
 				var setting = user.Client.Settings;
 				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask);
 				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion);
@@ -577,12 +601,14 @@ namespace AdminInterface.Controllers
 		{
 			CancelView();
 			var user = DbSession.Load<User>(userId);
-			if (user.Client != null) {
+			if (user.Client != null)
+			{
 				user.UserUpdateInfo.AFAppVersion = 999;
 				DbSession.Save(user);
 				Notify("Версия АФ сброшена");
 			}
-			else {
+			else
+			{
 				Error("Нельзя сбросить версию АФ для пользователя поставщика");
 			}
 			return userId;
@@ -595,12 +621,15 @@ namespace AdminInterface.Controllers
 			[DataBind("OrderRegions")] ulong[] orderRegions)
 		{
 			var oldFirstTable = DbSession.OldValue(user, u => u.SubmitOrders) && DbSession.OldValue(user, u => u.IgnoreCheckMinOrder);
-			if (oldFirstTable != user.FirstTable) {
-				if (user.FirstTable) {
+			if (oldFirstTable != user.FirstTable)
+			{
+				if (user.FirstTable)
+				{
 					user.Accounting.Payment = 0;
 					user.Accounting.BeAccounted = false;
 				}
-				else {
+				else
+				{
 					user.Accounting.Payment = user.Client.HomeRegion.UserPayment;
 					user.Accounting.BeAccounted = false;
 				}
@@ -628,14 +657,16 @@ namespace AdminInterface.Controllers
 		{
 			var user = DbSession.Load<User>(id);
 
-			if (user.CanDelete(DbSession)) {
+			if (user.CanDelete(DbSession))
+			{
 				var payer = user.Payer;
 				DbSession.Delete(user);
 				payer.UpdatePaymentSum();
 				Notify("Удалено");
 				RedirectTo(user.RootService);
 			}
-			else {
+			else
+			{
 				Error("Не могу удалить пользователя т.к. у него есть заказы");
 				RedirectToReferrer();
 			}
@@ -655,7 +686,8 @@ namespace AdminInterface.Controllers
 				.ToList();
 
 			var returned = new List<object>();
-			foreach (var user in result) {
+			foreach (var user in result)
+			{
 				if (user.Login.ToLower().Contains(text.ToLower()))
 					returned.Add(new { id = user.Id, name = string.Format("Код: {0} - login: {1}", user.Id, user.Login) });
 				if (user.Name.ToLower().Contains(text.ToLower()))

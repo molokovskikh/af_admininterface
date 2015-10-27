@@ -830,9 +830,9 @@ WHERE
 			return owner.GetEmails(ContactGroupType.General).Implode();
 		}
 
-        public virtual string GetPhonesForSendingSms()
+        public virtual string[] GetPhonesForSendingSms()
         {
-            ContactGroupOwner owner = null;
+					ContactGroupOwner owner = null;
             var groups = new ContactGroupType[0];
             if (RootService is Client)
             {
@@ -845,15 +845,18 @@ WHERE
                 owner = ((Supplier)RootService).ContactGroupOwner;
             }
 
-            if (owner == null)
-                return "";
+	        if (owner == null)
+	        {
+							var result = new string[] {};
+							return result;
+					}
 
-            var phones = owner.GetPhones(groups);
+			var phones = owner.GetPhones(groups);
             if (phones.Any())
-                return phones.Select(x => x.Replace("-", "")).Implode();
+                return phones.Select(x => x.Replace("-", "")).ToArray();
 
             // 351-7983153 -> 3517983153
-            return owner.GetPhones(ContactGroupType.General).Select(x => x.Replace("-", "")).Implode();
+            return owner.GetPhones(ContactGroupType.General).Select(x => x.Replace("-", "")).ToArray();
         }
 
 

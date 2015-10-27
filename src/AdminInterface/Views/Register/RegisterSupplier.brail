@@ -36,7 +36,7 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 		$("#options_FillBillingInfo").attr({ disabled: null });
 
 		jQuery.validator.addMethod("noEmailAddress", function(value, element) {
-			if (value.toString().length == 0 && $("#additionalEmails").val().length == 0 
+			if (value.toString().length == 0 && $("#additionalEmails").val().length == 0
 				&& $("#SendRegistrationCard").prop("checked"))
 			{
 				return false;
@@ -73,7 +73,7 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 		width: 100%;
 		border-spacing: 0px;
 	}
-	
+
 	#supplier_Name, #supplier_FullName
 	{
 		width: 100%;
@@ -134,7 +134,7 @@ ${FormHelper.FormTag("", {})}
 				</td>
 				<td></td>
 			</tr>
-			
+
 			<tr valign="top">
 				<td colspan="2">
 					<div class="contextualNoTopSpace">
@@ -215,6 +215,11 @@ ${FormHelper.FormTag("", {})}
 					${app.Edit("options.ShowRegistrationCard")}
 				</td>
 			</tr>
+			<tr>
+				<td colspan="2">
+					${app.Edit("options.SendSms")}
+				</td>
+			</tr>
 		</table>
 		<fieldset>
 			<legend>
@@ -222,11 +227,11 @@ ${FormHelper.FormTag("", {})}
 			</legend>
 			<br />
 			Дополнительные адреса для отправки регистрационной карты:<br />
-			<textarea rows="2" cols="60" name="additionalEmailsForSendingCard" 
+			<textarea rows="2" cols="60" name="additionalEmailsForSendingCard"
 				id="additionalEmails"></textarea>
 		</fieldset>
 	</div>
-	
+
 	<div class="block">
 		<h3>Региональная настройка</h3>
 		${app.GetValidationError("supplier.RegionMask")}

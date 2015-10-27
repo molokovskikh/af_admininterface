@@ -51,6 +51,10 @@ namespace AdminInterface.Controllers
 
 		[Description("Регистрировать без адреса доставки и пользователя")]
 		public bool RegisterEmpty { get; set; }
+
+		[Description("Отправить пароль при помощи SMS")]
+		public bool SendSms { get; set; }
+
 	}
 
 	[
@@ -169,6 +173,13 @@ namespace AdminInterface.Controllers
 			var log = new PasswordChangeLogEntity(user.Login);
 			if (options.SendRegistrationCard)
 				log = SendRegistrationCard(log, user, password.Password, additionalEmailsForSendingCard);
+
+			if (options.SendSms)
+			{
+				var phonesForSend = user.GetPhonesForSendingSms();
+				log.SmsLog = ReportHelper.SendSms(user.Login, password.Password, phonesForSend); ;
+			}
+
 			DbSession.Save(log);
 
 			if (options.FillBillingInfo) {
@@ -295,6 +306,13 @@ namespace AdminInterface.Controllers
 				var log = new PasswordChangeLogEntity(user.Login);
 				if (options.SendRegistrationCard)
 					log = SendRegistrationCard(log, user, password.Password, additionalEmailsForSendingCard);
+
+				if (options.SendSms)
+				{
+					var phonesForSend = user.GetPhonesForSendingSms();
+					log.SmsLog = ReportHelper.SendSms(user.Login, password.Password, phonesForSend); ;
+				}
+
 				DbSession.Save(log);
 			}
 

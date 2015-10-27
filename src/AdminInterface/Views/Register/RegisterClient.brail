@@ -81,7 +81,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		$("[name=\"clientContacts[1].ContactText\"]").rules("add", { noEmailAddress: true });
 		$("#address_Value").rules("remove", "required");
 	}
-	
+
 	function ShowSelectSupplierDiv() {
 		var searchText = $("#SearchSupplierTextPattern").val();
 		if (searchText.length == 0)
@@ -173,7 +173,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 			viewModel.payerId(null);
 		}
 	}
-	
+
 	function LockPayer() {
 		$("#PayerExists").prop("checked", false);
 		$("#PayerExists").click();
@@ -184,7 +184,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		ViewDiv(false, '#SelectPayerDiv');
 		ViewDiv(false, "#SearchPayerDiv");
 	}
-	
+
 	function SetLockedPayer(payerName) {
 		$("#PayerExists").prop("checked", true);
 		$("#PayerExistsValue").val(true);
@@ -262,7 +262,7 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 				</td>
 				<td></td>
 			</tr>
-			
+
 			<tr valign="top">
 				<td colspan="2">
 					<div class="contextualNoTopSpace">
@@ -307,7 +307,7 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 			<% end %>
 		</div>
 	</div>
-	
+
 	<div class="block">
 		<h3>Настройка</h3>
 		<table cellpadding="1" border="0" width="100%">
@@ -378,8 +378,13 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td colspan="2">
 					${app.Edit("options.RegisterEmpty")}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					${app.Edit("options.SendSms")}
 				</td>
 			</tr>
 		</table>
@@ -389,11 +394,11 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 			</legend>
 			<br />
 			Дополнительные адреса для отправки регистрационной карты:<br />
-			<textarea rows="2" cols="60" name="additionalEmailsForSendingCard" 
+			<textarea rows="2" cols="60" name="additionalEmailsForSendingCard"
 				id="additionalEmails"></textarea>
 		</fieldset>
 	</div>
-	
+
 	<div class="block">
 		<h3>Региональная настройка</h3>
 		${app.GetValidationError(client, "MaskRegion")}

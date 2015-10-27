@@ -23,7 +23,7 @@
 		var elemId = regionType+'Region'+regionId;
 		if(regionId == '${maxRegion}')
 			elemId = regionType+'Region{maxRegion}';
-		
+
 		var regionEdit = document.getElementById(elemId);
 		if(regionEdit != null)
 			regionEdit.checked = check == 'True' ? true : false;
@@ -64,16 +64,35 @@
 		</div>
 
 		<div class=block>
-			<h3>
-				<input id="sendClientCard" name="sendClientCard" type="checkbox" ${"checked" if (SendToEmail)} />
-				<label>Отправлять регистрационную карту на E-mail:</label>
-			</h3>
-			<label for="To">
-				Адреса для отправки регистрационной карты (перечисляются через запятую):
-			</label>
-			<div>
-				<textarea style="width: 100%" name="mails">${emailForSend}</textarea>
-			</div>
+			<fieldset>
+				<legend>
+					<label>Отправить пароль при помощи SMS:</label>
+				</legend>
+				<label for="To" style="display: block; float: left; width: 30%">
+					Телефоны в формате 9031234567<br>
+					(10 цифр):
+				</label>
+				<div style="display: block; float: right; width: 68%">
+						<% for i, phone in enumerate(phonesForSend): %>
+							<input type=checkbox name="phonesForSend" value="${phone}"/>
+							<label>${phone}</label>
+							<br>
+						<% end %>
+				</div>
+			</fieldset>
+
+			<fieldset>
+				<legend>
+					<input id="sendClientCard" name="sendClientCard" type="checkbox" ${"checked" if (SendToEmail)} />
+					<label>Отправлять регистрационную карту на E-mail:</label>
+				</legend>
+				<label for="To">
+					Адреса для отправки регистрационной карты (перечисляются через запятую):
+				</label>
+				<div>
+					<textarea cols="60" rows="4" name="mails">${emailForSend}</textarea>
+				</div>
+			</fieldset>
 		</div>
 
 		<div class=block>
@@ -133,7 +152,7 @@
 						<input type=checkbox name=user.AssignedPermissions[${i}].Id value=${permission.Id}  ${"checked" if user.UserHasPermission(permission.Id)}>
 							${permission.Name}
 						<br>
-				
+
 				<% end %>
 			<% end %>
 			</div>
