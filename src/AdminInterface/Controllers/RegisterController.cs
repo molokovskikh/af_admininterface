@@ -54,7 +54,6 @@ namespace AdminInterface.Controllers
 
 		[Description("Отправить пароль при помощи SMS")]
 		public bool SendSms { get; set; }
-
 	}
 
 	[
@@ -174,10 +173,10 @@ namespace AdminInterface.Controllers
 			if (options.SendRegistrationCard)
 				log = SendRegistrationCard(log, user, password.Password, additionalEmailsForSendingCard);
 
-			if (options.SendSms)
-			{
+			if (options.SendSms) {
 				var phonesForSend = user.GetPhonesForSendingSms();
-				log.SmsLog = ReportHelper.SendSms(user.Login, password.Password, phonesForSend); ;
+				log.SmsLog = ReportHelper.SendSms(user.Login, password.Password, phonesForSend);
+				;
 			}
 
 			DbSession.Save(log);
@@ -307,10 +306,10 @@ namespace AdminInterface.Controllers
 				if (options.SendRegistrationCard)
 					log = SendRegistrationCard(log, user, password.Password, additionalEmailsForSendingCard);
 
-				if (options.SendSms)
-				{
+				if (options.SendSms) {
 					var phonesForSend = user.GetPhonesForSendingSms();
-					log.SmsLog = ReportHelper.SendSms(user.Login, password.Password, phonesForSend); ;
+					log.SmsLog = ReportHelper.SendSms(user.Login, password.Password, phonesForSend);
+					;
 				}
 
 				DbSession.Save(log);

@@ -76,12 +76,10 @@ namespace AdminInterface.Helpers
 		public static string SendSms(string login, string password, string[] phonesForSend)
 		{
 			var result = "";
-			if (phonesForSend != null && phonesForSend.Length > 0)
-			{
+			if (phonesForSend != null && phonesForSend.Length > 0) {
 				var message = String.Format("Ваш логин от analit: {0}, ваш пароль: {1}", login, password);
 				var l = new List<string>();
-				foreach (var phone in phonesForSend)
-				{
+				foreach (var phone in phonesForSend) {
 					int smsId = 0;
 					// 3517983153 -> 73517983153
 					if (phone.Length == 10 && phone.All(char.IsDigit))
@@ -152,8 +150,6 @@ namespace AdminInterface.Helpers
 
 				return Func.Send(message);
 			}
-
 		}
-
-    }
-    }
+	}
+}

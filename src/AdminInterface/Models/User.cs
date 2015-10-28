@@ -86,8 +86,7 @@ namespace AdminInterface.Models
 				};
 				//не нужно сбрасывать значение если оно отсутствует в справочнике
 				if (BinUpdateChannel != null
-					&& !items.Any(x => x.Key == BinUpdateChannel))
-				{
+						&& !items.Any(x => x.Key == BinUpdateChannel)) {
 					return new[] { new KeyValuePair<string, string>(BinUpdateChannel, BinUpdateChannel), }
 						.Concat(items).ToArray();
 				}
@@ -99,14 +98,10 @@ namespace AdminInterface.Models
 
 	public enum UserADStatus
 	{
-		[Description("")]
-		Ok,
-		[Description("Заблокирован")]
-		Locked,
-		[Description("Отключен")]
-		Disabled,
-		[Description("Не существует")]
-		NotExists,
+		[Description("")] Ok,
+		[Description("Заблокирован")] Locked,
+		[Description("Отключен")] Disabled,
+		[Description("Не существует")] NotExists,
 	}
 
 	public class LoginNotFoundException : Exception
@@ -191,16 +186,14 @@ namespace AdminInterface.Models
 			: this()
 		{
 			RootService = service;
-			if (service is Client)
-			{
+			if (service is Client) {
 				Client = (Client)RootService;
 				if (Client.Payers.Count == 1)
 					Payer = Client.Payers.First();
 				WorkRegionMask = Client.MaskRegion;
 				OrderRegionMask = Client.Settings.OrderRegionMask;
 			}
-			else if (service is Supplier)
-			{
+			else if (service is Supplier) {
 				WorkRegionMask = ulong.MaxValue;
 				Payer = ((Supplier)service).Payer;
 			}
@@ -237,8 +230,7 @@ namespace AdminInterface.Models
 			get { return _enabled; }
 			set
 			{
-				if (_enabled != value)
-				{
+				if (_enabled != value) {
 					_enabled = value;
 					if (Payer != null)
 						Payer.PaymentSum = Payer.TotalSum;
@@ -298,7 +290,7 @@ namespace AdminInterface.Models
 		public virtual ContactGroup ContactGroup { get; set; }
 
 		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke),
-		 Description("Наследовать настройки прайс листов"), Auditable, SetForceReplication]
+		Description("Наследовать настройки прайс листов"), Auditable, SetForceReplication]
 		public virtual User InheritPricesFrom { get; set; }
 
 		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke), Description("Плательщик"), Auditable, ValidateNonEmpty]
@@ -461,12 +453,10 @@ namespace AdminInterface.Models
 		{
 			get
 			{
-				try
-				{
+				try {
 					return !ADHelper.IsBelongsToOfficeContainer(Login);
 				}
-				catch (Exception)
-				{
+				catch (Exception) {
 					return false;
 				}
 			}
@@ -578,8 +568,7 @@ namespace AdminInterface.Models
 				.Distinct()
 				.Except(AssignedPermissions)
 				.ToArray();
-			foreach (var permission in permissions)
-			{
+			foreach (var permission in permissions) {
 				AssignedPermissions.Add(permission);
 			}
 		}
@@ -588,12 +577,10 @@ namespace AdminInterface.Models
 		{
 			get
 			{
-				try
-				{
+				try {
 					return (ADHelper.IsLoginExists(Login) && ADHelper.IsLocked(Login));
 				}
-				catch (Exception)
-				{
+				catch (Exception) {
 					return false;
 				}
 			}
@@ -614,16 +601,15 @@ namespace AdminInterface.Models
 		public virtual bool HaveUin()
 		{
 			return !String.IsNullOrWhiteSpace(UserUpdateInfo.AFCopyId)
-				|| (AFNetConfig != null
-					&& (!String.IsNullOrEmpty(AFNetConfig.ClientToken)
-						|| !String.IsNullOrEmpty(AFNetConfig.ClientTokenV2)));
+						|| (AFNetConfig != null
+								&& (!String.IsNullOrEmpty(AFNetConfig.ClientToken)
+										|| !String.IsNullOrEmpty(AFNetConfig.ClientTokenV2)));
 		}
 
 		public virtual void ResetUin()
 		{
 			UserUpdateInfo.AFCopyId = "";
-			if (AFNetConfig != null)
-			{
+			if (AFNetConfig != null) {
 				AFNetConfig.ClientToken = null;
 				AFNetConfig.ClientTokenV2 = null;
 			}
@@ -631,10 +617,8 @@ namespace AdminInterface.Models
 
 		public virtual void PrepareSave(ISession session)
 		{
-			if (Client != null)
-			{
-				if (AssignedPermissions.FirstOrDefault(p => p.Shortcut == "ConfigureMatrixAssortment") != null && Client.Settings.BuyingMatrix == null)
-				{
+			if (Client != null) {
+				if (AssignedPermissions.FirstOrDefault(p => p.Shortcut == "ConfigureMatrixAssortment") != null && Client.Settings.BuyingMatrix == null) {
 					var matrix = new Matrix();
 					session.Save(matrix);
 					Client.Settings.BuyingMatrix = matrix;
@@ -693,8 +677,7 @@ namespace AdminInterface.Models
 		{
 			if (persons == null || persons.Length == 0)
 				return;
-			if (ContactGroup == null)
-			{
+			if (ContactGroup == null) {
 				AddContactGroup();
 				foreach (var person in persons)
 					ContactGroup.AddPerson(person.Name);
@@ -769,8 +752,7 @@ WHERE
 		{
 			if (String.IsNullOrEmpty(name))
 				return;
-			if (ContactGroup == null)
-			{
+			if (ContactGroup == null) {
 				var groupOwner = Client.ContactGroupOwner;
 				var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
 				group.Save();
@@ -790,17 +772,14 @@ WHERE
 			var regions = session.Query<Region>().ToArray();
 			// Если маски регионов не совпадают, добавляем записи в UserPrices для тех регионов,
 			// которых не было у старого клиента, но они есть у нового клиента
-			if (Client.MaskRegion != newOwner.MaskRegion)
-			{
-				foreach (var region in regions)
-				{
+			if (Client.MaskRegion != newOwner.MaskRegion) {
+				foreach (var region in regions) {
 					// Если этот регион есть у старого клиента, пропускаем его
 					if ((region.Id & Client.MaskRegion) > 0)
 						continue;
 					// Если региона нет у старого клиента, но он есть у нового,
 					// и для этого пользователя нет прайсов в этом регионе добавляем прайсы для этого региона
-					if ((region.Id & newOwner.MaskRegion) > 0)
-					{
+					if ((region.Id & newOwner.MaskRegion) > 0) {
 						if (!HavePricesInRegion(session, region))
 							AddPrices(session, newOwner, region);
 					}
@@ -810,8 +789,7 @@ WHERE
 			AuditRecord.UpdateLogs(newOwner.Id, this);
 			Client = newOwner;
 			RootService = newOwner;
-			if (Payer != legalEntity.Payer)
-			{
+			if (Payer != legalEntity.Payer) {
 				Payer = legalEntity.Payer;
 			}
 			InheritPricesFrom = null;
@@ -834,13 +812,11 @@ WHERE
 		{
 			ContactGroupOwner owner = null;
 			var groups = new ContactGroupType[0];
-			if (RootService is Client)
-			{
+			if (RootService is Client) {
 				groups = new[] { ContactGroupType.OrderManagers };
 				owner = ((Client)RootService).ContactGroupOwner;
 			}
-			else if (RootService is Supplier)
-			{
+			else if (RootService is Supplier) {
 				groups = new[] { ContactGroupType.OrderManagers, ContactGroupType.ClientManagers };
 				owner = ((Supplier)RootService).ContactGroupOwner;
 			}
@@ -859,19 +835,16 @@ WHERE
 		{
 			ContactGroupOwner owner = null;
 			var groups = new ContactGroupType[0];
-			if (RootService is Client)
-			{
+			if (RootService is Client) {
 				groups = new[] { ContactGroupType.OrderManagers };
 				owner = ((Client)RootService).ContactGroupOwner;
 			}
-			else if (RootService is Supplier)
-			{
+			else if (RootService is Supplier) {
 				groups = new[] { ContactGroupType.OrderManagers, ContactGroupType.ClientManagers };
 				owner = ((Supplier)RootService).ContactGroupOwner;
 			}
 
-			if (owner == null)
-			{
+			if (owner == null) {
 				var result = new string[] { };
 				return result;
 			}
@@ -965,8 +938,7 @@ WHERE
 			//Прокси сервиса не приводится к поставщику
 			var serv = RootService;
 			var proxy = RootService as INHibernateProxy;
-			if (proxy != null)
-			{
+			if (proxy != null) {
 				var session = proxy.HibernateLazyInitializer.Session;
 				serv = (Service)session.PersistenceContext.Unproxy(proxy);
 			}

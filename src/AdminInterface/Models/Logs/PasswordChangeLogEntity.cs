@@ -52,10 +52,10 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public string SentTo { get; set; }
 
-    [Property]
-    public string SmsLog { get; set; }
+		[Property]
+		public string SmsLog { get; set; }
 
-    public static IList<PasswordChangeLogEntity> GetByLogin(string login, DateTime beginDate, DateTime endDate)
+		public static IList<PasswordChangeLogEntity> GetByLogin(string login, DateTime beginDate, DateTime endDate)
 		{
 			IList<PasswordChangeLogEntity> entity = null;
 			ArHelper.WithSession(session => entity = session.CreateSQLQuery(@"
@@ -75,7 +75,7 @@ where LogTime >= :BeginDate and LogTime <= :EndDate and TargetUserName = :Login"
 			SentTo = emailsToNotify;
 		}
 
-    public bool IsChangedByOneSelf()
+		public bool IsChangedByOneSelf()
 		{
 			return UserName.ToLowerInvariant() == TargetUserName.ToLowerInvariant();
 		}
