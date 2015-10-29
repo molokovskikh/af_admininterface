@@ -8,6 +8,7 @@ using System.Web.UI;
 using AddUser;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Security;
 using AdminInterface.Properties;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
@@ -73,11 +74,10 @@ namespace AdminInterface.Helpers
 			return stream;
 		}
 
-		public static string SendSms(string login, string password, string[] phonesForSend)
+		public static string SendSms(string message, string[] phonesForSend)
 		{
 			var result = "";
 			if (phonesForSend != null && phonesForSend.Length > 0) {
-				var message = String.Format("Ваш логин от analit: {0}, ваш пароль: {1}", login, password);
 				var l = new List<string>();
 				foreach (var phone in phonesForSend) {
 					int smsId = 0;
@@ -91,6 +91,20 @@ namespace AdminInterface.Helpers
 				result = String.Join("; ", l);
 			}
 			return result;
+		}
+
+		public static string SendSmsPasswordToUser(string login, string password, string[] phonesForSend)
+		{
+			var message = String.Format("Ваш логин от analit: {0}, ваш пароль: {1}", login, password);
+			string response = ReportHelper.SendSms(message, phonesForSend);
+			return String.Format("To user: {0}", String.IsNullOrEmpty(response) ? "none" : response);
+		}
+
+		public static string SendSmsToRegionalAdmin(string login, string password, string[] phonesForSend)
+		{
+			var message = String.Format("Пользователь analit с логином {0} получил пароль {1}", login, password);
+			string response = ReportHelper.SendSms(message, phonesForSend);
+			return String.Format("To admin: {0}", String.IsNullOrEmpty(response) ? "none" : response);
 		}
 
 

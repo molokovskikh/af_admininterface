@@ -68,7 +68,7 @@ namespace Integration.Controllers
 			user2.UserUpdateInfo.AFCopyId = "12345";
 			session.Save(user2.UserUpdateInfo);
 
-			controller.DoPasswordChange(user1.Id, "", false, true, false, "", null);
+			controller.DoPasswordChange(user1.Id, "", false, true, false, "", null, null);
 
 			Assert.That(user1.UserUpdateInfo.AFCopyId, Is.Empty);
 			Assert.That(user2.UserUpdateInfo.AFCopyId, Is.EqualTo("12345"));
@@ -97,7 +97,7 @@ namespace Integration.Controllers
 			Prepare();
 			Request.Params.Add("user.Payer.Id", client.Payers.First().Id.ToString());
 
-			controller.Add(clientContacts, regionSettings, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut", null, null, null);
+			controller.Add(clientContacts, regionSettings, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut", null, null, null, null);
 			Flush();
 
 			var user = Registred();
@@ -120,7 +120,7 @@ namespace Integration.Controllers
 				new RegionSettings { Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true }
 			};
 			Prepare();
-			controller.Add(new Contact[0], regionSettings, new Person[0], "", false, client.Id, null, null, null, null);
+			controller.Add(new Contact[0], regionSettings, new Person[0], "", false, client.Id, null, null, null, null, null);
 
 			Assert.IsTrue(Response.WasRedirected);
 			var passwordId = HttpUtility.ParseQueryString(new Uri("http://localhost" + Response.RedirectedTo).Query)["passwordId"];
@@ -139,7 +139,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null, null, null);
 
 			var user = Registred();
 			var messages = session.Query<AuditRecord>().Where(l => l.ObjectId == user.Id);
@@ -161,7 +161,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null, null, null);
 
 			Assert.IsTrue(Response.WasRedirected);
 			var user = Registred();
@@ -186,7 +186,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null, null, null);
 			Assert.That(controller.Flash["Message"].ToString(),
 				Is.StringContaining("Ошибка регистрации: попытка зарегистрировать пользователя и адрес в различных Плательщиках"));
 		}
@@ -209,7 +209,7 @@ namespace Integration.Controllers
 				new RegionSettings {
 					Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 				},
-			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null, null);
+			}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null, null, null, null, null);
 
 			Assert.IsTrue(Response.WasRedirected);
 			var user = Registred();

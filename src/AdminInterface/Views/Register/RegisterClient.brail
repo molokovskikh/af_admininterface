@@ -384,7 +384,12 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 			</tr>
 			<tr>
 				<td colspan="2">
-					${app.Edit("options.SendSms")}
+					${app.Edit("options.SendSmsToUser")}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					${app.Edit("options.SendSmsToAdmin")}
 				</td>
 			</tr>
 		</table>

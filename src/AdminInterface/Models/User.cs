@@ -833,6 +833,7 @@ WHERE
 
 		public virtual string[] GetPhonesForSendingSms()
 		{
+			var result = new string[] { };
 			ContactGroupOwner owner = null;
 			var groups = new ContactGroupType[0];
 			if (RootService is Client) {
@@ -844,19 +845,17 @@ WHERE
 				owner = ((Supplier)RootService).ContactGroupOwner;
 			}
 
-			if (owner == null) {
-				var result = new string[] { };
-				return result;
+			if (owner != null) {
+				var phones = owner.GetPhones(groups);
+				// 351-7983153 -> 3517983153
+				if (phones.Any())
+					result = phones.Select(x => x.Replace("-", "")).ToArray();
+				else
+					result = owner.GetPhones(ContactGroupType.General).Select(x => x.Replace("-", "")).ToArray();
 			}
-
-			var phones = owner.GetPhones(groups);
-			if (phones.Any())
-				return phones.Select(x => x.Replace("-", "")).ToArray();
-
-			// 351-7983153 -> 3517983153
-			return owner.GetPhones(ContactGroupType.General).Select(x => x.Replace("-", "")).ToArray();
+			// только мобильные
+			return result.Where(x => x.StartsWith("9")).ToArray();
 		}
-
 
 		public virtual void AddBillingComment(string billingMessage)
 		{

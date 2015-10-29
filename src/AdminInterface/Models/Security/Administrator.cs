@@ -59,6 +59,11 @@ namespace AdminInterface.Models.Security
 		[Property, ValidateNonEmpty]
 		public string PhoneSupport { get; set; }
 
+		public string PhoneSupportFormat
+		{
+			get { return PhoneSupport.Replace("-", ""); }
+		}
+
 		[Property]
 		public string InternalPhone { get; set; }
 
@@ -93,6 +98,27 @@ namespace AdminInterface.Models.Security
 		public static IList<Administrator> FindAll()
 		{
 			return ActiveRecordMediator<Administrator>.FindAll(new[] { Order.Asc("UserName") });
+		}
+
+		public static string[] GetPhoneSupportByRegionForSms(ulong regionMask)
+		{
+			return ActiveRecordMediator<Administrator>.FindAll().
+				Where(x => (x.RegionMask & regionMask) > 0
+									&& !ADHelper.IsDisabled(x.UserName)
+									&& x.Department == Department.Processing
+									&& x.PhoneSupport.StartsWith("9")).
+				Select(x => x.PhoneSupport.Replace("-", "")).
+				Distinct().ToArray();
+		}
+
+		public static IList<Administrator> GetAdminByRegionForSms(ulong regionMask)
+		{
+			return ActiveRecordMediator<Administrator>.FindAll().
+				Where(x => (x.RegionMask & regionMask) > 0
+									&& !ADHelper.IsDisabled(x.UserName)
+									&& x.Department == Department.Processing
+									&& x.PhoneSupport.StartsWith("9")).
+				ToList();
 		}
 
 		public void Delete()

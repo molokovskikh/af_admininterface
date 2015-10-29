@@ -125,7 +125,7 @@ namespace AdminInterface.Helpers
 			return 0;
 		}
 
-        public static int SendSms(string phone, string message)
+        public static int SendSms(string message, string phone)
         {
             string smsUri = GetSmsUri();
             var r = WebRequest.Create(smsUri) as HttpWebRequest;
