@@ -189,7 +189,11 @@ ${app.Asset("Client.js")}
 							<a href="${siteroot}/users/${user.Id}/edit">${user.Login}</a>
 						</td>
 						<td>${user.Name}</td>
-						<td>${user.Logs.GetLastServicesUsage()}</td>
+						<td>
+							<% if user.Logs != null : %>
+							${user.Logs.GetLastServicesUsage()}
+							<% end %>
+						</td>
 					</tr>
 				<% end %>
 			</table>

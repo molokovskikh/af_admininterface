@@ -51,6 +51,12 @@ namespace AdminInterface.Controllers
 
 		[Description("Регистрировать без адреса доставки и пользователя")]
 		public bool RegisterEmpty { get; set; }
+
+		[Description("Отправить пароль при помощи SMS")]
+		public bool SendSmsToUser { get; set; }
+
+		[Description("Отправить SMS-уведомление рег. админам")]
+		public bool SendSmsToAdmin { get; set; }
 	}
 
 	[
@@ -169,6 +175,19 @@ namespace AdminInterface.Controllers
 			var log = new PasswordChangeLogEntity(user.Login);
 			if (options.SendRegistrationCard)
 				log = SendRegistrationCard(log, user, password.Password, additionalEmailsForSendingCard);
+
+			string smsLog = "";
+			if (options.SendSmsToUser) {
+				var phonesForSendToUser = user.GetPhonesForSendingSms();
+				smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUser);
+			}
+
+			if (options.SendSmsToAdmin) {
+				var phonesForSendToAdmin = Administrator.GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
+				smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdmin);
+			}
+			log.SmsLog = smsLog;
+
 			DbSession.Save(log);
 
 			if (options.FillBillingInfo) {
@@ -295,6 +314,19 @@ namespace AdminInterface.Controllers
 				var log = new PasswordChangeLogEntity(user.Login);
 				if (options.SendRegistrationCard)
 					log = SendRegistrationCard(log, user, password.Password, additionalEmailsForSendingCard);
+
+				string smsLog = "";
+				if (options.SendSmsToUser) {
+					var phonesForSendToUser = user.GetPhonesForSendingSms();
+					smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUser);
+				}
+
+				if (options.SendSmsToAdmin) {
+					var phonesForSendToAdmin = Administrator.GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
+					smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdmin);
+				}
+				log.SmsLog = smsLog;
+
 				DbSession.Save(log);
 			}
 

@@ -76,7 +76,8 @@ namespace AdminInterface.Models
 
 		public KeyValuePair<string, string>[] Channels
 		{
-			get {
+			get
+			{
 				var items = new[] {
 					new KeyValuePair<string, string>("alpha", "Без тестирования"),
 					new KeyValuePair<string, string>("beta", "Внутреннее тестирование"),
@@ -85,8 +86,8 @@ namespace AdminInterface.Models
 				};
 				//не нужно сбрасывать значение если оно отсутствует в справочнике
 				if (BinUpdateChannel != null
-					&& !items.Any(x => x.Key == BinUpdateChannel)) {
-					return new [] { new KeyValuePair<string, string>(BinUpdateChannel, BinUpdateChannel), }
+						&& !items.Any(x => x.Key == BinUpdateChannel)) {
+					return new[] { new KeyValuePair<string, string>(BinUpdateChannel, BinUpdateChannel), }
 						.Concat(items).ToArray();
 				}
 				return items;
@@ -289,7 +290,7 @@ namespace AdminInterface.Models
 		public virtual ContactGroup ContactGroup { get; set; }
 
 		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke),
-		 Description("Наследовать настройки прайс листов"), Auditable, SetForceReplication]
+		Description("Наследовать настройки прайс листов"), Auditable, SetForceReplication]
 		public virtual User InheritPricesFrom { get; set; }
 
 		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke), Description("Плательщик"), Auditable, ValidateNonEmpty]
@@ -600,9 +601,9 @@ namespace AdminInterface.Models
 		public virtual bool HaveUin()
 		{
 			return !String.IsNullOrWhiteSpace(UserUpdateInfo.AFCopyId)
-				|| (AFNetConfig != null
-					&& (!String.IsNullOrEmpty(AFNetConfig.ClientToken)
-						|| !String.IsNullOrEmpty(AFNetConfig.ClientTokenV2)));
+						|| (AFNetConfig != null
+								&& (!String.IsNullOrEmpty(AFNetConfig.ClientToken)
+										|| !String.IsNullOrEmpty(AFNetConfig.ClientTokenV2)));
 		}
 
 		public virtual void ResetUin()
@@ -830,34 +831,33 @@ WHERE
 			return owner.GetEmails(ContactGroupType.General).Implode();
 		}
 
-        public virtual string GetPhonesForSendingSms()
-        {
-            ContactGroupOwner owner = null;
-            var groups = new ContactGroupType[0];
-            if (RootService is Client)
-            {
-                groups = new[] { ContactGroupType.OrderManagers };
-                owner = ((Client)RootService).ContactGroupOwner;
-            }
-            else if (RootService is Supplier)
-            {
-                groups = new[] { ContactGroupType.OrderManagers, ContactGroupType.ClientManagers };
-                owner = ((Supplier)RootService).ContactGroupOwner;
-            }
+		public virtual string[] GetPhonesForSendingSms()
+		{
+			var result = new string[] { };
+			ContactGroupOwner owner = null;
+			var groups = new ContactGroupType[0];
+			if (RootService is Client) {
+				groups = new[] { ContactGroupType.OrderManagers };
+				owner = ((Client)RootService).ContactGroupOwner;
+			}
+			else if (RootService is Supplier) {
+				groups = new[] { ContactGroupType.OrderManagers, ContactGroupType.ClientManagers };
+				owner = ((Supplier)RootService).ContactGroupOwner;
+			}
 
-            if (owner == null)
-                return "";
+			if (owner != null) {
+				var phones = owner.GetPhones(groups);
+				// 351-7983153 -> 3517983153
+				if (phones.Any())
+					result = phones.Select(x => x.Replace("-", "")).ToArray();
+				else
+					result = owner.GetPhones(ContactGroupType.General).Select(x => x.Replace("-", "")).ToArray();
+			}
+			// только мобильные
+			return result.Where(x => x.StartsWith("9")).ToArray();
+		}
 
-            var phones = owner.GetPhones(groups);
-            if (phones.Any())
-                return phones.Select(x => x.Replace("-", "")).Implode();
-
-            // 351-7983153 -> 3517983153
-            return owner.GetPhones(ContactGroupType.General).Select(x => x.Replace("-", "")).Implode();
-        }
-
-
-        public virtual void AddBillingComment(string billingMessage)
+		public virtual void AddBillingComment(string billingMessage)
 		{
 			if (String.IsNullOrEmpty(billingMessage))
 				return;

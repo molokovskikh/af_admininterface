@@ -62,7 +62,9 @@ namespace AdminInterface.Controllers
 				deserializedObj.RootService.Id,
 				string.Empty,
 				jsonText,
-				deserializedObj);
+				deserializedObj,
+				null,
+				null);
 		}
 
 		///<summary>
@@ -133,6 +135,9 @@ namespace AdminInterface.Controllers
 				user.SendWaybills = rejectWaibillParams.SendWaybills;
 				user.SendRejects = rejectWaibillParams.SendRejects;
 			}
+
+			PropertyBag["phonesForSendToUser"] = user.GetPhonesForSendingSms(); //"79031848398";
+			PropertyBag["adminsForSendSms"] = Administrator.GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
 
 			PropertyBag["client"] = service;
 			if (service.IsClient()) {
@@ -236,7 +241,8 @@ namespace AdminInterface.Controllers
 			string mails,
 			string jsonSource,
 			User userJson,
-			bool sendSms = false)
+			string[] phonesForSendToUser,
+			string[] phonesForSendToAdmin)
 		{
 			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
 			DbSession.Get<Client>(clientId);
@@ -262,6 +268,8 @@ namespace AdminInterface.Controllers
 				PropertyBag["InputContactsList"] = contacts;
 				PropertyBag["SelectedRegions"] = regionSettings;
 				PropertyBag["deliveryAddress"] = address.Value ?? "";
+				PropertyBag["phonesForSendToUser"] = phonesForSendToUser;
+				PropertyBag["adminsForSendSms"] = Administrator.GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
 				return;
 			}
 
@@ -321,16 +329,11 @@ namespace AdminInterface.Controllers
 				DbSession.Save(new AuditRecord(message, user.Client) { MessageType = LogMessageType.System });
 			}
 
-			//var hasPhone = contacts.Any(i => i.Type == ContactType.Phone);
-			//if (sendSms && hasPhone) {
-			//	var phoneNumbers = contacts.Where(i => i.Type == ContactType.Phone).ToList();
-			//	var sms = "Ваш логин от analit: " + user.Login + " , ваш пароль: " + password;
-			//	//var helper = new SmsHelper();
-			//	//helper.SendMessage("+79671526606", sms);
-			//	foreach (var phone in phoneNumbers) {
-			//	}
-			//}
-            var haveMails = !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim());
+			string smsLog = ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUser);
+			smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdmin);
+			passwordChangeLog.SmsLog = smsLog;
+
+			var haveMails = !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim());
 			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
 			if (sendClientCard && (haveMails || !string.IsNullOrEmpty(user.EmailForCard))) {
 				var smtpId = ReportHelper.SendClientCard(user,
@@ -416,7 +419,7 @@ namespace AdminInterface.Controllers
 		}
 
 
-        [RequiredPermission(PermissionType.ChangePassword)]
+		[RequiredPermission(PermissionType.ChangePassword)]
 		public void ChangePassword(uint id)
 		{
 			var user = DbSession.Load<User>(id);
@@ -424,8 +427,9 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["user"] = user;
 			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
-		    PropertyBag["phonesForSend"] = user.GetPhonesForSendingSms(); //"79031848398";
-        }
+			PropertyBag["phonesForSendToUser"] = user.GetPhonesForSendingSms();
+			PropertyBag["adminsForSendSms"] = Administrator.GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
+		}
 
 		[RequiredPermission(PermissionType.ChangePassword)]
 		public void DoPasswordChange(uint userId,
@@ -434,8 +438,8 @@ namespace AdminInterface.Controllers
 			bool isFree,
 			bool changeLogin,
 			string reason,
-            bool sendSms,
-            string phonesForSend)
+			string[] phonesForSendToUser,
+			string[] phonesForSendToAdmin)
 		{
 			var user = DbSession.Load<User>(userId);
 			user.CheckLogin();
@@ -449,7 +453,7 @@ namespace AdminInterface.Controllers
 
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 
-            if (isSendClientCard) {
+			if (isSendClientCard) {
 				var smtpId = ReportHelper.SendClientCard(
 					user,
 					password.Password,
@@ -459,23 +463,11 @@ namespace AdminInterface.Controllers
 				passwordChangeLog.SetSentTo(smtpId, emailsForSend);
 			}
 
-            if (sendSms && !String.IsNullOrEmpty(phonesForSend))
-            {
-                var message = String.Format("Ваш логин от analit: {0}, ваш пароль: {1}", user.Login, password.Password);
-                var log = new List<string>();
-                foreach (var phone in phonesForSend.Split(',').Select(x => x.Trim())) {
-                    int smsId = 0;
-                    // 3517983153 -> 73517983153
-                    if (phone.Length == 10 && phone.All(char.IsDigit))
-                        smsId = Func.SendSms(message, "7" + phone);
+			string smsLog = ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUser);
+			smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdmin);
+			passwordChangeLog.SmsLog = smsLog;
 
-                    if (smsId > 0)
-                        log.Add(String.Format("{1}, smsId={0}", smsId, phone));
-                }
-                passwordChangeLog.SetSmsLog(String.Join("; ", log));
-            }
-
-            DbSession.Save(user);
+			DbSession.Save(user);
 			DbSession.Save(AuditRecord.PasswordChange(user, isFree, reason));
 			DbSession.Save(passwordChangeLog);
 

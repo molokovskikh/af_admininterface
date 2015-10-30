@@ -59,9 +59,9 @@ namespace AdminInterface.Helpers
 				LastLogOnDate = value;
 			if (Logs != null && LastLogOnDate != null) {
 				if (!(LastLogOnDate > Logs.AFTime.GetValueOrDefault() &&
-					LastLogOnDate > Logs.CITime.GetValueOrDefault() &&
-					LastLogOnDate > Logs.AOLTime.GetValueOrDefault() &&
-					LastLogOnDate > Logs.IOLTime.GetValueOrDefault())) {
+							LastLogOnDate > Logs.CITime.GetValueOrDefault() &&
+							LastLogOnDate > Logs.AOLTime.GetValueOrDefault() &&
+							LastLogOnDate > Logs.IOLTime.GetValueOrDefault())) {
 					LastLogOnDate = null;
 				}
 			}
