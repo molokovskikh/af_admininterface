@@ -100,27 +100,6 @@ namespace AdminInterface.Models.Security
 			return ActiveRecordMediator<Administrator>.FindAll(new[] { Order.Asc("UserName") });
 		}
 
-		public static string[] GetPhoneSupportByRegionForSms(ulong regionMask)
-		{
-			return ActiveRecordMediator<Administrator>.FindAll().
-				Where(x => (x.RegionMask & regionMask) > 0
-									&& !ADHelper.IsDisabled(x.UserName)
-									&& x.Department == Department.Processing
-									&& x.PhoneSupport.StartsWith("9")).
-				Select(x => x.PhoneSupport.Replace("-", "")).
-				Distinct().ToArray();
-		}
-
-		public static IList<Administrator> GetAdminByRegionForSms(ulong regionMask)
-		{
-			return ActiveRecordMediator<Administrator>.FindAll().
-				Where(x => (x.RegionMask & regionMask) > 0
-									&& !ADHelper.IsDisabled(x.UserName)
-									&& x.Department == Department.Processing
-									&& x.PhoneSupport.StartsWith("9")).
-				ToList();
-		}
-
 		public void Delete()
 		{
 			ActiveRecordMediator<Administrator>.Delete(this);

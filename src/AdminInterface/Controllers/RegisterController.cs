@@ -183,7 +183,7 @@ namespace AdminInterface.Controllers
 			}
 
 			if (options.SendSmsToAdmin) {
-				var phonesForSendToAdmin = Administrator.GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
+				var phonesForSendToAdmin = GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
 				smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdmin);
 			}
 			log.SmsLog = smsLog;
@@ -322,7 +322,7 @@ namespace AdminInterface.Controllers
 				}
 
 				if (options.SendSmsToAdmin) {
-					var phonesForSendToAdmin = Administrator.GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
+					var phonesForSendToAdmin = GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
 					smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdmin);
 				}
 				log.SmsLog = smsLog;
@@ -467,6 +467,17 @@ WHERE   pricesdata.firmcode = s.Id
 				if (contact.ContactText != null)
 					generalGroup.AddContact(contact);
 			DbSession.Save(owner);
+		}
+
+		private string[] GetPhoneSupportByRegionForSms(ulong regionMask)
+		{
+			var list = DbSession.Query<Administrator>().
+				Where(x => (x.RegionMask & regionMask) > 0
+									&& x.Department == Department.Processing
+									&& x.PhoneSupport.StartsWith("9")).ToList();
+			return list.Where(x => !ADHelper.IsDisabled(x.UserName)).
+				Select(x => x.PhoneSupportFormat).
+				Distinct().ToArray();
 		}
 
 		public void RegisterPayer(uint id, bool showRegistrationCard, string passwordId)

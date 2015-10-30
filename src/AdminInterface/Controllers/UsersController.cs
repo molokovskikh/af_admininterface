@@ -137,7 +137,7 @@ namespace AdminInterface.Controllers
 			}
 
 			PropertyBag["phonesForSendToUser"] = user.GetPhonesForSendingSms(); //"79031848398";
-			PropertyBag["adminsForSendSms"] = Administrator.GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
+			PropertyBag["adminsForSendSms"] = GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
 
 			PropertyBag["client"] = service;
 			if (service.IsClient()) {
@@ -269,7 +269,7 @@ namespace AdminInterface.Controllers
 				PropertyBag["SelectedRegions"] = regionSettings;
 				PropertyBag["deliveryAddress"] = address.Value ?? "";
 				PropertyBag["phonesForSendToUser"] = phonesForSendToUser;
-				PropertyBag["adminsForSendSms"] = Administrator.GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
+				PropertyBag["adminsForSendSms"] = GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
 				return;
 			}
 
@@ -428,7 +428,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["user"] = user;
 			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
 			PropertyBag["phonesForSendToUser"] = user.GetPhonesForSendingSms();
-			PropertyBag["adminsForSendSms"] = Administrator.GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
+			PropertyBag["adminsForSendSms"] = GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
 		}
 
 		[RequiredPermission(PermissionType.ChangePassword)]
@@ -656,6 +656,16 @@ namespace AdminInterface.Controllers
 					returned.Add(new { id = user.Id, name = string.Format("Код: {0} - клиент: {1} - {2}", user.Id, user.RootService.Id, user.RootService.Name) });
 			}
 			return returned.ToArray();
+		}
+
+		private IList<Administrator> GetAdminByRegionForSms(ulong regionMask)
+		{
+			var list = DbSession.Query<Administrator>().
+				Where(x => (x.RegionMask & regionMask) > 0
+									&& x.Department == Department.Processing
+									&& x.PhoneSupport.StartsWith("9")).
+				ToList();
+			return list.Where(x => !ADHelper.IsDisabled(x.UserName)).ToList();
 		}
 	}
 }
