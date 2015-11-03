@@ -17,6 +17,7 @@ namespace Functional
 			Test.Support.IntegrationFixture.DoNotUserTransaction = true;
 			ForTest.InitialzeAR();
 			_webServer = WatinSetup.StartServer();
+			SeleniumFixture.WebPort = WatinSetup.WebPort;
 			SeleniumFixture.GlobalSetup();
 		}
 
