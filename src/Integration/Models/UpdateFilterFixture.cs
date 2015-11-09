@@ -61,7 +61,7 @@ namespace Integration.Models
 			var filter = new UpdateFilter {
 				User = user
 			};
-			var logs = filter.FindNewAppLogs(session);
+			var logs = filter.Find(session);
 			Assert.AreEqual(logs.Count, 1, logs.Implode());
 			Assert.IsTrue(logs[0].HaveLog);
 		}

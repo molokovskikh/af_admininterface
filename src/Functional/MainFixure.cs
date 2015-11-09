@@ -1,22 +1,26 @@
 ﻿using System.Linq;
+using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using Common.Tools.Calendar;
+using Common.Tools.Helpers;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using Test.Support.Web;
+using WatiN.Core.Native.Chrome;
 using WatiN.Core.Native.Windows;
 
 namespace Functional
 {
-	public class MainFixure : FunctionalFixture
+	public class MainFixure : AdmSeleniumFixture
 	{
 		[Test]
 		public void Open_main_view()
 		{
 			Open();
-			Assert.That(browser.Text, Is.StringContaining("Статистика"));
+			AssertText("Статистика");
 			session.CreateSQLQuery("delete from usersettings.defaults;").ExecuteUpdate();
 			var sender = session.Get<OrderHandler>(1u);
 			var formatter = session.Get<OrderHandler>(12u);
@@ -54,9 +58,9 @@ namespace Functional
 		public void OpenSettingsView()
 		{
 			Open("main/Settings");
-			Assert.That(browser.Text, Is.StringContaining("Настройки по умолчанию"));
-			Assert.That(browser.Text, Is.StringContaining("Общие настройки"));
-			Assert.That(browser.Text, Is.StringContaining("Настройки мини-почты"));
+			AssertText("Настройки по умолчанию");
+			AssertText("Общие настройки");
+			AssertText("Настройки мини-почты");
 		}
 
 		[Test(Description = "Проверяет корректность сохранения режима работы техподдержки")]
@@ -65,13 +69,17 @@ namespace Functional
 			Open("main/Settings");
 			AssertText("Настройки по умолчанию");
 			Click("Режим работы техподдержки");
-			Css("#defaults_TechOperatingModeBegin").Value = "70.30";
-			Css("#defaults_TechOperatingModeEnd").Value = "19.80";
+			Css("#defaults_TechOperatingModeBegin").Clear();
+			Css("#defaults_TechOperatingModeBegin").SendKeys("70.30");
+			Css("#defaults_TechOperatingModeEnd").Clear();
+			Css("#defaults_TechOperatingModeEnd").SendKeys("19.80");
 			Click("Сохранить");
 			AssertText("Некорректное время начала рабочего дня");
 			AssertText("Некорректное время окончания рабочего дня");
-			Css("#defaults_TechOperatingModeBegin").Value = "8.00";
-			Css("#defaults_TechOperatingModeEnd").Value = "20.30";
+			Css("#defaults_TechOperatingModeBegin").Clear();
+			Css("#defaults_TechOperatingModeBegin").SendKeys("8.00");
+			Css("#defaults_TechOperatingModeEnd").Clear();
+			Css("#defaults_TechOperatingModeEnd").SendKeys("20.30");
 			Click("Сохранить");
 			AssertText("Сохранено");
 		}
@@ -82,10 +90,10 @@ namespace Functional
 			Open("main/Settings");
 			AssertText("Настройки по умолчанию");
 			Click("Уведомления Обработки");
-			Css("#Defaults_ProcessingAboutFirmSubject").AppendText("testFirmSubject_interface");
-			Css("#Defaults_ProcessingAboutFirmBody").AppendText("testFirmBody_interface");
-			Css("#Defaults_ProcessingAboutNamesSubject").AppendText("testNameSubject_interface");
-			Css("#Defaults_ProcessingAboutNamesBody").AppendText("testNameBody_interface");
+			Css("#Defaults_ProcessingAboutFirmSubject").SendKeys("testFirmSubject_interface");
+			Css("#Defaults_ProcessingAboutFirmBody").SendKeys("testFirmBody_interface");
+			Css("#Defaults_ProcessingAboutNamesSubject").SendKeys("testNameSubject_interface");
+			Css("#Defaults_ProcessingAboutNamesBody").SendKeys("testNameBody_interface");
 			Click("Сохранить");
 			AssertText("Сохранено");
 		}
@@ -106,10 +114,11 @@ namespace Functional
 			Save(log);
 
 			Open();
-			var link = browser.Links.First(l => l.Url.EndsWith("Monitoring/Updates"));
-			link.Click();
+			Css("#updates-monitoring").Click();
+			WaitHelper.WaitOrFail(10.Second(), () => GlobalDriver.WindowHandles.Count > 1, "Не удалось дождаться окна");
 
-			OpenedWindow("Обновляющиеся клиенты");
+			var handle = GlobalDriver.WindowHandles.First(x => x != GlobalDriver.CurrentWindowHandle);
+			GlobalDriver.SwitchTo().Window(handle);
 			AssertText("Обновляющиеся клиенты");
 			AssertText("FileHandler");
 		}
@@ -126,6 +135,23 @@ namespace Functional
 			AssertText("test2");
 			AssertText("AAA");
 			AssertText("789");
+		}
+
+		[Test]
+		public void AF_Net_Updates()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var log = new RequestLog(client.Users.First()) {
+				Version = "1.11",
+				IsCompleted = true,
+				UpdateType = "MainController",
+				ErrorType = 1
+			};
+			session.Save(log);
+			Open();
+			AssertText("AnalitF.Net:");
+			Css("#af-net-ban").Click();
+			AssertText("История обновлений AnalitF.net");
 		}
 	}
 }

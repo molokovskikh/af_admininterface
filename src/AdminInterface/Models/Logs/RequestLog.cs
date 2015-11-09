@@ -24,6 +24,9 @@ namespace AdminInterface.Models.Logs
 		public uint Id { get; set; }
 
 		[Property]
+		public virtual int ErrorType { get; set; }
+
+		[Property]
 		public virtual string Error { get; set; }
 
 		[BelongsTo("UserId")]
@@ -34,6 +37,12 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public virtual string Version { get; set; }
+
+		[Property]
+		public virtual bool IsCompleted { get; set; }
+
+		[Property]
+		public virtual bool IsFaulted { get; set; }
 
 		[Property]
 		public virtual bool IsConfirmed { get; set; }

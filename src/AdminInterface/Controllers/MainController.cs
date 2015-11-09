@@ -76,7 +76,7 @@ namespace AdminInterface.Controllers
 			foreach (var pair in data.ToKeyValuePairs()) {
 				var column = pair.Key;
 				var value = pair.Value;
-				value = TryToFixProkenDateTimeValue(value);
+				value = TryToFixBrokenDateTimeValue(value);
 				if (value != DBNull.Value && column.DataType == typeof(DateTime)) {
 					var dateTimeValue = ((DateTime)value);
 					value = dateTimeValue.ToLongTimeString();
@@ -100,7 +100,7 @@ namespace AdminInterface.Controllers
 		//если в mysql применить агрегирующую функцию к выражению с датой
 		//то результирующий тип будет строка, правим это
 		//пример max(if(1 == 1, someDate, null))
-		public static object TryToFixProkenDateTimeValue(object value)
+		public static object TryToFixBrokenDateTimeValue(object value)
 		{
 			if (value == null)
 				return null;

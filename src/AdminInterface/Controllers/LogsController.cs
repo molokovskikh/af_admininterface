@@ -199,11 +199,11 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 			//по умолчанию биндер будет пытаться проверить наши обекты, в данном контексте делать этого не следует
 			Binder.Validator = null;
 
-			var filter = new UpdateFilter();
+			var filter = new NewUpdateFilter();
 			BindObjectInstance(filter, "filter");
 			PropertyBag["filter"] = filter;
 
-			PropertyBag["logEntities"] = filter.FindNewAppLogs(DbSession);
+			PropertyBag["logEntities"] = filter.Find(DbSession);
 		}
 
 		public void ShowClientLog(uint id)

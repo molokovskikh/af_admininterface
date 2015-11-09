@@ -160,15 +160,15 @@ SELECT count(DISTINCT oh.clientcode) as UniqClientOrders,
 	   max(WriteTime) as MaxOrderTime
 		{1}
 FROM (orders.ordershead oh,
-	 orders.orderslist ol, 
-	 Customers.Clients cd, 
+	 orders.orderslist ol,
+	 Customers.Clients cd,
 	 usersettings.retclientsset rcs)
 	join Customers.Users u on u.Id = oh.UserId
 WHERE oh.rowid = orderid
 	AND cd.Id = oh.clientcode
 	AND u.PayerId <> 921
 	AND rcs.clientcode = oh.clientcode
-	AND rcs.serviceclient = 0 
+	AND rcs.serviceclient = 0
 	AND oh.regioncode & ?RegionMaskParam   > 0
 	AND oh.Deleted = 0
 	AND oh.Submited = 1
@@ -199,8 +199,15 @@ FROM Customers.Clients cd
 WHERE cd.maskregion & ?RegionMaskParam > 0
 	  AND afu.RequestTime >= ?StartDateParam AND afu.RequestTime <= ?EndDateParam;
 
-
-";
+select sum(if(l.IsCompleted = 1 and l.IsFaulted = 0 and l.UpdateType = 'MainController', 1, 0))as AnalitFNetUpdate,
+	count(distinct if(l.IsCompleted = 1 and l.IsFaulted = 0 and l.UpdateType = 'MainController', l.UserId, null)) as AnalitFNetUpdateUniq,
+	sum(if(l.ErrorType = 1, 1, 0)) as AnalitFNetBan,
+	count(distinct if(l.ErrorType = 1, l.UserId, null)) as AnalitFNetBanUniq
+from logs.RequestLogs l
+	join Customers.Users u on l.UserId = u.Id
+		join Customers.Clients c on c.Id = u.ClientId
+where c.MaskRegion & ?RegionMaskParam > 0
+	and l.CreatedOn >= ?StartDateParam and l.CreatedOn <= ?EndDateParam;";
 			var additionalUpdateStatColumns = new[] {
 				"ifnull(sum(if(afu.UpdateType in (1,2), resultsize, 0)), 0) as DownloadDataSize",
 				"ifnull(sum(if(afu.UpdateType in (8), resultsize, 0)), 0) as DownloadDocumentSize"

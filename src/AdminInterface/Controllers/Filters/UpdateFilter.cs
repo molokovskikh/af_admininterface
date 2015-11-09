@@ -14,7 +14,6 @@ using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Criterion;
-using NHibernate.Linq;
 using NHibernate.SqlCommand;
 using NPOI.SS.Formula.Functions;
 using log4net;
@@ -178,32 +177,6 @@ namespace AdminInterface.Controllers.Filters
 		public bool ShowLog()
 		{
 			return ShowUpdateType();
-		}
-
-		/// <summary>
-		/// Поиск логов для нового приложения analit-f
-		/// </summary>
-		/// <returns></returns>
-		public IList<RequestLog> FindNewAppLogs(ISession DbSession)
-		{
-			var logs = DbSession.Query<ClientAppLog>().Where(i => (i.User.Client == Client || i.User == User)
-				&& i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1)).ToList();
-
-			var results = DbSession.Query<RequestLog>()
-				.Where(i => (i.User.Client == Client || i.User == User) && i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
-				.OrderByDescending(r => r.CreatedOn)
-				.ToList();
-
-			var connectedLogs = logs
-				.Where(l => l.RequestToken != null && results.Any(x => x.RequestToken == l.RequestToken))
-				.ToArray();
-
-			results.Each(x => x.HaveLog = connectedLogs.Any(y => y.RequestToken == x.RequestToken));
-
-			return results.Concat(logs.Except(connectedLogs)
-				.Select(x => x.ToRequestLog()))
-				.OrderByDescending(x => x.CreatedOn)
-				.ToList();
 		}
 	}
 

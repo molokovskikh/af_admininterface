@@ -86,11 +86,11 @@ namespace Functional.Drugstore
 		public void View_password_change_statistics()
 		{
 			ClickLink(user.Login);
-			AssertText(String.Format("Пользователь {0}", user.Login));
+			AssertText($"Пользователь {user.Login}");
 
 			ClickLink("Статистика изменения пароля");
-			using (var stat = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика изменения пароля для пользователя {0}", user.Login)))) {
-				Assert.That(stat.Text, Is.StringContaining(String.Format("Статистика изменения пароля для пользователя {0}", user.Login)));
+			using (var stat = IE.AttachTo<IE>(Find.ByTitle($"Статистика изменения пароля для пользователя {user.Login}"))) {
+				Assert.That(stat.Text, Is.StringContaining($"Статистика изменения пароля для пользователя {user.Login}"));
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace Functional.Drugstore
 		private void GoToChangePassword()
 		{
 			ClickLink(user.Login);
-			AssertText(String.Format("Пользователь {0}", user.Login));
+			AssertText($"Пользователь {user.Login}");
 			ClickLink("Изменить пароль");
 			AssertText("Изменение пароля пользователя");
 		}

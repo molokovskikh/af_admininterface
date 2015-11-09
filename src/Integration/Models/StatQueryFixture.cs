@@ -21,7 +21,7 @@ namespace Integration.Models
 		[Test]
 		public void Fix_broke_dates()
 		{
-			var value = MainController.TryToFixProkenDateTimeValue("2012-01-17 17:53:13");
+			var value = MainController.TryToFixBrokenDateTimeValue("2012-01-17 17:53:13");
 			Assert.That(value, Is.EqualTo("17:53:13"));
 		}
 	}

@@ -1,4 +1,5 @@
 ﻿<% uriTemplate = "${siteroot}/Logs/UpdateLog?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${?query.Region.Id}" %>
+<% logRoot = "${siteroot}/Logs/NewUpdateLog?filter.BeginDate=${FromDate}&filter.EndDate=${ToDate.AddDays(1)}&filter.RegionMask=${?query.Region.Id}" %>
 
 <style type="text/css">
 	.StatisticData
@@ -53,7 +54,7 @@
 		text-align: center;
 		font-size: 8pt;
 	}
-	
+
 	.header-description
 	{
 		text-align: right;
@@ -157,7 +158,7 @@
 					</td>
 					<td class="statistic-value">
 						<% if ?RequestInProcessCount and RequestInProcessCount: %>
-							${app.LinkTo(RequestInProcessCount.ToString(), @Monitoring, @Updates, {@attributes: {"target": "_blank"}})}
+							${app.LinkTo(RequestInProcessCount.ToString(), @Monitoring, @Updates, {@attributes: {"target": "_blank", @id: "updates-monitoring"}})}
 						<% end %>
 					</td>
 				</tr>
@@ -177,6 +178,41 @@
 					</td>
 				</tr>
 				<% end %>
+
+				<tr>
+					<td class="statistic-header" colspan=2>
+						AnalitF.Net:
+					</td>
+					<td class="statistic-header header-description" colspan=2>
+						В скобках указано количество уникальных пользователей
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">
+						Приготовлено обычных:
+					</td>
+					<td class="statistic-value">
+						<% if AnalitFNetUpdate: %>
+						<a href="${logRoot}&filter.ErrorType=1">
+							<abbr title="В скобках указано количество уникальных пользователей.">!{AnalitFNetUpdate}(!{AnalitFNetUpdateUniq})</abbr>
+						</a>
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td class="statistic-label">
+						Запретов:
+					</td>
+					<td class="statistic-value">
+						<% if AnalitFNetBan: %>
+						<a href="${logRoot}&filter.ErrorType=1" id="af-net-ban">
+							<abbr title="В скобках указано количество уникальных пользователей.">${AnalitFNetBan}(!{AnalitFNetBanUniq})</abbr>
+						</a>
+						<% else: %>
+						-
+						<% end %>
+					</td>
+				</tr>
 
 				<tr>
 					<td class="statistic-header" colspan=2>

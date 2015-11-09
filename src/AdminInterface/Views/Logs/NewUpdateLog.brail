@@ -17,23 +17,10 @@
 <% component CaptureFor, {"id" : "PostToServer"}: %>
 	${FormHelper.HiddenField("filter.Client.Id")}
 	${FormHelper.HiddenField("filter.User.Id")}
+	${FormHelper.HiddenField("filter.ErrorType")}
 <% end %>
 
-<% if not filter.UpdateType: %>
 <% OutputSubView("SelectDateIntervalSubView") %>
-<% else: %>
-
-<% component Bubble, {@bredcrumbs: []} %>
-
-	${app.BeginFormFor("filter")}
-	${FormHelper.HiddenField("filter.SortBy")}
-	${FormHelper.HiddenField("filter.SortDirection")}
-	${FormHelper.HiddenField("filter.BeginDate")}
-	${FormHelper.HiddenField("filter.EndDate")}
-	${app.FilterFor("filter.UpdateType")}
-	${app.EndFormFor("filter")}
-
-<% end %>
 
 <div class="block">
 	Всего обновлений ${logEntities.Count}
@@ -98,9 +85,14 @@
 				<td class="${'NotCommitedUpdate' if not log.IsConfirmed}" style="width:1%;">
 					${log.CreatedOn}
 				</td>
+				<% if filter.ShowRegion(): %>
+				<td>
+					!{?log.User.Client.HomeRegion.Name}
+				</td>
+				<% end %>
 				<% if filter.ShowClient(): %>
 				<td>
-					${app.LinkTo(log.User.Clien)}
+					${app.LinkTo(log.User.Client)}
 				</td>
 				<% end %>
 				<% if filter.ShowUpdateType(): %>
