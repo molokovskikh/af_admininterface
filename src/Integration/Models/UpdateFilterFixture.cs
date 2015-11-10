@@ -58,7 +58,7 @@ namespace Integration.Models
 			requestLog.RequestToken = clientLog.RequestToken;
 			session.Save(requestLog);
 
-			var filter = new UpdateFilter {
+			var filter = new NewUpdateFilter {
 				User = user
 			};
 			var logs = filter.Find(session);
