@@ -19,8 +19,14 @@ namespace AdminInterface.Controllers.Filters
 		public Client Client { get; set; }
 		public User User { get; set; }
 
+		public NewUpdateFilter()
+		{
+			BeginDate = DateTime.Today;
+			EndDate = DateTime.Today.AddDays(1);
+		}
+
 		/// <summary>
-		/// Поиск логов для нового приложения analit-f
+		/// РџРѕРёСЃРє Р»РѕРіРѕРІ РґР»СЏ РЅРѕРІРѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ analit-f
 		/// </summary>
 		/// <returns></returns>
 		public IList<RequestLog> Find(ISession session)
