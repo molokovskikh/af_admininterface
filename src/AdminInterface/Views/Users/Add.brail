@@ -64,15 +64,15 @@
 		</div>
 
 		<div class=block>
-			<% if phonesForSendToUser.Length > 0 : %>
+			<% if phonesForSendToUser.Count > 0 : %>
 				<fieldset>
 					<legend>
 						<label>Отправить пароль при помощи SMS:</label>
 					</legend>
 					<div style="display: block; float: right; width: 68%">
 							<% for i, phone in enumerate(phonesForSendToUser): %>
-								<input type=checkbox name="phonesForSendToUser" value="${phone}"/>
-								<label>${phone}</label>
+								<input type=checkbox name="phonesForSendToUser" value="${phone.Number}"/>
+								<label>${phone.Number} ${phone.Comment}</label>
 								<br>
 							<% end %>
 					</div>
