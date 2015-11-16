@@ -36,18 +36,5 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public virtual string RequestToken { get; set; }
-
-		public virtual RequestLog ToRequestLog()
-		{
-			return new RequestLog {
-				Id = Id,
-				User = User,
-				CreatedOn = CreatedOn,
-				Version = Version,
-				IsConfirmed = true,
-				UpdateType = "Logs",
-				HaveLog = true,
-			};
-		}
 	}
 }

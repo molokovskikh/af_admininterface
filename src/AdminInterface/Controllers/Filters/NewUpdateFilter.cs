@@ -60,10 +60,7 @@ namespace AdminInterface.Controllers.Filters
 
 			results.Each(x => x.HaveLog = connectedLogs.Any(y => y.RequestToken == x.RequestToken));
 
-			return results.Concat(logs.Except(connectedLogs)
-				.Select(x => x.ToRequestLog()))
-				.OrderByDescending(x => x.CreatedOn)
-				.ToList();
+			return results;
 		}
 
 		public bool ShowRegion()
