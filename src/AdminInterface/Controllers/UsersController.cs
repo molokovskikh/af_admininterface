@@ -24,6 +24,7 @@ using Common.Tools;
 using System.Web;
 using Common.Web.Ui.Models;
 using System.Linq;
+using AdminInterface.Components;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
@@ -136,7 +137,7 @@ namespace AdminInterface.Controllers
 				user.SendRejects = rejectWaibillParams.SendRejects;
 			}
 
-			PropertyBag["phonesForSendToUser"] = user.GetPhonesForSendingSms(); //"79031848398";
+			PropertyBag["phonesForSendToUser"] = user.GetPhonesForSendingSms(); //"9031848398";
 			PropertyBag["adminsForSendSms"] = GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
 
 			PropertyBag["client"] = service;
@@ -662,10 +663,10 @@ namespace AdminInterface.Controllers
 		{
 			var list = DbSession.Query<Administrator>().
 				Where(x => (x.RegionMask & regionMask) > 0
-									&& x.Department == Department.Processing
-									&& x.PhoneSupport.StartsWith("9")).
-				ToList();
-			return list.Where(x => !ADHelper.IsDisabled(x.UserName)).ToList();
+									&& x.PhoneSupport.StartsWith("9"))
+				.OrderBy(x => x.ManagerName)
+				.ToList();
+			return list.Where(x => !ADHelper.IsDisabled(x.UserName)).Distinct(new AdministratorComparer()).ToList();
 		}
 	}
 }

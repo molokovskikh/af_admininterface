@@ -178,7 +178,7 @@ namespace AdminInterface.Controllers
 
 			string smsLog = "";
 			if (options.SendSmsToUser) {
-				var phonesForSendToUser = user.GetPhonesForSendingSms();
+				var phonesForSendToUser = user.GetPhonesForSendingSms().Select(x => x.Number).ToArray();
 				smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUser);
 			}
 
@@ -317,7 +317,7 @@ namespace AdminInterface.Controllers
 
 				string smsLog = "";
 				if (options.SendSmsToUser) {
-					var phonesForSendToUser = user.GetPhonesForSendingSms();
+					var phonesForSendToUser = user.GetPhonesForSendingSms().Select(x => x.Number).ToArray();
 					smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUser);
 				}
 
@@ -473,7 +473,6 @@ WHERE   pricesdata.firmcode = s.Id
 		{
 			var list = DbSession.Query<Administrator>().
 				Where(x => (x.RegionMask & regionMask) > 0
-									&& x.Department == Department.Processing
 									&& x.PhoneSupport.StartsWith("9")).ToList();
 			return list.Where(x => !ADHelper.IsDisabled(x.UserName)).
 				Select(x => x.PhoneSupportFormat).
