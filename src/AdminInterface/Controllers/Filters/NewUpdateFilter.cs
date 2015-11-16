@@ -42,7 +42,7 @@ namespace AdminInterface.Controllers.Filters
 				requestQuery = session.Query<RequestLog>().Where(i => i.User.Client == Client);
 			}
 			if (ErrorType == 1) {
-				requestQuery = session.Query<RequestLog>().Where(i => i.ErrorType == 0);
+				requestQuery = session.Query<RequestLog>().Where(i => i.ErrorType == 1);
 			} else if (ErrorType == 0) {
 				requestQuery = session.Query<RequestLog>().Where(i => i.IsCompleted && !i.IsFaulted && i.UpdateType == "MainController");
 			}
