@@ -137,8 +137,8 @@ namespace AdminInterface.Controllers
 				user.SendRejects = rejectWaibillParams.SendRejects;
 			}
 
-			PropertyBag["phonesForSendToUser"] = user.GetPhonesForSendingSms(); //"9031848398";
-			PropertyBag["adminsForSendSms"] = GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
+			PropertyBag["phonesForSendToUserList"] = user.GetPhonesForSendingSms(); //"9031848398";
+			PropertyBag["phonesForSendToAdminList"] = GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
 
 			PropertyBag["client"] = service;
 			if (service.IsClient()) {
@@ -242,8 +242,8 @@ namespace AdminInterface.Controllers
 			string mails,
 			string jsonSource,
 			User userJson,
-			string[] phonesForSendToUser,
-			string[] phonesForSendToAdmin)
+			string[] phonesForSendToUserArray,
+			string[] phonesForSendToAdminArray)
 		{
 			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
 			DbSession.Get<Client>(clientId);
@@ -269,8 +269,8 @@ namespace AdminInterface.Controllers
 				PropertyBag["InputContactsList"] = contacts;
 				PropertyBag["SelectedRegions"] = regionSettings;
 				PropertyBag["deliveryAddress"] = address.Value ?? "";
-				PropertyBag["phonesForSendToUser"] = phonesForSendToUser;
-				PropertyBag["adminsForSendSms"] = GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
+				PropertyBag["phonesForSendToUserList"] = user.GetPhonesForSendingSms();
+				PropertyBag["phonesForSendToAdminList"] = GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
 				return;
 			}
 
@@ -330,8 +330,8 @@ namespace AdminInterface.Controllers
 				DbSession.Save(new AuditRecord(message, user.Client) { MessageType = LogMessageType.System });
 			}
 
-			string smsLog = ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUser);
-			smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdmin);
+			string smsLog = ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUserArray);
+			smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdminArray);
 			passwordChangeLog.SmsLog = smsLog;
 
 			var haveMails = !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim());
@@ -428,8 +428,8 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["user"] = user;
 			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
-			PropertyBag["phonesForSendToUser"] = user.GetPhonesForSendingSms();
-			PropertyBag["adminsForSendSms"] = GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
+			PropertyBag["phonesForSendToUserList"] = user.GetPhonesForSendingSms();
+			PropertyBag["phonesForSendToAdminList"] = GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
 		}
 
 		[RequiredPermission(PermissionType.ChangePassword)]
@@ -439,8 +439,8 @@ namespace AdminInterface.Controllers
 			bool isFree,
 			bool changeLogin,
 			string reason,
-			string[] phonesForSendToUser,
-			string[] phonesForSendToAdmin)
+			string[] phonesForSendToUserArray,
+			string[] phonesForSendToAdminArray)
 		{
 			var user = DbSession.Load<User>(userId);
 			user.CheckLogin();
@@ -464,8 +464,8 @@ namespace AdminInterface.Controllers
 				passwordChangeLog.SetSentTo(smtpId, emailsForSend);
 			}
 
-			string smsLog = ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUser);
-			smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdmin);
+			string smsLog = ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUserArray);
+			smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdminArray);
 			passwordChangeLog.SmsLog = smsLog;
 
 			DbSession.Save(user);
