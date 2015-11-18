@@ -178,13 +178,13 @@ namespace AdminInterface.Controllers
 
 			string smsLog = "";
 			if (options.SendSmsToUser) {
-				var phonesForSendToUser = user.GetPhonesForSendingSms().Select(x => x.Number).ToArray();
-				smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUser);
+				var phonesForSendToUserArray = user.GetPhonesForSendingSms().Select(x => x.Number).ToArray();
+				smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUserArray);
 			}
 
 			if (options.SendSmsToAdmin) {
-				var phonesForSendToAdmin = GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
-				smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdmin);
+				var phonesForSendToAdminArray = GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
+				smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdminArray);
 			}
 			log.SmsLog = smsLog;
 
@@ -317,13 +317,13 @@ namespace AdminInterface.Controllers
 
 				string smsLog = "";
 				if (options.SendSmsToUser) {
-					var phonesForSendToUser = user.GetPhonesForSendingSms().Select(x => x.Number).ToArray();
-					smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUser);
+					var phonesForSendToUserArray = user.GetPhonesForSendingSms().Select(x => x.Number).ToArray();
+					smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUserArray);
 				}
 
 				if (options.SendSmsToAdmin) {
-					var phonesForSendToAdmin = GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
-					smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdmin);
+					var phonesForSendToAdminArray = GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
+					smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdminArray);
 				}
 				log.SmsLog = smsLog;
 
