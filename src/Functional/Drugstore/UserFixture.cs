@@ -45,10 +45,12 @@ namespace Functional.Drugstore
 			var clientLog = new ClientAppLog(client.Users.First());
 			clientLog.Text = "bla bla1";
 			clientLog.Version = "1.11";
+			clientLog.RequestToken = Guid.NewGuid().ToString();
 			session.Save(clientLog);
 			var requestLog = new RequestLog(client.Users.First());
 			requestLog.Error = "bla bla2";
 			requestLog.Version = "1.11";
+			requestLog.RequestToken = clientLog.RequestToken;
 			session.Save(requestLog);
 			Open("Logs/NewUpdateLog?filter.Client.Id={0}", client.Id);
 			AssertText("История обновлений AnalitF.net");
