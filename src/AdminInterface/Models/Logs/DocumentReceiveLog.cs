@@ -6,6 +6,7 @@ using AddUser;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Internal;
+using Common.Tools;
 using Common.Web.Ui.Models;
 using NHibernate;
 
@@ -130,8 +131,9 @@ namespace AdminInterface.Models.Logs
 			if (Address == null)
 				return null;
 
-			var file = String.Format("{0}_{1}({2}){3}", Id, FromSupplier.Name, Path.GetFileNameWithoutExtension(FileName), Path.GetExtension(FileName));
-			return Path.Combine(config.AptBox, Address.Id.ToString(), DocumentType.ToString() + "s", file);
+			var file = $"{Id}_{FileHelper.StringToFileName(FromSupplier.Name)}" +
+				$"({Path.GetFileNameWithoutExtension(FileName)}){Path.GetExtension(FileName)}";
+			return Path.Combine(config.AptBox, Address.Id.ToString(), DocumentType + "s", file);
 		}
 	}
 }
