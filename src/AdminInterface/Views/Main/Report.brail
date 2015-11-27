@@ -9,7 +9,7 @@
 		{
 			font-family: Verdana;
 		}
-		
+
 		label
 		{
 			font-weight:bold;
@@ -130,8 +130,8 @@
                         <tr>
                             <td valign="top" height="60" style="text-align:left; ">
                                 <font size="1" face="Verdana">
-									Режим работы: Понедельник – Пятница с 9.00 до 18.00 часов по московскому времени
-									<br />
+									Режим работы: Понедельник – Пятница с 7.00 до 19.00 часов по московскому времени <br />
+									Суббота с 9.00 до 17.00 часов по московскому времени <br/>
 									Телефоны:
                                     <ul style="list-style-type:none;  margin:0 0 0 10px; ">
 										<% for phone in defaults.GetPhones(): %>
@@ -139,7 +139,7 @@
 										<% end %>
                                     </ul>
                                     e-mail: <a>tech@analit.net</a>
-                              
+
                             </td>
                         </tr>
                     </table>

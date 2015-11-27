@@ -49,7 +49,9 @@ namespace AdminInterface.Helpers
 			Warning[] warnings;
 
 			var phones = defaults.Phones;
-			phones = "Режим работы: Понедельник – Пятница с 9.00 до 18.00 часов по московскому времени\r\n" + "Телефоны:\r\n" + phones + "\r\n" + "e-mail: tech@analit.net";
+			phones = "Режим работы: Понедельник – Пятница с 7.00 до 19.00 часов по московскому времени\r\n"
+				+ "Суббота с 9.00 до 17.00 часов по московскому времени\r\n"
+				+ "Телефоны:\r\n" + phones + "\r\n" + "e-mail: tech@analit.net";
 
 			report.SetParameters(new List<ReportParameter> {
 				new ReportParameter("ClientCode", clientCode.ToString()),
