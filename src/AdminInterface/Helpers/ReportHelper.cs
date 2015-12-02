@@ -102,18 +102,26 @@ namespace AdminInterface.Helpers
 			return String.Join("; ", l);
 		}
 
-		public static string SendSmsPasswordToUser(string login, string password, string[] phonesForSend)
+		public static string SendSmsPasswordToUser(User user, string password, string[] phonesForSend)
 		{
-			var message = String.Format("Ваш логин от analit: {0}, ваш пароль: {1}", login, password);
+			var clientInfo = "";
+			if (user.Client != null)
+				clientInfo = $"клиента {user.Client.Name} ";
+
+			var message = $"В АналитФармация для {clientInfo}пользователя: {user.Login} ({user.Name}) установлен пароль: {password}";
 			var response = ReportHelper.SendSms(message, phonesForSend);
-			return String.Format("To user: {0}", response);
+			return $"To user: {response}";
 		}
 
-		public static string SendSmsToRegionalAdmin(string login, string password, string[] phonesForSend)
+		public static string SendSmsToRegionalAdmin(User user, string password, string[] phonesForSend)
 		{
-			var message = String.Format("Пользователь analit с логином {0} получил пароль {1}", login, password);
+			var clientInfo = "";
+			if (user.Client != null)
+				clientInfo = $"клиента {user.Client.Name} ";
+
+			var message = $"В АналитФармация для {clientInfo}пользователя: {user.Login} ({user.Name}) установлен пароль: {password}";
 			string response = ReportHelper.SendSms(message, phonesForSend);
-			return String.Format("To admin: {0}", response);
+			return $"To admin: {response}";
 		}
 
 
