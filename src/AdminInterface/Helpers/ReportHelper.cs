@@ -79,26 +79,23 @@ namespace AdminInterface.Helpers
 		public static string SendSms(string message, string[] phonesForSend)
 		{
 			if (phonesForSend == null || phonesForSend.Length == 0) {
-				return "don't point numbers";
+				return "не указаны номера";
 			}
 			var l = new List<string>();
 			foreach (var phone in phonesForSend) {
 				if (phone.Length != 10 || !phone.All(char.IsDigit)) {
-					l.Add(String.Format("bad format {0}", phone));
+					l.Add($"неправильный формат {phone}");
 					continue;
 				}
 				// 3517983153 -> 73517983153
-				int smsId = Func.SendSms(message, "7" + phone);
+				var error = "";
+				int smsId = Func.SendSms(message, "7" + phone, out error);
 				if (smsId == 0) {
-#if DEBUG
-					l.Add(String.Format("don't sent {0}, debug mode", phone));
-#else
-					l.Add(String.Format("don't sent {0}, read SMS-serv. log", phone));
-#endif
+					l.Add($"не отправлено {phone}, {error}");
 					continue;
 				}
-				l.Add(String.Format("OK {0}, smsId={1}", phone, smsId));
-			}
+				l.Add($"{phone} <a href=\"{Func.GetSmsStatUri()}?id={smsId}\">передано сервису отправки смс</a>");
+      }
 			return String.Join("; ", l);
 		}
 
@@ -110,7 +107,7 @@ namespace AdminInterface.Helpers
 
 			var message = $"В АналитФармация для {clientInfo}пользователя: {user.Login} ({user.Name}) установлен пароль: {password}";
 			var response = ReportHelper.SendSms(message, phonesForSend);
-			return $"To user: {response}";
+			return $"Пользователям: {response}";
 		}
 
 		public static string SendSmsToRegionalAdmin(User user, string password, string[] phonesForSend)
@@ -121,7 +118,7 @@ namespace AdminInterface.Helpers
 
 			var message = $"В АналитФармация для {clientInfo}пользователя: {user.Login} ({user.Name}) установлен пароль: {password}";
 			string response = ReportHelper.SendSms(message, phonesForSend);
-			return $"To admin: {response}";
+			return $"Админам: {response}";
 		}
 
 
