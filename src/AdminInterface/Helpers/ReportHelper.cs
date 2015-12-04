@@ -94,7 +94,7 @@ namespace AdminInterface.Helpers
 					l.Add($"не отправлено {phone}, {error}");
 					continue;
 				}
-				l.Add($"{phone} <a href=\"{Func.GetSmsStatUri()}?id={smsId}\">передано сервису отправки смс</a>");
+				l.Add($"{phone} передано для отправки, smsId = {smsId}");
       }
 			return String.Join("; ", l);
 		}
