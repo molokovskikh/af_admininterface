@@ -85,6 +85,10 @@ namespace AdminInterface.Helpers
 			return ConfigurationManager.AppSettings["SmsUri"];
 		}
 
+		public static string GetSmsStatUri()
+		{
+			return ConfigurationManager.AppSettings["SmsStatUri"];
+		}
 
 		public static void SendWitnStandartSender(MailMessage message)
 		{
@@ -126,15 +130,23 @@ namespace AdminInterface.Helpers
 			return 0;
 		}
 
-		public static int SendSms(string message, string phone)
+		public static int SendSms(string message, string phone, out string error)
 		{
 			int result = 0;
+			error = "";
 
 			string smsUri = GetSmsUri();
-			var r = WebRequest.Create(smsUri) as HttpWebRequest;
-			string data = String.Format("text={0}&dest={1}", HttpUtility.UrlEncode(message), HttpUtility.UrlEncode(phone));
+			if (String.IsNullOrEmpty(smsUri)) {
+				error = "не найден адрес сервиса отправки смс";
+				_log.Error("Не удалось отправить SMS", new NotSupportedException(error));
+				return result;
+			}
+
+			var r = (HttpWebRequest)(WebRequest.Create(smsUri));
+			string data =$"text={HttpUtility.UrlEncode(message)}&dest={HttpUtility.UrlEncode(phone)}";
 
 #if DEBUG
+			error = "режим дебага, отправка сообщений отключена";
 			return result;
 #endif
 
@@ -144,35 +156,38 @@ namespace AdminInterface.Helpers
 			r.Credentials = CredentialCache.DefaultCredentials;
 			r.ContentType = "application/x-www-form-urlencoded";
 
-			using (var requestStream = r.GetRequestStream())
-				requestStream.Write(encoding.GetBytes(data), 0, encoding.GetByteCount(data));
-
-			string responseBody = "";
 			try {
-				var response = r.GetResponse() as HttpWebResponse;
+				using (var requestStream = r.GetRequestStream())
+					requestStream.Write(encoding.GetBytes(data), 0, encoding.GetByteCount(data));
+
+				string responseBody = "";
+				var response = (HttpWebResponse)(r.GetResponse());
+
 				// если непредусмотренный ответ
-				if (response.StatusCode != HttpStatusCode.OK || response.StatusCode != HttpStatusCode.BadRequest) {
-					_log.Error("Не удалось отправить SMS", new NotSupportedException(String.Format("Server response whis http-code: {0}", response.StatusCode)));
-					return result;
+				if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.BadRequest) {
+					error = $"сервиc отправки смс ответил с http-статусом {response.StatusCode}";
+					throw new NotSupportedException(error);
 				}
 				using (var rspStm = response.GetResponseStream())
 				using (var reader = new StreamReader(rspStm, encoding))
 					responseBody = reader.ReadToEnd();
 
+				// если ответ BadRequest
 				if (response.StatusCode == HttpStatusCode.BadRequest) {
-					_log.Error("Не удалось отправить SMS", new NotSupportedException(String.Format("Server response whis http-code: {0}, {1}", response.StatusCode, responseBody)));
-					return result;
+					error = $"сервис отправки смс ответил {response.StatusCode}, \"{responseBody}\"";
+					throw new NotSupportedException(error);
 				}
+
+				// ожидается ответ вида OK;3517
+				var values = responseBody.Split(';');
+				if (values.Length < 2 || values[0] != "OK" || String.IsNullOrEmpty(values[1]) || !Int32.TryParse(values[1], out result)) {
+					error = $"ответ сервиса отправки смс имеет неправильный формат \"{responseBody}\"";
+					throw new NotSupportedException(error);
+				}
+
 			}
 			catch (Exception ex) {
 				_log.Error("Не удалось отправить SMS", ex);
-				return result;
-			}
-
-			// ожидается ответ вида OK;3517
-			var values = responseBody.Split(';');
-			if (values.Length < 2 || values[0] != "OK" || String.IsNullOrEmpty(values[1]) || !Int32.TryParse(values[1], out result)) {
-				_log.Error("Не удалось отправить SMS", new NotSupportedException(String.Format("Service response has wrong format: \"{0}\"", responseBody)));
 				return result;
 			}
 

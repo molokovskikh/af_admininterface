@@ -330,8 +330,8 @@ namespace AdminInterface.Controllers
 				DbSession.Save(new AuditRecord(message, user.Client) { MessageType = LogMessageType.System });
 			}
 
-			string smsLog = ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUserArray);
-			smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdminArray);
+			string smsLog = ReportHelper.SendSmsPasswordToUser(user, password.Password, phonesForSendToUserArray);
+			smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user, password.Password, phonesForSendToAdminArray);
 			passwordChangeLog.SmsLog = smsLog;
 
 			var haveMails = !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim());
@@ -464,8 +464,8 @@ namespace AdminInterface.Controllers
 				passwordChangeLog.SetSentTo(smtpId, emailsForSend);
 			}
 
-			string smsLog = ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUserArray);
-			smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdminArray);
+			string smsLog = ReportHelper.SendSmsPasswordToUser(user, password.Password, phonesForSendToUserArray);
+			smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user, password.Password, phonesForSendToAdminArray);
 			passwordChangeLog.SmsLog = smsLog;
 
 			DbSession.Save(user);
@@ -661,8 +661,10 @@ namespace AdminInterface.Controllers
 
 		private IList<Administrator> GetAdminByRegionForSms(ulong regionMask)
 		{
+			// только сотрудникам подразделений "Управление" и " Отдел регионального развития"
 			var list = DbSession.Query<Administrator>().
 				Where(x => (x.RegionMask & regionMask) > 0
+									&& (x.Department == Department.Administration || x.Department == Department.Manager)
 									&& x.PhoneSupport.StartsWith("9"))
 				.OrderBy(x => x.ManagerName)
 				.ToList();

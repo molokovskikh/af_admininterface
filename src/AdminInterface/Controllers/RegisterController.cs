@@ -179,12 +179,12 @@ namespace AdminInterface.Controllers
 			string smsLog = "";
 			if (options.SendSmsToUser) {
 				var phonesForSendToUserArray = user.GetPhonesForSendingSms().Select(x => x.Number).ToArray();
-				smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUserArray);
+				smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user, password.Password, phonesForSendToUserArray);
 			}
 
 			if (options.SendSmsToAdmin) {
 				var phonesForSendToAdminArray = GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
-				smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdminArray);
+				smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user, password.Password, phonesForSendToAdminArray);
 			}
 			log.SmsLog = smsLog;
 
@@ -318,12 +318,12 @@ namespace AdminInterface.Controllers
 				string smsLog = "";
 				if (options.SendSmsToUser) {
 					var phonesForSendToUserArray = user.GetPhonesForSendingSms().Select(x => x.Number).ToArray();
-					smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user.Login, password.Password, phonesForSendToUserArray);
+					smsLog = smsLog + " " + ReportHelper.SendSmsPasswordToUser(user, password.Password, phonesForSendToUserArray);
 				}
 
 				if (options.SendSmsToAdmin) {
 					var phonesForSendToAdminArray = GetPhoneSupportByRegionForSms(user.RootService.HomeRegion.Id);
-					smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user.Login, password.Password, phonesForSendToAdminArray);
+					smsLog = smsLog + " " + ReportHelper.SendSmsToRegionalAdmin(user, password.Password, phonesForSendToAdminArray);
 				}
 				log.SmsLog = smsLog;
 
@@ -471,8 +471,10 @@ WHERE   pricesdata.firmcode = s.Id
 
 		private string[] GetPhoneSupportByRegionForSms(ulong regionMask)
 		{
+			// только сотрудникам подразделений "Управление" и " Отдел регионального развития"
 			var list = DbSession.Query<Administrator>().
 				Where(x => (x.RegionMask & regionMask) > 0
+									&& (x.Department == Department.Administration || x.Department == Department.Manager)
 									&& x.PhoneSupport.StartsWith("9")).ToList();
 			return list.Where(x => !ADHelper.IsDisabled(x.UserName)).
 				Select(x => x.PhoneSupportFormat).
