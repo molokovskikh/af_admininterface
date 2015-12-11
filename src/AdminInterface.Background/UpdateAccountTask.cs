@@ -26,10 +26,12 @@ namespace AdminInterface.Background
 				if (account.ObjectType == LogObjectType.User) {
 					account = Session.Load<UserAccount>(id);
 					var user = ((UserAccount)account).User;
-					var updateCount = Session.Query<UpdateLogEntity>().Count(u => u.User == user
+					var afUpdateCount = Session.Query<UpdateLogEntity>().Count(u => u.User == user
 						&& u.Commit
 						&& (u.UpdateType == UpdateType.Accumulative || u.UpdateType == UpdateType.Cumulative));
-					if (updateCount >= 10) {
+					var afNetUpdateCount = Session.Query<RequestLog>().Count(u => u.User == user && u.IsConfirmed
+						&& u.UpdateType == "MainController");
+					if (afUpdateCount >= 10 || afNetUpdateCount >= 10) {
 						account.ReadyForAccounting = true;
 						Session.Save(account);
 					}

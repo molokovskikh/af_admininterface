@@ -6,6 +6,8 @@ using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Scopes;
+using Common.Tools;
+using Common.Web.Ui.NHibernateExtentions;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.log4net;
@@ -85,6 +87,22 @@ namespace Integration.Tasks
 			Check();
 			session.Refresh(address);
 			Assert.That(address.Accounting.ReadyForAccounting, Is.True);
+		}
+
+		[Test]
+		public void Respect_analitf_net()
+		{
+			var updates = Enumerable.Range(0, 100)
+				.Select(_ => new RequestLog(user) { IsConfirmed = true, IsCompleted = true, UpdateType = "MainController" });
+			session.SaveEach(updates.Take(5));
+			Check();
+			session.Refresh(user);
+			Assert.IsFalse(user.Accounting.ReadyForAccounting);
+
+			session.SaveEach(updates.Take(5));
+			Check();
+			session.Refresh(user);
+			Assert.IsTrue(user.Accounting.ReadyForAccounting);
 		}
 
 		private void MakeUpdates(User user, int count)
