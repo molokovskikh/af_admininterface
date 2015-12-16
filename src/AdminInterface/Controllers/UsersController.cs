@@ -25,6 +25,7 @@ using System.Web;
 using Common.Web.Ui.Models;
 using System.Linq;
 using AdminInterface.Components;
+using AdminInterface.Models.AFNet;
 using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
@@ -561,6 +562,8 @@ namespace AdminInterface.Controllers
 				PropertyBag["permissions"] = UserPermission.FindPermissionsForDrugstore(DbSession);
 				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel);
 				PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint);
+				if (user.AFNetConfig != null)
+					user.AFNetConfig.Channels = BinChannel.Load(DbSession, user);
 				RenderView("DrugstoreSettings");
 			}
 		}

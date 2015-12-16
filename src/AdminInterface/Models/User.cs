@@ -74,25 +74,7 @@ namespace AdminInterface.Models
 		[OneToOne]
 		public virtual User User { get; set; }
 
-		public KeyValuePair<string, string>[] Channels
-		{
-			get
-			{
-				var items = new[] {
-					new KeyValuePair<string, string>("alpha", "Без тестирования"),
-					new KeyValuePair<string, string>("beta", "Внутреннее тестирование"),
-					new KeyValuePair<string, string>("rtm", "Для клиентов"),
-					new KeyValuePair<string, string>("migration", "Перенос клиентов с AnalitF"),
-				};
-				//не нужно сбрасывать значение если оно отсутствует в справочнике
-				if (BinUpdateChannel != null
-						&& !items.Any(x => x.Key == BinUpdateChannel)) {
-					return new[] { new KeyValuePair<string, string>(BinUpdateChannel, BinUpdateChannel), }
-						.Concat(items).ToArray();
-				}
-				return items;
-			}
-		}
+		public KeyValuePair<string, string>[] Channels { get; set; }
 	}
 
 

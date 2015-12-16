@@ -206,6 +206,7 @@
     <Compile Include="Controllers\PricesController.cs" />
     <Compile Include="Helpers\NewSupplierMessage.cs" />
     <Compile Include="Initializers\Seed.cs" />
+    <Compile Include="Models\AFNet\BinChannel.cs" />
     <Compile Include="Models\Core.cs" />
     <Compile Include="Models\CostOptimization.cs" />
     <Compile Include="Models\Logs\ClientAppLog.cs" />
