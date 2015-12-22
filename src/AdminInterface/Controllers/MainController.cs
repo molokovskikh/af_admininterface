@@ -50,28 +50,28 @@ namespace AdminInterface.Controllers
 			BindObjectInstance(query, "query");
 
 			var data = query.Load(fromDate, toDate);
-			var statuses = new StatusServices();
+
 
 			int errorsPrices = 0;
 			if (Directory.Exists(Config.ErrorFilesPath))
 				errorsPrices = Directory.GetFiles(Config.ErrorFilesPath).Length;
+
 #if !DEBUG
 			RemoteServiceHelper.RemotingCall(s => {
 				var itemList = s.GetPriceItemList();
 				var downloadedCount = itemList.Count(i => i.Downloaded);
 				PropertyBag["FormalizationQueue"] = string.Format("Всего: {0}, загруженные: {1}, перепроводимые: {2}, Error: {3}", itemList.Length, downloadedCount, itemList.Length - downloadedCount, errorsPrices);
 			});
-
-
-			statuses.OrderProcStatus = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("offdc.adc.analit.net", "OrderProcService"));
-			statuses.PriceProcessorMasterStatus = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("priceprocessor.adc.analit.net", "PriceProcessor"));
-			PropertyBag["StatusServices"] = statuses;
 #else
-			statuses.OrderProcStatus = "";
-			statuses.PriceProcessorMasterStatus = "";
-			PropertyBag["StatusServices"] = statuses;
 			PropertyBag["FormalizationQueue"] = "Всего: 0, загруженные: 0, перепроводимые: 0, Error: 0";
 #endif
+			var statuses = new StatusServices {
+				OrderProcStatus =
+					BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus(Config.OrderServiceHost, Config.OrderServiceName)),
+				PriceProcessorMasterStatus =
+					BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus(Config.PriceServiceHost, Config.PriceServiceName))
+			};
+			PropertyBag["StatusServices"] = statuses;
 
 			foreach (var pair in data.ToKeyValuePairs()) {
 				var column = pair.Key;
@@ -179,7 +179,7 @@ namespace AdminInterface.Controllers
 					addresses.AppendFormat("<div>{0}</div>", address.Name);
 				addresses.Append("  ");
 			}
-			
+
 			PropertyBag["now"] = DateTime.Now;
 			PropertyBag["user"] = user;
 			PropertyBag["addresses"] = addresses.ToString();

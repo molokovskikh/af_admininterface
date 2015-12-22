@@ -32,6 +32,11 @@ namespace AdminInterface
 		public string RedmineAssignedTo { get; set; }
 		public string NewSupplierMailFilePath { get; set; }
 		public string RegisterListEmail { get; set; }
+
+		public string OrderServiceHost { get; set; }
+		public string OrderServiceName { get; set; }
+		public string PriceServiceHost { get; set; }
+		public string PriceServiceName { get; set; }
 	}
 
 	public class Global : WebApplication

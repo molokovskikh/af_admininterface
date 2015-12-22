@@ -53,6 +53,8 @@ namespace AdminInterface.Helpers
 
 		public static ServiceStatus GetServiceStatus(string host, string serviceName)
 		{
+			if (String.IsNullOrEmpty(host) || String.IsNullOrEmpty(serviceName))
+				return ServiceStatus.Unknown;
 			return Try(
 				() => {
 					using (WindowsIdentity.GetCurrent().Impersonate()) {
