@@ -199,7 +199,6 @@ namespace Unit.Models
 		}
 
 		[Test]
-		[ExpectedException(typeof(NotHavePermissionException))]
 		public void In_client_check_home_region_must_be_checked()
 		{
 			var client = new Client {
@@ -207,11 +206,10 @@ namespace Unit.Models
 				Type = ServiceType.Drugstore,
 			};
 			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewDrugstore });
-			_adm.CheckClientPermission(client);
+			Assert.Throws<NotHavePermissionException>(() => _adm.CheckClientPermission(client));
 		}
 
 		[Test]
-		[ExpectedException(typeof(NotHavePermissionException))]
 		public void In_client_check_client_type_must_be_checked()
 		{
 			var client = new Client {
@@ -219,7 +217,7 @@ namespace Unit.Models
 				Type = ServiceType.Drugstore,
 			};
 			_adm.RegionMask = 1;
-			_adm.CheckClientPermission(client);
+			Assert.Throws<NotHavePermissionException>(() => _adm.CheckClientPermission(client));
 		}
 	}
 }

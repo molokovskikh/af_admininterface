@@ -77,7 +77,6 @@ namespace Integration.Controllers
 		}
 
 		[Test, Ignore("нет доступа к ad")]
-		[ExpectedException(typeof(NotHavePermissionException))]
 		public void Before_unlock_user_permission_must_be_checked()
 		{
 			SecurityContext.GetAdministrator = () => new Administrator { AllowedPermissions = new List<Permission>() };

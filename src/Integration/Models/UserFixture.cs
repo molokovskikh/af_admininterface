@@ -32,23 +32,23 @@ namespace Integration.Models
 
 		[
 			Test,
-			ExpectedException(typeof(CantChangePassword), ExpectedMessage = "Не возможно изменить пароль для учетной записи test546116879 поскольку она принадлежит пользователю из офиса"),
 			Ignore("Сломан из-за зажатого доступа")
 		]
 		public void Throw_cant_change_password_exception_if_user_from_office()
 		{
 			using (var testUser = new TestADUser("test546116879", "LDAP://OU=Офис,DC=adc,DC=analit,DC=net")) {
-				user.CheckLogin();
+				Assert.Throws<CantChangePassword>(() => user.CheckLogin(),
+					"Не возможно изменить пароль для учетной записи test546116879 поскольку она принадлежит пользователю из офиса");
 			}
 		}
 
 		[Test]
-		[ExpectedException(typeof(LoginNotFoundException), ExpectedMessage = "Учетная запись test546116879 не найдена"),
-		 Ignore("Не работает, т.к. нет доступа к AD")]
+		[Ignore("Не работает, т.к. нет доступа к AD")]
 		public void Throw_not_found_exception_if_login_not_exists()
 		{
 			ADHelper.Delete(user.Login);
-			user.CheckLogin();
+			Assert.Throws<LoginNotFoundException>(() => user.CheckLogin(),
+				"Учетная запись test546116879 не найдена");
 		}
 
 		[Test]
