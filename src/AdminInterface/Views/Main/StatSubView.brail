@@ -193,7 +193,7 @@
 					</td>
 					<td class="statistic-value">
 						<% if AnalitFNetUpdate: %>
-						<a href="${logRoot}&filter.ErrorType=1">
+						<a href="${logRoot}&filter.ErrorType=0">
 							<abbr title="В скобках указано количество уникальных пользователей.">!{AnalitFNetUpdate}(!{AnalitFNetUpdateUniq})</abbr>
 						</a>
 						<% else: %>
