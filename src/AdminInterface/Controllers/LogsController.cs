@@ -51,12 +51,12 @@ namespace AdminInterface.Controllers
 				}
 			}
 			PropertyBag["filter"] = filter;
-			PropertyBag["logEntities"] = filter.Find();
+			PropertyBag["logEntities"] = filter.Find(DbSession);
 		}
 
 		public void DocumentsToExcel([DataBind("filter")] DocumentFilter filter)
 		{
-			var result = ExportModel.DocumentsLog(filter);
+			var result = ExportModel.DocumentsLog(DbSession, filter);
 			this.RenderFile("Неразобранные накладные.xls", result);
 		}
 

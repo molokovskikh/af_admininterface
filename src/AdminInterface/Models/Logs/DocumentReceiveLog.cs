@@ -56,6 +56,9 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual bool DocumentDelivered { get; set; }
 
+		[Property]
+		public virtual DateTime? SendDate { get; set; }
+
 		private bool DocumentProcessedSuccessfully()
 		{
 			return (Id <= 15374942) || FileDelivered || DocumentDelivered;

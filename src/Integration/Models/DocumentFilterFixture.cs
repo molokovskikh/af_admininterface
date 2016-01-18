@@ -44,7 +44,7 @@ namespace Integration.Models
 
 			var filter = new DocumentFilter();
 			filter.Supplier = supplier;
-			var documents = filter.Find();
+			var documents = filter.Find(session);
 			Assert.That(documents.Count, Is.GreaterThan(0));
 			Assert.That(documents.Any(d => d.Id == document.Id), Is.True,
 				"должен быть {0} но есть {1}", document.Id, documents.Implode(d => d.Id));
@@ -82,13 +82,13 @@ namespace Integration.Models
 			filter.Supplier = supplier;
 			filter.OnlyNoParsed = true;
 
-			var documents = filter.Find();
+			var documents = filter.Find(session);
 			// должны получить документы в количестве равном одной странице
 			Assert.That(documents.Count, Is.EqualTo(filter.PageSize));
 
 			// ищем все документы
 			filter.OnlyNoParsed = false;
-			documents = filter.Find();
+			documents = filter.Find(session);
 			// должны получить документы в количестве большем одной страницы
 			Assert.That(documents.Count, Is.GreaterThan(filter.PageSize));
 		}
@@ -144,7 +144,7 @@ namespace Integration.Models
 			var filter = new DocumentFilter();
 			filter.Supplier = _supplier;
 			filter.OnlyNoParsed = true;
-			var documents = filter.Find();
+			var documents = filter.Find(session);
 			// Добавляем логи отправки
 			_documentLog.SendLogs = new List<DocumentSendLog>();
 			_documentLog.SendLogs.Add(new DocumentSendLog(_client.Users[0], _documentLog));
@@ -152,7 +152,7 @@ namespace Integration.Models
 			Save(_documentLog.SendLogs);
 			Save(_documentLog);
 			// проверяем, что два сохраненных лога не дают дублирование документа
-			var documentsWithSendLogs = filter.Find();
+			var documentsWithSendLogs = filter.Find(session);
 			Assert.That(documents.Count, Is.GreaterThan(0));
 			Assert.That(documents.Count, Is.EqualTo(documentsWithSendLogs.Count));
 		}
@@ -168,7 +168,7 @@ namespace Integration.Models
 			var document = DataMother.CreateTestDocument(_supplier, _client, _documentLog);
 			Save(document);
 			// не должны выбрать запись лога, так как уже есть документ
-			var documents = filter.Find();
+			var documents = filter.Find(session);
 			Assert.That(documents.Count, Is.EqualTo(0));
 		}
 
@@ -183,7 +183,7 @@ namespace Integration.Models
 			filter.Supplier = _supplier;
 			filter.OnlyNoParsed = true;
 			// ищем
-			var documents = filter.Find();
+			var documents = filter.Find(session);
 			// не должны получить сохраненный выше документ из-за установленного IsFake
 			Assert.That(documents.Count, Is.EqualTo(0));
 		}
@@ -193,7 +193,7 @@ namespace Integration.Models
 		public void OnlyNoParsedReport()
 		{
 			var filter = new DocumentFilter();
-			var documents = filter.FindStat();
+			var documents = filter.FindStat(session);
 			var resultDoc = documents.FirstOrDefault(d => d.SupplierId == _supplier.Id);
 			Assert.That(resultDoc.DocumentsCount, Is.EqualTo(1));
 			Assert.That(resultDoc.DocumentToClientsCount, Is.EqualTo(String.Format("{0}: {1}; ", _client.Name, 1)));

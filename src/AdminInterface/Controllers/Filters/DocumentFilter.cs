@@ -42,7 +42,7 @@ namespace AdminInterface.Controllers.Filters
 		public Client Client { get; set; }
 		public Supplier Supplier { get; set; }
 
-		private IList<DocumentLog> AcceptPaginator(DetachedCriteria criteria, bool forExport = false)
+		private IList<DocumentLog> AcceptPaginator(ISession session, DetachedCriteria criteria, bool forExport = false)
 		{
 			var countQuery = CriteriaTransformer.TransformToRowCount(criteria);
 			if(OnlyNoParsed && !forExport) {
@@ -52,13 +52,11 @@ namespace AdminInterface.Controllers.Filters
 				criteria.SetMaxResults(PageSize);
 			}
 
-			return ArHelper.WithSession(s => {
-				RowsCount = countQuery.GetExecutableCriteria(s).UniqueResult<int>();
-				return criteria.GetExecutableCriteria(s).ToList<DocumentLog>();
-			});
+			RowsCount = countQuery.GetExecutableCriteria(session).UniqueResult<int>();
+			return criteria.GetExecutableCriteria(session).ToList<DocumentLog>();
 		}
 
-		public IList<NotParcedStat> FindStat()
+		public IList<NotParcedStat> FindStat(ISession session)
 		{
 			SortKeyMap = new Dictionary<string, string> {
 				{ "Supplier", "Supplier" },
@@ -71,7 +69,7 @@ namespace AdminInterface.Controllers.Filters
 			criteria.Add(Expression.IsNull("d.Id"));
 			criteria.Add(Expression.Eq("DocumentType", DocumentType.Waybill));
 
-			var documents = ArHelper.WithSession(s => criteria.GetExecutableCriteria(s).ToList<DocumentLog>());
+			var documents = criteria.GetExecutableCriteria(session).ToList<DocumentLog>();
 
 			//var documents = AcceptPaginator(criteria);
 
@@ -101,7 +99,7 @@ namespace AdminInterface.Controllers.Filters
 			return documentStats;
 		}
 
-		public IList<DocumentLog> Find(bool forExport = false)
+		public IList<DocumentLog> Find(ISession session, bool forExport = false)
 		{
 			var criteria = GetCriteriaForView(Period.Begin, Period.End);
 			if (User != null)
@@ -118,7 +116,7 @@ namespace AdminInterface.Controllers.Filters
 				criteria.Add(Expression.Eq("DocumentType", DocumentType.Waybill));
 			}
 
-			return AcceptPaginator(criteria, forExport);
+			return AcceptPaginator(session, criteria, forExport);
 		}
 
 		private DetachedCriteria GetCriteriaForView(DateTime begin, DateTime end)
@@ -169,7 +167,8 @@ namespace AdminInterface.Controllers.Filters
 				projection.Add(Projections.Property("su.RequestTime").As("RequestTime"))
 					.Add(Projections.Property("sl.Id").As("DeliveredId"))
 					.Add(Projections.Property("sl.FileDelivered").As("FileDelivered"))
-					.Add(Projections.Property("sl.DocumentDelivered").As("DocumentDelivered"));
+					.Add(Projections.Property("sl.DocumentDelivered").As("DocumentDelivered"))
+					.Add(Projections.Property("sl.SendDate").As("SendDate"));
 			}
 			criteria.SetProjection(projection)
 				.Add(Expression.Ge("LogTime", begin))
@@ -214,6 +213,7 @@ namespace AdminInterface.Controllers.Filters
 		public bool? FileDelivered { get; set; }
 		public bool? DocumentDelivered { get; set; }
 		public string RegionName { get; set; }
+		public DateTime? SendDate { get; set; }
 
 		public bool DocumentProcessedSuccessfully()
 		{
@@ -222,6 +222,8 @@ namespace AdminInterface.Controllers.Filters
 
 		public DateTime? GetDisplayRequestTime()
 		{
+			if (SendDate != null && (FileDelivered.GetValueOrDefault() || DocumentDelivered.GetValueOrDefault()))
+				return SendDate;
 			if (DocumentProcessedSuccessfully())
 				return RequestTime;
 

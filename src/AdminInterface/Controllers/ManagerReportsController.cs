@@ -269,14 +269,14 @@ namespace AdminInterface.Controllers
 		{
 			var filter = new DocumentFilter();
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
-			var documents = filter.FindStat();
+			var documents = filter.FindStat(DbSession);
 			PropertyBag["filter"] = filter;
 			PropertyBag["documents"] = documents;
 		}
 
 		public void NotParcedWaybillsToExcel([DataBind("filter")] DocumentFilter filter)
 		{
-			var result = ExportModel.GetNotParcedWaybills(filter);
+			var result = ExportModel.GetNotParcedWaybills(DbSession, filter);
 			this.RenderFile("Отчет о состоянии неформализованных накладных.xls", result);
 		}
 

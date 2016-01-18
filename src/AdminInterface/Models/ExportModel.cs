@@ -24,6 +24,7 @@ using ExcelLibrary.BinaryFileFormat;
 using ExcelLibrary.CompoundDocumentFormat;
 using ExcelLibrary.Office.Excel.BinaryFileFormat.Records;
 using ExcelLibrary.SpreadSheet;
+using NHibernate;
 using NPOI.HSSF.UserModel;
 using NPOI.HSSF.Util;
 using NPOI.SS.UserModel;
@@ -765,7 +766,7 @@ namespace AdminInterface.Models
 			return buffer.ToArray();
 		}
 
-		public static byte[] GetNotParcedWaybills(DocumentFilter filter)
+		public static byte[] GetNotParcedWaybills(ISession session, DocumentFilter filter)
 		{
 			var book = new HSSFWorkbook();
 
@@ -803,7 +804,7 @@ namespace AdminInterface.Models
 			var dataStyle = GetDataStyle(book);
 			var centerDataStyle = GetDataStyle(book, true);
 			// формируем данные таблицы
-			row = CreateTableData(sheet, type, dataStyle, centerDataStyle, row, filter.FindStat);
+			row = CreateTableData(sheet, type, dataStyle, centerDataStyle, row, () => filter.FindStat(session));
 
 			// устанавливаем ширину столбцов
 			sheet.SetColumnWidth(0, sheet.GetColumnWidth(0) * 2);
@@ -991,7 +992,7 @@ namespace AdminInterface.Models
 			return buffer.ToArray();
 		}
 
-		public static byte[] DocumentsLog(DocumentFilter filter)
+		public static byte[] DocumentsLog(ISession session, DocumentFilter filter)
 		{
 			var book = new HSSFWorkbook();
 			var sheet = book.CreateSheet("Неразобранные накладные");
@@ -1023,7 +1024,7 @@ namespace AdminInterface.Models
 			NPOIExcelHelper.FillNewCell(sheetRow, 8, "Парсер", headerStyle);
 			NPOIExcelHelper.FillNewCell(sheetRow, 9, "Комментарий", headerStyle);
 
-			var items = filter.Find(true);
+			var items = filter.Find(session, true);
 			foreach (var item in items) {
 				sheetRow = sheet.CreateRow(row++);
 				NPOIExcelHelper.FillNewCell(sheetRow, 0, item.Id.ToString(), dataStyle);
