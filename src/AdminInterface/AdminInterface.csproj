@@ -214,6 +214,7 @@
     <Compile Include="Models\Markup.cs" />
     <Compile Include="Models\ProducerSynonym.cs" />
     <Compile Include="Models\ProductSynonym.cs" />
+    <Compile Include="Models\Redmine.cs" />
     <Compile Include="Models\ReorderSchedule.cs" />
     <Compile Include="Models\Suppliers\RegionalData.cs" />
     <Compile Include="Models\WaybillExcludeFile.cs" />

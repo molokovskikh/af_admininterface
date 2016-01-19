@@ -37,7 +37,7 @@ where l.LogTime >= :begin and l.PayerId is not null")
 			foreach (var payerId in payerIds) {
 				var payer = Payer.Find(payerId);
 				payer.UpdatePaymentSum();
-				payer.Save();
+				Session.Save(payer);
 			}
 			Session.Save(state);
 		}

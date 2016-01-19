@@ -6,6 +6,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
+using NHibernate.Linq;
 
 namespace AdminInterface.Background
 {
@@ -20,7 +21,8 @@ namespace AdminInterface.Background
 
 		protected override void Process()
 		{
-			var invoices = Invoice.Queryable.Where(i => ((i.SendToEmail && i.Payer.InvoiceSettings.EmailInvoice) || (i.SendToMinimail && i.Payer.InvoiceSettings.SendToMinimail)) && i.Date <= DateTime.Today);
+			var invoices = Session.Query<Invoice>()
+				.Where(i => ((i.SendToEmail && i.Payer.InvoiceSettings.EmailInvoice) || (i.SendToMinimail && i.Payer.InvoiceSettings.SendToMinimail)) && i.Date <= DateTime.Today);
 			foreach (var invoice in invoices) {
 				_mailer.Clear();
 				if (invoice.SendToEmail && invoice.Payer.InvoiceSettings.EmailInvoice) {
@@ -32,7 +34,7 @@ namespace AdminInterface.Background
 				}
 				_mailer.Send();
 
-				invoice.Update();
+				Session.Save(invoice);
 			}
 		}
 	}

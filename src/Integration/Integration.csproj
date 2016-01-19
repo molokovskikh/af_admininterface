@@ -193,6 +193,7 @@
     <Compile Include="Tasks\UpdateAccountTaskFixture.cs" />
     <Compile Include="SendPaymentNotificationFixture.cs" />
     <Compile Include="SetupFixture.cs" />
+    <Compile Include="Tasks\WarnFixture.cs" />
     <Compile Include="UpdatedAndDidNotDoOrdersFixture.cs" />
     <Compile Include="WhoWasNotUpdatedFilterFixture.cs" />
   </ItemGroup>

@@ -51,6 +51,9 @@ namespace AdminInterface.Models
 		public virtual bool Submited { get; set; }
 
 		[Property]
+		public virtual bool Processed { get; set; }
+
+		[Property]
 		public virtual bool Deleted { get; set; }
 
 		[Property]

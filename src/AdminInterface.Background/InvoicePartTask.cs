@@ -5,6 +5,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate;
+using NHibernate.Linq;
 
 namespace AdminInterface.Background
 {
@@ -12,17 +13,16 @@ namespace AdminInterface.Background
 	{
 		protected override void Process()
 		{
-			var ids = ActiveRecordLinqBase<InvoicePart>
-				.Queryable
+			var ids = Session.Query<InvoicePart>()
 				.Where(p => p.PayDate <= DateTime.Today && p.Processed == false)
 				.Select(p => p.Id)
 				.ToArray();
 
 			foreach (var id in ids) {
-				var part = ActiveRecordMediator<InvoicePart>.FindByPrimaryKey(id);
+				var part = Session.Load<InvoicePart>(id);
 				part.Process();
-				ActiveRecordMediator.Save(part.Invoice);
-				ActiveRecordMediator.Save(part);
+				Session.Save(part.Invoice);
+				Session.Save(part);
 			}
 		}
 	}

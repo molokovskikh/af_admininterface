@@ -289,6 +289,15 @@ namespace AdminInterface.Models
 		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual AFNetConfig AFNetConfig { get; set; }
 
+		[Property]
+		public virtual bool DoNotCheckWellBeing { get; set; }
+
+		[Property]
+		public virtual decimal LastOrderSum { get; set; }
+
+		[Property]
+		public virtual decimal OrderSumDelta { get; set; }
+
 		[
 			HasAndBelongsToMany(typeof(UserPermission),
 				Lazy = true,
