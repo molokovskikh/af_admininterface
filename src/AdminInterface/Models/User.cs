@@ -289,7 +289,7 @@ namespace AdminInterface.Models
 		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual AFNetConfig AFNetConfig { get; set; }
 
-		[Property]
+		[Property, Description("Не предупреждать о падении объема закупок и отсутствии  обновлений"), Auditable]
 		public virtual bool DoNotCheckWellBeing { get; set; }
 
 		[Property]

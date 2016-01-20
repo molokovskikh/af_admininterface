@@ -12,6 +12,7 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models.Jobs;
 using log4net;
 using log4net.Config;
+using NDesk.Options;
 
 namespace AdminInterface.Background
 {
@@ -22,6 +23,22 @@ namespace AdminInterface.Background
 		public static int Main(string[] args)
 		{
 			try {
+				var help = false;
+				string task = null;
+				var options = new OptionSet {
+					{ "help", x => help = x != null },
+					{ "task=", "Выполнить указанную задачу и выйти", x => task = x },
+				};
+				try {
+					options.Parse(args);
+				} catch(Exception e) {
+					Console.WriteLine(e.Message);
+					options.WriteOptionDescriptions(Console.Out);
+				}
+				if (help) {
+					options.WriteOptionDescriptions(Console.Out);
+					return 0;
+				}
 				XmlConfigurator.Configure();
 				var assembly = typeof(Program).Assembly;
 				StandaloneInitializer.Init(assembly);
@@ -43,6 +60,16 @@ namespace AdminInterface.Background
 					.Select(t => Activator.CreateInstance(t))
 					.OfType<Task>())
 					.ToList();
+
+				if (!String.IsNullOrEmpty(task)) {
+					var toRun = tasks.Where(x => x.GetType().Name.Match(task)).ToList();
+					if (toRun.Count == 0) {
+						Console.WriteLine($"Не удалось найти задачу {task}, доступные задачи {tasks.Implode(x => x.GetType().Name)}");
+						return 1;
+					}
+					toRun.Each(x => x.Execute());
+					return 0;
+				}
 
 				var actions = tasks.Select(x => new Action(x.Execute))
 					.Concat(jobs.Select(x => {
