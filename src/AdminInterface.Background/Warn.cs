@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Configuration;
 using System.Linq;
 using AdminInterface.Models;
@@ -130,4 +130,4 @@ where oh.UserId = :userId
 			user.LastOrderSum = sum;
 		}
 	}
-}
+}*/

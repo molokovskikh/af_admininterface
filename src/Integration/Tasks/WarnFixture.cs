@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Linq;
 using System.Collections.Generic;
 using AdminInterface.Background;
@@ -51,4 +51,4 @@ namespace Integration.Tasks
 			Assert.That(issue, Is.StringContaining("объем закупок уменьшился на 100%"), issue);
 		}
 	}
-}
+}*/
