@@ -46,6 +46,7 @@ namespace Integration.Tasks
 			SystemTime.Now = () => DateTime.Now.AddDays(7);
 			task = new Warn(session);
 			task.Execute();
+			Console.WriteLine(messages.Keys.Implode());
 			issue = messages[messages.Keys.First(x => x.Contains("Падение объема") && x.Contains($" {user.Id}"))];
 			Assert.That(issue, Is.StringContaining("объем закупок уменьшился на 100%"), issue);
 		}

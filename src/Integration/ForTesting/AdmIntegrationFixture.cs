@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Common.Tools;
+using NUnit.Framework;
 
 namespace Integration.ForTesting
 {
@@ -11,6 +12,12 @@ namespace Integration.ForTesting
 		public void AdmIntegrationSetup()
 		{
 			DataMother = new DataMother(session);
+		}
+
+		[TearDown]
+		public void AdmIntegrationTearDown()
+		{
+			SystemTime.Reset();
 		}
 	}
 }
