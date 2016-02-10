@@ -8,6 +8,7 @@
 	<thead>
 		<tr>
 			<th>Название</th>
+			<th>Статистически информативен</th>
 			<th>Телефон по умолчанию</th>
 			<th>E-mail для письма в МиниПочту всем пользователям региона</th>
 			<th>Временной сдвиг относительно Москвы, в часах</th>
@@ -25,6 +26,11 @@
 	<% for i, region in enumerate(regions): %>
 		<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(regions)}">
 			<td>${app.LinkTo(region, @Edit)}</td>
+			<td>
+				<% if region.Stat: %>
+					Да
+				<% end %>
+			</td>
 			<td>${region.DefaultPhone}</td>
 			<td><a href="mailto:${region.MiniMail()}">${region.MiniMail()}</a></td>
 			<td><% if region.MoscowBias != null and region.MoscowBias != 0: %>${region.MoscowBias}

@@ -19,6 +19,12 @@ ${FormHelper.FormTag("", {})}
 	<table>
 		<tr>
 			<td colspan=2>
+				${app.Edit("region.Stat")}
+				${app.GetValidationError("region.Stat")}
+			</td>
+		</tr>
+		<tr>
+			<td colspan=2>
 				${app.Edit("region.DrugsSearchRegion")}
 				${app.GetValidationError(region, "DrugsSearchRegion")}
 			</td>
