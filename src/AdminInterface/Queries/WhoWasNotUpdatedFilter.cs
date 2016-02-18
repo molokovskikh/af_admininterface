@@ -104,9 +104,11 @@ FROM customers.Users U
 	join customers.Clients c on c.id = u.ClientId and c.Status = 1
 	join usersettings.AssignedPermissions ap1 on ap1.UserId = u.Id and ap1.PermissionId = 1
 	join farm.Regions reg on reg.RegionCode = c.RegionCode
+	left join Customers.AnalitFNetDatas nd on nd.UserId = u.Id
 where uu.UpdateDate < :beginDate
-and u.Enabled = true
-and c.RegionCode & :RegionCode > 0
+	and ifnull(nd.LastUpdateAt, '2000-01-01') < :beginDate
+	and u.Enabled = true
+	and c.RegionCode & :RegionCode > 0
 group by u.id
 having count(a.id) > 1
 
@@ -128,28 +130,30 @@ FROM customers.Users U
 	left join accessright.regionaladmins reg on reg.UserName = c.Registrant
 	join usersettings.AssignedPermissions ap1 on ap1.UserId = u.Id and ap1.PermissionId = 1
 	join farm.Regions reg on reg.RegionCode = c.RegionCode
+	left join Customers.AnalitFNetDatas nd on nd.UserId = u.Id
 where uu.UpdateDate < :beginDate
-and u.Enabled = true
-and c.RegionCode & :RegionCode > 0
-and
-u.id in
-(select if (
-	(select count(oud.UserId)
-	from
-		customers.oneUserDate oud
-	where
-		oud.AddressId = uaddr.AddressId
-	) = (
-	select count(ou.UserId)
-	from
-		customers.oneUser ou
-	where
-		ou.AddressId = uaddr.AddressId)
-	, uaddr.UserId, 0)
-
-	from customers.UserAddresses as uaddr
-	where uaddr.UserId = u.id
-)
+	and ifnull(nd.LastUpdateAt, '2000-01-01') < :beginDate
+	and u.Enabled = true
+	and c.RegionCode & :RegionCode > 0
+	and
+	u.id in
+	(
+		select if ((select count(oud.UserId)
+				from
+					customers.oneUserDate oud
+				where
+					oud.AddressId = uaddr.AddressId
+			) = (
+				select count(ou.UserId)
+				from
+					customers.oneUser ou
+				where
+					ou.AddressId = uaddr.AddressId)
+				, uaddr.UserId, 0
+		)
+		from customers.UserAddresses as uaddr
+		where uaddr.UserId = u.id
+	)
 group by u.id
 having count(a.id) = 1
 order by {0} {1}

@@ -28,8 +28,10 @@ namespace Integration
 		[SetUp]
 		public void SetUp()
 		{
-			session.CreateSQLQuery("update Customers.Users set InheritPricesFrom = null;" +
-				" delete from customers.Users;")
+			session.CreateSQLQuery(@"
+update Customers.Users set InheritPricesFrom = null;
+delete from customers.Users;
+delete from Billing.Accounts where Type = 0;")
 				.ExecuteUpdate();
 
 			client = DataMother.TestClient();
