@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -136,7 +137,11 @@ namespace AdminInterface.Models.Logs
 
 			var file = $"{Id}_{FileHelper.StringToFileName(FromSupplier.Name)}" +
 				$"({Path.GetFileNameWithoutExtension(FileName)}){Path.GetExtension(FileName)}";
-			return Path.Combine(config.AptBox, Address.Id.ToString(), DocumentType + "s", file);
+			file = Path.Combine(config.AptBox, Address.Id.ToString(), DocumentType + "s", file);
+			if (File.Exists(file))
+				return file;
+			return Directory.GetFiles(Path.Combine(config.AptBox, Address.Id.ToString(), DocumentType + "s"), $"{Id}_*")
+				.FirstOrDefault();
 		}
 	}
 }
