@@ -35,6 +35,7 @@ namespace Functional.Drugstore
 				s.AddPrice("Ассортиментный прайс", PriceType.Assortment);
 			});
 			Save(supplier);
+			FlushAndCommit();
 
 			//отключаем
 			Css("#drugstore_EnableSmartOrder").Click();

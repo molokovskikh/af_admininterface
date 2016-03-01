@@ -1,8 +1,10 @@
-﻿using AdminInterface;
+﻿using System.IO;
+using AdminInterface;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using Common.Tools;
 using NUnit.Framework;
 
 namespace Unit.Models
@@ -23,10 +25,13 @@ namespace Unit.Models
 				FileName = "test.txt",
 				Id = 879,
 			};
+			Directory.CreateDirectory(@".\2575\Waybills\");
+			var expectedFilename = @".\2575\Waybills\879_Надежда-Фарм Орел_Фарма Орел(test).txt";
+			FileHelper.Touch(expectedFilename);
 			var filename = log.GetRemoteFileName(new AppConfig {
 				AptBox = "."
 			});
-			Assert.AreEqual(@".\2575\Waybills\879_Надежда-Фарм Орел_Фарма Орел(test).txt", filename);
+			Assert.AreEqual(expectedFilename, filename);
 		}
 	}
 }
