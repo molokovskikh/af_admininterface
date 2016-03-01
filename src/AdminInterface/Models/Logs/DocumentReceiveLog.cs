@@ -137,10 +137,13 @@ namespace AdminInterface.Models.Logs
 
 			var file = $"{Id}_{FileHelper.StringToFileName(FromSupplier.Name)}" +
 				$"({Path.GetFileNameWithoutExtension(FileName)}){Path.GetExtension(FileName)}";
-			file = Path.Combine(config.AptBox, Address.Id.ToString(), DocumentType + "s", file);
+			var dir = Path.Combine(config.AptBox, Address.Id.ToString(), DocumentType + "s");
+			file = Path.Combine(dir, file);
 			if (File.Exists(file))
 				return file;
-			return Directory.GetFiles(Path.Combine(config.AptBox, Address.Id.ToString(), DocumentType + "s"), $"{Id}_*")
+			if (!Directory.Exists(dir))
+				return null;
+			return Directory.GetFiles(dir, $"{Id}_*")
 				.FirstOrDefault();
 		}
 	}
