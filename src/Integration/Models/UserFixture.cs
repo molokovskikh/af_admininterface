@@ -215,7 +215,7 @@ namespace Integration.Models
 			user.AFNetConfig.ClientToken = Guid.NewGuid().ToString();
 			Assert.IsTrue(user.HaveUin());
 			user.ResetUin();
-			Assert.IsNullOrEmpty(user.AFNetConfig.ClientToken);
+			Assert.That(user.AFNetConfig.ClientToken, Is.Null.Or.Empty);
 		}
 	}
 }

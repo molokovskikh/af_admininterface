@@ -7,7 +7,7 @@ namespace Unit
 	[SetUpFixture]
 	public class Setup
 	{
-		[SetUp]
+		[OneTimeSetUp]
 		public void SetupFixture()
 		{
 			SecurityContext.GetAdministrator = () => new Administrator { UserName = "test" };

@@ -14,7 +14,7 @@ namespace Integration
 	[SetUpFixture]
 	public class SetupFixture
 	{
-		[SetUp]
+		[OneTimeSetUp]
 		public void Setup()
 		{
 			IntegrationFixture.DoNotUserTransaction = true;

@@ -11,7 +11,7 @@ namespace Functional
 	{
 		private Server _webServer;
 
-		[SetUp]
+		[OneTimeSetUp]
 		public void SetupFixture()
 		{
 			Test.Support.IntegrationFixture.DoNotUserTransaction = true;
@@ -21,7 +21,7 @@ namespace Functional
 			SeleniumFixture.GlobalSetup();
 		}
 
-		[TearDown]
+		[OneTimeTearDown]
 		public void TeardownFixture()
 		{
 			_webServer.ShutDown();
