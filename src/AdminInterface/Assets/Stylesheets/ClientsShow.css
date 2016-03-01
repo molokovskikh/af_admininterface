@@ -6,10 +6,6 @@ input[id='client_FullName']
 {
 width: 100%;
 }
-input[id='supplier_FullName']
-{
-width: 100%;
-}
 span.message
 {
 	display:block;

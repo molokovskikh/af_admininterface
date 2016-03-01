@@ -174,3 +174,12 @@ table.tablelike-editor tr
 	/*выравнивать нужно по верху что бы при отображении ошибки валидации поля не "уезжали" со своего места*/
 	vertical-align: top;
 }
+
+.input-field {
+	padding-bottom: 7px;
+}
+
+.input-field label {
+	clear: both;
+	display: block;
+}

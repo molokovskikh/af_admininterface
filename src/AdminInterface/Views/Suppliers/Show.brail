@@ -1,4 +1,6 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search")]} %>
+﻿${app.Asset("alt.form.css")}
+
+<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search")]} %>
 
 <% component CaptureFor, {@id : @Title}: %>
 	Поставщик ${supplier.Name}, Код ${supplier.Id}
@@ -137,36 +139,27 @@ ${app.Asset("ClientsShow.css")}
 			<h3>Общая информация</h3>
 			${app.Display("supplier.Registration")}
 			${FormHelper.FormTag("", null)}
+				${FormHelper.HiddenField("supplier.Id")}
 				<div>
-					${FormHelper.HiddenField("supplier.Id")}
-					<div>
-					<table class="width100">
-						<tr class="topvalign">
-							<td class="width70">
-								<p>
-									Полное наименование<br>
-									${FormHelper.TextField("supplier.FullName")}
-									${app.GetValidationError(supplier, @FullName)}
-								</p>
-							</td>
-							<td>
-								<p>
-									<br>
-									<span class="innspan">${supplier.INN}</span>
-								</p>
-							</td>
-						</tr>
-						<tr>
-							<td colspan=2>
-								<p>
-									Краткое наименование<br>
-									${FormHelper.TextField("supplier.Name")}
-									${app.GetValidationError(supplier, @Name)}
-								</p>
-							</td>
-						</tr>
-				</table>
+					<span class="innspan">!{supplier.INN}</span>
 				</div>
+				<div class="input-field">
+					${app.Label("supplier.FullName")}
+					${app.Edit("supplier.FullName")}
+					${app.Error("supplier.FullName")}
+				</div>
+				<div class="input-field">
+					${app.Label("supplier.Name")}
+					${app.Edit("supplier.Name")}
+					${app.Error("supplier.Name")}
+				</div>
+				<div class="input-field">
+					${app.Label("supplier.VendorId")}
+					${app.Edit("supplier.VendorId")}
+					${app.Error("supplier.VendorId")}
+					<div class="desc">
+						Для отчета "Ежемесячный мониторинг цен на ЖНВЛП" в AnalitF.net
+					</div>
 				</div>
 				<div>
 					<input type=submit value="Сохранить" />

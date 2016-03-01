@@ -145,6 +145,9 @@ namespace AdminInterface.Models.Suppliers
 		[Property, Auditable, NotifyBilling, ValidateGreaterThanZero("Вы не выбрали регионы работы"), Description("Регионы работы"), SetForceReplication]
 		public virtual ulong RegionMask { get; set; }
 
+		[Property, Auditable, Description("VendorId")]
+		public virtual string VendorId { get; set; }
+
 		[BelongsTo, Auditable, Description("Домашний регион")]
 		public override Region HomeRegion { get; set; }
 
