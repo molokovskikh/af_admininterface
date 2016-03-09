@@ -50,35 +50,12 @@ namespace AdminInterface.Controllers
 			BindObjectInstance(query, "query");
 
 			var data = query.Load(fromDate, toDate);
-
-
-			int errorsPrices = 0;
-			if (Directory.Exists(Config.ErrorFilesPath))
-				errorsPrices = Directory.GetFiles(Config.ErrorFilesPath).Length;
-
-#if !DEBUG
-			RemoteServiceHelper.RemotingCall(s => {
-				var itemList = s.GetPriceItemList();
-				var downloadedCount = itemList.Count(i => i.Downloaded);
-				PropertyBag["FormalizationQueue"] = string.Format("Всего: {0}, загруженные: {1}, перепроводимые: {2}, Error: {3}", itemList.Length, downloadedCount, itemList.Length - downloadedCount, errorsPrices);
-			});
-#else
-			PropertyBag["FormalizationQueue"] = "Всего: 0, загруженные: 0, перепроводимые: 0, Error: 0";
-#endif
-			var statuses = new StatusServices {
-				OrderProcStatus =
-					BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus(Config.OrderServiceHost, Config.OrderServiceName)),
-				PriceProcessorMasterStatus =
-					BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus(Config.PriceServiceHost, Config.PriceServiceName))
-			};
-			PropertyBag["StatusServices"] = statuses;
-
 			foreach (var pair in data.ToKeyValuePairs()) {
 				var column = pair.Key;
 				var value = pair.Value;
 				value = TryToFixBrokenDateTimeValue(value);
 				if (value != DBNull.Value && column.DataType == typeof(DateTime)) {
-					var dateTimeValue = ((DateTime)value);
+					var dateTimeValue = (DateTime)value;
 					value = dateTimeValue.ToLongTimeString();
 				}
 				PropertyBag[column.ColumnName] = value;
@@ -95,6 +72,32 @@ namespace AdminInterface.Controllers
 			PropertyBag["FromDate"] = fromDate;
 			PropertyBag["ToDate"] = toDate;
 			PropertyBag["query"] = query;
+		}
+
+		[return: JSONReturnBinder]
+		public object Status()
+		{
+			var errorsPrices = 0;
+			if (Directory.Exists(Config.ErrorFilesPath))
+				errorsPrices = Directory.GetFiles(Config.ErrorFilesPath).Length;
+			var priceProcessorStat = "";
+			RemoteServiceHelper.RemotingCall(s => {
+				var itemList = s.GetPriceItemList();
+				var downloadedCount = itemList.Count(i => i.Downloaded);
+				priceProcessorStat =
+					$"Всего: {itemList.Length}, загруженные: {downloadedCount}, перепроводимые: {itemList.Length - downloadedCount}, Ошибок: {errorsPrices}";
+			});
+			var orderProcStatus = BindingHelper.GetDescription(RemoteServiceHelper
+				.GetServiceStatus(Config.OrderServiceHost, Config.OrderServiceName));
+			var priceProcessorStatus = BindingHelper.GetDescription(RemoteServiceHelper
+				.GetServiceStatus(Config.PriceServiceHost, Config.PriceServiceName));
+			return new {
+				OrderProcStatus = orderProcStatus,
+				IsOrderProcUnavailable = RemoteServiceHelper.IsUnavailable(orderProcStatus),
+				PriceProcessorStatus = priceProcessorStatus,
+				IsPriceProcessorUnavailable = RemoteServiceHelper.IsUnavailable(priceProcessorStatus),
+				PriceProcessorStat = priceProcessorStat
+			};
 		}
 
 		//если в mysql применить агрегирующую функцию к выражению с датой

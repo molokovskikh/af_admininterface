@@ -1,6 +1,20 @@
 ﻿<% uriTemplate = "${siteroot}/Logs/UpdateLog?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${?query.Region.Id}" %>
 <% logRoot = "${siteroot}/Logs/NewUpdateLog?filter.BeginDate=${FromDate}&filter.EndDate=${ToDate.AddDays(1)}&filter.RegionMask=${?query.Region.Id}" %>
 
+<script>
+	$(function () {
+		$.get("${siteroot}/Main/Status", function(data) {
+			$("#order-proc-status").text(data.OrderProcStatus);
+			if (data.IsOrderProcUnavailable)
+				$("#order-proc-status").addClass("service-stoped");
+			$("#price-processor-status").text(data.PriceProcessorStatus);
+			if (data.IsPriceProcessorUnavailable)
+				$("#price-processor-status").addClass("service-stoped");
+			$("#price-processor-stat a").text(data.PriceProcessorStat);
+		});
+	});
+</script>
+
 <style type="text/css">
 	.StatisticData
 	{
@@ -267,7 +281,7 @@
 				</tr>
 				<tr>
 					<td class="statistic-label" colspan=2>Очередь формализации:</td>
-					<td class="statistic-value" colspan=2>
+					<td class="statistic-value" colspan="2" id="price-processor-stat">
 						${app.LinkTo(?FormalizationQueue, @Monitoring, @InboundPriceItemsList)}
 					</td>
 				</tr>
@@ -392,14 +406,12 @@
 				</tr>
 				<tr>
 					<td class="statistic-label">Обработки заказов:</td>
-					<td class="statistic-value OrderProcStatus ${app.Style(StatusServices)}" colspan=3>
-						${StatusServices.OrderProcStatus}
+					<td class="statistic-value OrderProcStatus" colspan=3 id="order-proc-status">
 					</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Обработки прайс листов:</td>
-					<td class="statistic-value PriceProcessorMasterStatus ${app.Style(StatusServices)}" colspan=3>
-						${StatusServices.PriceProcessorMasterStatus}
+					<td class="statistic-value PriceProcessorMasterStatus" colspan=3 id="price-processor-status">
 					</td>
 				</tr>
 				<tr>

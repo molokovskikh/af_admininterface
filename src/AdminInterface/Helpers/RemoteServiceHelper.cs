@@ -90,5 +90,10 @@ namespace AdminInterface.Helpers
 				_log.Error(e);
 			}
 		}
+
+		public static bool IsUnavailable(string status)
+		{
+			return status == "Недоступна" || status == "Не запущена";
+		}
 	}
 }
