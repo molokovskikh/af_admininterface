@@ -23,8 +23,15 @@ namespace AdminInterface.Helpers
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof(RemoteServiceHelper));
 
+		public static IRemotePriceProcessor Stub;
+
 		public static void RemotingCall(Action<IRemotePriceProcessor> action)
 		{
+			if (Stub != null) {
+				action(Stub);
+				return;
+			}
+
 			var binding = new NetTcpBinding();
 			binding.Security.Transport.ProtectionLevel = ProtectionLevel.EncryptAndSign;
 			binding.Security.Mode = SecurityMode.None;

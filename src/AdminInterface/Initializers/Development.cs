@@ -6,15 +6,110 @@ using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.MonoRailExtentions;
 using log4net;
+using RemotePriceProcessor;
 
 namespace AdminInterface.Initializers
 {
+	public class Stub : IRemotePriceProcessor
+	{
+		public void ResendPrice(WcfCallParameter paramDownlogId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void RetransPrice(WcfCallParameter downlogId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void RetransPriceSmart(uint priceId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public string[] ErrorFiles()
+		{
+			throw new NotImplementedException();
+		}
+
+		public string[] InboundFiles()
+		{
+			throw new NotImplementedException();
+		}
+
+		public WcfPriceProcessItem[] GetPriceItemList()
+		{
+			return new WcfPriceProcessItem[0];
+		}
+
+		public bool TopInInboundList(int hashCode)
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool DeleteItemInInboundList(int hashCode)
+		{
+			throw new NotImplementedException();
+		}
+
+		public string[] InboundPriceItemIds()
+		{
+			throw new NotImplementedException();
+		}
+
+		public Stream BaseFile(uint priceItemId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public HistoryFile GetFileFormHistory(WcfCallParameter downlogId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void PutFileToInbound(FilePriceInfo filePriceInfo)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void PutFileToBase(FilePriceInfo filePriceInfo)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void RetransErrorPrice(WcfCallParameter priceItemId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public string[] FindSynonyms(uint priceItemId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public string[] FindSynonymsResult(string taskId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void StopFindSynonyms(string taskId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void AppendToIndex(string[] synonymsId)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
 	public class Development : IEnvironment
 	{
 		public void Run()
 		{
 			ADHelper.Storage = new MemoryUserStorage();
 			BaseRemoteRequest.Runner = new StubRequestRunner();
+			RemoteServiceHelper.Stub = new Stub();
 
 			var config = Global.Config;
 			var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
