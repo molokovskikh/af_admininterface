@@ -200,6 +200,8 @@ table.DataTable tr.update-is-uncommited td.update-date
 .waiter
 {
 	background-image: url(../../images/loading.gif);
+	background-repeat: no-repeat;
+	background-position: center;
 	width: 18px;
 	height: 18px;
 }

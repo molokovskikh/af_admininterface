@@ -7,10 +7,13 @@
 			$("#order-proc-status").text(data.OrderProcStatus);
 			if (data.IsOrderProcUnavailable)
 				$("#order-proc-status").addClass("service-stoped");
+			$("#order-proc-status").removeClass("waiter")
 			$("#price-processor-status").text(data.PriceProcessorStatus);
 			if (data.IsPriceProcessorUnavailable)
 				$("#price-processor-status").addClass("service-stoped");
+			$("#price-processor-status").removeClass("waiter")
 			$("#price-processor-stat a").text(data.PriceProcessorStat);
+			$("#price-processor-stat").removeClass("waiter")
 		});
 	});
 </script>
@@ -281,8 +284,8 @@
 				</tr>
 				<tr>
 					<td class="statistic-label" colspan=2>Очередь формализации:</td>
-					<td class="statistic-value" colspan="2" id="price-processor-stat">
-						${app.LinkTo(?FormalizationQueue, @Monitoring, @InboundPriceItemsList)}
+					<td class="statistic-value waiter" colspan="2" id="price-processor-stat">
+						${app.LinkTo("", @Monitoring, @InboundPriceItemsList)}
 					</td>
 				</tr>
 				<tr>
@@ -406,12 +409,12 @@
 				</tr>
 				<tr>
 					<td class="statistic-label">Обработки заказов:</td>
-					<td class="statistic-value OrderProcStatus" colspan=3 id="order-proc-status">
+					<td class="statistic-value OrderProcStatus waiter" colspan=3 id="order-proc-status">
 					</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Обработки прайс листов:</td>
-					<td class="statistic-value PriceProcessorMasterStatus" colspan=3 id="price-processor-status">
+					<td class="statistic-value PriceProcessorMasterStatus waiter" colspan=3 id="price-processor-status">
 					</td>
 				</tr>
 				<tr>

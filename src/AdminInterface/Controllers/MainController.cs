@@ -17,6 +17,7 @@ using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using System.Linq;
+using System.Threading;
 
 namespace AdminInterface.Controllers
 {
@@ -85,7 +86,7 @@ namespace AdminInterface.Controllers
 				var itemList = s.GetPriceItemList();
 				var downloadedCount = itemList.Count(i => i.Downloaded);
 				priceProcessorStat =
-					$"Всего: {itemList.Length}, загруженные: {downloadedCount}, перепроводимые: {itemList.Length - downloadedCount}, Ошибок: {errorsPrices}";
+					$"Всего: {itemList.Length}, загруженные: {downloadedCount}, перепроводимые: {itemList.Length - downloadedCount}, ошибок: {errorsPrices}";
 			});
 			var orderProcStatus = BindingHelper.GetDescription(RemoteServiceHelper
 				.GetServiceStatus(Config.OrderServiceHost, Config.OrderServiceName));
