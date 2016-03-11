@@ -272,6 +272,10 @@ namespace AdminInterface.Controllers
 				PropertyBag["deliveryAddress"] = address.Value ?? "";
 				PropertyBag["phonesForSendToUserList"] = user.GetPhonesForSendingSms();
 				PropertyBag["phonesForSendToAdminList"] = GetAdminByRegionForSms(user.RootService.HomeRegion.Id);
+				if (!String.IsNullOrEmpty(jsonSource)) {
+					var errorSummary = Validator.GetErrorSummary(user);
+					throw new Exception(errorSummary.InvalidProperties.Implode(x => $"{x} {errorSummary.GetErrorsForProperty(x).Implode()}"));
+				}
 				return;
 			}
 
@@ -294,9 +298,7 @@ namespace AdminInterface.Controllers
 			if (string.IsNullOrEmpty(jsonSource)) {
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
 				user.OrderRegionMask = regionSettings.GetOrderMask();
-			}
-			else {
-				user.WorkRegionMask = BitConverter.ToUInt64(userJson.RegionSettings.Select(Convert.ToByte).ToArray(), 0);
+			} else {
 				mails = user.EmailForCard;
 			}
 			user.SetFtpAccess(user.FtpAccess);
