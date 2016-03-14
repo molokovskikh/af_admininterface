@@ -54,8 +54,8 @@ namespace AdminInterface.Controllers
 			var encode = Encoding.GetEncoding("utf-8");
 			Request.InputStream.Seek(0, SeekOrigin.Begin);
 			var responseStream = new StreamReader(Request.InputStream, encode);
-			var jsonText = PatchJson(responseStream.ReadLine());
-			var deserializedObj = JsonConvert.DeserializeObject<User>(jsonText);
+			var json = PatchJson(responseStream.ReadLine());
+			var deserializedObj = JsonConvert.DeserializeObject<User>(json);
 			Add(new Contact[0],
 				null,
 				new Person[0],
@@ -63,8 +63,7 @@ namespace AdminInterface.Controllers
 				true,
 				deserializedObj.RootService.Id,
 				string.Empty,
-				jsonText,
-				deserializedObj,
+				json,
 				null,
 				null);
 		}
@@ -90,15 +89,7 @@ namespace AdminInterface.Controllers
 		public static string PatchJson(string request)
 		{
 			var json = JObject.Parse(request);
-			var payer = json.GetValue("Payer") as JObject;
-			if (payer == null)
-				return request;
-			var id = payer.GetValue("PayerID") as JValue;
-			if (id != null) {
-				payer.Remove("PayerID");
-				payer.Add("Id", id);
-			}
-			payer.Remove("ContactGroupOwner");
+			json.Remove("Payer");
 			json.Remove("Client");
 			json.Remove("AvaliableAddresses");
 			json.Remove("InheritPricesFrom");
@@ -242,7 +233,6 @@ namespace AdminInterface.Controllers
 			uint clientId,
 			string mails,
 			string jsonSource,
-			User userJson,
 			string[] phonesForSendToUserArray,
 			string[] phonesForSendToAdminArray)
 		{
@@ -254,7 +244,7 @@ namespace AdminInterface.Controllers
 			var address = new Address();
 
 			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
-			Account account = user.Accounting;
+			var account = user.Accounting;
 
 			BindObjectInstanceForUser(user, "user", jsonSource);
 			BindObjectInstance(address, "address", AutoLoadBehavior.NewInstanceIfInvalidKey);
