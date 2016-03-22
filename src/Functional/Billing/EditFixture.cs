@@ -37,7 +37,7 @@ namespace Functional.Billing
 		[Test]
 		public void Set_null_recipient()
 		{
-			Open(string.Format("Billing/Edit?BillingCode={0}#tab-mail", _payer.Id));
+			Open($"Billing/Edit?BillingCode={_payer.Id}#tab-mail");
 			var selectList = browser.SelectList(Find.ByName("Instance.Recipient.Id"));
 			var items = selectList.Options;
 			selectList.SelectByValue(items[0].Value);
@@ -50,14 +50,14 @@ namespace Functional.Billing
 		[Test]
 		public void Check_comment_with_disable_client()
 		{
-			Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
+			Open($"Billing/Edit?BillingCode={_payer.Id}");
 			Css("#clients input[name=\"status\"]").Checked = false;
 			Css("input[name=AddComment]").AppendText("TestComment");
 			ConfirmDialog();
 
 			Wait(() => session.Query<PayerAuditRecord>()
 				.Any(r => r.Comment == "TestComment" && r.Payer == _payer),
-				String.Format("не дождался сохранения сообщения {0}", _payer.Id));
+				$"не дождался сохранения сообщения {_payer.Id}");
 			Refresh();
 			AssertText("TestComment");
 		}
@@ -92,7 +92,7 @@ namespace Functional.Billing
 		[Test]
 		public void Check_report_status_test()
 		{
-			Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
+			Open($"Billing/Edit?BillingCode={_payer.Id}");
 			Css("#reports input[name=status]").Checked = true;
 			Css("#reports input[name=status]").Checked = false;
 			Css("input[name=AddComment]").AppendText("Check_report_status_test");
@@ -100,7 +100,7 @@ namespace Functional.Billing
 
 			Wait(() => session.Query<PayerAuditRecord>()
 				.Any(r => r.Comment == "Check_report_status_test" && r.Payer == _payer),
-				String.Format("не дождался сохранения сообщения {0}", _payer.Id));
+				$"не дождался сохранения сообщения {_payer.Id}");
 			Refresh();
 			AssertText("Check_report_status_test");
 		}
@@ -108,7 +108,7 @@ namespace Functional.Billing
 		[Test]
 		public void Check_audit_record_messages_for_client()
 		{
-			Open(string.Format("Billing/Edit?BillingCode={0}", _payer.Id));
+			Open($"Billing/Edit?BillingCode={_payer.Id}");
 
 			var record = new AuditRecord("test_message_for_client", _client);
 			session.Save(record);
@@ -117,6 +117,7 @@ namespace Functional.Billing
 
 			Assert.IsFalse(browser.CheckBox("filter_Types").Checked);
 			browser.CheckBox("filter_Types").Checked = true;
+			WaitAjax();
 
 			AssertText("test_message_for_client");
 		}
