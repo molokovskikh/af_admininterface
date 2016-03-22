@@ -198,6 +198,9 @@ namespace AdminInterface.Models
 		[Property, Description("Рассчитывать лидеров при получении заказов"), Auditable]
 		public virtual bool CalculateLeader { get; set; }
 
+		[Property, Description("Уведомлять по E-mail о появлении заказов с первых столов"), Auditable]
+		public virtual bool NotifyAwaitedOrders { get; set; }
+
 		[BelongsTo("SmartOrderRuleId", Cascade = CascadeEnum.SaveUpdate)]
 		public virtual SmartOrderRules SmartOrderRules { get; set; }
 

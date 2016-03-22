@@ -19,11 +19,11 @@ ${app.Asset("smart.order.settings.js")}
 			<p>Клиент отключен</p>
 		</div>
 	<% end %>
-	
+
 	<div style="width: 900px;">
-	
+
 		<form id="NotifySuppliers" method="post" action="NotifySuppliers?clientId=${client.Id}"></form>
-		
+
 		<form id="DrugstoreSettingsForm" method=post action="${siteroot}/clients/UpdateDrugstore">
 			${FormHelper.HiddenField("client.Id")}
 			${FormHelper.HiddenField("drugstore.Id")}
@@ -76,6 +76,7 @@ ${app.Asset("smart.order.settings.js")}
 							${app.Edit("drugstore.DebugOrders")}<br>
 							${app.Label("drugstore.ProtekWaybillSavingType")}
 							${app.Edit("drugstore.ProtekWaybillSavingType")}<br>
+							${app.Edit("drugstore.NotifyAwaitedOrders")}<br>
 
 							<h4>AnalitF</h4>
 							${app.Edit("drugstore.SendWaybillsFromClient")}<br>
@@ -252,7 +253,7 @@ ${app.Asset("smart.order.settings.js")}
 			<div class=save>
 				<input type=submit value="Сохранить">
 			</div>
-			
+
 		</form>
 	</div>
 </div>

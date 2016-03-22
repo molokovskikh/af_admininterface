@@ -298,9 +298,6 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual decimal OrderSumDelta { get; set; }
 
-		[Property, Description("Уведомлять по E-mail о появлении заказов с первых столов"), Auditable]
-		public virtual bool NotifyAwaitedOrders { get; set; }
-
 		[
 			HasAndBelongsToMany(typeof(UserPermission),
 				Lazy = true,
