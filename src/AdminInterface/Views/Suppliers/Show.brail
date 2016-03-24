@@ -161,6 +161,13 @@ ${app.Asset("ClientsShow.css")}
 						Для отчета "Ежемесячный мониторинг цен на ЖНВЛП" в AnalitF.net
 					</div>
 				</div>
+				<div class="input-field">
+					${app.Edit("supplier.IsFederal")}
+					${app.Error("supplier.IsFederal")}
+					<div class="desc">
+						Для интерфейса производителя, определят включается ли поставщик в отчеты
+					</div>
+				</div>
 				<div>
 					<input type=submit value="Сохранить" />
 				</div>

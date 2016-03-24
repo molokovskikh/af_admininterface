@@ -47,16 +47,10 @@ namespace AdminInterface.Models
 		public bool IsLoginExists { get; set; }
 
 		[Style]
-		public bool NotExistsUser
-		{
-			get { return !IsLoginExists; }
-		}
+		public bool NotExistsUser => !IsLoginExists;
 
 		[Style]
-		public bool FirstTable
-		{
-			get { return SubmitOrders && IgnoreCheckMinOrder; }
-		}
+		public bool FirstTable => SubmitOrders && IgnoreCheckMinOrder;
 
 		[Style]
 		public bool IsLocked { get; set; }
@@ -67,22 +61,13 @@ namespace AdminInterface.Models
 		[Style]
 		public bool InvisibleClient { get; set; }
 
-		public bool IsDrugstore
-		{
-			get { return ClientType == SearchClientType.Drugstore; }
-		}
+		public bool IsDrugstore => ClientType == SearchClientType.Drugstore;
 
 		[Style]
-		public bool DisabledByParent
-		{
-			get { return ServiceDisabled; }
-		}
+		public bool DisabledByParent => ServiceDisabled;
 
 		[Style]
-		public bool SelfDisabled
-		{
-			get { return !UserEnabled; }
-		}
+		public bool SelfDisabled => !UserEnabled;
 
 		[Style]
 		public bool IsOldUserUpdate

@@ -174,23 +174,23 @@ WHERE pd.firmcode = ?supplierId
 GROUP BY pd.PriceCode;
 ";
 			var regionSettingsCommnadText = @"
-SELECT  RowID, 
+SELECT  RowID,
 		r.RegionCode,
 		Region,
-		Enabled, 
-		`Storage`, 
-		AdminMail, 
-		TmpMail, 
-		SupportPhone, 
-		ContactInfo, 
-		OperativeInfo  
-FROM    usersettings.regionaldata rd  
-	JOIN farm.regions r ON rd.regioncode = r.regioncode  
+		Enabled,
+		`Storage`,
+		AdminMail,
+		TmpMail,
+		SupportPhone,
+		ContactInfo,
+		OperativeInfo
+FROM    usersettings.regionaldata rd
+	JOIN farm.regions r ON rd.regioncode = r.regioncode
 WHERE rd.FirmCode      = ?ClientCode
 	  and r.regionCode & ?AdminRegionMask;";
 
 			var regionsCommandText = @"
-SELECT  RegionCode,   
+SELECT  RegionCode,
 		Region
 FROM Farm.Regions
 WHERE regionCode & ?AdminRegionMask > 0
@@ -370,14 +370,14 @@ SET @InsertedPriceCode = Last_Insert_ID();
 INSERT INTO farm.formrules() VALUES();
 SET @NewFormRulesId = Last_Insert_ID();
 
-INSERT INTO farm.sources(RequestInterval) VALUES(IF(?PriceType=1, 86400, NULL));	
+INSERT INTO farm.sources(RequestInterval) VALUES(IF(?PriceType=1, 86400, NULL));
 SET @NewSourceId = Last_Insert_ID();
 
 INSERT INTO usersettings.PriceItems(FormRuleId, SourceId) VALUES(@NewFormRulesId, @NewSourceId);
 SET @NewPriceItemId = Last_Insert_ID();
 
 INSERT INTO PricesCosts (PriceCode, PriceItemId) SELECT @InsertedPriceCode, @NewPriceItemId;
-SET @NewPriceCostId:=Last_Insert_ID(); 
+SET @NewPriceCostId:=Last_Insert_ID();
 
 INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 
@@ -403,9 +403,9 @@ WHERE   p.PriceCode  = @InsertedPriceCode
 		AND (r.RegionCode & s.RegionMask > 0)
 		AND not exists
 		(
-			SELECT * 
-			FROM    pricesregionaldata prd 
-			WHERE   prd.PriceCode      = p.PriceCode 
+			SELECT *
+			FROM    pricesregionaldata prd
+			WHERE   prd.PriceCode      = p.PriceCode
 					AND prd.RegionCode = r.RegionCode
 		);
 
@@ -696,7 +696,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 			if (supplier.HomeRegion.Id == currentHomeRegion)
 				return;
 
-			supplier.HomeRegion = Common.Web.Ui.Models.Region.Find(currentHomeRegion);
+			supplier.HomeRegion = DbSession.Load<Common.Web.Ui.Models.Region>(currentHomeRegion);
 			DbSession.Save(supplier);
 		}
 

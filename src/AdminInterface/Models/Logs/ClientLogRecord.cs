@@ -9,7 +9,7 @@ using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord("ClientLogs", Schema = "logs")]
+	[ActiveRecord("ClientLogs", Schema = "logs", SchemaAction = "none")]
 	public class ClientLogRecord : ActiveRecordBase<ClientLogRecord>, IAuditRecord
 	{
 		public ClientLogRecord()

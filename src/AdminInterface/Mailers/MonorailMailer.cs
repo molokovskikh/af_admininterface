@@ -326,7 +326,7 @@ namespace AdminInterface.Mailers
 			var changes = new List<AuditableProperty>();
 			foreach (var property in properties) {
 				if (DbSession.IsChanged(doc, property.Name)) {
-					changes.Add(new AuditableProperty(property, null, property.GetValue(doc, null), DbSession.OldValue<object>(doc, property.Name)));
+					changes.Add(new AuditableProperty(DbSession, property, null, property.GetValue(doc, null), DbSession.OldValue<object>(doc, property.Name)));
 				}
 			}
 

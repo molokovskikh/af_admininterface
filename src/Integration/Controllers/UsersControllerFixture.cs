@@ -269,8 +269,8 @@ namespace Integration.Controllers
 			user.SubmitOrders = true;
 			user.IgnoreCheckMinOrder = true;
 			controller.SaveSettings(user,
-				Region.GetRegionsByMask(user.WorkRegionMask).Select(r => r.Id).ToArray(),
-				Region.GetRegionsByMask(user.OrderRegionMask).Select(r => r.Id).ToArray());
+				Region.GetRegionsByMask(session, user.WorkRegionMask).Select(r => r.Id).ToArray(),
+				Region.GetRegionsByMask(session, user.OrderRegionMask).Select(r => r.Id).ToArray());
 
 			Assert.IsTrue(user.FirstTable);
 			Assert.IsFalse(user.Accounting.BeAccounted);

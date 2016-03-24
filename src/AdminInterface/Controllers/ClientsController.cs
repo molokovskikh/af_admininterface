@@ -262,7 +262,7 @@ where Phone like :phone")
 		public void Settings(uint id)
 		{
 			var client = Client.FindAndCheck<Client>(id);
-			var regions = Region.All().ToArray();
+			var regions = Region.All(DbSession).ToArray();
 			var drugstore = client.Settings;
 			PropertyBag["client"] = client;
 			PropertyBag["regions"] = regions;

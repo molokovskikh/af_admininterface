@@ -7,7 +7,7 @@ namespace AdminInterface.Models.Logs
 	/// <summary>
 	/// Серверный лог, новой версии analit-f
 	/// </summary>
-	[ActiveRecord(Table = "RequestLogs", Schema = "logs")]
+	[ActiveRecord(Table = "RequestLogs", Schema = "logs", SchemaAction = "none")]
 	public class RequestLog
 	{
 		public RequestLog()

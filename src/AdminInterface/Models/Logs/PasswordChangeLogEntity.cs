@@ -7,7 +7,7 @@ using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord("passwordchange", Schema = "logs")]
+	[ActiveRecord("passwordchange", Schema = "logs", SchemaAction = "none")]
 	public class PasswordChangeLogEntity
 	{
 		public PasswordChangeLogEntity()

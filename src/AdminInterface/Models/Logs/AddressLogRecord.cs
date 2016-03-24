@@ -6,7 +6,7 @@ using NHibernate;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord("AddressLogs", Schema = "logs")]
+	[ActiveRecord("AddressLogs", Schema = "logs", SchemaAction = "none")]
 	public class AddressLogRecord
 	{
 		[PrimaryKey]

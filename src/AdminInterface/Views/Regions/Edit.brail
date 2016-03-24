@@ -87,6 +87,22 @@ ${FormHelper.FormTag("", {})}
 				${app.GetValidationError(region, "Comment")}
 			</td>
 		</tr>
+		<tr>
+			<td colspan="2">
+				<% if childRegions.Count == 0: %>
+				${app.Label("region.Parent")}<br>
+				${app.Edit("region.Parent", {@emptyValue: ""})}
+				${app.Error("region.Parent")}
+				<% else: %>
+					<Label>Дочерние регионы:</Label><br>
+					<ul>
+						<% for child in childRegions: %>
+							<li>!{child.Name}</li>
+						<% end %>
+					<ul>
+				<% end %>
+			</td>
+		</tr>
 		<tr id="EditDefaultRegions" class="nodisplay">
 			<td colspan=2>
 				<hr>

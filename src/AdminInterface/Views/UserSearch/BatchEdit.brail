@@ -1,0 +1,32 @@
+﻿<% component Bubble, {"bredcrumbs" : [ ("Поиск пользователей", "${siteroot}/Users/Search") ]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	Групповое редактирование
+<% end %>
+
+<div class="block">
+	<h3>Поставщики</h3>
+	<ul>
+		<% for supplier in suppliers: %>
+			<li>!{supplier.Id} - ${app.LinkTo(supplier)}</li>
+		<% end %>
+	</ul>
+<div>
+
+<div>
+	<h3>Поля для редактирования</h3>
+	${FormHelper.FormTag("", {@class: @vertical})}
+	<div class="input-field">
+		${app.Label("data.FederalSupplier")}
+		${FormHelper.Select("data.FederalSupplier", { @true: "Да", @false: "Нет" }, {
+			@firstoption: "Не изменять",
+			@firstoptionvalue: "",
+			@text: "Value",
+			@value: "Key"})}
+		${app.Error("data.FederalSupplier")}
+	</div>
+	<div>
+		${FormHelper.Submit("Сохранить")}
+	</div>
+	${FormHelper.EndFormTag()}
+<div>

@@ -131,6 +131,7 @@ form.vertical label {
 	display: block;
 }
 
+.input-field label.inline,
 form.vertical label.inline {
 	display: inline;
 }

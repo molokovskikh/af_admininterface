@@ -536,14 +536,14 @@ namespace AdminInterface.Models.Billing
 				settings.SendWaybillsFromClient = true;
 		}
 
-		public virtual void CheckCommentChangesAndLog(MonorailMailer mailer)
+		public virtual void CheckCommentChangesAndLog(ISession session, MonorailMailer mailer)
 		{
 			if (!this.IsChanged(p => p.Comment))
 				return;
 
 			var oldValue = this.OldValue(p => p.Comment);
 			var propertyInfo = typeof(Payer).GetProperty("Comment");
-			var property = new DiffAuditableProperty(propertyInfo, BindingHelper.GetDescription(propertyInfo), Comment, oldValue);
+			var property = new DiffAuditableProperty(session, propertyInfo, BindingHelper.GetDescription(propertyInfo), Comment, oldValue);
 			mailer.NotifyAboutChanges(property, this, "BillingList@analit.net");
 			foreach (var client in Clients) {
 				var log = new AuditRecord(client) {

@@ -17,7 +17,7 @@ namespace AdminInterface.Models.Logs
 		[Description("Мини-почта")] MiniMail
 	}
 
-	[ActiveRecord("EmailRejectLogs", Schema = "logs")]
+	[ActiveRecord("EmailRejectLogs", Schema = "logs", SchemaAction = "none")]
 	public class RejectedEmail : ActiveRecordLinqBase<RejectedEmail>
 	{
 		[PrimaryKey]

@@ -280,7 +280,7 @@ namespace AdminInterface.Controllers
 			var promotion = DbSession.Load<SupplierPromotion>(id);
 			PropertyBag["promotion"] = promotion;
 			ActiveRecordMediator.Evict(promotion);
-			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.PromotionOwnerSupplier.MaskRegion).OrderBy(reg => reg.Name);
+			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(DbSession, promotion.PromotionOwnerSupplier.MaskRegion).OrderBy(reg => reg.Name);
 
 
 			if (IsPost) {
@@ -356,7 +356,7 @@ namespace AdminInterface.Controllers
 			};
 
 			PropertyBag["promotion"] = promotion;
-			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.PromotionOwnerSupplier.MaskRegion);
+			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(DbSession, promotion.PromotionOwnerSupplier.MaskRegion);
 
 			if (IsPost) {
 				promotion.RegionMask = promoRegions.Aggregate(0UL, (v, a) => a + v);

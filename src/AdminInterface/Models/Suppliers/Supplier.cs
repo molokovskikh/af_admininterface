@@ -31,6 +31,20 @@ using NPOI.SS.Formula.Functions;
 
 namespace AdminInterface.Models.Suppliers
 {
+	public class BatchEdit
+	{
+		[Description("Федеральный поставщик")]
+		public string FederalSupplier { get; set; }
+
+		public void Update(Supplier[] suppliers)
+		{
+			foreach (var supplier in suppliers) {
+				if (!String.IsNullOrEmpty(FederalSupplier))
+					supplier.IsFederal = FederalSupplier == "true";
+			}
+		}
+	}
+
 	public class RegionEdit
 	{
 		private Supplier supplier;
@@ -41,7 +55,7 @@ namespace AdminInterface.Models.Suppliers
 		{
 			this.supplier = supplier;
 			this.admin = admin;
-			regions = Region.GetRegionsByMask(admin.RegionMask).Except(supplier.GetRegions(session, admin)).ToList();
+			regions = Region.GetRegionsByMask(session, admin.RegionMask).Except(supplier.GetRegions(session, admin)).ToList();
 		}
 
 		[ValidateNonEmpty, Description("Регион")]
@@ -153,6 +167,9 @@ namespace AdminInterface.Models.Suppliers
 
 		[Property]
 		public virtual string Address { get; set; }
+
+		[Property, Auditable, Description("Федеральный поставщик")]
+		public virtual bool IsFederal { get; set; }
 
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style, Auditable("Включен")]
 		public override bool Disabled
@@ -585,7 +602,7 @@ where s.Id = :supplierId")
 
 		public virtual List<Region> GetRegions(ISession dbSession, Administrator admin)
 		{
-			return Region.GetRegionsByMask(admin.RegionMask & RegionMask).ToList();
+			return Region.GetRegionsByMask(dbSession, admin.RegionMask & RegionMask).ToList();
 		}
 
 		public virtual void MergePerson(ContactGroupType type, Person person)

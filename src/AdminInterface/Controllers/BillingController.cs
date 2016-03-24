@@ -185,7 +185,7 @@ namespace AdminInterface.Controllers
 			uint clientCode,
 			string tab)
 		{
-			payer.CheckCommentChangesAndLog(this.Mailer());
+			payer.CheckCommentChangesAndLog(DbSession, this.Mailer());
 			DbSession.Save(payer);
 			Notify("Изменения сохранены");
 			RedirectToReferrer();
@@ -303,7 +303,7 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 			var user = DbSession.Load<User>(userId);
 			PropertyBag["user"] = user;
-			PropertyBag["regions"] = Region.All().Where(r => (r.Id & user.WorkRegionMask) > 0).ToArray();
+			PropertyBag["regions"] = Region.All(DbSession).Where(r => (r.Id & user.WorkRegionMask) > 0).ToArray();
 		}
 
 		public void AdditionalAddressInfo(uint addressId, string cssClassName)

@@ -4,7 +4,7 @@ using Castle.ActiveRecord;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord(Table = "UpdateDownloadLogs", Schema = "logs")]
+	[ActiveRecord(Table = "UpdateDownloadLogs", Schema = "logs", SchemaAction = "none")]
 	public class UpdateDownloadLogEntity
 	{
 		[PrimaryKey]

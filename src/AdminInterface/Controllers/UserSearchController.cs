@@ -11,6 +11,8 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Suppliers;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -33,6 +35,27 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 				var result = filter.Find();
 				PropertyBag["SearchResults"] = result;
+			}
+		}
+
+		public void BatchEdit(uint[] ids)
+		{
+			var suppliers = DbSession.Query<Supplier>().Where(x => ids.Contains(x.Id)).Distinct().ToArray();
+			var batchEdit = new BatchEdit();
+			if (suppliers.Length == 0) {
+				Error("Не выбрано ни одного поставщика для редактирования");
+				RedirectToReferrer();
+				return;
+			}
+			PropertyBag["suppliers"] = suppliers;
+			PropertyBag["data"] = batchEdit;
+			if (IsPost) {
+				Bind(batchEdit, "data");
+				if (IsValid(batchEdit)) {
+					batchEdit.Update(suppliers);
+					Notify("Сохранено");
+					RedirectToAction("Search");
+				}
 			}
 		}
 	}

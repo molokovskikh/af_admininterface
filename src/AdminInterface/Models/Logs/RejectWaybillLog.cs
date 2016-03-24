@@ -17,7 +17,7 @@ namespace AdminInterface.Models.Logs
 		[Description("Пользователь не обновлялся более месяца")] UserNotUpdate = 4
 	}
 
-	[ActiveRecord(Schema = "Logs", Lazy = true)]
+	[ActiveRecord(Schema = "Logs", Lazy = true, SchemaAction = "none")]
 	public class RejectWaybillLog
 	{
 		[PrimaryKey("RowId")]

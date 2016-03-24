@@ -20,7 +20,7 @@ namespace AdminInterface.Models.Logs
 		[Description("Документы от АналитФармация")] InforoomDoc = 3
 	}
 
-	[ActiveRecord("DocumentSendLogs", Schema = "Logs", Lazy = true)]
+	[ActiveRecord("DocumentSendLogs", Schema = "Logs", Lazy = true, SchemaAction = "none")]
 	public class DocumentSendLog
 	{
 		public DocumentSendLog()
@@ -73,7 +73,7 @@ namespace AdminInterface.Models.Logs
 		}
 	}
 
-	[ActiveRecord("Document_logs", Schema = "Logs", Lazy = true)]
+	[ActiveRecord("Document_logs", Schema = "Logs", Lazy = true, SchemaAction = "none")]
 	public class DocumentReceiveLog
 	{
 		public DocumentReceiveLog()

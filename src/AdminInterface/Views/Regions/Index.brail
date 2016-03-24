@@ -35,8 +35,8 @@
 			<td><a href="mailto:${region.MiniMail()}">${region.MiniMail()}</a></td>
 			<td><% if region.MoscowBias != null and region.MoscowBias != 0: %>${region.MoscowBias}
 			<% end %></td>
-			<td class="width15">${region.GetDefaultRegions(false)}</td>
-			<td class="width15">${region.GetDefaultRegions(true)}</td>
+			<td class="width15">${region.GetNeighborRegions(regions)}</td>
+			<td class="width15">${region.GetVisibleRegions(regions)}</td>
 			<td>${region.UserPayment.ToString("#")}</td>
 			<td>${region.AddressPayment.ToString("#")}</td>
 			<td>${region.SupplierUserPayment.ToString("#")}</td>

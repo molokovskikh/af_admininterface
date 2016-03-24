@@ -7,7 +7,7 @@ using Common.Tools;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord("UserLogs", Schema = "logs")]
+	[ActiveRecord("UserLogs", Schema = "logs", SchemaAction = "none")]
 	public class UserLogRecord : ActiveRecordBase<UserLogRecord>
 	{
 		[PrimaryKey]

@@ -6,6 +6,7 @@ using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
+using NHibernate;
 using NHibernate.Event;
 
 namespace AdminInterface.Models.Audit
@@ -47,23 +48,23 @@ namespace AdminInterface.Models.Audit
 			}
 		}
 
-		protected override AuditableProperty GetPropertyForNotify(PropertyInfo property, string name, object newState, object oldState, object entity)
+		protected override AuditableProperty GetPropertyForNotify(ISession session, PropertyInfo property, string name, object newState, object oldState, object entity)
 		{
 			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region")) {
-				return new MaskedAuditableProperty(property, name, newState, oldState);
+				return new MaskedAuditableProperty(session, property, name, newState, oldState);
 			}
-			return new HtmlAuditableProperty(property, name, newState, oldState);
+			return new HtmlAuditableProperty(session, property, name, newState, oldState);
 		}
 
-		protected override AuditableProperty GetAuditableProperty(PropertyInfo property, string name, object newState, object oldState, object entity)
+		protected override AuditableProperty GetAuditableProperty(ISession session, PropertyInfo property, string name, object newState, object oldState, object entity)
 		{
 			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region")) {
-				return new MaskedAuditableProperty(property, name, newState, oldState);
+				return new MaskedAuditableProperty(session, property, name, newState, oldState);
 			}
 			if(property.PropertyType == typeof(bool) && property.Name == "Disabled" && entity.GetType() == typeof(Suppliers.Supplier)) {
-				return base.GetAuditableProperty(property, name, oldState, newState, entity);
+				return base.GetAuditableProperty(session, property, name, oldState, newState, entity);
 			}
-			return base.GetAuditableProperty(property, name, newState, oldState, entity);
+			return base.GetAuditableProperty(session, property, name, newState, oldState, entity);
 		}
 	}
 }

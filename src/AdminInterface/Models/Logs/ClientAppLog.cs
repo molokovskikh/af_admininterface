@@ -6,7 +6,7 @@ namespace AdminInterface.Models.Logs
 	/// <summary>
 	/// Клиентский лог, новой версии analit-f
 	/// </summary>
-	[ActiveRecord(Table = "ClientAppLogs", Schema = "logs")]
+	[ActiveRecord(Table = "ClientAppLogs", Schema = "logs", SchemaAction = "none")]
 	public class ClientAppLog
 	{
 		public ClientAppLog(User user)

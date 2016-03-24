@@ -512,7 +512,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Select_mask_region_after_home_region_change()
 		{
-			var region = Region.All().First(r => r.Name == "Златоуст");
+			var region = Region.All(session).First(r => r.Name == "Златоуст");
 			Css("#HomeRegionComboBox").Select("Златоуст");
 			Assert.That(Css(String.Format("#browseRegion{0}", region.Id)).Checked, Is.True);
 

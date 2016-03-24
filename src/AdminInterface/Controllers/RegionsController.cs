@@ -17,7 +17,7 @@ namespace AdminInterface.Controllers
 	{
 		public void Index()
 		{
-			PropertyBag["regions"] = Region.All();
+			PropertyBag["regions"] = Region.All(DbSession);
 		}
 
 		public void Edit(ulong id,
@@ -74,8 +74,10 @@ namespace AdminInterface.Controllers
 					RedirectToReferrer();
 				}
 			}
+			var regions = Region.All(DbSession);
 			PropertyBag["region"] = region;
-			PropertyBag["AllRegions"] = Region.All();
+			PropertyBag["childRegions"] = regions.Where(x => x.Parent == region).ToList();
+			PropertyBag["AllRegions"] = regions;
 			PropertyBag["SuppliersMarkup"] = qsuppliersMarkup;
 			PropertyBag["DrugstoreMarkup"] = qdrugstoreMarkup;
 		}
@@ -87,7 +89,7 @@ namespace AdminInterface.Controllers
 
 		public void ShowRegions(uint? clientId, ulong? homeRegionId, bool showDefaultRegions, bool showNonDefaultRegions)
 		{
-			var allRegions = Region.FindAll();
+			var allRegions = Region.All(DbSession);
 			if (homeRegionId.HasValue) {
 				var homeRegion = DbSession.Load<Region>(homeRegionId.Value);
 				if (showDefaultRegions)
@@ -117,7 +119,7 @@ namespace AdminInterface.Controllers
 		public void DefaultRegions(ulong homeRegionId, bool singleRegions)
 		{
 			var homeRegion = DbSession.Load<Region>(homeRegionId);
-			var regions = Region.FindAll()
+			var regions = Region.All(DbSession)
 				.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0)
 				.OrderBy(region => region.Name)
 				.ToArray();
@@ -132,7 +134,7 @@ namespace AdminInterface.Controllers
 			var homeRegion = DbSession.Load<Region>(homeRegionId);
 			var client = DbSession.Load<Client>(clientId);
 			var drugstore = client.Settings;
-			var regions = Region.FindAll()
+			var regions = Region.All(DbSession)
 				.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0 ||
 					((region.Id & client.MaskRegion) > 0) ||
 					((region.Id & drugstore.OrderRegionMask) > 0))

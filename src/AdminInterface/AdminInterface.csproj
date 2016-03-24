@@ -668,6 +668,7 @@
     <None Include="Views\Templates\Nomenclatures.brail" />
     <None Include="Views\Templates\Settings.brail" />
     <None Include="Views\Templates\Users.brail" />
+    <Content Include="Views\UserSearch\BatchEdit.brail" />
     <None Include="Views\Users\ShowUsers.brail" />
     <None Include="Views\Users\SupplierSettings.brail" />
     <Content Include="Web.test.config">

@@ -44,7 +44,7 @@ namespace Integration.Models
 			var payer = _client.Payers.First();
 
 			payer.Comment += "\r\nтестовое сообщение";
-			payer.CheckCommentChangesAndLog(mailer);
+			payer.CheckCommentChangesAndLog(session, mailer);
 			session.Save(payer);
 			Flush();
 
@@ -66,7 +66,7 @@ namespace Integration.Models
 			});
 			payer.Clients.Add(client1);
 			payer.Comment += "\r\nтестовое сообщение";
-			payer.CheckCommentChangesAndLog(mailer);
+			payer.CheckCommentChangesAndLog(session, mailer);
 			session.Save(payer);
 			Flush();
 

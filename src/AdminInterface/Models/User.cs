@@ -734,9 +734,9 @@ WHERE
 				.UniqueResult()) > 0);
 		}
 
-		public virtual List<Region> GetRegions()
+		public virtual List<Region> GetRegions(ISession session)
 		{
-			return Region.All().Where(r => (r.Id & WorkRegionMask) > 0).ToList();
+			return Region.All(session).Where(r => (r.Id & WorkRegionMask) > 0).ToList();
 		}
 
 		public virtual void AddContactPerson(string name)

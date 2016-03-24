@@ -20,6 +20,7 @@ using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using System.Linq;
 using Castle.ActiveRecord;
+using Castle.Components.Validator;
 using Common.Web.Ui.Models;
 using NHibernate;
 using NHibernate.Linq;
@@ -57,6 +58,9 @@ namespace AdminInterface.Controllers
 
 		[Description("Отправить SMS-уведомление рег. админам")]
 		public bool SendSmsToAdmin { get; set; }
+
+		[Description("Федеральный поставщик"), ValidateNonEmpty]
+		public string FederalSupplier { get; set; }
 	}
 
 	[
@@ -76,7 +80,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["options"] = new AdditionalSettings();
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["user"] = user;
-			PropertyBag["regions"] = Region.All().ToArray();
+			PropertyBag["regions"] = Region.All(DbSession).ToArray();
 			PropertyBag["SingleRegions"] = true;
 		}
 
@@ -110,13 +114,15 @@ namespace AdminInterface.Controllers
 			var user = new User(supplier.Payer, supplier);
 			BindObjectInstance(user, "user");
 
-			if (!IsValid(supplier, user)) {
+			if (!IsValid(supplier, user, options)) {
 				RegisterSupplier();
 				PropertyBag["options"] = options;
 				PropertyBag["supplier"] = supplier;
 				PropertyBag["user"] = user;
+				PropertyBag["options"] = options;
 				return;
 			}
+			supplier.IsFederal = options.FederalSupplier == "true";
 			supplier.ContactGroupOwner.AddContactGroup(new ContactGroup(ContactGroupType.MiniMails));
 			currentPayer.Suppliers.Add(supplier);
 			currentPayer.UpdatePaymentSum();
@@ -212,7 +218,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void RegisterClient()
 		{
-			var regions = Region.All().ToArray();
+			var regions = Region.All(DbSession).ToArray();
 			var client = new Client(new Payer(""), regions.First());
 			var user = new User(client);
 

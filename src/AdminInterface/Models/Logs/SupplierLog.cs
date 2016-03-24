@@ -7,7 +7,7 @@ using Castle.ActiveRecord.Framework;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord(Schema = "logs")]
+	[ActiveRecord(Schema = "logs", SchemaAction = "none")]
 	public class SupplierLog : ActiveRecordLinqBase<SupplierLog>
 	{
 		[PrimaryKey]

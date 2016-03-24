@@ -5,7 +5,7 @@ using Castle.ActiveRecord;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord(Schema = "Logs")]
+	[ActiveRecord(Schema = "Logs", SchemaAction = "none")]
 	public class UserMessageSendLog
 	{
 		public UserMessageSendLog()

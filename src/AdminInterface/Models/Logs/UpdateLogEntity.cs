@@ -44,7 +44,7 @@ namespace AdminInterface.Models.Logs
 		[Description("Кумулятивное")] FullUpdate = 50,
 	}
 
-	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs")]
+	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs", SchemaAction = "none")]
 	public class UpdateLogEntity
 	{
 		public UpdateLogEntity()

@@ -251,7 +251,7 @@ namespace Integration
 		{
 			var oldValue = client.Name;
 			client.Name += "1";
-			var property = new AuditableProperty(payer.GetType().GetProperty("Name"), "Наименование", client.Name, oldValue);
+			var property = new AuditableProperty(session, payer.GetType().GetProperty("Name"), "Наименование", client.Name, oldValue);
 
 			mailer.NotifyAboutChanges(property, client, "RegisterList@subscribe.analit.net");
 			Assert.That(message.IsBodyHtml, Is.False);
@@ -266,7 +266,7 @@ namespace Integration
 		[Test]
 		public void Notify_about_user_region_change()
 		{
-			var property = new MaskedAuditableProperty(user.GetType().GetProperty("WorkRegionMask"), "Регионы работы", 1ul, 3ul);
+			var property = new MaskedAuditableProperty(session, user.GetType().GetProperty("WorkRegionMask"), "Регионы работы", 1ul, 3ul);
 			mailer.NotifyAboutChanges(property, user, "Billing@analit.net");
 			Assert.That(message.IsBodyHtml, Is.False);
 			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Регионы работы'"));
@@ -276,7 +276,7 @@ namespace Integration
 		[Test]
 		public void Do_not_notify_about_ignored_region_changes()
 		{
-			var property = new MaskedAuditableProperty(user.GetType().GetProperty("WorkRegionMask"), "Регионы работы", 1ul | 524288ul, 1ul);
+			var property = new MaskedAuditableProperty(session, user.GetType().GetProperty("WorkRegionMask"), "Регионы работы", 1ul | 524288ul, 1ul);
 			mailer.NotifyAboutChanges(property, user, "Billing@analit.net");
 			Assert.That(message, Is.Null);
 		}
@@ -303,7 +303,7 @@ namespace Integration
 		{
 			var oldValue = payer.Comment;
 			payer.Comment += "\r\nТестовый комментарий";
-			var property = new DiffAuditableProperty(payer.GetType().GetProperty("Comment"), "Комментарий", payer.Comment, oldValue);
+			var property = new DiffAuditableProperty(session, payer.GetType().GetProperty("Comment"), "Комментарий", payer.Comment, oldValue);
 			mailer.NotifyAboutChanges(property, payer, "BillingList@analit.net");
 
 			Assert.That(message.IsBodyHtml, Is.True);

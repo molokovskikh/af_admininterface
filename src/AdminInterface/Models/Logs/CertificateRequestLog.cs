@@ -8,7 +8,7 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord(Schema = "Logs", Table = "CertificateRequestLogs")]
+	[ActiveRecord(Schema = "Logs", Table = "CertificateRequestLogs", SchemaAction = "none")]
 	public class CertificateRequestLog
 	{
 		[PrimaryKey]

@@ -41,7 +41,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void Add()
 		{
-			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
+			var regions = Region.All(DbSession).ToArray();
 			PropertyBag["administrator"] = new Administrator();
 			PropertyBag["permissions"] = Permission.FindAll();
 			PropertyBag["regions"] = regions;
@@ -92,7 +92,7 @@ namespace AdminInterface.Controllers
 
 		public void Edit(uint id)
 		{
-			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
+			var regions = Region.All(DbSession).ToArray();
 			var admin = Administrator.GetById(id);
 			PropertyBag["administrator"] = admin;
 			PropertyBag["permissions"] = Permission.FindAll();

@@ -121,7 +121,7 @@ namespace AdminInterface.Controllers.Filters
 
 			var items = criteria.ToList<UpdateLogView>();
 
-			var regions = Region.All();
+			var regions = Region.All(s);
 			items.Where(i => i.RegionId != null).Each(i => {
 				var region = regions.FirstOrDefault(r => r.Id == i.RegionId.Value);
 				if (region == null)

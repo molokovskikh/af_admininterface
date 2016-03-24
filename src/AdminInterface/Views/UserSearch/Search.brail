@@ -10,14 +10,31 @@
 		width: 100%;
 		text-align: center;
 	}
+
 </style>
 
 <script type="text/javascript">
-	jQuery(document).ready(
-		function() {
-			jQuery("#filter_SearchText").focus();
+	$(function() {
+		$("#filter_SearchText").focus();
+		registerCheckboxAll();
+
+		function Model() {
+			this.selectable = ko.observable(false);
+			this.header = ko.observable("Редактировать");
+			this.toggle = function () {
+				this.selectable(!this.selectable());
+				if (this.selectable())
+					this.header("Скрыть")
+				else
+					this.header("Редактировать")
+			};
 		}
-	);
+		ko.applyBindings(new Model());
+	});
+
+	function toggleSelect() {
+		$(".DataTable .select-col").toggle();
+	}
 </script>
 
 <div class="CenterBlock FilterBlock">
@@ -31,7 +48,7 @@
 		</p>
 		<table>
 			<tr>
-				<td>Искать по:</td><td></td><td></td>
+				<td>Искать по:</td>
 			</tr>
 			<tr>
 				<td></td>
@@ -70,58 +87,72 @@
 
 <% if ?searchResults: %>
 	<% if searchResults.Count: %>
-		<table class="DataTable">
-			<thead>
-				<tr>
-					<th>${app.Sortable("Договор", "PayerId")}</th>
-					<th>${app.Sortable("Код клиента", "ClientId")}</th>
-					<th>${app.Sortable("Код пользователя", "UserId")}</th>
-					<th>${app.Sortable("Имя клиента", "ClientName")}</th>
-					<th>${app.Sortable("Логин", "Login")}</th>
-					<th>${app.Sortable("Комментарий", "UserName")}</th>
-					<th>${app.Sortable("Регион", "RegionName")}</th>
-					<th>${app.Sortable("Обновление", "UpdateDate")}</th>
-					<th>${app.Sortable("Версия", "AFVersion")}</th>
-					<th>${app.Sortable("Тип", "ClientType")}</th>
-					<th class="minimumHead">Условия работы</th>
-				</tr>
-			</thead>
-			<tbody id="SearchResults" class="HighLightCurrentRow">
-			<% for i,item in enumerate(searchResults): %>
-				<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(item)}">
-					<td>
-						${app.LinkTo(item.PayerId.ToString(), @Payers, @Show, {@ClientCode: item.ClientId, @id: item.PayerId})}
-					</td>
-					<td>${item.ClientId}</td>
-					<td class="user-id">${item.UserId}</td>
-					<td class="client-name">
-						<% if item.IsDrugstore: %>
-							${UrlHelper.Link(item.ClientName, {@controller: @Clients, @params: {@id: item.ClientId}})}
-						<% else: %>
-							${UrlHelper.Link(item.ClientName, {@controller: @Suppliers, @params: {@id: item.ClientId}})}
-						<% end %>
-					</td>
-					<td class="login">
-						<a href="${siteroot}/Users/${item.UserId}/edit">${item.Login}</a>
-					</td>
-					<td class="user-name">${item.UserName}</td>
-					<td class="region-name">${item.RegionName}</td>
-					<td class="update-date">${item.UpdateDate}</td>
-					<td class="af-version">${item.AFVersion}</td>
-					<td class="client-type">${BindingHelper.GetDescription(item.ClientType)}</td>
-					<td>
-						<%if (item.IsDrugstore and not item.InvisibleClient):%>
-							${FormHelper.FormTag("${SiteRoot}/ManagerReports/ClientConditionsMonitoring", {@method : @get})}
-								${FormHelper.HiddenField("filter.ClientId", item.ClientId)}
-								${FormHelper.HiddenField("filter.ClientName", item.ClientName)}
-								${FormHelper.ButtonElement("Отчет", @submit, {@title : "Мониторинг выставления условий клиенту"})}
-							${FormHelper.EndFormTag()}
-						<%end%>
-					</td>
-				</tr>
-			<% end %>
-			</tbody>
-		</table>
+		<form method="get" action="${siteroot}/UserSearch/BatchEdit">
+
+			<input type="button" data-bind="click: toggle, value: header">
+			<input type="submit" data-bind="visible: selectable" value="Редактировать">
+
+			<table class="DataTable">
+				<thead>
+					<tr>
+						<th class="select-col" data-bind="visible: selectable">
+							<input type="checkbox" class="all">
+						</th>
+						<th>${app.Sortable("Договор", "PayerId")}</th>
+						<th>${app.Sortable("Код клиента", "ClientId")}</th>
+						<th>${app.Sortable("Код пользователя", "UserId")}</th>
+						<th>${app.Sortable("Имя клиента", "ClientName")}</th>
+						<th>${app.Sortable("Логин", "Login")}</th>
+						<th>${app.Sortable("Комментарий", "UserName")}</th>
+						<th>${app.Sortable("Регион", "RegionName")}</th>
+						<th>${app.Sortable("Обновление", "UpdateDate")}</th>
+						<th>${app.Sortable("Версия", "AFVersion")}</th>
+						<th>${app.Sortable("Тип", "ClientType")}</th>
+						<th class="minimumHead">Условия работы</th>
+					</tr>
+				</thead>
+				<tbody id="SearchResults" class="HighLightCurrentRow">
+				<% for i,item in enumerate(searchResults): %>
+					<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(item)}">
+						<td class="select-col" data-bind="visible: selectable">
+							<% unless item.IsDrugstore: %>
+								<input type="checkbox" name="ids" value="${item.ClientId}">
+							<% end %>
+						</td>
+						<td>
+							${app.LinkTo(item.PayerId.ToString(), @Payers, @Show, {@ClientCode: item.ClientId, @id: item.PayerId})}
+						</td>
+						<td>${item.ClientId}</td>
+						<td class="user-id">${item.UserId}</td>
+						<td class="client-name">
+							<% if item.IsDrugstore: %>
+								${UrlHelper.Link(item.ClientName, {@controller: @Clients, @params: {@id: item.ClientId}})}
+							<% else: %>
+								${UrlHelper.Link(item.ClientName, {@controller: @Suppliers, @params: {@id: item.ClientId}})}
+							<% end %>
+						</td>
+						<td class="login">
+							<a href="${siteroot}/Users/${item.UserId}/edit">${item.Login}</a>
+						</td>
+						<td class="user-name">${item.UserName}</td>
+						<td class="region-name">${item.RegionName}</td>
+						<td class="update-date">${item.UpdateDate}</td>
+						<td class="af-version">${item.AFVersion}</td>
+						<td class="client-type">${BindingHelper.GetDescription(item.ClientType)}</td>
+						<td>
+							<%if (item.IsDrugstore and not item.InvisibleClient):%>
+								${FormHelper.FormTag("${SiteRoot}/ManagerReports/ClientConditionsMonitoring", {@method : @get})}
+									${FormHelper.HiddenField("filter.ClientId", item.ClientId)}
+									${FormHelper.HiddenField("filter.ClientName", item.ClientName)}
+									${FormHelper.ButtonElement("Отчет", @submit, {@title : "Мониторинг выставления условий клиенту"})}
+								${FormHelper.EndFormTag()}
+							<%end%>
+						</td>
+					</tr>
+				<% end %>
+				</tbody>
+			</table>
+		<form>
 		<div style="width: 100%;" align="center">
 			<br /><% OutputSubView("LegendView") %>
 		</div>

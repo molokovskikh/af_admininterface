@@ -154,7 +154,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
-			PropertyBag["regions"] = Region.All().ToArray();
+			PropertyBag["regions"] = Region.All(DbSession).ToArray();
 			IList<Payer> payers = new List<Payer>();
 			if (service.IsClient())
 				payers = ((Client)service).Payers;
@@ -542,15 +542,15 @@ namespace AdminInterface.Controllers
 			if (user.Client == null) {
 				var supplier = DbSession.Load<Supplier>(user.RootService.Id);
 				if (supplier != null) {
-					PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(supplier.RegionMask);
+					PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(DbSession, supplier.RegionMask);
 				}
 				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.SupplierInterface);
 				RenderView("SupplierSettings");
 			}
 			else {
 				var setting = user.Client.Settings;
-				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask);
-				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion);
+				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(DbSession, setting.OrderRegionMask);
+				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(DbSession, user.Client.MaskRegion);
 				PropertyBag["permissions"] = UserPermission.FindPermissionsForDrugstore(DbSession);
 				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel);
 				PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint);
@@ -645,11 +645,12 @@ namespace AdminInterface.Controllers
 			var returned = new List<object>();
 			foreach (var user in result) {
 				if (user.Login.ToLower().Contains(text.ToLower()))
-					returned.Add(new { id = user.Id, name = string.Format("Код: {0} - login: {1}", user.Id, user.Login) });
+					returned.Add(new { id = user.Id, name = $"Код: {user.Id} - login: {user.Login}" });
 				if (user.Name.ToLower().Contains(text.ToLower()))
-					returned.Add(new { id = user.Id, name = string.Format("Код: {0} - комментарий: {1}", user.Id, user.Name) });
+					returned.Add(new { id = user.Id, name = $"Код: {user.Id} - комментарий: {user.Name}" });
 				if (user.RootService != null && user.RootService.Name.ToLower().Contains(text.ToLower()))
-					returned.Add(new { id = user.Id, name = string.Format("Код: {0} - клиент: {1} - {2}", user.Id, user.RootService.Id, user.RootService.Name) });
+					returned.Add(new { id = user.Id, name = $"Код: {user.Id} - клиент: {user.RootService.Id} - {user.RootService.Name}"
+				});
 			}
 			return returned.ToArray();
 		}
