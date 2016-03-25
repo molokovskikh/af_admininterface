@@ -3,11 +3,12 @@ using AdminInterface.Models.Audit;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models.Audit;
 using NUnit.Framework;
+using Test.Support;
 
 namespace Integration
 {
 	[TestFixture]
-	public class MaskedAuditablePropertyFixture
+	public class MaskedAuditablePropertyFixture : IntegrationFixture
 	{
 		public class Test
 		{
@@ -17,28 +18,28 @@ namespace Integration
 		[Test]
 		public void Build_region()
 		{
-			var property = new MaskedAuditableProperty(null, typeof(Test).GetProperty("MaskRegion"), "Регион", 4ul, 5ul);
+			var property = new MaskedAuditableProperty(session, typeof(Test).GetProperty("MaskRegion"), "Регион", 4ul, 5ul);
 			Assert.That(property.ToString(), Is.EqualTo("$$$Изменено 'Регион' Удалено 'Воронеж'"));
 		}
 
 		[Test]
 		public void Change_region()
 		{
-			var property = new MaskedAuditableProperty(null, typeof(Test).GetProperty("MaskRegion"), "Регион", 1UL, 16UL);
+			var property = new MaskedAuditableProperty(session, typeof(Test).GetProperty("MaskRegion"), "Регион", 1UL, 16UL);
 			Assert.That(property.ToString(), Is.EqualTo("$$$Изменено 'Регион' Удалено 'Тамбов' Добавлено 'Воронеж'"));
 		}
 
 		[Test]
 		public void Ignore_unknown_region()
 		{
-			var property = new MaskedAuditableProperty(null, typeof(Test).GetProperty("MaskRegion"), "Регион", 0UL, 18446742976345407488UL);
+			var property = new MaskedAuditableProperty(session, typeof(Test).GetProperty("MaskRegion"), "Регион", 0UL, 18446742976345407488UL);
 			Assert.That(property.ToString(), Is.StringContaining("$$$Изменено 'Регион' Удалено 'Ижевск'"));
 		}
 
 		[Test]
 		public void Disable_all_regions()
 		{
-			var property = new MaskedAuditableProperty(null, typeof(Test).GetProperty("MaskRegion"), "Регион", 0UL, ulong.MaxValue);
+			var property = new MaskedAuditableProperty(session, typeof(Test).GetProperty("MaskRegion"), "Регион", 0UL, ulong.MaxValue);
 			Assert.That(property.ToString(), Is.EqualTo("$$$Изменено 'Регион' Удалено 'Все регионы'"));
 		}
 	}
