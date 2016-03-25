@@ -119,6 +119,7 @@ namespace Functional.Billing
 			browser.CheckBox("filter_Types").Checked = true;
 			WaitAjax();
 
+			WaitForText();
 			AssertText("test_message_for_client");
 		}
 	}
