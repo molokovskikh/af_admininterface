@@ -244,6 +244,9 @@ namespace AdminInterface.Helpers
 		{
 			var result = new ADUserInformationCollection();
 			result.AddRange(logins.Select(user => new ADUserInformation { Login = user }));
+#if DEBUG
+			return result;
+#endif
 			try {
 				var filter = new StringBuilder();
 				foreach (var login in logins)
