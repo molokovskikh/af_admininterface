@@ -232,11 +232,7 @@ namespace Integration.ForTesting
 
 		public User CreateSupplierUser()
 		{
-			var supplier = CreateSupplier();
-			var user = new User(supplier.Payer, supplier);
-			user.AssignDefaultPermission(session);
-			user.Setup(session);
-			return user;
+			return CreateSupplier().Users.Last();
 		}
 
 		public Supplier CreateSupplier(Action<Supplier> action = null)
@@ -250,6 +246,9 @@ namespace Integration.ForTesting
 			};
 			supplier.RegionalData.Add(new RegionalData { Region = homeRegion, Supplier = supplier });
 			supplier.AddPrice("Базовый");
+			var user = new User(supplier.Payer, supplier);
+			user.AssignDefaultPermission(session);
+			user.Setup(session);
 			if (action != null)
 				action(supplier);
 			return supplier;

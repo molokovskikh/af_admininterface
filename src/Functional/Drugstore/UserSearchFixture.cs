@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Queries;
 using Common.Web.Ui.Models;
@@ -14,6 +15,32 @@ using WatiN.Core.Native.Windows;
 
 namespace Functional.Drugstore
 {
+	public class SearchFixture : AdmSeleniumFixture
+	{
+		[Test]
+		public void Batch_edit()
+		{
+			var supplier = DataMother.CreateSupplier();
+			Open("UserSearch/Search");
+			AssertText("Поиск пользователей");
+			Css("#filter_SearchText").SendKeys(supplier.Id.ToString());
+			Click("Поиск");
+
+			Click("Редактировать");
+			browser
+				.FindElementsByCssSelector(".select-col input[type=checkbox]")
+				.First(x => x.GetAttribute("value") == supplier.Id.ToString()).Click();
+			Click("Редактировать");
+
+			AssertText("Групповое редактирование");
+			Css("#data_FederalSupplier").SelectByText("Да");
+			Click("Сохранить");
+			AssertText("Сохранено");
+			session.Refresh(supplier);
+			Assert.IsTrue(supplier.IsFederal);
+		}
+	}
+
 	public class UserSearchFixture : FunctionalFixture
 	{
 		private void TestSearchResultsByUserInfo(string columnName, SearchUserBy searchBy)
@@ -78,12 +105,6 @@ namespace Functional.Drugstore
 			ClickButton("Поиск");
 			Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 			Assert.That(browser.Text, Is.Not.StringContaining("По вашему запросу ничего не найдено"));
-		}
-
-		[Test]
-		public void SearchByUserId()
-		{
-			AssertText("Поиск пользователей");
 		}
 
 		[Test]

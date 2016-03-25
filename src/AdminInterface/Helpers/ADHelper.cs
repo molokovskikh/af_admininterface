@@ -368,6 +368,9 @@ namespace AdminInterface.Helpers
 
 		public static DateTime GetPasswordExpirationDate(string login)
 		{
+#if DEBUG
+			return DateTime.Now;
+#endif
 			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(sAMAccountName={0}))", login)))
 				return DateTime.FromFileTime((long)searcher.FindOne().Properties["pwdLastSet"][0]) + GetMaxPasswordAge();
 		}
