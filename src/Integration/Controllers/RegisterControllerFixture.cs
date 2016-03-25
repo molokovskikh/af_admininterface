@@ -63,7 +63,11 @@ namespace Integration.Controllers
 			regionSettings = new[] {
 				new RegionSettings { Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true }
 			};
-			options = new AdditionalSettings { PayerExists = true };
+			options = new AdditionalSettings {
+				PayerExists = true,
+				FederalSupplier = "false"
+			};
+
 			clientContacts = new[] { new Contact { Type = ContactType.Email, ContactText = "11@33.ru" } };
 			person = new[] { new Person() };
 		}
@@ -208,10 +212,12 @@ namespace Integration.Controllers
 			Request.Params.Add("supplier.FullName", "Тестовый поставщик");
 			Request.Params.Add("user.Name", "тестовый пользователь");
 
+			var options = new AdditionalSettings();
+			options.FederalSupplier = "false";
 			controller.RegisterSupplier(
 				new Contact[0], 1,
 				new[] { new RegionSettings { Id = 1, IsAvaliableForBrowse = true } },
-				new AdditionalSettings(),
+				options,
 				null,
 				null,
 				new Contact[0],
