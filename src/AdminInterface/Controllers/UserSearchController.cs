@@ -40,7 +40,7 @@ namespace AdminInterface.Controllers
 
 		public void BatchEdit(uint[] ids)
 		{
-			var suppliers = DbSession.Query<Supplier>().Where(x => ids.Contains(x.Id)).Distinct().ToArray();
+			var suppliers = DbSession.Query<Supplier>().Where(x => ids.Contains(x.Id)).Distinct().OrderBy(x => x.Name).ToArray();
 			var batchEdit = new BatchEdit();
 			if (suppliers.Length == 0) {
 				Error("Не выбрано ни одного поставщика для редактирования");

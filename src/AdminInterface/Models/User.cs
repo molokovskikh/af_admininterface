@@ -19,6 +19,7 @@ using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
+using Common.Web.Ui.Controllers;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.Models.Audit;
@@ -737,6 +738,11 @@ WHERE
 		public virtual List<Region> GetRegions(ISession session)
 		{
 			return Region.All(session).Where(r => (r.Id & WorkRegionMask) > 0).ToList();
+		}
+
+		public virtual List<Region> GetRegions()
+		{
+			return Region.All(BaseController.CurrentDbSession).Where(r => (r.Id & WorkRegionMask) > 0).ToList();
 		}
 
 		public virtual void AddContactPerson(string name)

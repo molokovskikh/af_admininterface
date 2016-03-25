@@ -1,15 +1,33 @@
 ﻿using System.Linq;
+using System.Threading;
 using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Models;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
+using OpenQA.Selenium;
 using Test.Support.Web;
 using WatiN.Core;
 
 namespace Functional.Suppliers
 {
+	[TestFixture]
+	public class RegistrationFixture2 : AdmSeleniumFixture
+	{
+		[Test]
+		public void Test_validation()
+		{
+			Open();
+			Click("Поставщик");
+			AssertText("Регистрация поставщика");
+			Css("#supplier_Name").SendKeys("тестовый!");
+			Eval("$('#RegisterButton').click()");
+			AssertText("Поле может содержать только");
+			Assert.AreEqual("Заполнение поля обязательно", Css("label.error[for=options_FederalSupplier]").Text);
+		}
+	}
+
 	[TestFixture]
 	public class RegistrationFixture : FunctionalFixture
 	{
@@ -65,6 +83,7 @@ namespace Functional.Suppliers
 			Css("#ClientManagersContactEmail").TypeText("manager1@analit.net");
 			Css("input[name='ClientManagersPersons[0].Name']").TypeText("Родионов Максим Валерьевич");
 			Css("#options_FillBillingInfo").Click();
+			Css("#options_FederalSupplier").Select("Да");
 			browser.Click("Зарегистрировать");
 			AssertText("Регистрационная карта");
 
@@ -77,6 +96,7 @@ namespace Functional.Suppliers
 			Assert.That(group.Contacts.Where(c => c.Type == ContactType.Phone).Select(p => p.ContactText).ToArray(),
 				Is.EquivalentTo(new[] { "473-2606000" }));
 			Assert.That(group.Contacts.Count, Is.EqualTo(2));
+			Assert.IsTrue(supplier.IsFederal);
 		}
 
 		[Test]
@@ -125,7 +145,7 @@ namespace Functional.Suppliers
 			browser.TextField(Find.ByName("mails")).AppendText("kvasovtest@analit.net");
 			Click("Создать");
 			AssertText("Пользователь создан");
-			AssertText(string.Format("Поставщик {0}, Код {1}", supplier.Name, supplier.Id));
+			AssertText($"Поставщик {supplier.Name}, Код {supplier.Id}");
 		}
 
 		private Supplier GetSupplier()
@@ -142,17 +162,7 @@ namespace Functional.Suppliers
 			Css("#ClientManagersContactEmail").TypeText("kvasovtest@analit.net");
 			Css("#OrderManagersContactEmail").TypeText("kvasovtest@analit.net");
 			Css("#user_Name").TypeText("Тестовый пользователь");
-		}
-
-		[Test]
-		public void TestOnForbiddenSymbols()
-		{
-			Open();
-			Click("Поставщик");
-			AssertText("Регистрация поставщика");
-			Css("#supplier_Name").TypeText("тестовый!");
-			Click("Зарегистрировать");
-			AssertText("Поле может содержать только");
+			Css("#options_FederalSupplier").Select("Нет");
 		}
 	}
 }
