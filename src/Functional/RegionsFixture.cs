@@ -57,8 +57,6 @@ namespace Functional
 			var id = field.GetAttribute("id");
 			field.Clear();
 			field.SendKeys("112");
-			Console.WriteLine(id);
-			Console.WriteLine(markup.Id);
 			Click("Сохранить");
 			AssertText("Сохранено");
 			session.Clear();

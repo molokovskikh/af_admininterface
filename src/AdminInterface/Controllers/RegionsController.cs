@@ -5,6 +5,7 @@ using System.Web;
 using AdminInterface.Models;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
+using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Models;
 using NHibernate.Linq;
@@ -15,6 +16,11 @@ namespace AdminInterface.Controllers
 	[Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))]
 	public class RegionsController : AdminInterfaceController
 	{
+		public RegionsController()
+		{
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+		}
+
 		public void Index()
 		{
 			PropertyBag["regions"] = Region.All(DbSession);
