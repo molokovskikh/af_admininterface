@@ -140,13 +140,9 @@
 						<td class="af-version">${item.AFVersion}</td>
 						<td class="client-type">${BindingHelper.GetDescription(item.ClientType)}</td>
 						<td>
-							<%if (item.IsDrugstore and not item.InvisibleClient):%>
-								${FormHelper.FormTag("${SiteRoot}/ManagerReports/ClientConditionsMonitoring", {@method : @get})}
-									${FormHelper.HiddenField("filter.ClientId", item.ClientId)}
-									${FormHelper.HiddenField("filter.ClientName", item.ClientName)}
-									${FormHelper.ButtonElement("Отчет", @submit, {@title : "Мониторинг выставления условий клиенту"})}
-								${FormHelper.EndFormTag()}
-							<%end%>
+							<% if (item.IsDrugstore and not item.InvisibleClient): %>
+								${app.LinkTo("Отчет", @ManagerReports, @ClientConditionsMonitoring, { "filter.ClientId": item.ClientId, "filter.ClientName" : item.ClientName })}
+							<% end %>
 						</td>
 					</tr>
 				<% end %>
