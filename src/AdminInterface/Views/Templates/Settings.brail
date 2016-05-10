@@ -24,7 +24,7 @@
 		</tbody>
 	</table>
 
-	<p class=save>
-		<input type="submit" name=${id} value="Сохранить" />
+	<p class="save">
+		<input type="submit" name="${id}" value="Сохранить" />
 	</p>
 </form>

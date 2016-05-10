@@ -1,16 +1,14 @@
-﻿using System.Linq;
-using System.Threading;
+﻿using System;
+using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using Common.Tools;
 using Common.Tools.Calendar;
 using Common.Tools.Helpers;
+using Common.Web.Ui.NHibernateExtentions;
 using Functional.ForTesting;
-using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
-using WatiN.Core;
-using Test.Support.Web;
-using WatiN.Core.Native.Chrome;
-using WatiN.Core.Native.Windows;
 
 namespace Functional
 {
@@ -153,6 +151,29 @@ namespace Functional
 			AssertText("AnalitF.Net:");
 			Css("#af-net-ban").Click();
 			AssertText("История обновлений AnalitF.net");
+		}
+
+		[Test]
+		public void Edit_tokens()
+		{
+			session.DeleteEach(session.Query<FederalSupplierToken>());
+			session.Save(new FederalSupplierToken(Guid.NewGuid().ToString()));
+			var newToken = Guid.NewGuid().ToString();
+
+			Open();
+			Click("Настройки");
+			AssertText("Признаки федеральности");
+			Click("Признаки федеральности");
+			AssertText("Признаки федеральности");
+
+			Click("Удалить");
+			Click("Создать?");
+			Css("input[name=\"items[0].Name\"]").SendKeys(newToken);
+			Click("Сохранить");
+			AssertText("Сохранено");
+
+			var tokens = session.Query<FederalSupplierToken>().ToArray();
+			Assert.AreEqual(newToken, tokens.Implode(x => x.Name));
 		}
 	}
 }

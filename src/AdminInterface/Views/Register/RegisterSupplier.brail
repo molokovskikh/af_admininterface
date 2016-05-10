@@ -225,17 +225,6 @@ ${FormHelper.FormTag("", {})}
 					${app.Edit("options.SendSmsToAdmin")}
 				</td>
 			</tr>
-			<tr>
-				<td colspan="2">
-					${app.Label("options.FederalSupplier")}<br>
-					${FormHelper.Select("options.FederalSupplier", { @true: "Да", @false: "Нет" }, {
-						@firstoption: "",
-						@firstoptionvalue: "",
-						@text: "Value",
-						@value: "Key"})}
-					${app.Error("options.FederalSupplier")}
-				</td>
-			</tr>
 		</table>
 		<fieldset>
 			<legend>

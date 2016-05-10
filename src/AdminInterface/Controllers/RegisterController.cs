@@ -58,9 +58,6 @@ namespace AdminInterface.Controllers
 
 		[Description("Отправить SMS-уведомление рег. админам")]
 		public bool SendSmsToAdmin { get; set; }
-
-		[Description("Федеральный поставщик"), ValidateNonEmpty]
-		public string FederalSupplier { get; set; }
 	}
 
 	[
@@ -122,7 +119,10 @@ namespace AdminInterface.Controllers
 				PropertyBag["options"] = options;
 				return;
 			}
-			supplier.IsFederal = options.FederalSupplier == "true";
+			var tokens = DbSession.Query<FederalSupplierToken>().ToList();
+			supplier.IsFederal = tokens.Select(x => x.Name)
+				.Any(x => supplier.Name.IndexOf(x, StringComparison.CurrentCultureIgnoreCase) >= 0
+					|| supplier.FullName.IndexOf(x, StringComparison.CurrentCultureIgnoreCase) >= 0);
 			supplier.ContactGroupOwner.AddContactGroup(new ContactGroup(ContactGroupType.MiniMails));
 			currentPayer.Suppliers.Add(supplier);
 			currentPayer.UpdatePaymentSum();

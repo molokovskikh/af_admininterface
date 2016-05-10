@@ -60,9 +60,9 @@ namespace AdminInterface.Controllers
 					var items = setting.Items;
 					var forDelete = items.Cast<dynamic>().Where(r => !forSave.Cast<dynamic>().Any(n => n.Id == r.Id));
 					foreach (var deleted in forDelete)
-						ActiveRecordMediator.Delete(deleted);
+						DbSession.Delete(deleted);
 					foreach (var item in forSave)
-						ActiveRecordMediator.Save(item);
+						DbSession.Save(item);
 
 					Notify("Сохранено");
 					//ie не передает в referer hash по этому формируем вручную

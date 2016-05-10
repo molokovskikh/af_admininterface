@@ -65,7 +65,6 @@ namespace Integration.Controllers
 			};
 			options = new AdditionalSettings {
 				PayerExists = true,
-				FederalSupplier = "false"
 			};
 
 			clientContacts = new[] { new Contact { Type = ContactType.Email, ContactText = "11@33.ru" } };
@@ -213,7 +212,6 @@ namespace Integration.Controllers
 			Request.Params.Add("user.Name", "тестовый пользователь");
 
 			var options = new AdditionalSettings();
-			options.FederalSupplier = "false";
 			controller.RegisterSupplier(
 				new Contact[0], 1,
 				new[] { new RegionSettings { Id = 1, IsAvaliableForBrowse = true } },
@@ -252,6 +250,31 @@ namespace Integration.Controllers
 				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
 			var registredClient = RegistredClient();
 			Assert.That(registredClient.Settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Hidden));
+		}
+
+		[Test]
+		public void Mark_supplier_as_federal()
+		{
+			var token = Guid.NewGuid().ToString();
+			session.Save(new FederalSupplierToken(token));
+
+			Request.Params.Add("supplier.Name", "Тестовый поставщик " + token);
+			Request.Params.Add("supplier.FullName", "Тестовый поставщик" + token);
+			Request.Params.Add("user.Name", "тестовый пользователь" + token);
+
+			var options = new AdditionalSettings();
+			controller.RegisterSupplier(
+				new Contact[0], 1,
+				new[] { new RegionSettings { Id = 1, IsAvaliableForBrowse = true } },
+				options,
+				null,
+				null,
+				new Contact[0],
+				new Person[0],
+				"",
+				"");
+			var supplier = RegistredSupplier();
+			Assert.IsTrue(supplier.IsFederal);
 		}
 
 		private void Prepare()

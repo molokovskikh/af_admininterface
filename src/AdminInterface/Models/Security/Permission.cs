@@ -145,12 +145,12 @@ namespace AdminInterface.Models.Security
 					return true;
 				}
 			}
-			if (Type == PermissionType.EditSettings) {
-				var controllers = new[] {
-					"CostOptimization",
-				};
-				return controllers.Any(c => String.Equals(c, controller, StringComparison.CurrentCultureIgnoreCase));
+
+			var controllerType = global::System.Type.GetType("AdminInterface.Controllers." + controller + "Controller");
+			if (controllerType != null) {
+				return controllerType.GetCustomAttributes<SecureAttribute>().SelectMany(x => x.PermissionTypes).Contains(Type);
 			}
+
 			return false;
 		}
 
@@ -235,6 +235,11 @@ namespace AdminInterface.Models.Security
 				}
 			}
 			return true;
+		}
+
+		public override string ToString()
+		{
+			return $"Permission: {Type}";
 		}
 	}
 }

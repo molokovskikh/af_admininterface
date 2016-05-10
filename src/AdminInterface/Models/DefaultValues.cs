@@ -14,6 +14,25 @@ using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models
 {
+	[ActiveRecord(Schema = "Billing"), Description("Наименование")]
+	public class FederalSupplierToken
+	{
+		public FederalSupplierToken()
+		{
+		}
+
+		public FederalSupplierToken(string name)
+		{
+			Name = name;
+		}
+
+		[PrimaryKey]
+		public uint Id { get; set; }
+
+		[Property, ValidateNonEmpty, ValidateIsUnique("Такое значение уже существует")]
+		public string Name { get; set; }
+	}
+
 	public enum HandlerType
 	{
 		Formater = 1,

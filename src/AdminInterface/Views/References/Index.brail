@@ -6,24 +6,6 @@
 
 ${app.Asset("table.editor.js")}
 
-<style>
-	input[type=text]
-	{
-		width: 400px;
-	}
-	
-	form
-	{
-		width:600px;
-	}
-	
-	.save
-	{
-		display:block;
-		margin: 1em 0;
-	}
-</style>
-
 <div class="tabs">
 	<ul>
 		<% for setting in settings: %>
@@ -35,7 +17,7 @@ ${app.Asset("table.editor.js")}
 </div>
 
 <% for setting in settings: %>
-<div id="${setting.Id}-tab" class="tab">
+<div id="${setting.Id}-tab" class="tab string-settings-block">
 	<% OutputSubView("/Templates/Settings", {@id: setting.Id, @name: setting.Name, @items: setting.Items}) %>
 </div>
 <% end %>

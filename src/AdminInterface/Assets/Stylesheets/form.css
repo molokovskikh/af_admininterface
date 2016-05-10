@@ -117,7 +117,9 @@ label.error
 {
 	color: red;
 	font-style: italic;
+	display: block;
 }
+
 input.error
 {
 	border: 1px dotted #f00;
@@ -183,4 +185,20 @@ table.tablelike-editor tr
 .input-field label {
 	clear: both;
 	display: block;
+}
+
+.string-settings-block input[type=text]
+{
+	width: 400px;
+}
+
+.string-settings-block form
+{
+	width:600px;
+}
+
+.string-settings-block .save
+{
+	display:block;
+	margin: 1em 0;
 }

@@ -204,6 +204,7 @@
     <Compile Include="Controllers\NewSupplierAttachmentsController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
+    <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Helpers\NewSupplierMessage.cs" />
     <Compile Include="Initializers\Seed.cs" />
     <Compile Include="Models\AFNet\BinChannel.cs" />
@@ -595,6 +596,7 @@
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />
     <None Include="Views\Prices\Edit.brail" />
+    <Content Include="Views\Settings\Terms.brail" />
     <None Include="Views\Shared\DisplayTemplates\RegistrationInfo.brail" />
     <Content Include="Views\Shared\EditorTemplates\TableFormBlock.brail" />
     <None Include="Views\Shared\EditorTemplates\TimeSpan.brail" />

@@ -1,0 +1,11 @@
+﻿<% component CaptureFor, {@id : @Title}: %>
+	Признаки федеральности
+<% end %>
+
+<% component Bubble, {@bredcrumbs : []} %>
+
+${app.Asset("table.editor.js")}
+
+<div class="string-settings-block">
+	<% OutputSubView("/Templates/Settings", {@id: "", @name: "", @items: items}) %>
+</div>
