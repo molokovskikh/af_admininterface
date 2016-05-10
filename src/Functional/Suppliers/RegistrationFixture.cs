@@ -24,7 +24,6 @@ namespace Functional.Suppliers
 			Css("#supplier_Name").SendKeys("тестовый!");
 			Eval("$('#RegisterButton').click()");
 			AssertText("Поле может содержать только");
-			Assert.AreEqual("Заполнение поля обязательно", Css("label.error[for=options_FederalSupplier]").Text);
 		}
 	}
 
@@ -83,7 +82,6 @@ namespace Functional.Suppliers
 			Css("#ClientManagersContactEmail").TypeText("manager1@analit.net");
 			Css("input[name='ClientManagersPersons[0].Name']").TypeText("Родионов Максим Валерьевич");
 			Css("#options_FillBillingInfo").Click();
-			Css("#options_FederalSupplier").Select("Да");
 			browser.Click("Зарегистрировать");
 			AssertText("Регистрационная карта");
 
@@ -96,7 +94,6 @@ namespace Functional.Suppliers
 			Assert.That(group.Contacts.Where(c => c.Type == ContactType.Phone).Select(p => p.ContactText).ToArray(),
 				Is.EquivalentTo(new[] { "473-2606000" }));
 			Assert.That(group.Contacts.Count, Is.EqualTo(2));
-			Assert.IsTrue(supplier.IsFederal);
 		}
 
 		[Test]
@@ -162,7 +159,6 @@ namespace Functional.Suppliers
 			Css("#ClientManagersContactEmail").TypeText("kvasovtest@analit.net");
 			Css("#OrderManagersContactEmail").TypeText("kvasovtest@analit.net");
 			Css("#user_Name").TypeText("Тестовый пользователь");
-			Css("#options_FederalSupplier").Select("Нет");
 		}
 	}
 }
