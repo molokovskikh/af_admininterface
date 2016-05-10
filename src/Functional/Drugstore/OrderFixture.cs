@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Linq;
 using AdminInterface.Models;
-using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Functional.ForTesting;
-using Integration.ForTesting;
-using NHibernate.Criterion;
-using NHibernate.Linq;
 using NUnit.Framework;
 using WatiN.Core;
-using Test.Support.Web;
 
 namespace Functional.Drugstore
 {
@@ -72,7 +66,7 @@ namespace Functional.Drugstore
 			Assert.That(addressLinks.Count, Is.EqualTo(1));
 			var text = addressLinks[0].Text;
 			addressLinks[0].Click();
-			AssertText(String.Format("Адрес доставки {0}", text));
+			AssertText($"Адрес доставки {text}");
 		}
 
 		[Test]
@@ -91,7 +85,7 @@ namespace Functional.Drugstore
 			var text = userLinks[0].Text;
 			userLinks[0].Click();
 			if (String.IsNullOrEmpty(text))
-				AssertText(String.Format("Пользователь {0}", text));
+				AssertText($"Пользователь {text}");
 			else
 				Assert.That(browser.TextField(Find.ByName("user.Name")).Text, Is.EqualTo(text));
 		}
