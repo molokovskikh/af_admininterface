@@ -77,6 +77,8 @@ ${app.Asset("smart.order.settings.js")}
 							${app.Label("drugstore.ProtekWaybillSavingType")}
 							${app.Edit("drugstore.ProtekWaybillSavingType")}<br>
 							${app.Edit("drugstore.NotifyAwaitedOrders")}<br>
+							${app.Label("drugstore.ProtekIntegrationFrom")}<br>
+							${app.Edit("drugstore.ProtekIntegrationFrom")}<br>
 
 							<h4>AnalitF</h4>
 							${app.Edit("drugstore.SendWaybillsFromClient")}<br>

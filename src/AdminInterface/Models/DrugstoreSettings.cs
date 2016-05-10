@@ -252,6 +252,9 @@ namespace AdminInterface.Models
 		[Property, Description("Отправлять копию заказа на zakaz_copy@analit.net"), Auditable]
 		public virtual bool DebugOrders { get; set; }
 
+		[Property,  Description("Адрес отправителя для ProtekIntegrationSender")]
+		public virtual string ProtekIntegrationFrom { get; set; }
+
 		public virtual void BeforeSave()
 		{
 			if (OfferMatrixPrice != null) {
