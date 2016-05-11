@@ -16,7 +16,6 @@ namespace Functional
 		public void SetupFixture()
 		{
 			Environment.CurrentDirectory = TestContext.CurrentContext.TestDirectory;
-			Test.Support.IntegrationFixture.DoNotUserTransaction = true;
 			ForTest.InitialzeAR();
 			_webServer = WatinSetup.StartServer();
 			SeleniumFixture.WebPort = WatinSetup.WebPort;
