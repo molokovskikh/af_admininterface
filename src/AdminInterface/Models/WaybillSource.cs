@@ -20,7 +20,6 @@ namespace AdminInterface.Models
 		public WaybillSource(Supplier supplier)
 		{
 			Supplier = supplier;
-			Id = supplier.Id;
 		}
 
 		[PrimaryKey("FirmCode", Generator = PrimaryKeyType.Foreign)]

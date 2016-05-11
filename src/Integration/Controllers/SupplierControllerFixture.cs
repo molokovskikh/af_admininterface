@@ -48,7 +48,6 @@ namespace Integration.Controllers
 			supplier1.WaybillSource = new WaybillSource(supplier1);
 			supplier1.WaybillSource.EMailFrom = "test@analit.net";
 			session.Save(supplier1);
-			session.Flush();
 
 			controller.Params["source.Emails[0]"] = "test@analit.net";
 			Request.HttpMethod = "POST";
