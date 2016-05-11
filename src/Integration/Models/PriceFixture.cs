@@ -75,7 +75,7 @@ namespace Integration.Models
 		}
 
 		[Test]
-		public void Update_priec_cost_type()
+		public void Update_price_cost_type()
 		{
 			var supplier = DataMother.CreateSupplier();
 			var price = supplier.Prices[0];
@@ -83,6 +83,7 @@ namespace Integration.Models
 			price.AddCost();
 			Save(supplier);
 			Assert.AreEqual(price.Costs[0].PriceItem, price.Costs[1].PriceItem);
+			session.Flush();
 
 			session.CreateSQLQuery("call UpdateCostType(:priceId, :costType)")
 				.SetParameter("priceId", price.Id)
@@ -92,6 +93,7 @@ namespace Integration.Models
 			session.Clear();
 			price = session.Load<Price>(price.Id);
 			Assert.AreEqual(price.CostType, 1);
+			Assert.AreEqual(2, price.Costs.Count, price.Id.ToString());
 			Assert.AreNotEqual(price.Costs[0].PriceItem, price.Costs[1].PriceItem);
 
 			session.CreateSQLQuery("call UpdateCostType(:priceId, :costType)")
