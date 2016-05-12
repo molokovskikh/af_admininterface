@@ -114,43 +114,15 @@ namespace Integration.Tasks
 		private void Check()
 		{
 			FlushAndCommit();
-			HideScope();
-			try {
-				new UpdateAccountTask().Execute();
-			}
-			finally {
-				ShowScope();
-			}
+			new UpdateAccountTask(session).Execute();
 		}
 
 		private void Check(int pageSize)
 		{
 			FlushAndCommit();
-			HideScope();
-			try {
-				new UpdateAccountTask {
-					PageSize = pageSize
-				}.Execute();
-			}
-			finally {
-				ShowScope();
-			}
-		}
-
-		private void HideScope()
-		{
-			savedStack = (Stack)ThreadScopeAccessor.Instance.CurrentStack.Clone();
-			ThreadScopeAccessor.Instance.CurrentStack.Clear();
-		}
-
-		private void ShowScope()
-		{
-			var stack = ThreadScopeAccessor.Instance.CurrentStack;
-			foreach (var sessionScope in stack.Cast<ISessionScope>().Reverse())
-				sessionScope.Dispose();
-			foreach (var scope in savedStack.Cast<ISessionScope>()) {
-				stack.Push(scope);
-			}
+			new UpdateAccountTask(session) {
+				PageSize = pageSize
+			}.Execute();
 		}
 	}
 }

@@ -5,6 +5,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models.Audit;
+using NHibernate;
 using NHibernate.Linq;
 
 namespace AdminInterface.Background
@@ -12,6 +13,14 @@ namespace AdminInterface.Background
 	public class UpdateAccountTask : Task
 	{
 		public int PageSize = 100;
+
+		public UpdateAccountTask()
+		{
+		}
+
+		public UpdateAccountTask(ISession session) : base(session)
+		{
+		}
 
 		protected override void Process()
 		{
