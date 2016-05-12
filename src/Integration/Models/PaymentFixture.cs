@@ -80,22 +80,6 @@ namespace Integration.Models
 		}
 
 		[Test]
-		public void Before_save_new_paymen_for_ad_create_ad()
-		{
-			var payer = DataMother.CreatePayerForBillingDocumentTest();
-			var payment = new Payment(payer);
-			payment.Sum = 800;
-			payment.ForAd = true;
-			payment.AdSum = 800;
-			session.Save(payment);
-
-			Assert.That(payment.Ad, Is.Not.Null);
-			Assert.That(payment.Ad.Payer, Is.EqualTo(payer));
-			Assert.That(payment.Ad.Payment, Is.EqualTo(payment));
-			Assert.That(payment.Ad.Cost, Is.EqualTo(800));
-		}
-
-		[Test]
 		public void Update_payer_balance()
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();

@@ -35,6 +35,7 @@ namespace Functional.Suppliers
 			supplier = (Supplier)user.RootService;
 			payer = DataMother.CreatePayer();
 			session.Save(payer);
+			MakeNameUniq(payer);
 		}
 
 		[Test]
@@ -112,36 +113,16 @@ namespace Functional.Suppliers
 			Assert.That(supplier.Name, Is.EqualTo("Тестовый_поставщик_обновленный"));
 		}
 
-		[Test, Ignore("Не реализовано")]
-		public void Add_user()
-		{
-			Open(supplier);
-			browser.Click("Новый пользователь");
-			AssertText("Новый пользователь");
-			browser.Click("Сохранить");
-			AssertText("Сохранено");
-		}
-
 		[Test]
 		public void Change_Payer()
 		{
-			AppDomain.CurrentDomain.FirstChanceException += LogFirstChance;
-			try {
-				Open(supplier);
-				var selectList = SearchV2Root(Css("#ChangePayer"), "Тестовый");
-				Assert.That(selectList.Options.Count, Is.GreaterThan(0));
-				var option = selectList.Options.First();
-				selectList.SelectByValue(option.Value);
-				Click("Изменить");
-				AssertText("Изменено");
-			} finally {
-				AppDomain.CurrentDomain.FirstChanceException -= LogFirstChance;
-			}
-		}
-
-		private void LogFirstChance(object sender, FirstChanceExceptionEventArgs e)
-		{
-			Console.WriteLine(e.Exception);
+			Open(supplier);
+			var selectList = SearchV2Root(Css("#ChangePayer"), payer.Name);
+			Assert.That(selectList.Options.Count, Is.GreaterThan(0));
+			var option = selectList.Options.First();
+			selectList.SelectByValue(option.Value);
+			Click("Изменить");
+			AssertText("Изменено");
 		}
 
 		[Test]
