@@ -119,7 +119,7 @@ namespace Functional.Drugstore
 				s.FullName = "FullTestToRename";
 			});
 			Save(client);
-			Flush();
+
 			Open(client);
 			var clientNameEdit = browser.TextField(Find.ByValue("TestToRename"));
 			clientNameEdit.Value = "test";

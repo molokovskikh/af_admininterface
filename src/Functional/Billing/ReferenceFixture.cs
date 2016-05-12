@@ -4,9 +4,7 @@ using Common.Web.Ui.NHibernateExtentions;
 using Functional.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using Test.Support.Web;
 using WatiN.Core;
-using Test.Support.Web;
 
 namespace Functional.Billing
 {
@@ -17,7 +15,6 @@ namespace Functional.Billing
 		public void Setup()
 		{
 			session.DeleteMany(session.Query<Nomenclature>().ToArray());
-			Flush();
 
 			Open("References");
 			AssertText("Справочники");

@@ -33,7 +33,6 @@ namespace Functional.Drugstore
 			client = DataMother.CreateTestClientWithUser();
 			settings = client.Settings;
 			user = client.Users.First();
-			Flush();
 
 			Open(client);
 			AssertText("Клиент");
@@ -454,7 +453,6 @@ namespace Functional.Drugstore
 			user.WorkRegionMask = 2;
 			user.OrderRegionMask = 1;
 			session.SaveOrUpdate(user);
-			Flush();
 
 			Open(user, "Edit");
 			Click("Настройка");
@@ -517,7 +515,7 @@ namespace Functional.Drugstore
 			foreach (var region in orderRegions)
 				settings.OrderRegionMask |= region;
 			session.SaveOrUpdate(settings);
-			Flush();
+			FlushAndCommit();
 
 			ClickLink("Новый пользователь");
 			Thread.Sleep(2000);

@@ -174,13 +174,13 @@ namespace Functional.Suppliers
 		[Test]
 		public void Set_sertificate_source()
 		{
-			Open(supplier);
 			var newCertificate = new CertificateSource {
 				Name = "Test_Source",
 				SourceClassName = "Test_class_Name"
 			};
 			session.Save(newCertificate);
-			Flush();
+
+			Open(supplier);
 			Css("#editChangerButton").Click();
 			Css("select[name='sertificateSourceId']").SelectByValue(newCertificate.Id.ToString());
 			Css("#saveCertificateSourceButton").Click();
@@ -244,7 +244,7 @@ Where pc.PriceCode = :PriceId1")
 		{
 			var waybillSource = new WaybillSource { SourceType = WaybillSourceType.FtpSupplier, ReaderClassName = "testReaderClass", Supplier = supplier };
 			session.Save(waybillSource);
-			Flush();
+
 			Open("Suppliers/WaybillSourceSettings?supplierId=" + supplier.Id);
 			AssertText("Настройка данных для доступа к FTP");
 			Css("#source_WaybillUrl").AppendText("testUrl");

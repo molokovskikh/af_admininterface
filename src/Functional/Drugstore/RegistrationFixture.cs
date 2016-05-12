@@ -80,7 +80,7 @@ namespace Functional.Drugstore
 		public void Test_select_existsing_payer()
 		{
 			var payer = DataMother.TestClient().Payers.First().MakeNameUniq();
-			Flush();
+			FlushAndCommit();
 
 			SetupGeneralInformation();
 			browser.CheckBox(Find.ById("PayerExists")).Checked = true;
@@ -101,14 +101,12 @@ namespace Functional.Drugstore
 		[Test]
 		public void Register_client_for_supplier()
 		{
-			Supplier supplier;
-
-			supplier = DataMother.CreateSupplier();
+			var supplier = DataMother.CreateSupplier();
 			Save(supplier);
 			supplier.Name = "Тестовый поставщик " + supplier.Id;
 			Save(supplier);
+			FlushAndCommit();
 
-			Flush();
 			SetupGeneralInformation();
 			Css("#ShowForOneSupplier").Checked = true;
 			Assert.That(Css("#PayerExists").Enabled, Is.False);
@@ -172,7 +170,7 @@ namespace Functional.Drugstore
 			var defaults = session.Query<DefaultValues>().First();
 			defaults.AnalitFVersion = 705;
 			Save(defaults);
-			Flush();
+			FlushAndCommit();
 
 			SetupGeneralInformation();
 			Css("#options_FillBillingInfo").Checked = false;
@@ -213,7 +211,7 @@ namespace Functional.Drugstore
 		{
 			var supplier = DataMother.CreateSupplier(s => s.AddRegion(session.Load<Region>(524288ul), session));
 			Save(supplier);
-			Flush();
+			FlushAndCommit();
 
 			SetupGeneralInformation();
 			Css("#options_FillBillingInfo").Checked = false;
@@ -495,7 +493,7 @@ namespace Functional.Drugstore
 
 			var supplier2 = DataMother.CreateSupplier();
 			MakeNameUniq(supplier2);
-			Flush();
+			FlushAndCommit();
 
 			Css("#ShowForOneSupplier").Click();
 			SearchSupplier(supplier1.Name);
@@ -514,7 +512,7 @@ namespace Functional.Drugstore
 		{
 			var region = Region.All(session).First(r => r.Name == "Златоуст");
 			Css("#HomeRegionComboBox").Select("Златоуст");
-			Assert.That(Css(String.Format("#browseRegion{0}", region.Id)).Checked, Is.True);
+			Assert.That(Css($"#browseRegion{region.Id}").Checked, Is.True);
 
 			var client = Register();
 			Assert.That(client.HomeRegion, Is.EqualTo(region));

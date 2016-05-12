@@ -27,7 +27,6 @@ namespace Functional.Drugstore
 			var supplier = DataMother.CreateSupplier();
 			Save(supplier);
 			client = DataMother.CreateTestClientWithUser();
-			Flush();
 			Open(client);
 			AssertText("Клиент");
 		}
@@ -38,7 +37,8 @@ namespace Functional.Drugstore
 			var defaultSettings = session.Query<DefaultValues>().First();
 			defaultSettings.AddressesHelpText = "Тестовый текст памятки адреса";
 			session.Save(defaultSettings);
-			Flush();
+			FlushAndCommit();
+
 			Click("Новый пользователь");
 			AssertText("Тестовый текст памятки адреса");
 			Open(client);
@@ -195,7 +195,6 @@ namespace Functional.Drugstore
 			var newClient = DataMother.CreateTestClientWithAddressAndUser();
 			var address = oldClient.Addresses[0];
 			var addressIdForMove = address.Id;
-			Flush();
 
 			Open(address);
 			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());

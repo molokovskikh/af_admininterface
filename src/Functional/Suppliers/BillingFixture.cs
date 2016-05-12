@@ -18,7 +18,6 @@ namespace Functional.Suppliers
 			var user = DataMother.CreateSupplierUser();
 			var supplier = (Supplier)user.RootService;
 			Save(supplier);
-			Flush();
 
 			Open(supplier.Payer);
 			AssertText("Плательщик");

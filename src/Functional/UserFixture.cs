@@ -102,7 +102,7 @@ namespace Functional
 			user.AvaliableAddresses.Add(address);
 			address.Enabled = false;
 			session.SaveOrUpdate(address);
-			Flush();
+
 			Open(user);
 			browser.CheckBox(Find.ByName("user.AvaliableAddresses[0].Id")).Checked = false;
 			Click("Сохранить");

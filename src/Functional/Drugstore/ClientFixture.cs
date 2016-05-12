@@ -195,7 +195,7 @@ namespace Functional.Drugstore
 			Assert.IsNotNull(organizaion);
 			organizaion.Name = "JuridicalOrganization";
 			session.Save(organizaion);
-			Flush();
+
 			Refresh();
 			Click(organizaion.Name);
 			AssertText("Краткое наименование");
@@ -218,7 +218,7 @@ namespace Functional.Drugstore
 			payer.INN = "123321123";
 			session.Save(payer);
 			payer.Name = "Тестовый плательщик " + payer.Id;
-			Flush();
+			FlushAndCommit();
 			DebugContext.Add("clientId", client.Id);
 			DebugContext.Add("payerId", payer.Id);
 

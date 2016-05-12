@@ -19,7 +19,6 @@ namespace Functional.Drugstore
 		public void Setup()
 		{
 			client = DataMother.CreateTestClientWithUser();
-			Flush();
 			settings = client.Settings;
 
 			Open(client, "Settings");

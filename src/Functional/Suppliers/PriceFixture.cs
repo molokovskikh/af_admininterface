@@ -42,7 +42,6 @@ namespace Functional.Suppliers
 			var price = supplier.AddPrice("forDelete");
 			Save(price);
 			session.CreateSQLQuery(string.Format("insert into ordersold.ordershead (RowId, PriceCode) value ({0}, {1})", generator.Next(10000), supplier.Prices[0].Id)).ExecuteUpdate();
-			Flush();
 
 			Open("managep.aspx?cc=" + supplier.Id);
 			Click("Удалить");
@@ -89,7 +88,7 @@ namespace Functional.Suppliers
 			price.Costs[0].Name = "Базовая";
 			price.CostType = 0;
 			session.Save(price);
-			Flush();
+
 			Open(supplier);
 			Click("Настройка");
 			Click("Базовый");
@@ -158,7 +157,7 @@ namespace Functional.Suppliers
 			// выставляем базовой колонкой другую
 			regionalData.Cost = price.Costs[0];
 			Save(regionalData);
-			Flush();
+
 			// Удаляем ценовые колонки, назначенные клиенту
 			Open(supplier);
 			Click("Настройка");

@@ -496,7 +496,7 @@ namespace Functional.Billing
 			client.Addresses.Remove(address);
 			payer.Addresses.Remove(address);
 			session.Delete(address);
-			Flush();
+			FlushAndCommit();
 
 			var errorMessageDiv = browser.Div(Find.ById("ErrorMessageDiv"));
 			Assert.IsTrue(errorMessageDiv.Style.Display.ToLower().Equals("none"));

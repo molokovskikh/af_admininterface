@@ -250,7 +250,7 @@ namespace Functional.Drugstore
 				Update = updateEntity
 			};
 			Save(sert);
-			Flush();
+
 			Open("Main/Stat");
 			Css("#StatisticsTD a").Click();
 			AssertText("Статистика по сертификатам");

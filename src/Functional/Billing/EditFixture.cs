@@ -42,7 +42,7 @@ namespace Functional.Billing
 			var items = selectList.Options;
 			selectList.SelectByValue(items[0].Value);
 			browser.TableCell("savePayer").Buttons.First().Click();
-			Flush();
+
 			session.Refresh(_payer);
 			Assert.IsNull(_payer.Recipient);
 		}
@@ -108,12 +108,9 @@ namespace Functional.Billing
 		[Test]
 		public void Check_audit_record_messages_for_client()
 		{
+			session.Save(new AuditRecord("test_message_for_client", _client));
+
 			Open($"Billing/Edit?BillingCode={_payer.Id}");
-
-			var record = new AuditRecord("test_message_for_client", _client);
-			session.Save(record);
-
-			Flush();
 
 			Assert.IsFalse(browser.CheckBox("filter_Types").Checked);
 			browser.CheckBox("filter_Types").Checked = true;

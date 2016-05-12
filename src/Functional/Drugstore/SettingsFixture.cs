@@ -24,10 +24,9 @@ namespace Functional.Drugstore
 		private DrugstoreSettings settings;
 
 		[SetUp]
-		public new void Setup()
+		public void Setup()
 		{
 			client = DataMother.CreateTestClientWithUser();
-			Flush();
 			settings = client.Settings;
 
 			Open(client, "Settings");
@@ -129,7 +128,7 @@ namespace Functional.Drugstore
 			});
 			Save(supplier);
 			session.Save(new ParseAlgorithm("TextSource"));
-			Flush();
+			FlushAndCommit();
 
 			var price = SearchV2(Css("#drugstore_SmartOrderRules_AssortimentPriceCode_Id"), "Фармаимпекс");
 			Assert.That(price.SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
@@ -148,7 +147,7 @@ namespace Functional.Drugstore
 			});
 			Save(supplier);
 			session.Save(new ParseAlgorithm("TextSource"));
-			Flush();
+			FlushAndCommit();
 
 			var parser = SearchV2(Css("#drugstore_SmartOrderRules_ParseAlgorithm"), "TextSource");
 			Assert.That(parser.SelectedItem, Is.EqualTo("TextSource"));
@@ -486,7 +485,7 @@ namespace Functional.Drugstore
 			var region = session.Load<Region>(64UL);
 			var supplier = DataMother.CreateSupplier(s => s.AddRegion(region, session));
 			Save(supplier);
-			Flush();
+			FlushAndCommit();
 
 			ClickLink("Показать все регионы");
 			Thread.Sleep(500);
@@ -524,7 +523,7 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			client.Settings.NoiseCosts = true;
 			client.Settings.NoiseCostExceptSupplier = supplier;
 			session.SaveOrUpdate(client.Settings);
-			Flush();
+			FlushAndCommit();
 
 			Refresh();
 			//ждем тк список для редактирования отображает js
@@ -547,7 +546,7 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 				s.AddPrice("Ассортиментный прайс", PriceType.Assortment);
 			});
 			Save(supplier);
-			Flush();
+			FlushAndCommit();
 
 			var checkbox = (CheckBox)Css("#drugstore_IsConvertFormat");
 			checkbox.Click();
