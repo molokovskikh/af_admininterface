@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Models;
+using NHibernate;
 using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
@@ -53,35 +54,29 @@ namespace Functional.ForTesting
 			browser.Button(Find.ByValue(applyButtonText)).Click();
 		}
 
-		public static void CheckContactGroupInDb(ContactGroup contactGroup)
+		public static void CheckContactGroupInDb(ISession session, ContactGroup contactGroup)
 		{
-			var contactGroupCount = ArHelper.WithSession(s =>
-				s.CreateSQLQuery("select count(*) from contacts.contact_groups where Id = :ContactGroupId")
-					.SetParameter("ContactGroupId", contactGroup.Id)
-					.UniqueResult());
+			var contactGroupCount = session
+				.CreateSQLQuery("select count(*) from contacts.contact_groups where Id = :ContactGroupId")
+				.SetParameter("ContactGroupId", contactGroup.Id)
+				.UniqueResult();
 			Assert.That(Convert.ToInt32(contactGroupCount), Is.EqualTo(1), "Не найдена группа контактной информации");
 		}
 
-		public static int GetCountContactsInDb(ContactGroup contactGroup)
+		public static int GetCountContactsInDb(ISession session, ContactGroup contactGroup)
 		{
-			var contactIds = ArHelper.WithSession(s =>
-				s.CreateSQLQuery("select Id from contacts.contacts where ContactOwnerId = :ownerId")
-					.SetParameter("ownerId", contactGroup.Id)
-					.List());
+			var contactIds = session
+				.CreateSQLQuery("select Id from contacts.contacts where ContactOwnerId = :ownerId")
+				.SetParameter("ownerId", contactGroup.Id)
+				.List();
 			return contactIds.Count;
 		}
 
-		public static IList<string> GetPersons(ContactGroup contactGroup)
+		public static IList<string> GetPersons(ISession session, ContactGroup contactGroup)
 		{
-			var personNames = ArHelper.WithSession(s =>
-				s.CreateSQLQuery("select Name from contacts.persons where ContactGroupId = :contactGroupId")
-					.SetParameter("contactGroupId", contactGroup.Id)
-					.List<string>());
-			return personNames;
-		}
-
-		public static void DeleteContact(IE browser, ContactGroup contactGroup)
-		{
+			return session.CreateSQLQuery("select Name from contacts.persons where ContactGroupId = :contactGroupId")
+				.SetParameter("contactGroupId", contactGroup.Id)
+				.List<string>();
 		}
 	}
 }

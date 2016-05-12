@@ -64,7 +64,7 @@ namespace Functional.Drugstore
 
 			// Проверка, что контактная запись удалена
 			Thread.Sleep(500);
-			var count = ContactInformationHelper.GetCountContactsInDb(client.Addresses[0].ContactGroup);
+			var count = ContactInformationHelper.GetCountContactsInDb(session, client.Addresses[0].ContactGroup);
 			Assert.That(count, Is.EqualTo(countContacts - 1));
 		}
 
@@ -132,8 +132,8 @@ namespace Functional.Drugstore
 			Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
 				"Не совпадают Id владельца группы у клиента и у новой группы");
 
-			ContactInformationHelper.CheckContactGroupInDb(group);
-			countContacts = ContactInformationHelper.GetCountContactsInDb(group);
+			ContactInformationHelper.CheckContactGroupInDb(session, group);
+			countContacts = ContactInformationHelper.GetCountContactsInDb(session, group);
 			Assert.That(countContacts, Is.EqualTo(countContacts));
 		}
 

@@ -336,8 +336,8 @@ namespace Functional.Drugstore
 			Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
 				"Не совпадают Id владельца группы у клиента и у новой группы");
 			// Проверка, что контактные записи создались в БД
-			ContactInformationHelper.CheckContactGroupInDb(group);
-			var countContacts = ContactInformationHelper.GetCountContactsInDb(group);
+			ContactInformationHelper.CheckContactGroupInDb(session, group);
+			var countContacts = ContactInformationHelper.GetCountContactsInDb(session, group);
 			Assert.That(countContacts, Is.EqualTo(2));
 		}
 
@@ -358,8 +358,8 @@ namespace Functional.Drugstore
 			Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
 				"Не совпадают Id владельца группы у клиента и у новой группы");
 			// Проверка, что контактные записи создались в БД
-			ContactInformationHelper.CheckContactGroupInDb(group);
-			var persons = ContactInformationHelper.GetPersons(group);
+			ContactInformationHelper.CheckContactGroupInDb(session, group);
+			var persons = ContactInformationHelper.GetPersons(session, group);
 			Assert.That(persons.Count, Is.EqualTo(2));
 			Assert.That(persons[0], Is.EqualTo("Test person"));
 			Assert.That(persons[1], Is.EqualTo("Test person2"));
@@ -380,7 +380,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
 			ClickButton("Сохранить");
 			// Проверка, что контактная запись удалена
-			var countContacts = ContactInformationHelper.GetCountContactsInDb(client.Users[0].ContactGroup);
+			var countContacts = ContactInformationHelper.GetCountContactsInDb(session, client.Users[0].ContactGroup);
 			Assert.That(countContacts, Is.EqualTo(1));
 		}
 
@@ -400,7 +400,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByName(String.Format("persons[{0}].Delete", group.Persons[0].Id))).Click();
 			ClickButton("Сохранить");
 			// Проверка, что контактная запись удалена
-			var persons = ContactInformationHelper.GetPersons(client.Users[0].ContactGroup);
+			var persons = ContactInformationHelper.GetPersons(session, client.Users[0].ContactGroup);
 			Assert.That(persons.Count, Is.EqualTo(1));
 			Assert.That(persons[0], Is.EqualTo("Test person2"));
 		}
@@ -421,7 +421,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("");
 			ClickButton("Сохранить");
 			// Проверка, что контактная запись удалена
-			var persons = ContactInformationHelper.GetPersons(client.Users[0].ContactGroup);
+			var persons = ContactInformationHelper.GetPersons(session, client.Users[0].ContactGroup);
 			Assert.That(persons.Count, Is.EqualTo(1));
 			Assert.That(persons[0], Is.EqualTo("Test person2"));
 		}
@@ -439,7 +439,7 @@ namespace Functional.Drugstore
 			ClickButton("Сохранить");
 			AssertText("Сохранено");
 			// Проверка, что контактная запись изменена
-			var persons = ContactInformationHelper.GetPersons(user.ContactGroup);
+			var persons = ContactInformationHelper.GetPersons(session, user.ContactGroup);
 			Assert.That(persons.Count, Is.EqualTo(1));
 			Assert.That(persons[0], Is.EqualTo("Test person changed"));
 		}
@@ -718,7 +718,7 @@ namespace Functional.Drugstore
 
 			// Проверка, что комментарий записан
 			session.Refresh(contact);
-			Assert.That(contact.Comment, Is.EqualTo("some comment"));
+			Assert.That(contact.Comment, Is.EqualTo("some comment"), contact.Id.ToString());
 		}
 
 		[Test, NUnit.Framework.Description("Перемещение только пользователя (без адреса доставки) к другому клиенту")]

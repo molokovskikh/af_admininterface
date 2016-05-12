@@ -75,7 +75,6 @@ limit 1")
 			_supplier = CreateSupplier();
 			_catalog = FindFirstFreeCatalog();
 			_promotion = CreatePromotion(_supplier, _catalog);
-			session.Flush();
 
 			Open();
 			Click("Промо-акции");

@@ -17,7 +17,7 @@ namespace Functional.ForTesting
 		public string DataRoot;
 
 		[SetUp]
-		public void Setup()
+		public void FunctionalSetup()
 		{
 			DataRoot = "../../../AdminInterface/Data/";
 			DataMother = new DataMother(session);
