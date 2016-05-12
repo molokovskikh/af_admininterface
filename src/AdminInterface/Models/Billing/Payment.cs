@@ -373,38 +373,6 @@ namespace AdminInterface.Models.Billing
 				&& p.DocumentNumber == DocumentNumber) != null;
 		}
 
-		protected override void OnUpdate()
-		{
-			UpdateAd();
-			base.OnUpdate();
-		}
-
-		protected override void OnSave()
-		{
-			UpdateAd();
-			base.OnSave();
-		}
-
-		private void UpdateAd()
-		{
-			if (Payer != null
-				&& ForAd
-				&& this.IsChanged(p => p.ForAd)) {
-				//магия будь бдителен!
-				//запрос должен быть в другой сессии а то будет stackoverflow
-				Advertising ad;
-				using (new SessionScope())
-					ad = ActiveRecordLinqBase<Advertising>.Queryable.FirstOrDefault(a => a.Payer == Payer && a.Payment == null);
-				if (ad == null) {
-					ad = new Advertising(Payer);
-					ad.Cost = AdSum.Value;
-				}
-				Ad = ad;
-				ad.PayedSum = AdSum;
-				ad.Payment = this;
-			}
-		}
-
 		public void DoUpdate()
 		{
 			UpdateInn();

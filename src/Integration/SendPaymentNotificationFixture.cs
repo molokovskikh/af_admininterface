@@ -21,6 +21,7 @@ namespace Integration
 			session.Save(payer);
 			Flush();
 			SystemTime.Now = () => new DateTime(2011, 7, 27, 1, 2, 1);
+			FlushAndCommit();
 
 			new SendPaymentNotification().Process();
 			var message = session.Load<UserMessage>(client.Users.First().Id);

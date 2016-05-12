@@ -113,7 +113,7 @@ namespace Integration.Tasks
 
 		private void Check()
 		{
-			Flush();
+			FlushAndCommit();
 			HideScope();
 			try {
 				new UpdateAccountTask().Execute();
@@ -125,7 +125,7 @@ namespace Integration.Tasks
 
 		private void Check(int pageSize)
 		{
-			Flush();
+			FlushAndCommit();
 			HideScope();
 			try {
 				new UpdateAccountTask {

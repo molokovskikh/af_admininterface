@@ -27,6 +27,7 @@ namespace Integration.Tasks
 		{
 			var report = new Report { Payer = payer };
 			Save(report);
+			FlushAndCommit();
 
 			processor.Execute();
 
@@ -44,7 +45,7 @@ namespace Integration.Tasks
 			Assert.That(account.Report.Id, Is.Not.EqualTo(0u));
 			session.Clear();
 			session.Delete(account.Report);
-			session.Flush();
+			FlushAndCommit();
 
 			processor.Execute();
 

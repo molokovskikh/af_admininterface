@@ -24,6 +24,7 @@ namespace Integration.Tasks
 		public void Process_invoice_part_ready_for_processing()
 		{
 			var invoice = BuildInvoice(DateTime.Now.Date);
+			FlushAndCommit();
 
 			processor.Execute();
 
