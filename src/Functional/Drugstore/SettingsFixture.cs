@@ -88,6 +88,7 @@ namespace Functional.Drugstore
 		{
 			var supplier = DataMother.CreateMatrix();
 			Maintainer.MaintainIntersection(session, client, client.Orgs().First());
+			FlushAndCommit();
 
 			Css("#drugstore_EnableOfferMatrix").Click();
 			var select = Search("Фармаимпекс", "Ассортиментный прайс для матрицы закупок");

@@ -48,6 +48,8 @@ namespace Functional.Drugstore
 				Commit = true,
 			};
 			Save(updateLogEnity);
+			FlushAndCommit();
+
 			browser.Link(l => l.Text == "История обновлений").Click();
 			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений")))) {
 				Assert.That(openedWindow.Text, Is.StringContaining("История обновлений"));

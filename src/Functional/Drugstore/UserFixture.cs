@@ -639,6 +639,7 @@ namespace Functional.Drugstore
 			};
 			session.Save(legalEntity);
 			payer.JuridicalOrganizations.Add(legalEntity);
+			FlushAndCommit();
 
 			RegisterUserWithAddress(client, browser);
 			Css("#address_LegalEntity_Id").Select("Тестовая организация 2");

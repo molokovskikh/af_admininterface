@@ -3,11 +3,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Functional.ForTesting;
-using Integration.ForTesting;
 using NUnit.Framework;
-using Test.Support.Web;
-using WatiN.Core.UtilityClasses;
-using WatiN.CssSelectorExtensions;
 
 namespace Functional.Billing
 {
@@ -38,10 +34,10 @@ namespace Functional.Billing
 				Description = "Тест"
 			};
 			session.Save(operation);
-			session.Flush();
+			FlushAndCommit();
 
-			Click(String.Format("Платежи/Счета {0}", DateTime.Today.Year));
-			var selector = String.Format("#balance-summary-{0}-tab", DateTime.Today.Year);
+			Click($"Платежи/Счета {DateTime.Today.Year}");
+			var selector = $"#balance-summary-{DateTime.Today.Year}-tab";
 			WaitForCss(selector);
 			Click(Css(selector), "Редактировать");
 
