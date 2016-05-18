@@ -99,7 +99,7 @@ namespace Integration.Tasks
 			session.Refresh(user);
 			Assert.IsFalse(user.Accounting.ReadyForAccounting);
 
-			session.SaveEach(updates.Take(5));
+			session.SaveEach(updates.Skip(5).Take(5));
 			Check();
 			session.Refresh(user);
 			Assert.IsTrue(user.Accounting.ReadyForAccounting);
