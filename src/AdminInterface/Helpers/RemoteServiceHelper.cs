@@ -28,7 +28,11 @@ namespace AdminInterface.Helpers
 		public static void RemotingCall(Action<IRemotePriceProcessor> action)
 		{
 			if (Stub != null) {
-				action(Stub);
+				try {
+					action(Stub);
+				} catch(Exception e) {
+					_log.Warn("Ошибка при обращении к сервису обработки прайс листов", e);
+				}
 				return;
 			}
 

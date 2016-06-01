@@ -97,7 +97,8 @@ namespace AdminInterface.Controllers
 				IsOrderProcUnavailable = RemoteServiceHelper.IsUnavailable(orderProcStatus),
 				PriceProcessorStatus = priceProcessorStatus,
 				IsPriceProcessorUnavailable = RemoteServiceHelper.IsUnavailable(priceProcessorStatus),
-				PriceProcessorStat = priceProcessorStat
+				IsPriceProcessorStatUnavailable = String.IsNullOrEmpty(priceProcessorStat),
+				PriceProcessorStat = String.IsNullOrEmpty(priceProcessorStat) ? "Недоступна" : priceProcessorStat
 			};
 		}
 

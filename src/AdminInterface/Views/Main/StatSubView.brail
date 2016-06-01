@@ -7,14 +7,33 @@
 			$("#order-proc-status").text(data.OrderProcStatus);
 			if (data.IsOrderProcUnavailable)
 				$("#order-proc-status").addClass("service-stoped");
-			$("#order-proc-status").removeClass("waiter")
+			$("#order-proc-status").removeClass("waiter");
 			$("#price-processor-status").text(data.PriceProcessorStatus);
 			if (data.IsPriceProcessorUnavailable)
 				$("#price-processor-status").addClass("service-stoped");
-			$("#price-processor-status").removeClass("waiter")
-			$("#price-processor-stat a").text(data.PriceProcessorStat);
-			$("#price-processor-stat").removeClass("waiter")
-		});
+			$("#price-processor-status").removeClass("waiter");
+
+			$("#price-processor-stat").removeClass("waiter");
+			if (data.IsPriceProcessorStatUnavailable) {
+				$("#price-processor-stat").addClass("service-stoped");
+				$("#price-processor-stat").text(data.PriceProcessorStat);
+			} else {
+				$("#price-processor-stat a").text(data.PriceProcessorStat);
+			}
+		})
+			.fail(function () {
+				$("#order-proc-status").removeClass("waiter");
+				$("#order-proc-status").addClass("service-stoped");
+				$("#order-proc-status").text("Недоступна")
+
+				$("#price-processor-status").removeClass("waiter");
+				$("#price-processor-status").addClass("service-stoped");
+				$("#price-processor-status").text("Недоступна")
+
+				$("#price-processor-stat").removeClass("waiter");
+				$("#price-processor-stat").addClass("service-stoped");
+				$("#price-processor-stat").text("Недоступна")
+			});
 	});
 </script>
 
