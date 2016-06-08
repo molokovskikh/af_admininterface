@@ -304,5 +304,22 @@ namespace Integration.Controllers
 			Flush();
 			Assert.AreEqual(session.Get<User>(user.Id).UserUpdateInfo.AFAppVersion, 999);
 		}
+
+		/// <summary>
+		/// Добавление пользователя сторонним приложением
+		/// </summary>
+		[Test]
+		public void RemoteRegistration_test()
+		{
+			var client = DataMother.CreateClientAndUsers();
+			var clientUserPast = client.Users.OrderByDescending(s => s.Id).FirstOrDefault();
+			controller.AddClient(client.Id);
+			Flush();
+			var clientUserCurrent = client.Users.OrderByDescending(s => s.Id).FirstOrDefault();
+			var regRaw = Response.OutputContent.Trim().Split(',');
+			Assert.AreEqual(regRaw.Length, 2);
+			Assert.AreEqual(regRaw[0], clientUserCurrent.Login);
+			Assert.AreNotEqual(clientUserPast.Id, clientUserCurrent.Id);
+		}
 	}
 }

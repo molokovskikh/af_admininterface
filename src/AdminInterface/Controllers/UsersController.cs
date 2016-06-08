@@ -104,6 +104,46 @@ namespace AdminInterface.Controllers
 			return json.ToString();
 		}
 
+		/// <summary>
+		/// Добавление ftp-пользователя по Id клиента (для стороннего приложения)
+		/// </summary>
+		/// <param name="id">Id клиента</param>
+		public void AddClient(uint id)
+		{
+			Person[] persons = new Person[0];
+			string comment = "Пользователь создан из интерфейса поставщика";
+			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(id)*/
+			var currentClient = DbSession.Get<Client>(id);
+			DbSession.Get<Supplier>(id);
+			var service = Service.FindAndCheck<Service>(id);
+			var user = new User(service);
+
+			service.AddUser(user);
+			user.Setup(DbSession);
+			var password = user.CreateInAd(Session);
+			user.SetFtpAccess(user.FtpAccess);
+			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
+			DbSession.Save(passwordChangeLog);
+			user.UpdatePersons(persons);
+			DbSession.Save(service);
+
+			new Mailer(DbSession).Registred(user, comment, Defaults);
+			user.AddBillingComment(comment);
+
+			if (user.Client != null)
+			{
+				var message = string.Format("$$$Пользователю {0} - ({1}) подключены следующие адреса доставки: \r\n {2}",
+					user.Id,
+					user.Name,
+					user.AvaliableAddresses.Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
+				DbSession.Save(new AuditRecord(message, user.Client) { MessageType = LogMessageType.System });
+			}
+			DbSession.Save(currentClient);
+			Response.StatusCode = 200;
+			RenderText(user.Login + "," + password.Password);
+			CancelView();
+		}
+
 		[AccessibleThrough(Verb.Get)]
 		public void Add(uint clientId, User client = null)
 		{
