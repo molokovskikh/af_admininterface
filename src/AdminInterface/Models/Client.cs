@@ -167,6 +167,9 @@ namespace AdminInterface.Models
 		[HasMany(ColumnKey = "ClientId", Inverse = true, Lazy = true)]
 		public virtual IList<ClientLogRecord> Logs { get; set; }
 
+		[Property, Description("Ftp-интеграция")]
+		public virtual bool FtpIntegration { get; set; }
+
 		[HasAndBelongsToMany(typeof(Payer),
 			Lazy = true,
 			ColumnKey = "ClientId",

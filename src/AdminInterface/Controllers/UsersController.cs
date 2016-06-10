@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Configuration;
 using System.Dynamic;
 using System.IO;
 using System.Text;
@@ -24,6 +25,8 @@ using Common.Tools;
 using System.Web;
 using Common.Web.Ui.Models;
 using System.Linq;
+using System.Reflection;
+using System.Security.AccessControl;
 using AdminInterface.Components;
 using AdminInterface.Models.AFNet;
 using Common.Web.Ui.Models.Audit;
@@ -130,15 +133,76 @@ namespace AdminInterface.Controllers
 			new Mailer(DbSession).Registred(user, comment, Defaults);
 			user.AddBillingComment(comment);
 
-			if (user.Client != null)
-			{
+			if (user.Client != null) {
 				var message = string.Format("$$$Пользователю {0} - ({1}) подключены следующие адреса доставки: \r\n {2}",
 					user.Id,
 					user.Name,
 					user.AvaliableAddresses.Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
 				DbSession.Save(new AuditRecord(message, user.Client) { MessageType = LogMessageType.System });
 			}
+			user.UseFtpGateway = true;
+#if !DEBUG
+			//создаем папку 
+			var root = ConfigurationManager.AppSettings["FtpUserFolder"]+ user.Login;
+			var username = String.Format(@"ANALIT\{0}", user.Login);
+			Directory.CreateDirectory(root);
+			
+			//раздаем права на папку
+			var rootDirectorySecurity = Directory.GetAccessControl(root);
+			var rule =
+				new FileSystemAccessRule(username,
+					FileSystemRights.Read,
+					InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+					PropagationFlags.InheritOnly,
+					AccessControlType.Allow);
+			rootDirectorySecurity.AddAccessRule(rule);
+
+			rule = new FileSystemAccessRule(username,
+				FileSystemRights.Write,
+				InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+				PropagationFlags.InheritOnly,
+				AccessControlType.Allow);
+			rootDirectorySecurity.AddAccessRule(rule);
+
+			rule = new FileSystemAccessRule(username,
+				FileSystemRights.Delete,
+				InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+				PropagationFlags.InheritOnly,
+				AccessControlType.Allow);
+			rootDirectorySecurity.AddAccessRule(rule);
+
+			rule = new FileSystemAccessRule(username,
+				FileSystemRights.ExecuteFile,
+				InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+				PropagationFlags.InheritOnly,
+				AccessControlType.Allow);
+			rootDirectorySecurity.AddAccessRule(rule);
+
+			rule = new FileSystemAccessRule(username,
+				FileSystemRights.ListDirectory,
+				InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+				PropagationFlags.InheritOnly,
+				AccessControlType.Allow);
+			rootDirectorySecurity.AddAccessRule(rule);
+
+			rule = new FileSystemAccessRule(username,
+				FileSystemRights.CreateDirectories,
+				InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+				PropagationFlags.InheritOnly,
+				AccessControlType.Allow);
+			rootDirectorySecurity.AddAccessRule(rule);
+
+			rule = new FileSystemAccessRule(username,
+				FileSystemRights.WriteAttributes,
+				InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+				PropagationFlags.InheritOnly,
+				AccessControlType.Deny);
+			rootDirectorySecurity.AddAccessRule(rule);
+			Directory.SetAccessControl(root, rootDirectorySecurity);
+#endif
+
 			DbSession.Save(currentClient);
+			DbSession.Save(user);
 			Response.StatusCode = 200;
 			RenderText(user.Login + "," + password.Password);
 			CancelView();
@@ -328,7 +392,8 @@ namespace AdminInterface.Controllers
 			if (string.IsNullOrEmpty(jsonSource)) {
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
 				user.OrderRegionMask = regionSettings.GetOrderMask();
-			} else {
+			}
+			else {
 				mails = user.EmailForCard;
 			}
 			user.SetFtpAccess(user.FtpAccess);
@@ -689,8 +754,9 @@ namespace AdminInterface.Controllers
 				if (user.Name.ToLower().Contains(text.ToLower()))
 					returned.Add(new { id = user.Id, name = $"Код: {user.Id} - комментарий: {user.Name}" });
 				if (user.RootService != null && user.RootService.Name.ToLower().Contains(text.ToLower()))
-					returned.Add(new { id = user.Id, name = $"Код: {user.Id} - клиент: {user.RootService.Id} - {user.RootService.Name}"
-				});
+					returned.Add(new {
+						id = user.Id, name = $"Код: {user.Id} - клиент: {user.RootService.Id} - {user.RootService.Name}"
+					});
 			}
 			return returned.ToArray();
 		}
@@ -700,8 +766,8 @@ namespace AdminInterface.Controllers
 			// только сотрудникам подразделений "Управление" и " Отдел регионального развития"
 			var list = DbSession.Query<Administrator>().
 				Where(x => (x.RegionMask & regionMask) > 0
-									&& (x.Department == Department.Administration || x.Department == Department.Manager)
-									&& x.PhoneSupport.StartsWith("9"))
+				           && (x.Department == Department.Administration || x.Department == Department.Manager)
+				           && x.PhoneSupport.StartsWith("9"))
 				.OrderBy(x => x.ManagerName)
 				.ToList();
 			return list.Where(x => !ADHelper.IsDisabled(x.UserName)).Distinct(new AdministratorComparer()).ToList();

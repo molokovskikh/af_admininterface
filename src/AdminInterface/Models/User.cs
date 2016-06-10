@@ -192,6 +192,9 @@ namespace AdminInterface.Models
 		[Property, Description("Доступ к фтп поставщика"), Auditable]
 		public virtual bool FtpAccess { get; set; }
 
+		[Property, Description("Использовать Ftp интеграцию"), Auditable]
+		public virtual bool UseFtpGateway { get; set; }
+
 		[Property(NotNull = true), Description("Имя"), Auditable]
 		public virtual string Login { get; set; }
 
