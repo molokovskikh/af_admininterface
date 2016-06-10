@@ -68,6 +68,7 @@ ${app.Asset("smart.order.settings.js")}
 						<td colspan="2">
 							${app.Edit("drugstore.IsHiddenFromSupplier")}<br>
 							${app.Edit("drugstore.AllowDelayOfPayment")}<br>
+							${app.Edit("client.FtpIntegration")}<br>
 							${app.Edit("drugstore.ServiceClient")}<br>
 							${app.Edit("drugstore.IgnoreNewPrices")}<br>
 							${app.Edit("drugstore.IgnoreNewPriceForUser")}<br>
