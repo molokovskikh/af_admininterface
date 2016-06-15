@@ -32,6 +32,7 @@
 					<th>${app.Sortable("Отключена АналитФармация", "AgencyDisabled")}</th>
 					<th>${app.Sortable("Наименование", "Name")}</th>
 					<th>${app.Sortable("Поставщик", "SupplierName")}</th>
+					<th style="width: 80px; font-weight:normal;">Модерация пройдена</th>
 					<th></th>
 					<th></th>
 				</tr>
@@ -51,6 +52,13 @@
 				</td>
 				<td>${promotion.Name}</td>
 				<td>${promotion.PromotionOwnerSupplier.Name}</td>
+				<td>
+					<% if promotion.Moderated: %>
+					Да
+			<% else: %>
+					<font style='font-weight:bold'>Нет</font>
+					<% end %>
+				</td>
 				<td><a href="${siteroot}/Promotions/Edit?id=${promotion.Id}">Редактировать</a></td>
 				<td>
 					<form method=post action="${siteroot}/Promotions/Delete?id=${promotion.Id}">

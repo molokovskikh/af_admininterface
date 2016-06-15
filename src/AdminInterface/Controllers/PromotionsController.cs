@@ -287,6 +287,7 @@ namespace AdminInterface.Controllers
 				promotion.RegionMask = promoRegions.Aggregate(0UL, (v, a) => a + v);
 
 				BindObjectInstance(promotion, "promotion");
+				promotion.UpdateStatus();
 
 				if (IsValid(promotion)) {
 					var file = Request.Files["inputfile"] as HttpPostedFile;
@@ -308,6 +309,7 @@ namespace AdminInterface.Controllers
 						}
 					}
 
+					promotion.UpdateStatus();
 					DbSession.Update(promotion);
 
 					RedirectToAction("Index");
@@ -324,6 +326,7 @@ namespace AdminInterface.Controllers
 			var promotion = DbSession.Load<SupplierPromotion>(id);
 			promotion.Enabled = !promotion.Enabled;
 			Notify("Сохранено");
+			promotion.UpdateStatus();
 			DbSession.Save(promotion);
 			RedirectToAction("Index", filter.ToUrl());
 		}
@@ -333,6 +336,7 @@ namespace AdminInterface.Controllers
 			var promotion = DbSession.Load<SupplierPromotion>(id);
 			promotion.AgencyDisabled = !promotion.AgencyDisabled;
 			Notify("Сохранено");
+			promotion.UpdateStatus();
 			DbSession.Save(promotion);
 			RedirectToAction("Index", filter.ToUrl());
 		}
@@ -354,7 +358,6 @@ namespace AdminInterface.Controllers
 				Begin = DateTime.Now.Date,
 				End = DateTime.Now.AddDays(6).Date,
 			};
-
 			PropertyBag["promotion"] = promotion;
 			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(DbSession, promotion.PromotionOwnerSupplier.MaskRegion);
 
@@ -373,6 +376,7 @@ namespace AdminInterface.Controllers
 						promotion.PromoFile = file.FileName;
 					}
 
+					promotion.UpdateStatus();
 					DbSession.Save(promotion);
 
 					if (file != null && file.ContentLength > 0) {
@@ -454,6 +458,7 @@ namespace AdminInterface.Controllers
 				ActiveRecordMediator.Evict(promotion);
 				if (Validator.IsValid(promotion) && promotion.Catalogs.Count > 0) {
 					Notify("Сохранено");
+					promotion.UpdateStatus();
 					DbSession.Update(promotion);
 					RedirectToAction("EditCatalogs", filter.ToUrl());
 				}
