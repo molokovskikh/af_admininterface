@@ -129,4 +129,7 @@
 		</tr>
 	</table>
 	<input type=submit value=Сохранить>
+	${app.Edit("promotion.Moderated")}
+	<label for="promotion_Moderated" style='cursor:pointer;'>Модерация пройдена</label>
+
 </form>

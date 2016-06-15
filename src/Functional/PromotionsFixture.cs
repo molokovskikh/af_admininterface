@@ -53,8 +53,10 @@ limit 1")
 				Name = catalog.Name,
 				Begin = DateTime.Now.Date.AddDays(-7),
 				End = DateTime.Now.Date,
+				Moderated = true,
 				Catalogs = new List<Catalog> { catalog }
 			};
+			supplierPromotion.UpdateStatus();
 			session.Save(supplierPromotion);
 			return supplierPromotion;
 		}
@@ -154,6 +156,36 @@ limit 1")
 			Assert.That(_promotion.Enabled, Is.True);
 			Assert.That(_promotion.AgencyDisabled, Is.False);
 			RowPromotionNotExists(_promotion);
+		}
+
+		[Test(Description = "проверяем включение/выключение модерации акций")]
+		public void PromotionModeration()
+		{
+			//отключаем акцию
+			Assert.That(_promotion.Moderated, Is.True);
+			Assert.That(_promotion.IsActive(), Is.True);
+			WaitForText(_promotion.Name);
+			Click("Редактировать");
+			WaitForText("Акция активна");
+			((CheckBox)Css("#promotion_Moderated")).Click();
+			ClickButton("Сохранить");
+			session.Refresh(_promotion);
+			Assert.That(_promotion.Moderated, Is.False);
+			Assert.That(_promotion.IsActive(), Is.False);
+			Open();
+			Click("Промо-акции");
+			//находим ее в списке отключенных
+			var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
+			list.Select("Отключенные");
+			ClickButton("Показать");
+			WaitForText(_promotion.Name);
+			Click("Редактировать");
+			WaitForText("Акция не активна");
+			((CheckBox)Css("#promotion_Moderated")).Click();
+			ClickButton("Сохранить");
+			session.Refresh(_promotion);
+			Assert.That(_promotion.Moderated, Is.True);
+			Assert.That(_promotion.IsActive(), Is.True);
 		}
 
 		[Test(Description = "проверяем включение/выключение акций административно АК Инфорум")]
