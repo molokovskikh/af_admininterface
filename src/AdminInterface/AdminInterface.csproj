@@ -578,6 +578,7 @@
     <Content Include="Views\MailsModering\GetMail.brail" />
     <Content Include="Views\Mail\DeleteMiniMail.brail" />
     <Content Include="Views\Mail\ModifyDoc.brail" />
+    <Content Include="Views\Mail\PromotionsNeedModeration_html.brail" />
     <None Include="Views\Mail\RegisterNews.brail" />
     <Content Include="Views\ManagerReports\ClientAddressesMonitor.brail" />
     <None Include="Views\ManagerReports\ClientConditionsMonitoring.brail" />

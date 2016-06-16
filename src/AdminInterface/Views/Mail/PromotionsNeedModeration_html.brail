@@ -1,0 +1,20 @@
+﻿На ${System.DateTime.Now}<br/>
+Ожидают модерации ${promotions.Count} промо-акций:<br/>
+<table>
+<thead>
+	<tr>
+		<th>№</th>
+		<th>Наименование</th>
+		<th>Поставщик</th>
+	</tr>
+</thead>
+<tbody>
+<% for promotion in promotions: %>
+	<tr>
+		<td>${promotion.Id}</td>
+		<td>${promotion.Name}</td>
+		<td>${promotion.PromotionOwnerSupplier.Name}</td>
+	</tr>
+<% end %>
+</tbody>
+</table>

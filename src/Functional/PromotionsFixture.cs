@@ -14,6 +14,7 @@ namespace Functional
 		private PromotionOwnerSupplier _supplier;
 		private Catalog _catalog;
 		private SupplierPromotion _promotion;
+		private SupplierPromotion _promotionNotModerated;
 
 		private PromotionOwnerSupplier CreateSupplier()
 		{
@@ -44,7 +45,7 @@ limit 1")
 			return session.Load<Catalog>(catalogId);
 		}
 
-		private SupplierPromotion CreatePromotion(PromotionOwnerSupplier supplier, Catalog catalog)
+		private SupplierPromotion CreatePromotion(PromotionOwnerSupplier supplier, Catalog catalog, bool moderated = true)
 		{
 			var supplierPromotion = new SupplierPromotion {
 				Enabled = true,
@@ -53,7 +54,7 @@ limit 1")
 				Name = catalog.Name,
 				Begin = DateTime.Now.Date.AddDays(-7),
 				End = DateTime.Now.Date,
-				Moderated = true,
+				Moderated = moderated,
 				Catalogs = new List<Catalog> { catalog }
 			};
 			supplierPromotion.UpdateStatus();
@@ -74,7 +75,7 @@ limit 1")
 			_supplier = CreateSupplier();
 			_catalog = FindFirstFreeCatalog();
 			_promotion = CreatePromotion(_supplier, _catalog);
-
+			_promotionNotModerated = CreatePromotion(_supplier, _catalog, false);
 			Open();
 			Click("Промо-акции");
 			AssertText("Список акций");
@@ -93,16 +94,16 @@ limit 1")
 
 		public void RowPromotionNotExists(SupplierPromotion promotion)
 		{
-			var row = browser.TableRow("SupplierPromotionRow" + _promotion.Id);
+			var row = browser.TableRow("SupplierPromotionRow" + promotion.Id);
 			Assert.That(row.Exists, Is.False);
 		}
 
 		public TableRow RowPromotionExists(SupplierPromotion promotion)
 		{
-			var row = browser.TableRow("SupplierPromotionRow" + _promotion.Id);
+			var row = browser.TableRow("SupplierPromotionRow" + promotion.Id);
 			Assert.That(row.Exists, Is.True);
-			Assert.That(row.OwnTableCell(Find.ByText(_promotion.PromotionOwnerSupplier.Name)).Exists, Is.True);
-			Assert.That(row.OwnTableCell(Find.ByText(_promotion.Name)).Exists, Is.True);
+			Assert.That(row.OwnTableCell(Find.ByText(promotion.PromotionOwnerSupplier.Name)).Exists, Is.True);
+			Assert.That(row.OwnTableCell(Find.ByText(promotion.Name)).Exists, Is.True);
 			Assert.That(row.OwnTableCells[1].CheckBoxes.Count, Is.EqualTo(1));
 			Assert.That(row.OwnTableCells[1].CheckBoxes[0].Checked, Is.EqualTo(promotion.Enabled));
 			Assert.That(row.OwnTableCells[2].CheckBoxes.Count, Is.EqualTo(1));
@@ -129,6 +130,29 @@ limit 1")
 			ClickButton("Показать");
 
 			RowPromotionExists(_promotion);
+		}
+
+		[Test(Description = "проверяем работу фильтра по модерации акций")]
+		public void CheckFilterModeration()
+		{
+			RowPromotionNotExists(_promotionNotModerated);
+			RowPromotionExists(_promotion);
+
+			//ее не должно быть в списке не прошедших модерацию
+			var list = browser.SelectList(Find.ByName("filter.PromotionModerated"));
+			list.Select("Не прошедшие модерацию");
+			ClickButton("Показать");
+
+			RowPromotionExists(_promotionNotModerated);
+			RowPromotionNotExists(_promotion);
+
+			//она должна быть в списке прошедших модерацию
+			list = browser.SelectList(Find.ByName("filter.PromotionModerated"));
+			list.Select("Прошедшие модерацию");
+			ClickButton("Показать");
+
+			RowPromotionExists(_promotion);
+			RowPromotionNotExists(_promotionNotModerated);
 		}
 
 		[Test(Description = "проверяем включение/выключение акций")]

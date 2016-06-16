@@ -554,5 +554,18 @@ namespace AdminInterface.Mailers
 			Subject = edit.Subject();
 			Body = edit.Body();
 		}
+
+
+		public MonorailMailer PremoderatedPromotions(List<SupplierPromotion> promotions)
+		{
+			From = "register@analit.net";
+			To = "ayakimenko@analit.net";
+			//		To = "billing@analit.net, office@analit.net";
+			IsBodyHtml = true;
+			Template = "PromotionsNeedModeration_html";
+			PropertyBag["promotions"] = promotions;
+			Subject = String.Format("Ожидают модерации {0} промо-акция(й)", promotions.Count);
+			return this;
+		}
 	}
 }
