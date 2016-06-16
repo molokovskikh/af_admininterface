@@ -33,8 +33,8 @@ form div.submit
 
 .FilterBlock
 {
-	width:40%; 
-	background-color:rgb(216, 241, 255); 
+	width:40%;
+	background-color:rgb(216, 241, 255);
 	margin-bottom:10px;
 	padding: 10px 30px 10px 30px;
 }
@@ -76,4 +76,11 @@ form div.submit
 .page_1_3_broken{
 	float: left;
 	width: 33%;
+}
+
+.input-w191 input[type='text'] {
+	width: 187px;
+}
+.input-w191 select{
+	width: 191px;
 }

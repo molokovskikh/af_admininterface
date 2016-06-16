@@ -6,14 +6,28 @@
 
 <div style="padding: 10px">
 
-	<div class=block style="padding:0;">
+	<div class="block input-w191" style="padding:0;">
 			<div style="margin:10px" align="center">
 				<h3>Список акций</h3>
 				${app.BeginFormFor("filter")}
 				${app.FilterFor("filter.PromotionStatus")}
+				${app.FilterFor("filter.PromotionModerated")}
 				${app.FilterFor("filter.SearchText")}
 				${app.EndFormFor("filter")}
 			</div>
+			<script>
+			////Модерация для статуса является уточнением, поэтому есть смысл учитывать модерацию только для статуса 'All'
+			$(function(){
+			$('[name="filter.PromotionModerated"]').change(function(){
+			if($(this).val() != '0' && $('[name="filter.PromotionStatus"]').val() != '0'){
+			$('[name="filter.PromotionStatus"]').val('0');
+			}});
+			$('[name="filter.PromotionStatus"]').change(function(){
+			if($(this).val() != '0' && $('[name="filter.PromotionModerated"]').val() != '0'){
+			$('[name="filter.PromotionModerated"]').val('0');
+			}});
+			});
+			</script>
 	</div>
 
 	<div class=block style="padding:5px;text-align: center;">

@@ -29,19 +29,31 @@ namespace AdminInterface.Controllers
 		[Description("Отключенные")] Disabled,
 	}
 
+	public enum PromotionModerate
+	{
+		[Description("Все")] All,
+		[Description("Прошедшие модерацию")] Moderated,
+		[Description("Не прошедшие модерацию")] NotModerated,
+	}
+
 	public class PromotionFilter : Sortable
 	{
 		[Description("Статус:")]
 		public PromotionStatus PromotionStatus { get; set; }
+
+		[Description("Модерация:")]
+		public PromotionModerate PromotionModerated { get; set; }
 
 		public string SearchText { get; set; }
 
 		public PromotionFilter()
 		{
 			PromotionStatus = PromotionStatus.Enabled;
+			PromotionModerated = PromotionModerate.All;
 			SortKeyMap = new Dictionary<string, string> {
 				{ "Id", "Id" },
 				{ "Enabled", "Enabled" },
+				{ "Moderated", "Moderated" },
 				{ "AgencyDisabled", "AgencyDisabled" },
 				{ "Name", "Name" },
 				{ "SupplierName", "s.Name" }
@@ -55,10 +67,17 @@ namespace AdminInterface.Controllers
 			var criteria = DetachedCriteria.For<T>()
 				.CreateAlias("PromotionOwnerSupplier", "s", JoinType.InnerJoin);
 
+			PromotionStatus = PromotionModerated != PromotionModerate.All ? PromotionStatus.All : PromotionStatus;
+
 			if (PromotionStatus == Controllers.PromotionStatus.Enabled)
 				criteria.Add(Expression.Eq("Status", true));
 			else if (PromotionStatus == Controllers.PromotionStatus.Disabled)
 				criteria.Add(Expression.Eq("Status", false));
+
+			if (PromotionModerated == Controllers.PromotionModerate.Moderated)
+				criteria.Add(Expression.Eq("Moderated", true));
+			else if (PromotionModerated == Controllers.PromotionModerate.NotModerated)
+				criteria.Add(Expression.Eq("Moderated", false));
 
 			if (!String.IsNullOrEmpty(SearchText))
 				criteria.Add(Expression.Like("Name", SearchText, MatchMode.Anywhere));
@@ -76,6 +95,7 @@ namespace AdminInterface.Controllers
 		public string[] ToUrl()
 		{
 			return new[] {
+				String.Format("filter.PromotionModerated={0}", (int)PromotionModerated),
 				String.Format("filter.PromotionStatus={0}", (int)PromotionStatus),
 				String.Format("filter.SearchText={0}", SearchText),
 			};
@@ -90,6 +110,7 @@ namespace AdminInterface.Controllers
 		{
 			var result = new StringBuilder();
 			result.Append("filter.PromotionStatus=" + (int)PromotionStatus);
+			result.Append("filter.PromotionModerated=" + (int)PromotionModerated);
 			if (!String.IsNullOrEmpty(SearchText)) {
 				result.Append("&filter.SearchText=" + SearchText);
 			}

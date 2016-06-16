@@ -76,6 +76,7 @@
     <Compile Include="SendInvoiceTask.cs" />
     <Compile Include="ReportLogsTask.cs" />
     <Compile Include="ReportTask.cs" />
+    <Compile Include="SendPremoderatedPomotionList.cs" />
     <Compile Include="SendPaymentNotification.cs" />
     <Compile Include="UpdateAccountTask.cs" />
     <Compile Include="Warn.cs" />
