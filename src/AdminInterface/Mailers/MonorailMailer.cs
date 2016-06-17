@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -559,8 +560,12 @@ namespace AdminInterface.Mailers
 		public MonorailMailer PremoderatedPromotions(List<SupplierPromotion> promotions)
 		{
 			From = "register@analit.net";
-			To = "ayakimenko@analit.net";
-			//		To = "billing@analit.net, office@analit.net";
+#if DEBUG
+			To = ConfigurationManager.AppSettings["DebugMail"];
+#else
+			To = ConfigurationManager.AppSettings["OfficeMail"];
+#endif
+
 			IsBodyHtml = true;
 			Template = "PromotionsNeedModeration_html";
 			PropertyBag["promotions"] = promotions;
