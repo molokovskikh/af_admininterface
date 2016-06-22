@@ -51,7 +51,7 @@ namespace AdminInterface.Models.Logs
 		{
 			return session.Query<RejectedEmail>()
 				.Where(x => x.LogTime >= fromDate && x.LogTime <= toDate.Add(new TimeSpan(23, 59, 59))
-					&& x.From.Contains(pattern) && x.Subject.Contains(pattern))
+					&& (x.From.Contains(pattern) || x.Subject.Contains(pattern)))
 				.OrderBy(x => x.LogTime).ToArray();
 		}
 	}

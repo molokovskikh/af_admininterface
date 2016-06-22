@@ -8,6 +8,7 @@ using Common.Tools;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
+using Test.Support.log4net;
 
 namespace Integration.Controllers
 {
@@ -20,7 +21,7 @@ namespace Integration.Controllers
 		public void SetUp()
 		{
 			controller = new SmapRejectorController();
-			PrepareController(controller);
+			Prepare(controller);
 			session.Query<RejectedEmail>()
 				.Where(r => r.LogTime >= DateTime.Today.AddDays(-1))
 				.Each(r => session.Delete(r));
