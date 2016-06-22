@@ -17,18 +17,16 @@ namespace Integration.Tasks
 		public void Setup()
 		{
 			payer = DataMother.CreatePayerForBillingDocumentTest();
-			processor = new InvoicePartTask();
+			processor = new InvoicePartTask(session);
 		}
 
 		[Test]
 		public void Process_invoice_part_ready_for_processing()
 		{
 			var invoice = BuildInvoice(DateTime.Now.Date);
-			FlushAndCommit();
 
 			processor.Execute();
-
-			session.Refresh(payer);
+			session.Flush();
 
 			Assert.That(payer.Balance, Is.EqualTo(-800));
 			session.Refresh(invoice);
@@ -41,6 +39,7 @@ namespace Integration.Tasks
 			var invoice = BuildInvoice(DateTime.Now.AddDays(1));
 
 			processor.Execute();
+			session.Flush();
 
 			Assert.That(payer.Balance, Is.EqualTo(0));
 			session.Refresh(invoice);

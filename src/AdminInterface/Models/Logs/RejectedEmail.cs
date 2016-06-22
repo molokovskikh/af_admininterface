@@ -1,10 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Common.Web.Ui.Models.Audit;
+using NHibernate;
 using NHibernate.Criterion;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models.Logs
 {
@@ -18,7 +21,7 @@ namespace AdminInterface.Models.Logs
 	}
 
 	[ActiveRecord("EmailRejectLogs", Schema = "logs", SchemaAction = "none")]
-	public class RejectedEmail : ActiveRecordLinqBase<RejectedEmail>
+	public class RejectedEmail
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
@@ -44,13 +47,12 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual string Subject { get; set; }
 
-		public static RejectedEmail[] Find(string pattern, DateTime fromDate, DateTime toDate)
+		public static RejectedEmail[] Find(ISession session, string pattern, DateTime fromDate, DateTime toDate)
 		{
-			return FindAll(Order.Asc("LogTime"),
-				(Expression.Ge("LogTime", fromDate)
-					&& Expression.Le("LogTime", toDate.Add(new TimeSpan(23, 59, 59)))
-					&& (Expression.Like("From", pattern, MatchMode.Anywhere)
-						|| Expression.Like("Subject", pattern, MatchMode.Anywhere))));
+			return session.Query<RejectedEmail>()
+				.Where(x => x.LogTime >= fromDate && x.LogTime <= toDate.Add(new TimeSpan(23, 59, 59))
+					&& x.From.Contains(pattern) && x.Subject.Contains(pattern))
+				.OrderBy(x => x.LogTime).ToArray();
 		}
 	}
 }

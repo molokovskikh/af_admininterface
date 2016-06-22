@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Models.Billing;
-using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate;
 using NHibernate.Linq;
@@ -11,6 +9,14 @@ namespace AdminInterface.Background
 {
 	public class InvoicePartTask : Task
 	{
+		public InvoicePartTask()
+		{
+		}
+
+		public InvoicePartTask(ISession session) : base(session)
+		{
+		}
+
 		protected override void Process()
 		{
 			var ids = Session.Query<InvoicePart>()

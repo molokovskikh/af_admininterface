@@ -26,6 +26,7 @@ using Common.Web.Ui.NHibernateExtentions;
 using ExcelLibrary.SpreadSheet;
 using NHibernate;
 using log4net;
+using NHibernate.Linq;
 using Attachment = System.Net.Mail.Attachment;
 
 namespace AdminInterface.Mailers
@@ -106,12 +107,12 @@ namespace AdminInterface.Mailers
 			if (clazz == typeof(Supplier)) {
 				type = "поставщика";
 				PropertyBag["service"] = item;
-				var disable = SupplierLog.Queryable.Where(s => s.Supplier == (Supplier)item && s.Disabled != null && s.Disabled == true).OrderByDescending(s => s.LogTime).FirstOrDefault();
+				var disable = DbSession.Query<SupplierLog>().Where(s => s.Supplier == (Supplier)item && s.Disabled != null && s.Disabled == true).OrderByDescending(s => s.LogTime).FirstOrDefault();
 				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
 					if(!item.Enabled) {
 						disable.Comment = comment;
-						disable.Save();
+						DbSession.Save(disable);
 					}
 					reasonDisable = disable.Comment;
 				}

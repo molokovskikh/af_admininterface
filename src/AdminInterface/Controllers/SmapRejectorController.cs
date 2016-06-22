@@ -24,7 +24,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["fromDate"] = fromDate;
 			PropertyBag["toDate"] = toDate;
 			PropertyBag["searchText"] = searchText;
-			PropertyBag["rejects"] = RejectedEmail.Find(searchText, fromDate, toDate);
+			PropertyBag["rejects"] = RejectedEmail.Find(DbSession, searchText, fromDate, toDate);
 		}
 	}
 }

@@ -4,13 +4,9 @@ using System.Linq;
 using AdminInterface.Background;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
-using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework.Scopes;
-using Common.Tools;
 using Common.Web.Ui.NHibernateExtentions;
 using Integration.ForTesting;
 using NUnit.Framework;
-using Test.Support.log4net;
 
 namespace Integration.Tasks
 {
@@ -93,7 +89,8 @@ namespace Integration.Tasks
 		public void Respect_analitf_net()
 		{
 			var updates = Enumerable.Range(0, 100)
-				.Select(_ => new RequestLog(user) { IsConfirmed = true, IsCompleted = true, UpdateType = "MainController" });
+				.Select(_ => new RequestLog(user) { IsConfirmed = true, IsCompleted = true, UpdateType = "MainController" })
+				.ToArray();
 			session.SaveEach(updates.Take(5));
 			Check();
 			session.Refresh(user);

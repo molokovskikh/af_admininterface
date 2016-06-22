@@ -22,7 +22,7 @@ namespace AdminInterface.Models.Logs
 	}
 
 	[ActiveRecord(Table = "CallLogs", Schema = "logs")]
-	public class CallLog : ActiveRecordLinqBase<CallLog>
+	public class CallLog
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }

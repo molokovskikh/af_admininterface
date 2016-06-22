@@ -82,16 +82,7 @@ delete from Billing.Accounts where Type = 0;")
 		[TearDown]
 		public void Down()
 		{
-			session.Delete(user);
-			session.Delete(user1);
-			session.Delete(user2);
-			session.Delete(user3);
-
-			session.Delete(address);
-			session.Delete(address2);
-
-			session.Delete(client);
-
+			client.Delete(session);
 			Flush();
 		}
 
