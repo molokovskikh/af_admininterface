@@ -112,6 +112,7 @@ namespace Integration.Tasks
 		{
 			FlushAndCommit();
 			new UpdateAccountTask(session).Execute();
+			session.BeginTransaction();
 		}
 
 		private void Check(int pageSize)
