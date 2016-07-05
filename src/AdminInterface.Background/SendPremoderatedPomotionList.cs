@@ -42,7 +42,7 @@ namespace AdminInterface.Background
 			if (SystemTime.Now() >= mailTime && SystemTime.Now() < mailTime.AddMinutes(30)) {
 				using (new SessionScope(FlushAction.Never)) {
 					var promotions = ActiveRecordLinq.AsQueryable<SupplierPromotion>()
-						.Where(p => !p.Moderated && p.Enabled).ToList();
+						.Where(p => !p.Moderated && p.Enabled).OrderBy(s=>s.Begin).ToList();
 					if (promotions.Count > 0) {
 						_mailer = (_mailer ?? new MonorailMailer()).PremoderatedPromotions(promotions);
 						_mailer.Send();

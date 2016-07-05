@@ -2,7 +2,70 @@
 	Промо-акции
 <% end %>
 
+
+
+
 <% component Bubble, {@bredcrumbs : []} %>
+
+<div style="padding: 10px">
+
+	<div class="block" style="padding:0;">
+			<h3>Промо-акции, ожидающие подтверждения</h3>
+	</div>
+	<div class=block>
+		<table class="DataTable HighLightCurrentRow" style="width: 100%;">
+			<% if promotionsPremoderated.Count: %>
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Включена</th>
+					<th>Отключена АналитФармация</th>
+					<th>Наименование</th>
+					<th>Поставщик</th>
+					<th>Модератор</th>
+					<th>Время модерации</th>
+					<th>Дата начала</th>
+					<th>Дата окончания</th>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
+			<% for i, promotion in enumerate(promotionsPremoderated): %>
+			<tr id="SupplierPromotionRow${promotion.Id}" class="${ViewHelper.GetRowStyle(i)} ${"redRow" if (promotion.Begin <= systemTime)}">
+				<td>${promotion.Id}</td>
+				<td>
+					<form method=post action="${siteroot}/Promotions/ChangeState?id=${promotion.Id}&${filter.ToUrlQuery()}">
+						<input type=checkbox name="promotions[${i}].Id" ${"checked" if promotion.Enabled} onclick="submit();">
+					</form>
+				</td>
+				<td>
+					<form method=post action="${siteroot}/Promotions/ChangeDisabled?id=${promotion.Id}&${filter.ToUrlQuery()}">
+						<input type=checkbox name="promotions[${i}].Id" ${"checked" if promotion.AgencyDisabled} onclick="submit();">
+					</form>
+				</td>
+				<td>${promotion.Name}</td>
+				<td>${promotion.PromotionOwnerSupplier.Name}</td>
+				<td>${promotion.Moderator}</td>
+				<td>${promotion.ModerationChanged}</td>
+				<td>${promotion.Begin.ToShortDateString()}</td>
+				<td>${promotion.End.ToShortDateString()}</td>
+				<td><a href="${siteroot}/Promotions/Edit?id=${promotion.Id}">Редактировать</a></td>
+				<td>
+					<form method=post action="${siteroot}/Promotions/Delete?id=${promotion.Id}">
+						<input type=submit value="Удалить">
+					</form>
+				</td>
+			</tr>
+			<% end %>
+			<% else: %>
+			<tr class=EmptyData>
+				<td>По вашему запросу ничего не найдено</td>
+			</tr>
+			<% end %>
+		</table>
+	</div>
+
+</div>
 
 <div style="padding: 10px">
 
@@ -11,23 +74,10 @@
 				<h3>Список акций</h3>
 				${app.BeginFormFor("filter")}
 				${app.FilterFor("filter.PromotionStatus")}
-				${app.FilterFor("filter.PromotionModerated")}
 				${app.FilterFor("filter.SearchText")}
+				${app.FilterFor("filter.SearchSupplier")}
 				${app.EndFormFor("filter")}
 			</div>
-			<script>
-			////Модерация для статуса является уточнением, поэтому есть смысл учитывать модерацию только для статуса 'All'
-			$(function(){
-			$('[name="filter.PromotionModerated"]').change(function(){
-			if($(this).val() != '0' && $('[name="filter.PromotionStatus"]').val() != '0'){
-			$('[name="filter.PromotionStatus"]').val('0');
-			}});
-			$('[name="filter.PromotionStatus"]').change(function(){
-			if($(this).val() != '0' && $('[name="filter.PromotionModerated"]').val() != '0'){
-			$('[name="filter.PromotionModerated"]').val('0');
-			}});
-			});
-			</script>
 	</div>
 
 	<div class=block style="padding:5px;text-align: center;">
@@ -46,7 +96,10 @@
 					<th>${app.Sortable("Отключена АналитФармация", "AgencyDisabled")}</th>
 					<th>${app.Sortable("Наименование", "Name")}</th>
 					<th>${app.Sortable("Поставщик", "SupplierName")}</th>
-					<th style="width: 80px; font-weight:normal;">Модерация пройдена</th>
+					<th>Модератор</th>
+					<th>Время модерации</th>
+					<th>${app.Sortable("Дата начала", "Begin")}</th>
+					<th>${app.Sortable("Дата окончания", "End")}</th>
 					<th></th>
 					<th></th>
 				</tr>
@@ -66,13 +119,10 @@
 				</td>
 				<td>${promotion.Name}</td>
 				<td>${promotion.PromotionOwnerSupplier.Name}</td>
-				<td>
-					<% if promotion.Moderated: %>
-					Да
-			<% else: %>
-					<font style='font-weight:bold'>Нет</font>
-					<% end %>
-				</td>
+				<td>${promotion.Moderator}</td>
+				<td>${promotion.ModerationChanged}</td>
+				<td>${promotion.Begin.ToShortDateString()}</td>
+				<td>${promotion.End.ToShortDateString()}</td>
 				<td><a href="${siteroot}/Promotions/Edit?id=${promotion.Id}">Редактировать</a></td>
 				<td>
 					<form method=post action="${siteroot}/Promotions/Delete?id=${promotion.Id}">

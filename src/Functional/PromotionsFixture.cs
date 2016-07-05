@@ -84,8 +84,10 @@ limit 1")
 		[Test(Description = "проверяем отображение основной страницы с акциями")]
 		public void OpenIndexPage()
 		{
+			AssertText("Промо-акции, ожидающие подтверждения");
 			AssertText("Список акций");
-			AssertText("Введите текст для поиска");
+			AssertText("Наименование");
+			AssertText("Поставщик");
 			AssertText("Статус:");
 			var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
 			Assert.That(list.Exists, Is.True);
@@ -132,27 +134,23 @@ limit 1")
 			RowPromotionExists(_promotion);
 		}
 
-		[Test(Description = "проверяем работу фильтра по модерации акций")]
-		public void CheckFilterModeration()
+		[Test(Description = "проверяем работу фильтра по поставцикам")]
+		public void CheckFilterModerationSupplierSurch()
 		{
-			RowPromotionNotExists(_promotionNotModerated);
+			RowPromotionExists(_promotionNotModerated);
 			RowPromotionExists(_promotion);
 
-			//ее не должно быть в списке не прошедших модерацию
-			var list = browser.SelectList(Find.ByName("filter.PromotionModerated"));
-			list.Select("Не прошедшие модерацию");
+			browser.TextField(Find.ByName("filter.SearchSupplier")).TypeText(_promotion.PromotionOwnerSupplier.Name + "NOT");
 			ClickButton("Показать");
 
 			RowPromotionExists(_promotionNotModerated);
 			RowPromotionNotExists(_promotion);
 
-			//она должна быть в списке прошедших модерацию
-			list = browser.SelectList(Find.ByName("filter.PromotionModerated"));
-			list.Select("Прошедшие модерацию");
+			browser.TextField(Find.ByName("filter.SearchSupplier")).TypeText(_promotion.PromotionOwnerSupplier.Name);
 			ClickButton("Показать");
 
+			RowPromotionExists(_promotionNotModerated);
 			RowPromotionExists(_promotion);
-			RowPromotionNotExists(_promotionNotModerated);
 		}
 
 		[Test(Description = "проверяем включение/выключение акций")]
@@ -185,31 +183,58 @@ limit 1")
 		[Test(Description = "проверяем включение/выключение модерации акций")]
 		public void PromotionModeration()
 		{
-			//отключаем акцию
+			//есть возможность удаления немодерируемой акции (выводится как обычная, только в другом блоке)
+			RowPromotionExists(_promotionNotModerated);
+			Click("Удалить");
+			RowPromotionNotExists(_promotionNotModerated);
+			WaitForText("Список акций");
+			//проверка отмены подтверждение Промоакции
 			Assert.That(_promotion.Moderated, Is.True);
 			Assert.That(_promotion.IsActive(), Is.True);
 			WaitForText(_promotion.Name);
 			Click("Редактировать");
-			WaitForText("Акция активна");
-			((CheckBox)Css("#promotion_Moderated")).Click();
-			ClickButton("Сохранить");
+			Click("Отменить подтверждение Промоакции");
+			WaitForText("Необходимо указать причину отмены!");
+			browser.TextField(Find.ByName("reason")).TypeText("Надо");
+			Click("Отменить подтверждение Промоакции");
 			session.Refresh(_promotion);
 			Assert.That(_promotion.Moderated, Is.False);
 			Assert.That(_promotion.IsActive(), Is.False);
+
+			//проверка подтверждение Промоакции
 			Open();
-			Click("Промо-акции");
-			//находим ее в списке отключенных
-			var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
-			list.Select("Отключенные");
-			ClickButton("Показать");
+			Click("Промо-акции"); 
 			WaitForText(_promotion.Name);
 			Click("Редактировать");
 			WaitForText("Акция не активна");
-			((CheckBox)Css("#promotion_Moderated")).Click();
-			ClickButton("Сохранить");
+			Click("Подтвердить");
 			session.Refresh(_promotion);
 			Assert.That(_promotion.Moderated, Is.True);
 			Assert.That(_promotion.IsActive(), Is.True);
+
+			//снова отменяем
+			Open();
+			Click("Промо-акции"); 
+			WaitForText(_promotion.Name);
+			Click("Редактировать");
+			browser.TextField(Find.ByName("reason")).TypeText("Надо");
+			Click("Отменить подтверждение Промоакции");
+			session.Refresh(_promotion);
+			Assert.That(_promotion.Moderated, Is.False);
+			Assert.That(_promotion.IsActive(), Is.False);
+			//проверка отказа в публикации Промоакции
+			Open();
+			Click("Промо-акции"); 
+			WaitForText(_promotion.Name);
+			Click("Редактировать");
+			WaitForText("Акция не активна");
+			Click("Отказать");
+			WaitForText("Необходимо указать причину отказа!");
+			browser.TextField(Find.ByName("reason")).TypeText("Надо");
+			Click("Отказать");
+			session.Refresh(_promotion);
+			Assert.That(_promotion.Moderated, Is.False);
+			Assert.That(_promotion.IsActive(), Is.False);
 		}
 
 		[Test(Description = "проверяем включение/выключение акций административно АК Инфорум")]
@@ -305,8 +330,9 @@ limit 1")
 			var chaBoxes = browser.CheckBoxes.Where(cb => cb.Name.StartsWith("cha")).ToList();
 			Assert.That(chaBoxes.Count, Is.GreaterThan(3), "Не найдено достаточное количество наименований в каталоге");
 			if (chaBoxes.Count > 3)
-				for (int i = 0; i < 3; i++)
+				for (int i = 0; i < 3; i++) {
 					chaBoxes[i].Click();
+				}
 
 			//Производим сохранение
 			var addBtn = browser.Button(Find.ById("addBtn"));
@@ -318,8 +344,9 @@ limit 1")
 			RefreshPromotion(_promotion);
 			var promoBoxes = browser.CheckBoxes.Where(cb => cb.Name.StartsWith("chd")).ToList();
 			Assert.That(promoBoxes.Count, Is.EqualTo(_promotion.Catalogs.Count), "Не совпадает количество доступных для удаления препаратов со списом препаратов акции");
-			foreach (var catalog in _promotion.Catalogs)
+			foreach (var catalog in _promotion.Catalogs) {
 				Assert.That(promoBoxes.Exists(box => box.Name == "chd" + catalog.Id), Is.True, "Не найден checkbox для удаления препарата с Id:{0} Name:{1}", catalog.Id, catalog.Name);
+			}
 
 			var parentPromo = browser.Link(Find.ByText("Редактирование акции"));
 			Assert.That(parentPromo.Exists, "Не найдена ссылка на родительскую промо-акцию");

@@ -6,6 +6,8 @@
 		<th>№</th>
 		<th>Наименование</th>
 		<th>Поставщик</th>
+		<th>Начало</th>
+		<th>Конец</th>
 	</tr>
 </thead>
 <tbody>
@@ -14,6 +16,8 @@
 		<td>${promotion.Id}</td>
 		<td>${promotion.Name}</td>
 		<td>${promotion.PromotionOwnerSupplier.Name}</td>
+		<td>${promotion.Begin}</td>
+		<td>${promotion.Begin}</td>
 	</tr>
 <% end %>
 </tbody>
