@@ -91,6 +91,24 @@ namespace AdminInterface.Models
 		public string ResponseBodyMiniMailOnAllowedExtensions { get; set; }
 
 		[Property, ValidateNonEmpty]
+		public string PromotionModerationDeniedSubject { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string PromotionModerationDeniedBody { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string PromotionModerationEscapeSubject { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string PromotionModerationEscapeBody { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string PromotionModerationAllowedSubject { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string PromotionModerationAllowedBody { get; set; }
+
+		[Property, ValidateNonEmpty]
 		public string AddressesHelpText { get; set; }
 
 		[Property, ValidateNonEmpty, Description("Тело письма")]

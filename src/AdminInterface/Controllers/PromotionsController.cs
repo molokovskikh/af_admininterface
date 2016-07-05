@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Web;
 using AdminInterface.Helpers;
@@ -11,6 +13,8 @@ using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Binder;
+using Castle.Components.Validator;
+using Castle.Core.Smtp;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
@@ -18,6 +22,7 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate.Criterion;
+using NHibernate.Linq;
 using NHibernate.SqlCommand;
 
 namespace AdminInterface.Controllers
@@ -29,33 +34,28 @@ namespace AdminInterface.Controllers
 		[Description("Отключенные")] Disabled,
 	}
 
-	public enum PromotionModerate
-	{
-		[Description("Все")] All,
-		[Description("Прошедшие модерацию")] Moderated,
-		[Description("Не прошедшие модерацию")] NotModerated,
-	}
-
 	public class PromotionFilter : Sortable
 	{
 		[Description("Статус:")]
 		public PromotionStatus PromotionStatus { get; set; }
 
-		[Description("Модерация:")]
-		public PromotionModerate PromotionModerated { get; set; }
-
+		[Description("Наименование:")]
 		public string SearchText { get; set; }
+
+		[Description("Поставщик:")]
+		public string SearchSupplier { get; set; }
 
 		public PromotionFilter()
 		{
 			PromotionStatus = PromotionStatus.Enabled;
-			PromotionModerated = PromotionModerate.All;
 			SortKeyMap = new Dictionary<string, string> {
 				{ "Id", "Id" },
 				{ "Enabled", "Enabled" },
 				{ "Moderated", "Moderated" },
 				{ "AgencyDisabled", "AgencyDisabled" },
 				{ "Name", "Name" },
+				{ "Begin", "Begin" },
+				{ "End", "End" },
 				{ "SupplierName", "s.Name" }
 			};
 			SortDirection = "Asc";
@@ -67,17 +67,15 @@ namespace AdminInterface.Controllers
 			var criteria = DetachedCriteria.For<T>()
 				.CreateAlias("PromotionOwnerSupplier", "s", JoinType.InnerJoin);
 
-			PromotionStatus = PromotionModerated != PromotionModerate.All ? PromotionStatus.All : PromotionStatus;
-
 			if (PromotionStatus == Controllers.PromotionStatus.Enabled)
 				criteria.Add(Expression.Eq("Status", true));
 			else if (PromotionStatus == Controllers.PromotionStatus.Disabled)
 				criteria.Add(Expression.Eq("Status", false));
 
-			if (PromotionModerated == Controllers.PromotionModerate.Moderated)
-				criteria.Add(Expression.Eq("Moderated", true));
-			else if (PromotionModerated == Controllers.PromotionModerate.NotModerated)
-				criteria.Add(Expression.Eq("Moderated", false));
+			criteria.Add(Expression.Eq("Moderated", true));
+
+			if (!String.IsNullOrEmpty(SearchSupplier))
+				criteria.Add(Expression.Like("s.Name", SearchSupplier, MatchMode.Anywhere));
 
 			if (!String.IsNullOrEmpty(SearchText))
 				criteria.Add(Expression.Like("Name", SearchText, MatchMode.Anywhere));
@@ -95,7 +93,7 @@ namespace AdminInterface.Controllers
 		public string[] ToUrl()
 		{
 			return new[] {
-				String.Format("filter.PromotionModerated={0}", (int)PromotionModerated),
+				String.Format("filter.SearchSupplier={0}", SearchSupplier),
 				String.Format("filter.PromotionStatus={0}", (int)PromotionStatus),
 				String.Format("filter.SearchText={0}", SearchText),
 			};
@@ -110,7 +108,7 @@ namespace AdminInterface.Controllers
 		{
 			var result = new StringBuilder();
 			result.Append("filter.PromotionStatus=" + (int)PromotionStatus);
-			result.Append("filter.PromotionModerated=" + (int)PromotionModerated);
+			String.Format("filter.SearchSupplier={0}", SearchSupplier);
 			if (!String.IsNullOrEmpty(SearchText)) {
 				result.Append("&filter.SearchText=" + SearchText);
 			}
@@ -277,7 +275,9 @@ namespace AdminInterface.Controllers
 		public void Index([DataBind("filter")] PromotionFilter filter)
 		{
 			PropertyBag["filter"] = filter;
+			PropertyBag["systemTime"] = SystemTime.Now().AddDays(3).Date;
 			PropertyBag["promotions"] = filter.Find<SupplierPromotion>();
+			PropertyBag["promotionsPremoderated"] = DbSession.Query<SupplierPromotion>().Where(s => s.Moderated == false).OrderBy(d => d.Begin).ToList();
 			PropertyBag["SortBy"] = Request["SortBy"];
 			PropertyBag["Direction"] = Request["Direction"];
 		}
@@ -341,6 +341,55 @@ namespace AdminInterface.Controllers
 			else
 				ActiveRecordMediator.Evict(promotion);
 		}
+
+		void SendMailFromModerator(List<string> contacts, string subject, string body)
+		{
+			var sender = new DefaultSmtpSender(ConfigurationManager.AppSettings["SmtpServer"]);
+			var message = new MailMessage();
+			message.Subject = subject;
+			message.From = new MailAddress(ConfigurationManager.AppSettings["ModeratorMailFrom"]);
+			message.To.Add(string.Join(",", contacts));
+			message.BodyEncoding = Encoding.UTF8;
+			message.HeadersEncoding = Encoding.UTF8;
+			message.IsBodyHtml = true;
+			message.Body = body;
+			sender.Send(message);
+		}
+
+		public void ChangeModeration(uint id, string buttonText, string reason)
+		{
+			var moderationState = buttonText == "Подтвердить" ? 0 : buttonText == "Отказать" ? 1 : 2;
+			if (moderationState != 0 && string.IsNullOrEmpty(reason)) {
+				Error($"Необходимо указать причину {(moderationState == 1 ? "отказа" : "отмены")}!");
+				RedirectToAction("Edit", new { id });
+				return;
+			}
+			var promotion = DbSession.Load<SupplierPromotion>(id);
+			promotion.Moderated = moderationState == 0;
+			promotion.ModerationChanged = SystemTime.Now();
+			promotion.Moderator = Admin.Name;
+			promotion.UpdateStatus();
+			DbSession.Save(promotion);
+			var defaultSettings = DbSession.Query<DefaultValues>().FirstOrDefault();
+			if (defaultSettings != null) {
+				var subject = moderationState == 0 ? defaultSettings.PromotionModerationAllowedSubject
+					: moderationState == 1 ? defaultSettings.PromotionModerationDeniedSubject : defaultSettings.PromotionModerationEscapeSubject;
+				var body = moderationState == 0 ? defaultSettings.PromotionModerationAllowedBody
+					: moderationState == 1 ? defaultSettings.PromotionModerationDeniedBody : defaultSettings.PromotionModerationEscapeBody;
+
+				body = string.Format(body ?? "", reason, promotion.Id, promotion.Name, Admin.Name);
+
+				var contacts = promotion.PromotionOwnerSupplier.ContactGroupOwner.GetEmails(ContactGroupType.ClientManagers).ToList();
+				if (contacts.Count > 0) {
+#if !DEBUG
+					SendMailFromModerator(contacts, subject, body);
+#endif
+				}
+			}
+			Notify("Сохранено");
+			RedirectToAction("Edit", new { id });
+		}
+
 
 		public void ChangeState(uint id, [DataBind("filter")] PromotionFilter filter)
 		{
@@ -457,23 +506,25 @@ namespace AdminInterface.Controllers
 
 			if (IsPost) {
 				if (Request.Params["delBtn"] != null) {
-					foreach (string key in Request.Params.AllKeys)
+					foreach (string key in Request.Params.AllKeys) {
 						if (key.StartsWith("chd")) {
 							var catalog = DbSession.Load<Catalog>(Convert.ToUInt32(Request.Params[key]));
 							var index = promotion.Catalogs.IndexOf(c => c.Id == catalog.Id);
 							if (index >= 0)
 								promotion.Catalogs.RemoveAt(index);
 						}
+					}
 				}
 
 				if (Request.Params["addBtn"] != null) {
-					foreach (string key in Request.Params.AllKeys)
+					foreach (string key in Request.Params.AllKeys) {
 						if (key.StartsWith("cha")) {
 							var catalog = DbSession.Load<Catalog>(Convert.ToUInt32(Request.Params[key]));
 
 							if (promotion.Catalogs.FirstOrDefault(c => c.Id == catalog.Id) == null)
 								promotion.Catalogs.Add(catalog);
 						}
+					}
 				}
 
 				ActiveRecordMediator.Evict(promotion);

@@ -170,6 +170,9 @@ ${app.Asset("MainSettings.js")}
 		<li>
 			<a id="newSupplierMail" href="#">Шаблон письма новому поставщику</a>
 		</li>
+		<li>
+			<a id="promotionMailSettings" href="#">Шаблон письма от модератора</a>
+		</li>
 	</ul>
 </div>
 
@@ -331,6 +334,25 @@ ${app.Asset("MainSettings.js")}
 
 	<% WriteLabelAndEditTemplate("Шаблон при недопустимом типе файла вложения", "ResponseSubjectMiniMailOnAllowedExtensions", defaults.ResponseSubjectMiniMailOnAllowedExtensions, "ResponseBodyMiniMailOnAllowedExtensions", defaults.ResponseBodyMiniMailOnAllowedExtensions) %>
 </div>
+
+<div id="promotionMailSettings-tab" class="tab" style="display:none">
+
+	<% WriteLabelAndEditTemplate("Шаблон письма модератора с подтверждением ", "PromotionModerationAllowedSubject", defaults.PromotionModerationAllowedSubject, "PromotionModerationAllowedBody", defaults.PromotionModerationAllowedBody) %>
+	<h4>{0} - тэг, указывающий место для вставки указанного комментария. <br/>
+	{1} - тэг, указывающий место для вставки номера промо-акции. <br/> 
+	{2} - тэг, указывающий место для вставки названия промо-акции.<br/>
+	{3} - тэг, указывающий место для вставки имени оператора.</h4>
+	<% WriteLabelAndEditTemplate("Шаблон письма модератора с отказом", "PromotionModerationDeniedSubject", defaults.PromotionModerationDeniedSubject, "PromotionModerationDeniedBody", defaults.PromotionModerationDeniedBody) %>
+	<h4>{0} - тэг, указывающий место для вставки указанного комментария. <br/>
+	{1} - тэг, указывающий место для вставки номера промо-акции. <br/>
+	{2} - тэг, указывающий место для вставки названия промо-акции.<br/>
+	{3} - тэг, указывающий место для вставки имени оператора.</h4>
+	<% WriteLabelAndEditTemplate("Шаблон письма  модератора с отменой", "PromotionModerationEscapeSubject", defaults.PromotionModerationEscapeSubject, "PromotionModerationEscapeBody", defaults.PromotionModerationEscapeBody) %>
+	<h4>{0} - тэг, указывающий место для вставки указанного комментария. <br/>
+	{1} - тэг, указывающий место для вставки номера промо-акции. <br/>
+	{2} - тэг, указывающий место для вставки названия промо-акции.<br/>
+	{3} - тэг, указывающий место для вставки имени оператора.</h4>
+ </div>
 
 <br>
 <button id="sendButton">Сохранить</button>
