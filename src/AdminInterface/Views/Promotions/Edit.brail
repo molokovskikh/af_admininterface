@@ -19,7 +19,7 @@
 	}
 </style>
 
-<form method=post enctype="multipart/form-data">
+<form id="PromotionFormEditor" method=post enctype="multipart/form-data">
 <% if promotion.Id: %>
 	<% if promotion.IsActive(): %>
 		<div class="flash notice">
@@ -70,10 +70,12 @@
 			<td class="DisplayName">Включена:</td>
 			<td>${app.Edit("promotion.Enabled")}</td>
 		</tr>
-		<tr>
-			<td class="DisplayName">Отключена АналитФармация:</td>
-			<td>${app.Edit("promotion.AgencyDisabled")}</td>
-		</tr>
+		<% if promotion.Moderated : %>
+			<tr>
+				<td class="DisplayName">Отключена АналитФармация:</td>
+				<td>${app.Edit("promotion.AgencyDisabled")}</td>
+			</tr>
+		<% end %>  
 		<tr>
 			<td class="DisplayName">Аннотация:</td>
 			<td>
@@ -129,20 +131,39 @@
 		</tr>
 	</table>
 	<input type=submit value=Сохранить>
-</form>
-<form method=post action="${siteroot}/Promotions/ChangeModeration" enctype="multipart/form-data">
-	<input name=id type=hidden value='${promotion.Id}'>
-	<div style="padding-top: 10px;">	
-	<% if promotion.Moderated == false : %>
-	<input name=buttonText type=submit value='Подтвердить'>
-	<input name=buttonText type=submit value='Отказать'>
-	<% else: %> 
-	<input name=buttonText type=submit  value='Отменить подтверждение Промоакции'>
-	<% end %>  
-		<div style="padding-top: 10px;">
-	<label style="padding-top: 10px;">Причина:</label>
-	<br/>
-	<textarea style="margin-top: 10px;" rows="4" cols="50" name="reason"></textarea>
-	</div> 	
-		</div> 
-</form>
+</form> 
+	<% if ( promotion.Id != 0 ) : %>
+			${app.Asset("PromotionDialog.js")}
+			<script type="text/javascript">
+					$(function() {
+						$("#PromotionFormEditor input[type='submit']").click(function (event) {
+							getModel(event,"Вы деиствительно хотите сохранить изменения в про-акции?", function(_this) {
+							}, function() {
+									document.getElementById("PromotionFormEditor").submit();
+							});
+						});
+					});
+			</script>
+
+			<form method=post action="${siteroot}/Promotions/ChangeModeration" enctype="multipart/form-data">
+				<input name=id type=hidden value='${promotion.Id}'>
+				<div style="padding-top: 10px;">	
+				<% if promotion.Moderated == false : %>
+				<input name=buttonText type=submit value='Подтвердить'>
+				<input name=buttonText type=submit value='Отказать'>
+					<div style="padding-top: 10px; margin-left: 100px;">
+						<label style="padding-top: 10px;">Причина отказа:</label>
+						<br/>
+						<textarea style="margin-top: 10px;" rows="4" cols="50" name="reason"></textarea>
+					</div> 	
+				<% else: %> 
+				<input name=buttonText type=submit  value='Отменить подтверждение Промоакции'>
+						<div style="padding-top: 10px;">
+							<label style="padding-top: 10px;">Причина отмены:</label>
+							<br/>
+							<textarea style="margin-top: 10px;" rows="4" cols="50" name="reason"></textarea>
+						</div> 	
+				<% end %> 
+					</div> 
+			</form>
+<% end %> 

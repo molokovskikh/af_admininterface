@@ -4,7 +4,7 @@
 <script type="text/javascript">
 	var nsChecked = false;
 	var sChecked = false;
-	
+
 	jQuery(document).ready(function() {
 		jQuery('#nsAll').click(MarkNotselected);
 		jQuery('#sAll').click(MarkSelected);
@@ -35,19 +35,19 @@
 		</div>
 	</div>
 
-		
-<form method="post" action="${siteroot}/Promotions/EditCatalogs?${filter.ToUrlQuery()}">
+
+<form id="PromotionFormEditor" method="post" action="${siteroot}/Promotions/EditCatalogs?${filter.ToUrlQuery()}">
 			<table style="width:100%;">
 				<tr>
 					<td class="DocumentHeader" style="width:45%;">Список препаратов</td>
-					
+
 					<td></td>
-					
+
 					<td class="DocumentHeader" style="width:45%;">Выбранные препараты</td>
 				</tr>
-				
+
 				<tr>
-				
+
 				<td style="width:45%; border: solid 1px #dadada; vertical-align:top;"> <!-- Левая колонка препаратов -->
 					<table id="catalogsAll" class="HighLightCurrentRow DataTable" style="width: 100%;">
 						<% if catalogNames.Count: %>
@@ -77,7 +77,7 @@
 						<% end %>
 					</table>
 				</td>
-				
+
 				<td style="vertical-align: middle; text-align: center;">
 					<div style="padding-bottom:6px;">
 						<input type="submit" id="addBtn" name="addBtn" value="--&gt;" title="Добавить"/>
@@ -86,10 +86,10 @@
 						<input type="submit" id="delBtn" name="delBtn" value="&lt;--" title="Удалить"/>
 					</div>
 				</td>
-				
+
 				<td style="width:45%; vertical-align: top; border: solid 1px #dadada;"> <!-- Правая колонка препаратов -->
 
-					<table id="catalogs" class="HighLightCurrentRow DataTable" style="width: 100%;">	
+					<table id="catalogs" class="HighLightCurrentRow DataTable" style="width: 100%;">
 						<tr class="NoHighLightRow">
 							<th><input id="sAll" name="sAll" type="checkbox" /></th>
 							<th>Наименование</th>
@@ -113,7 +113,4 @@
 				</tr>
 			</table>
 </form>
-
 </div>
-
-

@@ -108,8 +108,6 @@ limit 1")
 			Assert.That(row.OwnTableCell(Find.ByText(promotion.Name)).Exists, Is.True);
 			Assert.That(row.OwnTableCells[1].CheckBoxes.Count, Is.EqualTo(1));
 			Assert.That(row.OwnTableCells[1].CheckBoxes[0].Checked, Is.EqualTo(promotion.Enabled));
-			Assert.That(row.OwnTableCells[2].CheckBoxes.Count, Is.EqualTo(1));
-			Assert.That(row.OwnTableCells[2].CheckBoxes[0].Checked, Is.EqualTo(promotion.AgencyDisabled));
 			return row;
 		}
 
@@ -183,31 +181,20 @@ limit 1")
 		[Test(Description = "проверяем включение/выключение модерации акций")]
 		public void PromotionModeration()
 		{
-			//есть возможность удаления немодерируемой акции (выводится как обычная, только в другом блоке)
-			RowPromotionExists(_promotionNotModerated);
-			Click("Удалить");
-			RowPromotionNotExists(_promotionNotModerated);
 			WaitForText("Список акций");
 			//проверка отмены подтверждение Промоакции
 			Assert.That(_promotion.Moderated, Is.True);
 			Assert.That(_promotion.IsActive(), Is.True);
 			WaitForText(_promotion.Name);
-			Click("Редактировать");
-			Click("Отменить подтверждение Промоакции");
-			WaitForText("Необходимо указать причину отмены!");
-			browser.TextField(Find.ByName("reason")).TypeText("Надо");
-			Click("Отменить подтверждение Промоакции");
-			session.Refresh(_promotion);
-			Assert.That(_promotion.Moderated, Is.False);
-			Assert.That(_promotion.IsActive(), Is.False);
+			Click("Редактировать"); 
 
 			//проверка подтверждение Промоакции
 			Open();
 			Click("Промо-акции"); 
 			WaitForText(_promotion.Name);
-			Click("Редактировать");
+			Click("Редактировать"); 
 			WaitForText("Акция не активна");
-			Click("Подтвердить");
+			ClickButton("Подтвердить");
 			session.Refresh(_promotion);
 			Assert.That(_promotion.Moderated, Is.True);
 			Assert.That(_promotion.IsActive(), Is.True);
@@ -216,9 +203,9 @@ limit 1")
 			Open();
 			Click("Промо-акции"); 
 			WaitForText(_promotion.Name);
-			Click("Редактировать");
+			Click("Редактировать"); 
 			browser.TextField(Find.ByName("reason")).TypeText("Надо");
-			Click("Отменить подтверждение Промоакции");
+			ClickButton("Отменить подтверждение Промоакции");
 			session.Refresh(_promotion);
 			Assert.That(_promotion.Moderated, Is.False);
 			Assert.That(_promotion.IsActive(), Is.False);
@@ -226,12 +213,12 @@ limit 1")
 			Open();
 			Click("Промо-акции"); 
 			WaitForText(_promotion.Name);
-			Click("Редактировать");
+			Click("Редактировать"); 
 			WaitForText("Акция не активна");
-			Click("Отказать");
+			ClickButton("Отказать");
 			WaitForText("Необходимо указать причину отказа!");
 			browser.TextField(Find.ByName("reason")).TypeText("Надо");
-			Click("Отказать");
+			ClickButton("Отказать");
 			session.Refresh(_promotion);
 			Assert.That(_promotion.Moderated, Is.False);
 			Assert.That(_promotion.IsActive(), Is.False);
@@ -270,6 +257,7 @@ limit 1")
 			var row = RowPromotionExists(_promotion);
 
 			row.Button(Find.ByValue("Удалить")).Click();
+			ClickButton("Да");
 
 			session.Clear();
 			var deletedPromotion = session.Get<SupplierPromotion>(_promotion.Id);
@@ -294,6 +282,7 @@ limit 1")
 			browser.TextField(Find.ByName("promotion.Annotation")).TypeText("новое крутое описание");
 
 			ClickButton("Сохранить");
+			ClickButton("Да"); 
 
 			AssertText("Список акций");
 			RowPromotionNotExists(_promotion);
