@@ -171,7 +171,7 @@ ${app.Asset("MainSettings.js")}
 			<a id="newSupplierMail" href="#">Шаблон письма новому поставщику</a>
 		</li>
 		<li>
-			<a id="promotionMailSettings" href="#">Шаблон письма от модератора</a>
+			<a id="promotionMailSettings" href="#">Шаблоны писем по ПромоАкциям</a>
 		</li>
 	</ul>
 </div>

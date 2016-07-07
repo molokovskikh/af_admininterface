@@ -18,43 +18,31 @@
 			<thead>
 				<tr>
 					<th>Id</th>
-					<th>Включена</th>
-					<th>Отключена АналитФармация</th>
+					<th>Включена</th> 
 					<th>Наименование</th>
 					<th>Поставщик</th>
 					<th>Модератор</th>
 					<th>Время модерации</th>
 					<th>Дата начала</th>
 					<th>Дата окончания</th>
-					<th></th>
-					<th></th>
+					<th></th> 
 				</tr>
 			</thead>
 			<% for i, promotion in enumerate(promotionsPremoderated): %>
-			<tr id="SupplierPromotionRow${promotion.Id}" class="${ViewHelper.GetRowStyle(i)} ${"redRow" if (promotion.Begin <= systemTime)}">
+			<tr id="SupplierPromotionRow${promotion.Id}" class="${ViewHelper.GetRowStyle(i)} ${"redRow" if (promotion.Begin <= systemTime)} ${"yellowRow" if (promotion.End <= systemTime)}">
 				<td>${promotion.Id}</td>
 				<td>
 					<form method=post action="${siteroot}/Promotions/ChangeState?id=${promotion.Id}&${filter.ToUrlQuery()}">
 						<input type=checkbox name="promotions[${i}].Id" ${"checked" if promotion.Enabled} onclick="submit();">
 					</form>
-				</td>
-				<td>
-					<form method=post action="${siteroot}/Promotions/ChangeDisabled?id=${promotion.Id}&${filter.ToUrlQuery()}">
-						<input type=checkbox name="promotions[${i}].Id" ${"checked" if promotion.AgencyDisabled} onclick="submit();">
-					</form>
-				</td>
+				</td> 
 				<td>${promotion.Name}</td>
 				<td>${promotion.PromotionOwnerSupplier.Name}</td>
 				<td>${promotion.Moderator}</td>
 				<td>${promotion.ModerationChanged}</td>
 				<td>${promotion.Begin.ToShortDateString()}</td>
 				<td>${promotion.End.ToShortDateString()}</td>
-				<td><a href="${siteroot}/Promotions/Edit?id=${promotion.Id}">Редактировать</a></td>
-				<td>
-					<form method=post action="${siteroot}/Promotions/Delete?id=${promotion.Id}">
-						<input type=submit value="Удалить">
-					</form>
-				</td>
+				<td><a href="${siteroot}/Promotions/Edit?id=${promotion.Id}">Редактировать</a></td> 
 			</tr>
 			<% end %>
 			<% else: %>
@@ -63,6 +51,24 @@
 			</tr>
 			<% end %>
 		</table>
+			<table style="padding-top: 5px;">
+				<tbody>
+					<tr>
+						<td>
+							<div style="background-color: #ffd7d7;border: 1px solid #d2d2d2;width: 18px;height: 18px; margin-left: 4px;"></div>
+						</td>
+						<td>Актуальные промо-акции</td>
+						<td>
+							<div style="background-color: #f5f5dc;border: 1px solid #d2d2d2;width: 18px;height: 18px; margin-left: 4px;"></div>
+						</td>
+						<td>Просроченные промо-акции</td>
+						<td>
+							<div style="background-color: #ffffff;border: 1px solid #d2d2d2;width: 18px;height: 18px; margin-left: 4px;"></div>
+						</td>
+						<td>Будущие промо-акции</td>
+					</tr>
+				</tbody>
+			</table>
 	</div>
 
 </div>
@@ -125,8 +131,8 @@
 				<td>${promotion.End.ToShortDateString()}</td>
 				<td><a href="${siteroot}/Promotions/Edit?id=${promotion.Id}">Редактировать</a></td>
 				<td>
-					<form method=post action="${siteroot}/Promotions/Delete?id=${promotion.Id}">
-						<input type=submit value="Удалить">
+					<form class="deleteForm" method=post action="${siteroot}/Promotions/Delete?id=${promotion.Id}">
+						<input title="${promotion.Name}" type=submit value="Удалить">
 					</form>
 				</td>
 			</tr>
@@ -140,3 +146,20 @@
 	</div>
 
 </div>
+
+
+${app.Asset("PromotionDialog.js")}
+
+<script>
+$(function() {
+
+	$(".deleteForm input[type='submit']").click(function (event) {
+	var _this = this;
+		getModel(event,"<p>Вы действительно хотите удалить промо-акцию <strong>'"+$(this).attr('title')+"' </strong> ?</p>",
+		function() {}, function() { 
+				$(_this).parent("form").submit();
+		});
+	});
+
+});
+</script>

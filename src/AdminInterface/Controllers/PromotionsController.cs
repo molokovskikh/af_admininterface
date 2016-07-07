@@ -21,6 +21,7 @@ using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
+using log4net;
 using NHibernate.Criterion;
 using NHibernate.Linq;
 using NHibernate.SqlCommand;
@@ -253,6 +254,8 @@ namespace AdminInterface.Controllers
 	{
 		private Dictionary<string, string> _allowedExtentions;
 
+		private static ILog log = LogManager.GetLogger(typeof(PromotionsController));
+
 		public PromotionsController()
 		{
 			_allowedExtentions = new Dictionary<string, string> {
@@ -344,16 +347,24 @@ namespace AdminInterface.Controllers
 
 		void SendMailFromModerator(List<string> contacts, string subject, string body)
 		{
-			var sender = new DefaultSmtpSender(ConfigurationManager.AppSettings["SmtpServer"]);
-			var message = new MailMessage();
-			message.Subject = subject;
-			message.From = new MailAddress(ConfigurationManager.AppSettings["ModeratorMailFrom"]);
-			message.To.Add(string.Join(",", contacts));
-			message.BodyEncoding = Encoding.UTF8;
-			message.HeadersEncoding = Encoding.UTF8;
-			message.IsBodyHtml = true;
-			message.Body = body;
-			sender.Send(message);
+			try {
+				var sender = new DefaultSmtpSender(ConfigurationManager.AppSettings["SmtpServer"]);
+				var message = new MailMessage();
+				message.Subject = subject;
+				message.From = new MailAddress(ConfigurationManager.AppSettings["ModeratorMailFrom"]);
+				message.To.Add(string.Join(",", contacts));
+				message.BodyEncoding = Encoding.UTF8;
+				message.HeadersEncoding = Encoding.UTF8;
+				message.IsBodyHtml = true;
+				message.Body = body;
+				sender.Send(message);
+			}
+			catch (Exception e) {
+#if DEBUG
+				throw;
+#endif
+				log.Error(String.Format("Ошибка при отправке письма от модератора {0}", subject), e);
+			}
 		}
 
 		public void ChangeModeration(uint id, string buttonText, string reason)
@@ -417,6 +428,7 @@ namespace AdminInterface.Controllers
 			RenderView("/Promotions/Edit");
 			PropertyBag["allowedExtentions"] = GetAllowedExtentions();
 			Binder.Validator = Validator;
+			PropertyBag["IsNew"] = true;
 
 			var client = DbSession.Load<PromotionOwnerSupplier>(supplierId);
 

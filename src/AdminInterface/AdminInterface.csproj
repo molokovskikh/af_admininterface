@@ -504,6 +504,7 @@
     <Content Include="Assets\Javascripts\order.delivery.group.editor.coffee" />
     <Content Include="Assets\Javascripts\payer-send-message.coffee" />
     <Content Include="Assets\Javascripts\Payments.js" />
+    <Content Include="Assets\Javascripts\PromotionDialog.js" />
     <Content Include="Assets\Javascripts\Regions.js" />
     <Content Include="Assets\Javascripts\RegisterPayer.js" />
     <Content Include="Assets\Javascripts\registration.js" />
