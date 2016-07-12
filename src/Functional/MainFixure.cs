@@ -47,7 +47,13 @@ namespace Functional
 				ProcessingAboutNamesSubject = "temp",
 				DeletingMiniMailText = "temp",
 				NewSupplierMailSubject = "Аналитфармация",
-				NewSupplierMailText = "Письмо новому поставщику"
+				NewSupplierMailText = "Письмо новому поставщику",
+				PromotionModerationEscapeBody = "temp",
+				PromotionModerationAllowedSubject = "temp",
+				PromotionModerationDeniedBody = "temp",
+				PromotionModerationAllowedBody = "temp",
+				PromotionModerationDeniedSubject = "temp",
+				PromotionModerationEscapeSubject = "temp"
 			};
 			session.Save(defaults);
 		}
