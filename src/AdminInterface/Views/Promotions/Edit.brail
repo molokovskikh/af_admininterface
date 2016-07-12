@@ -149,12 +149,21 @@
 				<input name=id type=hidden value='${promotion.Id}'>
 				<div style="padding-top: 10px;">	
 				<% if promotion.Moderated == false : %>
-				<input name=buttonText type=submit value='Подтвердить'>
+				
+				<% if isOverdued == false : %>
+				<input name=buttonText type=submit value='Подтвердить'>	
+				<% else: %> 
+				<input name=buttonText type=button value='Подтвердить' disabled>	
+				<% end %> 
 				<input name=buttonText type=submit value='Отказать'>
 					<div style="padding-top: 10px; margin-left: 100px;">
 						<label style="padding-top: 10px;">Причина отказа:</label>
 						<br/>
+				<% if isOverdued == false : %>
 						<textarea style="margin-top: 10px;" rows="4" cols="50" name="reason"></textarea>
+				<% else: %> 
+						<textarea style="margin-top: 10px;" rows="4" cols="50" name="reason">Истекли сроки акции.</textarea>
+				<% end %> 
 					</div> 	
 				<% else: %> 
 				<input name=buttonText type=submit  value='Отменить подтверждение Промоакции'>
