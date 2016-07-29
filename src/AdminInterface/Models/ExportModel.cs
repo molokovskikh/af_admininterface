@@ -15,6 +15,7 @@ using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models.Telephony;
 using AdminInterface.Queries;
 using Castle.Components.DictionaryAdapter;
+using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Excel;
 using Common.Web.Ui.Helpers;
@@ -408,10 +409,10 @@ namespace AdminInterface.Models
 			ws.Merge(1, 1, 1, 2);
 			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
 			string regionName;
-			if (filter.Region == null)
+			if (filter.Regions == null)
 				regionName = "Все";
 			else {
-				regionName = filter.Region.Name;
+				regionName = ArHelper.WithSession(s => filter.GetRegionNames(s));
 			}
 			ExcelHelper.Write(ws, 1, 1, regionName, false);
 

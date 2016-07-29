@@ -143,11 +143,10 @@ namespace AdminInterface.Controllers
 			this.RenderFile("Мониторинг_выставления_условий_клиенту.xls", ExportModel.GetClientConditionsMonitoring(filter));
 		}
 
-		public void WhoWasNotUpdated()
+		public void WhoWasNotUpdated([DataBind("filter")] WhoWasNotUpdatedFilter filter)
 		{
-			var filter = new WhoWasNotUpdatedFilter();
-			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			PropertyBag["filter"] = filter;
+			PropertyBag["AllRegions"] = Region.All();
 			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null)
 				PropertyBag["Clients"] = filter.SqlQuery2(DbSession);
 			else

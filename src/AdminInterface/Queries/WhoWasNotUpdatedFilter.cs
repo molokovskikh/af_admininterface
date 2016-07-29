@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Models;
 using AdminInterface.Security;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
@@ -25,7 +26,7 @@ namespace AdminInterface.ManagerReportsFilters
 
 	public class WhoWasNotUpdatedFilter : PaginableSortable
 	{
-		public Region Region { get; set; }
+		public ulong[] Regions { get; set; }
 
 		[Description("Нет обновлений с")]
 		public DateTime BeginDate { get; set; }
@@ -36,11 +37,23 @@ namespace AdminInterface.ManagerReportsFilters
 			SortBy = "ClientName";
 		}
 
+		public string GetRegionNames(ISession session)
+		{
+			var result = "";
+			if (Regions != null && Regions.Any())
+				result = session.Query<Region>().Where(x => Regions.Contains(x.Id)).Select(x => x.Name).OrderBy(x => x).ToList().Implode();
+			return result;
+		}
+
 		public IList<WhoWasNotUpdatedField> SqlQuery2(ISession session, bool forExcel = false)
 		{
 			var regionMask = SecurityContext.Administrator.RegionMask;
-			if (Region != null)
-				regionMask &= Region.Id;
+			if (Regions != null) {
+				ulong mask = 0;
+				foreach (var region in Regions)
+					mask |= region;
+				regionMask &= mask;
+			}
 
 			var result = session.CreateSQLQuery(string.Format(@"
 DROP TEMPORARY TABLE IF EXISTS customers.oneUserDate;
