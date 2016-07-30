@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using Castle.Core.Internal;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using NHibernate;
+using NHibernate.Criterion;
 using NHibernate.Linq;
 
 namespace AdminInterface.Controllers.Filters
@@ -23,6 +26,14 @@ namespace AdminInterface.Controllers.Filters
 		{
 			BeginDate = DateTime.Today;
 			EndDate = DateTime.Today.AddDays(1);
+			SortDirection = "Desc";
+			SortKeyMap = new Dictionary<string, string> {
+				{ "CreatedOn", "CreatedOn" },
+				{ "UpdateType", "UpdateType" },
+				{ "Size", "Size" },
+				{ "Version", "Version" },
+				{ "Addition", "Addition" }
+			};
 		}
 
 		/// <summary>
@@ -51,8 +62,13 @@ namespace AdminInterface.Controllers.Filters
 
 			var results = requestQuery
 				.Where(i => i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
-				.OrderByDescending(r => r.CreatedOn)
 				.ToList();
+			if (!IsDesc())
+				results.Sort(new PropertyComparer<RequestLog>(Common.Tools.SortDirection.Asc, SortBy));
+			else
+			{
+				results.Sort(new PropertyComparer<RequestLog>(Common.Tools.SortDirection.Desc, SortBy.IsNullOrEmpty() ? "CreatedOn" : SortBy));
+			}
 
 			var connectedLogs = logs
 				.Where(l => l.RequestToken != null && results.Any(x => x.RequestToken == l.RequestToken))
