@@ -157,6 +157,17 @@ namespace AdminInterface.Controllers
 		{
 			var filter = BindFilter<UpdatedAndDidNotDoOrdersFilter, UpdatedAndDidNotDoOrdersField>();
 			PropertyBag["filter"] = filter;
+			PropertyBag["SupplierDisabled"] = new List<Tuple<bool, string>>() {
+				new Tuple<bool, string>(false, "Только по включенным поставщикам"),
+				new Tuple<bool, string>(true, "Только по отключенным поставщикам")
+			};
+			PropertyBag["AllRegions"] = Region.All();
+			PropertyBag["AllSuppliers"] = DbSession.Query<Supplier>()
+				.Where(s => !s.Disabled && !s.Name.Contains("ассортимент"))
+				.Select(x => Tuple.Create(x.Id, x.Name + " - " + x.HomeRegion.Name))
+				.ToList()
+				.OrderBy(x => x.Item2);
+
 			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null || filter.LoadDefault) {
 				var result = filter.Find();
 				PropertyBag["Clients"] = result.Cast<BaseItemForTable>().ToList();

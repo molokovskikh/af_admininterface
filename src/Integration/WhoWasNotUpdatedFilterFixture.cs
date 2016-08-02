@@ -101,7 +101,7 @@ delete from Billing.Accounts where Type = 0;")
 
 			Flush();
 
-			var filter = new WhoWasNotUpdatedFilter { BeginDate = DateTime.Now.AddDays(-1) };
+			var filter = new WhoWasNotUpdatedFilter { BeginDate = DateTime.Now.AddDays(-1), Regions = new ulong[] { client.HomeRegion.Id } };
 
 			var data = filter.SqlQuery2(session);
 			Assert.AreEqual(data.Count, 4);

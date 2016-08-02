@@ -48,7 +48,7 @@ namespace AdminInterface.ManagerReportsFilters
 		public IList<WhoWasNotUpdatedField> SqlQuery2(ISession session, bool forExcel = false)
 		{
 			var regionMask = SecurityContext.Administrator.RegionMask;
-			if (Regions != null) {
+			if (Regions != null && Regions.Any()) {
 				ulong mask = 0;
 				foreach (var region in Regions)
 					mask |= region;
