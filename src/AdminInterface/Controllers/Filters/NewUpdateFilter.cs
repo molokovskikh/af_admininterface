@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
-using Castle.Core.Internal;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using NHibernate;
-using NHibernate.Criterion;
 using NHibernate.Linq;
+using System.Linq.Dynamic;
 
 namespace AdminInterface.Controllers.Filters
 {
@@ -26,6 +24,7 @@ namespace AdminInterface.Controllers.Filters
 		{
 			BeginDate = DateTime.Today;
 			EndDate = DateTime.Today.AddDays(1);
+			SortBy = "CreatedOn";
 			SortDirection = "Desc";
 			SortKeyMap = new Dictionary<string, string> {
 				{ "CreatedOn", "CreatedOn" },
@@ -42,15 +41,22 @@ namespace AdminInterface.Controllers.Filters
 		/// <returns></returns>
 		public IList<RequestLog> Find(ISession session)
 		{
+			SortBy = SortBy == "Addition" ? "CreatedOn" : SortBy;
 			var logQuery = session.Query<ClientAppLog>();
 			var requestQuery = session.Query<RequestLog>();
 			if (User != null) {
-				logQuery = session.Query<ClientAppLog>().Where(i => i.User == User);
-				requestQuery = session.Query<RequestLog>().Where(i => i.User == User);
+				logQuery = session.Query<ClientAppLog>().Where(i => i.User == User &&
+										i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1));
+				requestQuery = session.Query<RequestLog>()
+															.Where(i => i.User == User && i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
+										.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
 			}
 			else if (Client != null) {
-				logQuery = session.Query<ClientAppLog>().Where(i => i.User.Client == Client);
-				requestQuery = session.Query<RequestLog>().Where(i => i.User.Client == Client);
+				logQuery = session.Query<ClientAppLog>().Where(i => i.User.Client == Client &&
+										i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1));
+				requestQuery = session.Query<RequestLog>().Where(i => i.User.Client == Client &&
+												i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
+												.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
 			}
 			if (ErrorType == 1) {
 				requestQuery = session.Query<RequestLog>().Where(i => i.ErrorType == 1);
@@ -58,17 +64,9 @@ namespace AdminInterface.Controllers.Filters
 				requestQuery = session.Query<RequestLog>().Where(i => i.IsCompleted && !i.IsFaulted && i.UpdateType == "MainController");
 			}
 
-			var logs = logQuery.Where(i => i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1)).ToList();
+			var logs = logQuery.ToList();
 
-			var results = requestQuery
-				.Where(i => i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
-				.ToList();
-			if (!IsDesc())
-				results.Sort(new PropertyComparer<RequestLog>(Common.Tools.SortDirection.Asc, SortBy));
-			else
-			{
-				results.Sort(new PropertyComparer<RequestLog>(Common.Tools.SortDirection.Desc, SortBy.IsNullOrEmpty() ? "CreatedOn" : SortBy));
-			}
+			var results = requestQuery.ToList();
 
 			var connectedLogs = logs
 				.Where(l => l.RequestToken != null && results.Any(x => x.RequestToken == l.RequestToken))
