@@ -53,7 +53,7 @@ limit 1")
 				Annotation = catalog.Name,
 				Name = catalog.Name,
 				Begin = DateTime.Now.Date.AddDays(-7),
-				End = DateTime.Now.Date,
+				End = DateTime.Now.Date.AddDays(1),
 				Moderated = moderated,
 				Catalogs = new List<Catalog> { catalog }
 			};
@@ -186,13 +186,14 @@ limit 1")
 			Assert.That(_promotion.Moderated, Is.True);
 			Assert.That(_promotion.IsActive(), Is.True);
 			WaitForText(_promotion.Name);
-			Click("Редактировать"); 
+			Click("Редактировать");
 
 			//проверка подтверждение Промоакции
 			Open();
-			Click("Промо-акции"); 
+
+			Click("Промо-акции");
 			WaitForText(_promotion.Name);
-			Click("Редактировать"); 
+			Click("Редактировать");
 			WaitForText("Акция не активна");
 			ClickButton("Подтвердить");
 			session.Refresh(_promotion);
@@ -201,19 +202,25 @@ limit 1")
 
 			//снова отменяем
 			Open();
-			Click("Промо-акции"); 
+			Click("Промо-акции");
 			WaitForText(_promotion.Name);
-			Click("Редактировать"); 
+			Click("Редактировать");
 			browser.TextField(Find.ByName("reason")).TypeText("Надо");
 			ClickButton("Отменить подтверждение Промоакции");
 			session.Refresh(_promotion);
 			Assert.That(_promotion.Moderated, Is.False);
 			Assert.That(_promotion.IsActive(), Is.False);
+
 			//проверка отказа в публикации Промоакции
 			Open();
-			Click("Промо-акции"); 
+			Click("Промо-акции");
+			//ее не должно быть в списке отключенных
+			var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
+			list.Select("Отключенные");
+			ClickButton("Показать");
+
 			WaitForText(_promotion.Name);
-			Click("Редактировать"); 
+			Click("Редактировать");
 			WaitForText("Акция не активна");
 			ClickButton("Отказать");
 			WaitForText("Необходимо указать причину отказа!");
@@ -222,6 +229,14 @@ limit 1")
 			session.Refresh(_promotion);
 			Assert.That(_promotion.Moderated, Is.False);
 			Assert.That(_promotion.IsActive(), Is.False);
+
+			_promotion.Moderator = null;
+			session.Save(_promotion);
+			session.Flush();
+			//проверка отказа в публикации Промоакции
+			Open();
+			Click("Промо-акции");
+			WaitForText(_promotion.Name);
 		}
 
 		[Test(Description = "проверяем включение/выключение акций административно АК Инфорум")]
@@ -282,7 +297,7 @@ limit 1")
 			browser.TextField(Find.ByName("promotion.Annotation")).TypeText("новое крутое описание");
 
 			ClickButton("Сохранить");
-			ClickButton("Да"); 
+			ClickButton("Да");
 
 			AssertText("Список акций");
 			RowPromotionNotExists(_promotion);

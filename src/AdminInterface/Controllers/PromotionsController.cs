@@ -73,7 +73,7 @@ namespace AdminInterface.Controllers
 			else if (PromotionStatus == Controllers.PromotionStatus.Disabled)
 				criteria.Add(Expression.Eq("Status", false));
 
-			criteria.Add(Expression.Eq("Moderated", true));
+			criteria.Add(Expression.Or(Expression.Eq("Moderated", true), Expression.And(Expression.IsNotNull("Moderator"), Expression.Eq("Moderated", false))));
 
 			if (!String.IsNullOrEmpty(SearchSupplier))
 				criteria.Add(Expression.Like("s.Name", SearchSupplier, MatchMode.Anywhere));
@@ -280,7 +280,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["filter"] = filter;
 			PropertyBag["systemTime"] = SystemTime.Now().AddDays(3).Date;
 			PropertyBag["promotions"] = filter.Find<SupplierPromotion>();
-			PropertyBag["promotionsPremoderated"] = DbSession.Query<SupplierPromotion>().Where(s => s.Moderated == false).OrderBy(d => d.Begin).ToList();
+			PropertyBag["promotionsPremoderated"] = DbSession.Query<SupplierPromotion>().Where(s => s.Moderator == null && s.Moderated == false).OrderBy(d => d.Begin).ToList();
 			PropertyBag["SortBy"] = Request["SortBy"];
 			PropertyBag["Direction"] = Request["Direction"];
 		}
@@ -302,7 +302,9 @@ namespace AdminInterface.Controllers
 			Binder.Validator = Validator;
 
 			var promotion = DbSession.Load<SupplierPromotion>(id);
+
 			PropertyBag["promotion"] = promotion;
+			PropertyBag["isOverdued"] = promotion.End < SystemTime.Now();
 			ActiveRecordMediator.Evict(promotion);
 			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(DbSession, promotion.PromotionOwnerSupplier.MaskRegion).OrderBy(reg => reg.Name);
 
@@ -370,12 +372,18 @@ namespace AdminInterface.Controllers
 		public void ChangeModeration(uint id, string buttonText, string reason)
 		{
 			var moderationState = buttonText == "Подтвердить" ? 0 : buttonText == "Отказать" ? 1 : 2;
+
 			if (moderationState != 0 && string.IsNullOrEmpty(reason)) {
 				Error($"Необходимо указать причину {(moderationState == 1 ? "отказа" : "отмены")}!");
 				RedirectToAction("Edit", new { id });
 				return;
 			}
 			var promotion = DbSession.Load<SupplierPromotion>(id);
+			if (moderationState == 0 && promotion.End < SystemTime.Now()) {
+				Error($"Акция является просроченной, ее нельзя подтвердить.");
+				RedirectToAction("Edit", new { id });
+				return;
+			}
 			promotion.Moderated = moderationState == 0;
 			promotion.ModerationChanged = SystemTime.Now();
 			promotion.Moderator = Admin.Name;
@@ -388,7 +396,7 @@ namespace AdminInterface.Controllers
 				var body = moderationState == 0 ? defaultSettings.PromotionModerationAllowedBody
 					: moderationState == 1 ? defaultSettings.PromotionModerationDeniedBody : defaultSettings.PromotionModerationEscapeBody;
 
-				body = string.Format(body ?? "", reason, promotion.Id, promotion.Name, Admin.Name);
+				body = string.Format(body ?? "", reason, promotion.Id, promotion.Name, Admin.Name, "<br/>");
 
 				var contacts = promotion.PromotionOwnerSupplier.ContactGroupOwner.GetEmails(ContactGroupType.ClientManagers).ToList();
 				if (contacts.Count > 0) {

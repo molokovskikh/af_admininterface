@@ -92,7 +92,17 @@
 		</form>
 	</div>
 
-	<div class=block>
+	<div class=block>	
+			<table style="padding-bottom: 5px;">
+				<tbody>
+					<tr>
+						<td>
+							<div style="background-color: #ffd7d7;border: 1px solid #d2d2d2;width: 18px;height: 18px; margin-left: 4px;"></div>
+						</td>
+						<td>Промо-акции, не прошедшие модерацию</td>  
+					</tr>
+				</tbody>
+			</table>
 		<table class="DataTable HighLightCurrentRow" style="width: 100%;">
 			<% if promotions.Count: %>
 			<thead>
@@ -111,7 +121,7 @@
 				</tr>
 			</thead>
 			<% for i, promotion in enumerate(promotions): %>
-			<tr id="SupplierPromotionRow${promotion.Id}" class="${ViewHelper.GetRowStyle(i)}">
+			<tr id="SupplierPromotionRow${promotion.Id}" class="${ViewHelper.GetRowStyle(i)} ${" redRow" if (promotion.Moderated == false and promotion.Moderator != null)}">
 				<td>${promotion.Id}</td>
 				<td>
 					<form method=post action="${siteroot}/Promotions/ChangeState?id=${promotion.Id}&${filter.ToUrlQuery()}">
