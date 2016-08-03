@@ -635,6 +635,7 @@
     <Content Include="Views\ManagerReports\SynonymStat.brail" />
     <Content Include="Views\Mon\Index.cshtml" />
     <Content Include="Views\Mon\Users.cshtml" />
+    <Content Include="Views\Mon\Logs.cshtml" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />
