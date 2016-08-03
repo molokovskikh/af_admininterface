@@ -17,7 +17,13 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		${app.FilterFor("filter.BeginDate")}
 		<tr>
 			<td class="filter-label">Регион</td>
-			<td>${app.Edit("filter.Region")}</td>
+			<td>${FormHelper.Select("filter.Regions", filter.Regions, AllRegions, {
+					@firstoption: "Все",
+					@firstoptionvalue: "",
+					@multiple: "true",
+					@size: "6",
+					@text: "Name",
+					@value: "Id"})}</td>
 		</tr>
 		<tr>
 			<td colspan=3>${app.ExportLink("Выгрузить отчет в Ехcel", "ExcelWhoWasNotUpdated", filter)}</td>

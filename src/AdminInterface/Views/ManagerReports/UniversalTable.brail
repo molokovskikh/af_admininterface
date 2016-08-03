@@ -7,8 +7,8 @@
 			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
 			<th>${app.Sortable("Код пользователя", "UserId")}</th>
 			<th>${app.Sortable("Комментарий пользователя", "UserName")}</th>
-			<th>Регион</th>
-			<th>Регистратор</th>
+			<th>${app.Sortable("Регион", "RegionName")}</th>
+			<th>${app.Sortable("Регистратор", "Registrant")}</th>
 			<th>${app.Sortable("Дата обновления", "UpdateDate")}</th>
 		</tr>
 	</thead>
@@ -17,11 +17,15 @@
 	<%if Clients.Count > 0: %>
 		<%for i, item in enumerate(Clients): %>
 		<tr class="${ViewHelper.GetRowStyle(i)} Submit">
-			<td>${item.ClientId}</td>
+			<td>
+				${UrlHelper.Link(item.ClientId.ToString(), {@controller: @Clients, @params: {@id: item.ClientId}})}
+			</td>
 			<td>
 				${UrlHelper.Link(item.ClientName, {@controller: @Clients, @params: {@id: item.ClientId}})}
 			</td>
-			<td>${item.UserId}</td>
+			<td>
+				${UrlHelper.Link(item.UserId.ToString(), {@controller: @Users, @params: {@id: item.UserId}})}
+			</td>
 			<td>
 				${UrlHelper.Link(item.UserName, {@controller: @Users, @params: {@id: item.UserId}})}
 			</td>
