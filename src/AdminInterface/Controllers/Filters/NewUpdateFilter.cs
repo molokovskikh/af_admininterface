@@ -41,22 +41,16 @@ namespace AdminInterface.Controllers.Filters
 		/// <returns></returns>
 		public IList<RequestLog> Find(ISession session)
 		{
-			SortBy = SortBy == "Addition" ? "CreatedOn" : SortBy;
+			SortBy = SortBy == "Addition" ? "CreatedOn" : SortBy; //У типа RequestLog нет поля Addition
 			var logQuery = session.Query<ClientAppLog>();
 			var requestQuery = session.Query<RequestLog>();
 			if (User != null) {
-				logQuery = session.Query<ClientAppLog>().Where(i => i.User == User &&
-										i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1));
-				requestQuery = session.Query<RequestLog>()
-															.Where(i => i.User == User && i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
-										.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
+				logQuery = GetClientAppLog<ClientAppLog>(session);
+				requestQuery = GetRequestLog<RequestLog>(session);
 			}
 			else if (Client != null) {
-				logQuery = session.Query<ClientAppLog>().Where(i => i.User.Client == Client &&
-										i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1));
-				requestQuery = session.Query<RequestLog>().Where(i => i.User.Client == Client &&
-												i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
-												.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
+				logQuery = GetClientAppLog<ClientAppLog>(session, true);
+				requestQuery = GetRequestLog<RequestLog>(session, true);
 			}
 			if (ErrorType == 1) {
 				requestQuery = session.Query<RequestLog>().Where(i => i.ErrorType == 1);
@@ -75,6 +69,25 @@ namespace AdminInterface.Controllers.Filters
 			results.Each(x => x.HaveLog = connectedLogs.Any(y => y.RequestToken == x.RequestToken));
 
 			return results;
+		}
+
+		private IQueryable<T> GetClientAppLog<T> (ISession session, bool a = false) where T : ClientAppLog
+		{
+			return session.Query<T>()
+								.Where(i => ((!a) ? i.User == User : i.User.Client == Client)
+														&& i.CreatedOn > BeginDate
+														&& i.CreatedOn < EndDate.AddDays(1)
+								);
+		}
+
+		private IQueryable<T> GetRequestLog<T>(ISession session, bool a = false) where T : RequestLog
+		{
+			return session.Query<T>()
+							.Where(i => ((!a) ? i.User == User : i.User.Client == Client)
+												&& i.CreatedOn > BeginDate
+												&& i.CreatedOn < EndDate.AddDays(1)
+											)
+							.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
 		}
 
 		public bool ShowRegion()
