@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
 using System.Web;
 using AdminInterface.Security;
 using Common.Web.Ui.Helpers;
@@ -167,6 +168,9 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public IList<UpdatedAndDidNotDoOrdersField> Find(bool forExport)
 		{
+			var query = new DetachedSqlQuery();
+			var sb = new StringBuilder();
+
 			var regionMask = SecurityContext.Administrator.RegionMask;
 			if (Regions != null && Regions.Any())
 			{
@@ -175,8 +179,11 @@ namespace AdminInterface.ManagerReportsFilters
 					mask |= region;
 				regionMask &= mask;
 			}
+			query.SetParameter("regionMask", regionMask);
+			query.SetParameter("updateDateStart", UpdatePeriod.Begin);
+			query.SetParameter("updateDateEnd", UpdatePeriod.End);
 
-			var sql = @"DROP TEMPORARY TABLE IF EXISTS usr;
+			sb.Append(@"DROP TEMPORARY TABLE IF EXISTS usr;
 CREATE TEMPORARY TABLE usr (INDEX idx(UserId) USING HASH) ENGINE MEMORY
 select
 	c.id as ClientId,
@@ -203,21 +210,22 @@ where
 	and rcs.InvisibleOnFirm = 0
 	and rcs.ServiceClient = 0
 	and ap.PermissionId = 1
-group by u.id; ";
+group by u.id; ");
 
 			// вычисление суммы заказов на адрес
 			if (Sum.HasValue && Sum.Value > 0) {
-				sql += string.Format(@"DROP TEMPORARY TABLE IF EXISTS sa;
+				sb.Append(@"DROP TEMPORARY TABLE IF EXISTS sa;
 CREATE TEMPORARY TABLE sa (INDEX idx(UserId) USING HASH) ENGINE MEMORY
 select distinct usr.UserId
 from usr
 left outer join orders.OrdersHead oh on (oh.`regioncode` & :regionMask > 0) and oh.UserId = usr.UserId and oh.`WriteTime` > :updateDateStart and oh.`WriteTime` < :updateDateEnd
 left join orders.orderslist ol on ol.OrderID = oh.RowID
 group by usr.UserId, oh.AddressId
-having IFNULL(SUM(ol.cost),0) < {0}; ", Sum.Value);
+having IFNULL(SUM(ol.cost),0) < :sumPerAddress; ");
+				query.SetParameter("sumPerAddress", Sum.Value);
 			}
 
-			sql += @"select usr.ClientId, usr.ClientName, usr.RegionName, usr.UserId, usr.UserName, usr.Registrant, usr.UpdateDate, usr.LastOrderDate,
+			sb.Append(@"select usr.ClientId, usr.ClientName, usr.RegionName, usr.UserId, usr.UserName, usr.Registrant, usr.UpdateDate, usr.LastOrderDate,
 count(distinct senb.Id) as EnabledSupCnt,
 count(distinct sdsb.Id) as DisabledSupCnt,
 group_concat(distinct sdsb.Name ORDER BY sdsb.Name separator ', ') as DisabledSupName
@@ -226,31 +234,30 @@ left join orders.OrdersHead oh on (oh.`regioncode` & :regionMask > 0) and oh.Use
 left join usersettings.pricesdata pd on pd.PriceCode = oh.PriceCode
 left join customers.Suppliers s on s.Id = pd.FirmCode
 left join customers.Suppliers senb on senb.Id = pd.FirmCode and senb.Disabled = 0
-left join customers.Suppliers sdsb on sdsb.Id = pd.FirmCode and sdsb.Disabled = 1 ";
+left join customers.Suppliers sdsb on sdsb.Id = pd.FirmCode and sdsb.Disabled = 1 ");
 
 			if (Sum.HasValue && Sum.Value > 0)
-				sql += "join sa on sa.UserId = usr.UserId ";
+				sb.AppendLine("join sa on sa.UserId = usr.UserId ");
 
 			var whre = new List<string>();
-			if (Suppliers != null && Suppliers.Any())
-				whre.Add($"IFNULL(s.Id,0) not in ({Suppliers.Implode()}) ");
-			if (SupplierDisabled.HasValue)
-				whre.Add($"s.Disabled = {Convert.ToInt32(SupplierDisabled.Value)} ");
+			if (Suppliers != null && Suppliers.Any()) {
+				whre.Add("IFNULL(s.Id,0) not in (:suppliers) ");
+				query.SetParameter("suppliers", Suppliers.Implode());
+			}
+			if (SupplierDisabled.HasValue) {
+				whre.Add("s.Disabled = :supplierDisabled ");
+				query.SetParameter("supplierDisabled", Convert.ToInt32(SupplierDisabled.Value));
+			}
 			if (whre.Count > 0)
-				sql += $"where {whre.Implode(" and ")} ";
+				sb.AppendLine($"where {whre.Implode(" and ")} ");
 
-			sql += "group by usr.UserId ";
-
+			sb.AppendLine("group by usr.UserId ");
 			if (NoOrders)
-				sql += "having COUNT(oh.RowID) = 0 ";
+				sb.AppendLine("having COUNT(oh.RowID) = 0 ");
+			sb.AppendLine($"order by {SortBy} {SortDirection};");
 
-			sql += $"order by {SortBy} {SortDirection};";
-
-			var result = Session.CreateSQLQuery(sql)
-				.SetParameter("updateDateStart", UpdatePeriod.Begin)
-				.SetParameter("updateDateEnd", UpdatePeriod.End)
-				.SetParameter("regionMask", regionMask)
-				.ToList<UpdatedAndDidNotDoOrdersField>();
+			query.Sql = sb.ToString();
+			var result = query.GetSqlQuery(Session).ToList<UpdatedAndDidNotDoOrdersField>();
 
 			Session.CreateSQLQuery("DROP TEMPORARY TABLE IF EXISTS usr; DROP TEMPORARY TABLE IF EXISTS sa;").ExecuteUpdate();
 

@@ -67,7 +67,6 @@ namespace Integration
 			var price = session.Query<Price>().First();
 			filter.UpdatePeriod.End = DateTime.Now;
 			filter.Regions = new [] { region.Id };
-			filter.Suppliers = new[] { price.Supplier.SupplierId };
 			filter.SupplierDisabled = price.Supplier.Disabled;
 			filter.Session = session;
 			var order = new ClientOrder { Client = client, User = user, WriteTime = DateTime.Now.AddDays(-2), Region = region, Price = price };
