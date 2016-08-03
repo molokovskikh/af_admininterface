@@ -70,6 +70,7 @@ namespace AdminInterface.Controllers
 		{
 			var items = DbSession.Query<RequestLog>()
 				.Where(x => x.CreatedOn > begin && x.CreatedOn < end && x.Version == version)
+				.OrderByDescending(x => x.CreatedOn)
 				.ToList();
 			return View(items);
 		}
