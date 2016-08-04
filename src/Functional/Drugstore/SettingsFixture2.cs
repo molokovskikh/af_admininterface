@@ -6,6 +6,8 @@ using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Remote;
+using OpenQA.Selenium.Support.UI;
 using Test.Support.Selenium;
 
 namespace Functional.Drugstore
@@ -54,6 +56,26 @@ namespace Functional.Drugstore
 
 			session.Refresh(settings.SmartOrderRules);
 			Assert.AreEqual(settings.SmartOrderRules.ProductColumn, "F1");
+		}
+
+		[Test, Description("Зашумлять цены для всех поставщиков кроме одного")]
+		public void Set_costs_noising_except_one_supplier()
+		{
+			var supplier = DataMother.CreateSupplier();
+			MakeNameUniq(supplier);
+			Maintainer.MaintainIntersection(supplier, session);
+			Refresh();
+
+			Css("#drugstore_NoiseCosts").Click();
+			var select = new SelectElement((RemoteWebElement)SearchV2("#drugstore_NoiseCostExceptSupplier_Id", supplier.Name));
+
+			Assert.That(select.SelectedOption.Text, Is.StringEnding(supplier.Name));
+
+			ClickButton("Сохранить");
+			AssertText("Сохранено");
+
+			session.Refresh(settings);
+			Assert.That(settings.FirmCodeOnly, Is.EqualTo(supplier.Id));
 		}
 
 		private string Error(string selector)

@@ -7,7 +7,7 @@ using WatiN.Core;
 
 namespace Functional.Billing
 {
-	public class BillingSearchFixture : FunctionalFixture
+	public class BillingSearchFixture : AdmSeleniumFixture
 	{
 		private Client client;
 		private Payer payer;
@@ -33,7 +33,7 @@ namespace Functional.Billing
 		{
 			Open("Billing/Search");
 
-			browser.SelectList(Find.ById("filter_ClientType")).SelectByValue("1");
+			Css("#filter_ClientType").SelectByValue("1");
 			AssertText("Игнорировать плательщиков, содержащих Поставщиков");
 		}
 
@@ -56,9 +56,8 @@ namespace Functional.Billing
 
 			ClickLink("Биллинг");
 			AssertText("Фильтр плательщиков");
-			var button = (RadioButton)Css("input[name='filter.SearchBy'][value='3']");
-			button.Click();
-			browser.TextField(Find.ById("filter_SearchText")).TypeText(payer.Id.ToString());
+			Css("input[name='filter.SearchBy'][value='3']").Click();
+			Css("#filter_SearchText").SendKeys(payer.Id.ToString());
 			ClickButton("Найти");
 
 			AssertText(payer.Name);
