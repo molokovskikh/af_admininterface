@@ -15,6 +15,7 @@
 			<th>Дата создания</th>
 			<th>Пользователь</th>
 			<th>Версия</th>
+			<th>Примечание</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -25,6 +26,7 @@
 					<a href="~/Users/@item.User.Id/Edit">@item.User.Name</a>
 				</td>
 				<td>@item.Version</td>
+				<td>@item.ErrorDescription</td>
 			</tr>
 			}
 		</tbody>
