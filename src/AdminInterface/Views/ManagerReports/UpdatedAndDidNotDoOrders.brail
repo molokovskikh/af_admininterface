@@ -14,10 +14,43 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 <tbody>
 	<tr><td colspan=3 class="bold">Период, когда были получены обновления</td></tr>
 	${app.FilterFor("filter.UpdatePeriod")}
-	${app.FilterFor("filter.OrderDate")}
 	<tr>
 		<td class="filter-label">Регион</td>
-		<td>${app.Edit("filter.Region")}</td>
+		<td colspan=2>${FormHelper.Select("filter.Regions", filter.Regions, AllRegions, {
+				@firstoption: "Все",
+				@firstoptionvalue: "",
+				@multiple: "true",
+				@size: "6",
+				@text: "Name",
+				@value: "Id"})}</td>
+	</tr>
+	<tr>
+		<td class="filter-label">Нет заказов на поставщиков</td>
+		<td colspan=2>${FormHelper.Select("filter.Suppliers", filter.Suppliers, AllSuppliers, {
+				@firstoption: "Все",
+				@firstoptionvalue: "",
+				@multiple: "true",
+				@size: "6",
+				@text: "Item2",
+				@value: "Item1"})}</td>
+	</tr>
+	<tr>
+		<td class="filter-label">Состояние поставщиков</td>
+		<td colspan=2>${FormHelper.Select("filter.SupplierDisabled", filter.SupplierDisabled, SupplierDisabled, {
+				@firstoption: "Все",
+				@firstoptionvalue: "",
+				@text: "Item2",
+				@value: "Item1"})}
+		</td>
+	</tr>
+	<tr>
+		<td class="filter-label">Кто не делал заказы вообще</td>
+		<td colspan=2>${FormHelper.CheckboxField("filter.NoOrders")}
+		</td>
+	</tr>
+	<tr>
+		<td class="filter-label">Сумма на адрес не более</td>
+		<td colspan=2>${FormHelper.TextField("filter.Sum")}</td>
 	</tr>
 	<tr>
 		<td colspan=3>${app.ExportLink("Выгрузить отчет в Ехcel", "ExcelUpdatedAndDidNotDoOrders", filter)}</td>

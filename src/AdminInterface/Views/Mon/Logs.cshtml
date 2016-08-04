@@ -1,0 +1,79 @@
+﻿<ol class="breadcrumb">
+	<li>
+		<a href="~/">Главная</a>
+	</li>
+	<li class="active">Ошибки пользователей</li>
+</ol>
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form-horizontal" })) {
+	<div class="form-group">
+		<div class="col-sm-offset-3 col-sm-3" style="width: auto">
+			<label>Начало</label>
+			@Html.Hidden("begin", (object) ViewBag.Begin)
+			<div class="calendar"></div>
+		</div>
+
+		<div class="col-sm-3" style="width: auto">
+			<label>Окончание</label>
+			@Html.Hidden("end", (object) ViewBag.End)
+			<div class="calendar"></div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-3 col-sm-9">
+			<div>
+				<label for="version">Версия</label>
+			</div>
+			@Html.DropDownList("version", (IEnumerable<SelectListItem>) ViewBag.Versions, new {multiple = "multiple"})
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-3 col-sm-9">
+			<div>
+				<label for="version">Не показывать если ошибок меньше</label>
+			</div>
+			@Html.TextBox("threashold", (int)ViewBag.Threashold)
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-3 col-sm-9">
+			<button type="submit" class="btn btn-default">Показать</button>
+		</div>
+	</div>
+}
+<div>
+	@foreach(var item in Model) {
+		<div>
+			<label>Ошибок: </label>@item.Count
+			<br>
+			<label>Версии: </label>@item.Versions
+			<br>
+			<label>Users: </label>@item.Users
+			<br>
+			<label>Ошибка: </label>
+			<pre>@item.Error</pre>
+			<br>
+			<label>Трассировка: </label><pre>@item.StackTrace</pre>
+			<br>
+		</div>
+		<hr/>
+	}
+</div>
+
+@section scripts {
+	<script type="text/javascript">
+		$(function () {
+			$.datepicker.setDefaults($.datepicker.regional['ru']);			$(".calendar").each(function () {
+				var value = $(this).siblings("input[type=hidden]");
+				$(this).datepicker({
+					defaultDate: value.val().split(/\s/)[0],
+					dateFormat: "dd.mm.yy",
+					altField: value
+				});
+			});
+		});
+	</script>
+}

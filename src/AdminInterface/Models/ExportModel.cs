@@ -15,6 +15,7 @@ using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models.Telephony;
 using AdminInterface.Queries;
 using Castle.Components.DictionaryAdapter;
+using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Excel;
 using Common.Web.Ui.Helpers;
@@ -120,12 +121,33 @@ namespace AdminInterface.Models
 			ws.Cells.Rows[headerRow].Height = 514;
 		}
 
-		private static void UpdatedAndDidNotDoOrders(Worksheet ws)
+		private static void UpdatedAndDidNotDoOrders(Worksheet ws, int headerRow)
 		{
-			int headerRow = 5;
-			FormatWhoWasNotUpdated(ws, 5);
+			ExcelHelper.WriteHeader1(ws, headerRow, 0, "Код клиента", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 1, "Наименование клиента", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 2, "Код пользователя", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 3, "Комментарий пользователя", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 4, "Регион", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 5, "Регистратор", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 6, "Дата обновления", true, true);
 			ExcelHelper.WriteHeader1(ws, headerRow, 7, "Дата последнего заказа", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 8, "Включенные поставщики", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 9, "Отключенные поставщики", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 10, "Список отключенных", true, true);
+
+			ws.Cells.ColumnWidth[0] = 4000;
+			ws.Cells.ColumnWidth[1] = 12000;
+			ws.Cells.ColumnWidth[2] = 4000;
+			ws.Cells.ColumnWidth[3] = 12000;
+			ws.Cells.ColumnWidth[4] = 6000;
+			ws.Cells.ColumnWidth[5] = 8000;
+			ws.Cells.ColumnWidth[6] = 6000;
 			ws.Cells.ColumnWidth[7] = 6000;
+			ws.Cells.ColumnWidth[8] = 6000;
+			ws.Cells.ColumnWidth[9] = 6000;
+			ws.Cells.ColumnWidth[10] = 6000;
+
+			ws.Cells.Rows[headerRow].Height = 514;
 		}
 
 		private static void AnalysisOfWorkDrugstoresFormat(Worksheet ws)
@@ -267,33 +289,65 @@ namespace AdminInterface.Models
 			var wb = new Workbook();
 			var ws = new Worksheet("Кто обновлялся и не делал заказы");
 
-			int row = 6;
+			int row = 0;
 			int colShift = 0;
 
-			ws.Merge(0, 0, 0, 6);
+			ws.Merge(row, 0, row, 6);
+			ExcelHelper.WriteHeader1(ws, row, 0, "Кто обновлялся и не делал заказы", false, true);
+			row++; // 1
 
-			ExcelHelper.WriteHeader1(ws, 0, 0, "Кто обновлялся и не делал заказы", false, true);
-
-			ws.Merge(1, 1, 1, 2);
-			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
+			ws.Merge(row, 1, row, 2);
+			ExcelHelper.Write(ws, row, 0, "Регион:", false);
 			string regionName;
-			if (filter.Region == null)
-				regionName = "Все";
+			if (filter.Regions != null && filter.Regions.Any())
+				regionName = ArHelper.WithSession(s => filter.GetRegionNames(s));
 			else {
-				regionName = filter.Region.Name;
+				regionName = "Все";
 			}
-			ExcelHelper.Write(ws, 1, 1, regionName, false);
+			ExcelHelper.Write(ws, row, 1, regionName, false);
+			row++; // 2
 
-			ws.Merge(2, 1, 2, 2);
-			ExcelHelper.Write(ws, 2, 0, "Период:", false);
+			ws.Merge(row, 1, row, 2);
+			ExcelHelper.Write(ws, row, 0, "Период:", false);
 			if (filter.UpdatePeriod.Begin != filter.UpdatePeriod.End)
-				ExcelHelper.Write(ws, 2, 1, "С " + filter.UpdatePeriod.Begin.ToString("dd.MM.yyyy") + " по " + filter.UpdatePeriod.End.ToString("dd.MM.yyyy"), false);
+				ExcelHelper.Write(ws, row, 1, "С " + filter.UpdatePeriod.Begin.ToString("dd.MM.yyyy") + " по " + filter.UpdatePeriod.End.ToString("dd.MM.yyyy"), false);
 			else
-				ExcelHelper.Write(ws, 2, 1, "За " + filter.UpdatePeriod.Begin.ToString("dd.MM.yyyy"), false);
+				ExcelHelper.Write(ws, row, 1, "За " + filter.UpdatePeriod.Begin.ToString("dd.MM.yyyy"), false);
+			row++; // 3
 
-			ws.Merge(3, 0, 3, 3);
-			ExcelHelper.Write(ws, 3, 0, "Не делались заказы с: " + filter.OrderDate.ToString("dd.MM.yyyy"), false);
-			//ExcelHelper.Write(ws, 3, 1, , false);
+			if (filter.SupplierDisabled.HasValue)
+			{
+				ws.Merge(row, 0, row, 3);
+				if (filter.SupplierDisabled.Value)
+					ExcelHelper.Write(ws, row, 0, "Только по отключенным поставщикам", false);
+				else
+					ExcelHelper.Write(ws, row, 0, "Только по включенным поставщикам", false);
+				row++;
+			}
+
+			if (filter.Sum.HasValue) {
+				ws.Merge(row, 0, row, 3);
+				ExcelHelper.Write(ws, row, 0, "Сумма заказов на адрес не более: " + filter.Sum.Value, false);
+				row++;
+			}
+
+			if (filter.Suppliers != null && filter.Suppliers.Any())
+			{
+				ws.Merge(row, 0, row, 3);
+				var supplierName = ArHelper.WithSession(s => filter.GetSupplierNames(s));
+				ExcelHelper.Write(ws, row, 0, "Те, у кого нет заказов на поставщиков: " + supplierName, false);
+				row++;
+			}
+
+			if (filter.NoOrders)
+			{
+				ws.Merge(row, 0, row, 3);
+				ExcelHelper.Write(ws, row, 0, "Те, кто не делал заказы вообще", false);
+				row++;
+			}
+
+			UpdatedAndDidNotDoOrders(ws, row);
+			row++;
 
 			var reportData = ArHelper.WithSession(s => {
 				filter.Session = s;
@@ -313,10 +367,11 @@ namespace AdminInterface.Models
 				ExcelHelper.Write(ws, row, colShift + 5, item.Registrant, true);
 				ExcelHelper.Write(ws, row, colShift + 6, item.UpdateDate, true);
 				ExcelHelper.Write(ws, row, colShift + 7, item.LastOrderDate, true);
+				ExcelHelper.Write(ws, row, colShift + 8, item.EnabledSupCnt, true);
+				ExcelHelper.Write(ws, row, colShift + 9, item.DisabledSupCnt, true);
+				ExcelHelper.Write(ws, row, colShift + 10, item.DisabledSupName, true);
 				row++;
 			}
-
-			UpdatedAndDidNotDoOrders(ws);
 
 			wb.Worksheets.Add(ws);
 			var ms = new MemoryStream();
@@ -408,10 +463,10 @@ namespace AdminInterface.Models
 			ws.Merge(1, 1, 1, 2);
 			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
 			string regionName;
-			if (filter.Region == null)
-				regionName = "Все";
+			if (filter.Regions != null && filter.Regions.Any())
+				regionName = ArHelper.WithSession(s => filter.GetRegionNames(s));
 			else {
-				regionName = filter.Region.Name;
+				regionName = "Все";
 			}
 			ExcelHelper.Write(ws, 1, 1, regionName, false);
 

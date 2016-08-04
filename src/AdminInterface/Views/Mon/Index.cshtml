@@ -1,0 +1,69 @@
+﻿<ol class="breadcrumb">
+	<li>
+		<a href="~/">Главная</a>
+	</li>
+	<li class="active">По группировка версии</li>
+</ol>
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form-horizontal" })) {
+	<div class="form-group">
+		<div class="col-sm-offset-3 col-sm-3" style="width: auto">
+			<label>Начало</label>
+			@Html.Hidden("begin", (object) ViewBag.Begin)
+			<div class="calendar"></div>
+		</div>
+
+		<div class="col-sm-3" style="width: auto">
+			<label>Окончание</label>
+			@Html.Hidden("end", (object) ViewBag.End)
+			<div class="calendar"></div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-3 col-sm-9">
+			<div>
+				<label for="version">Версия</label>
+			</div>
+			@Html.DropDownList("version", (IEnumerable<SelectListItem>) ViewBag.Versions, new {multiple = "multiple"})
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-3 col-sm-9">
+			<button type="submit" class="btn btn-default">Показать</button>
+		</div>
+	</div>
+}
+
+<table class="table">
+	<thead>
+	<tr>
+		<th>Количество запросов</th>
+		<th>Версия</th>
+	</tr>
+	</thead>
+	<tbody>
+	@foreach (var item in ViewBag.Items) {
+		<tr>
+			<td>@Html.ActionLink(((int) item.Count).ToString(), "Users", new {version = item.Version, begin = ViewBag.Begin, end = ViewBag.End})</td>
+			<td>@item.Version</td>
+		</tr>
+	}
+	</tbody>
+</table>
+
+@section scripts {
+	<script type="text/javascript">
+		$(function () {
+			$.datepicker.setDefaults($.datepicker.regional['ru']);			$(".calendar").each(function () {
+				var value = $(this).siblings("input[type=hidden]");
+				$(this).datepicker({
+					defaultDate: value.val().split(/\s/)[0],
+					dateFormat: "dd.mm.yy",
+					altField: value
+				});
+			});
+		});
+	</script>
+}

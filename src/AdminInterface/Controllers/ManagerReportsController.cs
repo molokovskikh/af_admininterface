@@ -143,11 +143,10 @@ namespace AdminInterface.Controllers
 			this.RenderFile("Мониторинг_выставления_условий_клиенту.xls", ExportModel.GetClientConditionsMonitoring(filter));
 		}
 
-		public void WhoWasNotUpdated()
+		public void WhoWasNotUpdated([DataBind("filter")] WhoWasNotUpdatedFilter filter)
 		{
-			var filter = new WhoWasNotUpdatedFilter();
-			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			PropertyBag["filter"] = filter;
+			PropertyBag["AllRegions"] = Region.All();
 			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null)
 				PropertyBag["Clients"] = filter.SqlQuery2(DbSession);
 			else
@@ -158,6 +157,17 @@ namespace AdminInterface.Controllers
 		{
 			var filter = BindFilter<UpdatedAndDidNotDoOrdersFilter, UpdatedAndDidNotDoOrdersField>();
 			PropertyBag["filter"] = filter;
+			PropertyBag["SupplierDisabled"] = new List<Tuple<bool, string>>() {
+				new Tuple<bool, string>(false, "Только по включенным поставщикам"),
+				new Tuple<bool, string>(true, "Только по отключенным поставщикам")
+			};
+			PropertyBag["AllRegions"] = Region.All();
+			PropertyBag["AllSuppliers"] = DbSession.Query<Supplier>()
+				.Where(s => !s.Disabled && !s.Name.Contains("ассортимент"))
+				.Select(x => Tuple.Create(x.Id, x.Name + " - " + x.HomeRegion.Name))
+				.ToList()
+				.OrderBy(x => x.Item2);
+
 			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null || filter.LoadDefault) {
 				var result = filter.Find();
 				PropertyBag["Clients"] = result.Cast<BaseItemForTable>().ToList();

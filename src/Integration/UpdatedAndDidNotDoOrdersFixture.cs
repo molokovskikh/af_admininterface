@@ -5,6 +5,7 @@ using System.Text;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NHibernate.Linq;
@@ -46,6 +47,7 @@ namespace Integration
 		{
 			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
 			filter.UpdatePeriod.End = DateTime.Now.AddDays(-3);
+			filter.NoOrders = true;
 			filter.Session = session;
 			session.Save(user);
 			Flush();
@@ -61,11 +63,13 @@ namespace Integration
 			var address = new Address(client) { Value = "123" };
 			session.Save(address);
 			user.AvaliableAddresses.Add(address);
-			filter.UpdatePeriod.End = DateTime.Now;
-			filter.OrderDate = DateTime.Now.AddDays(-1);
-			filter.Session = session;
 			var region = session.Query<Region>().First();
-			var order = new ClientOrder { Client = client, User = user, WriteTime = DateTime.Now.AddDays(-2), Region = region };
+			var price = session.Query<Price>().First();
+			filter.UpdatePeriod.End = DateTime.Now;
+			filter.Regions = new [] { region.Id };
+			filter.SupplierDisabled = price.Supplier.Disabled;
+			filter.Session = session;
+			var order = new ClientOrder { Client = client, User = user, WriteTime = DateTime.Now.AddDays(-2), Region = region, Price = price };
 			session.Save(order);
 			session.Save(user);
 			Flush();
