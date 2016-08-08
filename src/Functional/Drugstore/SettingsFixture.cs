@@ -448,27 +448,6 @@ namespace Functional.Drugstore
 			Assert.That(browser.TextField(Find.ByName(controlName)).Text, Is.EqualTo("0"));
 		}
 
-		[Test, Description("Зашумлять цены для всех поставщиков кроме одного")]
-		public void Set_costs_noising_except_one_supplier()
-		{
-			var supplier = DataMother.CreateSupplier();
-			MakeNameUniq(supplier);
-			Maintainer.MaintainIntersection(supplier, session);
-			Refresh();
-
-			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;
-			Search(supplier.Name);
-
-			Thread.Sleep(10000);
-			Assert.That(Css("div.search select").SelectedItem, Is.StringEnding(supplier.Name));
-
-			ClickButton("Сохранить");
-			AssertText("Сохранено");
-
-			session.Refresh(settings);
-			Assert.That(settings.FirmCodeOnly, Is.EqualTo(supplier.Id));
-		}
-
 		[Test, Description("Зашумлять цены для всех поставщиков")]
 		public void Set_costs_noising_for_all_suppliers()
 		{

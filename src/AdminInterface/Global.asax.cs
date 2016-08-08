@@ -4,6 +4,7 @@ using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Security;
 using System.Reflection;
+using System.Web.Optimization;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
@@ -59,6 +60,9 @@ namespace AdminInterface
 				ConfigReader.LoadSettings(Config);
 				Initialize();
 				MixedRouteHandler.ConfigRoute();
+				BundleTable.Bundles.Add(new StyleBundle("~/Content/css")
+					.Include("~/Content/bootstrap.css"));
+
 			}
 			catch (Exception ex) {
 				Log.Fatal("Ошибка при запуске Административного интерфейса", ex);

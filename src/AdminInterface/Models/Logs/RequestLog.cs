@@ -27,6 +27,9 @@ namespace AdminInterface.Models.Logs
 		public virtual int ErrorType { get; set; }
 
 		[Property]
+		public virtual string ErrorDescription { get; set; }
+
+		[Property]
 		public virtual string Error { get; set; }
 
 		[BelongsTo("UserId")]

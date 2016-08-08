@@ -22,6 +22,55 @@ using Document = WatiN.Core.Document;
 
 namespace Functional.Billing
 {
+	public class BillingFixture2 : AdmSeleniumFixture
+	{
+		private Client client;
+		private Supplier _supplier;
+		private Payer payer;
+		private Address address;
+		private User user;
+
+		[SetUp]
+		public void Setup()
+		{
+			client = DataMother.CreateTestClientWithAddressAndUser();
+			payer = client.Payers.First();
+			payer.Name += payer.Id;
+			session.SaveOrUpdate(payer);
+
+			client.AddAddress("test address for billing");
+			user = client.Users[0];
+			address = client.Addresses[0];
+			session.SaveOrUpdate(client);
+
+			_supplier = DataMother.CreateSupplier();
+			_supplier.Payer = payer;
+			session.Save(_supplier);
+
+			Open(payer);
+			WaitForText("Плательщик");
+			AssertText("Плательщик");
+		}
+
+		[Test]
+		public void View_all_users()
+		{
+			var user = client.AddUser(session, "test user for billing");
+			Save(user);
+
+			client.Users.Each(u => u.Enabled = false);
+			Refresh();
+
+			AssertText("Пользователи");
+			foreach (var item in client.Users) {
+				var row = Css("#UserRow" + item.Id);
+				Assert.That(row.GetAttribute("class"), Is.StringContaining("disabled"));
+				var checkBox = row.FindElementByCssSelector("input[name=status]");
+				Assert.That(checkBox.GetAttribute("Checked"), Is.Null);
+			}
+		}
+	}
+
 	public class BillingFixture : FunctionalFixture
 	{
 		private Client client;
@@ -61,24 +110,6 @@ namespace Functional.Billing
 			AssertText("Адреса доставки");
 			foreach (var address in client.Addresses) {
 				var row = browser.TableRow("AddressRow" + address.Id);
-				Assert.That(row.ClassName, Is.StringContaining("disabled"));
-				var checkBox = row.Css("input[name=status]");
-				Assert.That(checkBox.Checked, Is.False);
-			}
-		}
-
-		[Test]
-		public void View_all_users()
-		{
-			var user = client.AddUser(session, "test user for billing");
-			Save(user);
-
-			client.Users.Each(u => u.Enabled = false);
-			Refresh();
-
-			AssertText("Пользователи");
-			foreach (var item in client.Users) {
-				var row = browser.TableRow("UserRow" + item.Id);
 				Assert.That(row.ClassName, Is.StringContaining("disabled"));
 				var checkBox = row.Css("input[name=status]");
 				Assert.That(checkBox.Checked, Is.False);
