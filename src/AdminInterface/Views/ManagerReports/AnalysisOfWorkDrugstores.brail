@@ -63,8 +63,22 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		</td>
 	</tr>
 	<tr>
-		<td ></td>
-		<td class="filter-label rigthText">Регион ${app.Edit("filter.Region")}</td>
+		<td class="filter-label rigthText">Автофильтр<br/>
+			${FormHelper.Select("filter.Avtozakaz", filter.Avtozakaz, Avtozakaz, {
+					@firstoption: "Все",
+					@firstoptionvalue: "",
+					@text: "Item2",
+					@value: "Item1"})}
+		</td>
+		<td class="filter-label rigthText">Регион<br/> 
+			${FormHelper.Select("filter.Regions", filter.Regions, AllRegions, {
+					@firstoption: "Все",
+					@firstoptionvalue: "",
+					@multiple: "true",
+					@size: "6",
+					@text: "Name",
+					@value: "Id"})}
+		</td>
 	</tr>
 	<tr>
 		<td colspan=3 class="rigthText">

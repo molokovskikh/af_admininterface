@@ -180,8 +180,13 @@ namespace AdminInterface.Controllers
 		public void AnalysisOfWorkDrugstores()
 		{
 			var filter = BindFilter<AnalysisOfWorkDrugstoresFilter, BaseItemForTable>();
-			filter.SetDefaultRegion();
 			FindFilter(filter);
+			PropertyBag["AllRegions"] = Region.All();
+			PropertyBag["Avtozakaz"] = new List<Tuple<int, string>>() {
+				new Tuple<int, string>(0, "Не настроен"),
+				new Tuple<int, string>(1, "Не используют"),
+				new Tuple<int, string>(2, "Используют")
+			};
 			foreach (var item in (IList)PropertyBag["Items"]) {
 				((AnalysisOfWorkFiled)item).ReportType = AnalysisReportType.Client;
 			}
@@ -194,7 +199,7 @@ namespace AdminInterface.Controllers
 			var filter = BindFilter<AnalysisOfWorkDrugstoresFilter, BaseItemForTable>();
 			PropertyBag["filter"] = filter;
 			var thisClient = DbSession.Get<Client>(clientId);
-			var html = string.Format("<tr class=\"toggled\" id=\"toggledRow{0}\"><td colspan=9><div class=\"userInfoDivTable\">", clientId);
+			var html = string.Format("<tr class=\"toggled\" id=\"toggledRow{0}\"><td colspan=11><div class=\"userInfoDivTable\">", clientId);
 			html += string.Format("<b>Клиент: {0} </b><br/>", thisClient.Name);
 			html += "<div>";
 			foreach (var user in thisClient.Users) {
@@ -202,6 +207,7 @@ namespace AdminInterface.Controllers
 				filter.Type = AnalysisReportType.User;
 				filter.RenderHead = false;
 				var result = filter.Find();
+				result.Cast<AnalysisOfWorkFiled>().Each(r => r.ReportType = AnalysisReportType.User);
 				PropertyBag["Items"] = result;
 				TextWriter writer = new StringWriter();
 				BaseMailer.ViewEngineManager.Process("ManagerReports/SimpleTable", writer, Context, this, ControllerContext);
