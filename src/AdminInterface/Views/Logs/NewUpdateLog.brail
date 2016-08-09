@@ -123,7 +123,11 @@
 					${log.LocalHost}
 				</td>
 				<td style="text-align:center;">
+					<% if log.Error: %>
 					!{log.Error}
+					<% else: %>
+					!{log.ErrorDescription}
+					<% end %>
 				</td>
 					<% if filter.ShowLog(): %>
 				<td>
