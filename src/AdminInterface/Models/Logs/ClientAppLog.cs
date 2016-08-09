@@ -1,4 +1,5 @@
 ﻿using System;
+using AdminInterface.AbstractModel;
 using Castle.ActiveRecord;
 
 namespace AdminInterface.Models.Logs
@@ -7,7 +8,7 @@ namespace AdminInterface.Models.Logs
 	/// Клиентский лог, новой версии analit-f
 	/// </summary>
 	[ActiveRecord(Table = "ClientAppLogs", Schema = "logs", SchemaAction = "none")]
-	public class ClientAppLog
+	public class ClientAppLog : IPersonLog
 	{
 		public ClientAppLog(User user)
 		{
