@@ -49,13 +49,11 @@ namespace AdminInterface.Controllers.Filters
 
 			if (User != null) {
 				logQuery = GetUserLog(logQuery);
-				requestQuery = GetUserLog(requestQuery)
-					.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
+				requestQuery = GetUserLog(requestQuery);
 			}
 			else if (Client != null) {
 				logQuery = GetClientLog<ClientAppLog>(session);
-				requestQuery = GetClientLog<RequestLog>(session)
-					.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
+				requestQuery = GetClientLog<RequestLog>(session);
 			}
 			if (ErrorType == 1) {
 				requestQuery = session.Query<RequestLog>().Where(i => i.ErrorType == 1);
@@ -78,8 +76,15 @@ namespace AdminInterface.Controllers.Filters
 
 		private IQueryable<T> FillQuery<T>(DateTime begin, DateTime end, ISession session) where T : IPersonLog
 		{
-				return session.Query<T>()
+			var result = new object();
+			if (typeof(T) == typeof(ClientAppLog))
+				result = session.Query<T>()
 					.Where(x => x.CreatedOn > begin && x.CreatedOn < end);
+			else if (typeof(T) == typeof(RequestLog))
+				result = session.Query<T>()
+					.Where(x => x.CreatedOn > begin && x.CreatedOn < end)
+					.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
+			return (IQueryable<T>) result;
 		}
 
 		private IQueryable<T> GetUserLog<T>(IQueryable<T> personLog) where T : IPersonLog
