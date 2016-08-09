@@ -63,14 +63,14 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		</td>
 	</tr>
 	<tr>
-		<td class="filter-label rigthText">Автофильтр<br/>
+		<td class="filter-label rigthText">Автозаказ<br/>
 			${FormHelper.Select("filter.Avtozakaz", filter.Avtozakaz, Avtozakaz, {
 					@firstoption: "Все",
 					@firstoptionvalue: "",
 					@text: "Item2",
 					@value: "Item1"})}
 		</td>
-		<td class="filter-label rigthText">Регион<br/> 
+		<td class="filter-label rigthText">Регион<br/>
 			${FormHelper.Select("filter.Regions", filter.Regions, AllRegions, {
 					@firstoption: "Все",
 					@firstoptionvalue: "",
