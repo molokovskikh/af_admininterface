@@ -208,7 +208,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractModel\IPersonLog.cs" />
     <Compile Include="Components\AdministratorComparer.cs" />
     <Compile Include="Components\Bredcrumbs.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
