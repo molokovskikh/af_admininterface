@@ -438,12 +438,12 @@ namespace AdminInterface.Models
 				ExcelHelper.Write(ws, row, colShift + 2, item.UserCount, true);
 				ExcelHelper.Write(ws, row, colShift + 3, item.AddressCount, true);
 				ExcelHelper.Write(ws, row, colShift + 4, item.RegionName, true);
-				ExcelHelper.Write(ws, row, colShift + 5, item.Obn, true);
-				ExcelHelper.Write(ws, row, colShift + 6, item.ProblemObn, true);
-				ExcelHelper.Write(ws, row, colShift + 7, item.Zak, true);
-				ExcelHelper.Write(ws, row, colShift + 8, item.ProblemZak, true);
-				ExcelHelper.Write(ws, row, colShift + 9, item.Addr, true);
-				ExcelHelper.Write(ws, row, colShift + 10, item.Avtozakaz, true);
+				ExcelHelper.Write(ws, row, colShift + 5, item.Updates, true);
+				ExcelHelper.Write(ws, row, colShift + 6, item.ProblemUpdates, true);
+				ExcelHelper.Write(ws, row, colShift + 7, item.Orders, true);
+				ExcelHelper.Write(ws, row, colShift + 8, item.ProblemOrders, true);
+				ExcelHelper.Write(ws, row, colShift + 9, item.Addresses, true);
+				ExcelHelper.Write(ws, row, colShift + 10, item.AutoOrder, true);
 				row++;
 			}
 

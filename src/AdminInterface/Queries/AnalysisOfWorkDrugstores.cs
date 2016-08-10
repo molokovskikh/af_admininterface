@@ -91,62 +91,54 @@ namespace AdminInterface.Queries
 			set { _regionName = value; }
 		}
 
-		public int CurWeekObn { get; set; }
-		public int LastWeekObn { get; set; }
+		public int CurWeekUpdates { get; set; }
+		public int LastWeekUpdates { get; set; }
 
 		[Display(Name = "Обновления (Старый/Новый)", Order = 5)]
-		public string Obn
+		public string Updates
 		{
-			get { return string.Format("{0}/{1}", LastWeekObn, CurWeekObn); }
+			get { return string.Format("{0}/{1}", LastWeekUpdates, CurWeekUpdates); }
 		}
 
-		public int CurWeekZak { get; set; }
-		public int LastWeekZak { get; set; }
+		public int CurWeekOrders { get; set; }
+		public int LastWeekOrders { get; set; }
 
 		[Display(Name = "Заказы (Старый/Новый)", Order = 7)]
-		public string Zak
+		public string Orders
 		{
-			get { return string.Format("{0}/{1}", LastWeekZak.ToString("C"), CurWeekZak.ToString("C")); }
+			get { return string.Format("{0}/{1}", LastWeekOrders.ToString("C"), CurWeekOrders.ToString("C")); }
 		}
 
 		[Display(Name = "Падение обновлений %", Order = 6)]
-		public decimal ProblemObn { get; set; }
+		public decimal ProblemUpdates { get; set; }
 
 		[Display(Name = "Падение заказов %", Order = 8)]
-		public decimal ProblemZak { get; set; }
+		public decimal ProblemOrders { get; set; }
 
-		public int CurWeekAddr { get; set; }
-		public int LastWeekAddr { get; set; }
+		public int CurWeekAddresses { get; set; }
+		public int LastWeekAddresses { get; set; }
 
 		[Display(Name = "Адреса (Старый/Новый)", Order = 9)]
-		public string Addr
+		public string Addresses
 		{
 			get
 			{
 				if (ForSubQuery)
 					return "-";
-				return string.Format("{0}/{1}", LastWeekAddr, CurWeekAddr);
+				return string.Format("{0}/{1}", LastWeekAddresses, CurWeekAddresses);
 			}
 		}
 
-		public int AvtozakazIs { get; set; }
+		public AutoOrderStatus AutoOrderIs { get; set; }
 
 		[Display(Name = "Автозаказ", Order = 10)]
-		public string Avtozakaz
+		public string AutoOrder
 		{
 			get
 			{
 				if (ForSubQuery)
 					return "-";
-
-				switch (AvtozakazIs) {
-					case 2:
-						return "Используют";
-					case 1:
-						return "Не используют";
-					default:
-						return "Не настроен";
-				}
+				return AutoOrderIs.GetDescription();
 			}
 		}
 
@@ -162,6 +154,13 @@ namespace AdminInterface.Queries
 		[Description("Addresses")] Address
 	}
 
+	public enum AutoOrderStatus
+	{
+		[Description("Не настроен")] NotTuned,
+		[Description("Не используют")] NotUsed,
+		[Description("Используют")] Used
+	}
+
 	public class AnalysisOfWorkDrugstoresFilter : PaginableSortable, IFiltrable<BaseItemForTable>
 	{
 		public ulong[] Regions { get; set; }
@@ -171,7 +170,7 @@ namespace AdminInterface.Queries
 		public AnalysisReportType Type { get; set; }
 		public bool ForSubQuery { get; set; }
 
-		public int? Avtozakaz { get; set; }
+		public int? AutoOrder { get; set; }
 
 		public IList<BaseItemForTable> Find()
 		{
@@ -224,7 +223,7 @@ count(a.Id) as AddressCount,
 	AND o.clientid=cd.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) as CurWeekObn,
+) as CurWeekUpdates,
 (SELECT COUNT(au2.Updateid)
 	FROM logs.analitfupdates au2,
 	customers.users O
@@ -233,22 +232,30 @@ count(a.Id) as AddressCount,
 	AND o.clientid = cd.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) LastWeekObn,
-osf.ClientSum as CurWeekZak,
-osl.ClientSum as LastWeekZak,
-osf.AddressCnt as CurWeekAddr,
-osl.AddressCnt as LastWeekAddr,
-IFNULL(sr.AssortimentPriceCode,4662) <> 4662 as AvtozakazIs,
+) LastWeekUpdates,
+osf.ClientSum as CurWeekOrders,
+osl.ClientSum as LastWeekOrders,
+osf.AddressCnt as CurWeekAddresses,
+osl.AddressCnt as LastWeekAddresses,
+IFNULL(sr.AssortimentPriceCode,4662) <> 4662 as AutoOrderIs,
 (SELECT COUNT(o.id)
-	FROM logs.analitfupdates au1,
+	FROM logs.analitfupdates au3,
 	customers.users O
 	WHERE requesttime BETWEEN :FistPeriodStart AND :FistPeriodEnd
-	AND au1.userid =o.id
+	AND au3.userid =o.id
 	AND o.clientid=cd.id
 	AND COMMIT = 1
 	AND updatetype IN (10)
-) as AvtozakazCnt
-
+) as AutoOrderCnt,
+(SELECT COUNT(o.id)
+	FROM logs.RequestLogs au4,
+	customers.users O
+	WHERE au4.CreatedOn BETWEEN :FistPeriodStart AND :FistPeriodEnd
+	AND au4.UserId =o.id
+	AND o.clientid=cd.id
+	AND au4.IsCompleted = 1
+	AND (au4.UpdateType = 'BatchController' or au4.UpdateType = 'SmartOrder')
+) as AutoOrderCntNet
 
 FROM customers.Clients Cd
 	join usersettings.RetClientsSet Rcs on rcs.clientcode = cd.id
@@ -266,7 +273,7 @@ WHERE
 	AND rcs.invisibleonfirm = 0
 group by cd.id;";
 
-		public string UserTypeSqlPart = @"insert into Customers.Updates (Id, Name, CurWeekObn, LastWeekObn, CurWeekZak, LastWeekZak)
+		public string UserTypeSqlPart = @"insert into Customers.Updates (Id, Name, CurWeekUpdates, LastWeekUpdates, CurWeekOrders, LastWeekOrders)
 SELECT u.id,
 u.name,
 (SELECT COUNT(au1.Updateid)
@@ -275,14 +282,14 @@ u.name,
 	AND au1.userid = u.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) as CurWeekObn,
+) as CurWeekUpdates,
 (SELECT COUNT(au2.Updateid)
 	FROM logs.analitfupdates au2
 	WHERE requesttime BETWEEN :LastPeriodStart AND :LastPeriodEnd
 	AND au2.userid = u.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) LastWeekObn,
+) LastWeekUpdates,
 (SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh1,
 	orders.orderslist ol1
@@ -290,7 +297,7 @@ u.name,
 	AND ol1.orderid = oh1.rowid
 	AND oh1.UserId = u.id
 	AND oh1.RegionCode & :regionCode > 0
-) CurWeekZak,
+) CurWeekOrders,
 (SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh2,
 	orders.orderslist ol2
@@ -298,14 +305,14 @@ u.name,
 	AND ol2.orderid = oh2.rowid
 	AND oh2.UserId = u.id
 	AND oh2.RegionCode & :regionCode > 0
-) LastWeekZak
+) LastWeekOrders
 FROM customers.Users u
 WHERE
 u.WorkRegionMask & :regionCode > 0
 {0}
 ;";
 
-		public string AddressTypeSqlPart = @"insert into Customers.Updates (Id, Name, CurWeekObn, LastWeekObn)
+		public string AddressTypeSqlPart = @"insert into Customers.Updates (Id, Name, CurWeekUpdates, LastWeekUpdates)
 SELECT a.Id,
 a.Address as Name,
 (SELECT COUNT(au1.Updateid)
@@ -314,29 +321,28 @@ a.Address as Name,
 	AND au1.userid = u.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) as CurWeekObn,
+) as CurWeekUpdates,
 (SELECT COUNT(au2.Updateid)
 	FROM logs.analitfupdates au2
 	WHERE requesttime BETWEEN :LastPeriodStart AND :LastPeriodEnd
 	AND au2.userid = u.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) LastWeekObn
+) LastWeekUpdates
 FROM customers.Addresses a
 join customers.UserAddresses ua on ua.AddressId = a.Id
 join customers.Users u on u.Id = ua.UserId and (u.WorkRegionMask & :regionCode) > 0
 WHERE
 u.WorkRegionMask & :regionCode > 0
 {0}
-group by a.id
-;
+group by a.id;
 
 DROP TEMPORARY TABLE IF EXISTS Customers.AddressesUpdates;
 
 CREATE TEMPORARY TABLE Customers.AddressesUpdates (
 Id INT unsigned,
-CurWeekZak INT,
-LastWeekZak INT) engine=MEMORY;
+CurWeekOrders INT,
+LastWeekOrders INT) engine=MEMORY;
 
 insert into Customers.AddressesUpdates
 SELECT a.id,
@@ -347,7 +353,7 @@ SELECT a.id,
 	AND ol1.orderid = oh1.rowid
 	AND oh1.AddressId = a.id
 	AND oh1.RegionCode & :regionCode > 0
-) CurWeekZak,
+) CurWeekOrders,
 (SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh2,
 	orders.orderslist ol2
@@ -355,7 +361,7 @@ SELECT a.id,
 	AND ol2.orderid = oh2.rowid
 	AND oh2.AddressId = a.id
 	AND oh2.RegionCode & :regionCode > 0
-) LastWeekZak
+) LastWeekOrders
 FROM customers.Addresses a
 WHERE
 1=1
@@ -363,8 +369,8 @@ WHERE
 
 update Customers.Updates u, Customers.AddressesUpdates au
 set
-u.CurWeekZak = au.CurWeekZak,
-u.LastWeekZak = au.LastWeekZak
+u.CurWeekOrders = au.CurWeekOrders,
+u.LastWeekOrders = au.LastWeekOrders
 where u.id = au.Id;
 ";
 
@@ -381,13 +387,13 @@ where u.id = au.Id;
 				{ "Name", "Name" },
 				{ "UserCount", "UserCount" },
 				{ "AddressCount", "AddressCount" },
-				{ "ProblemObn", "ProblemObn" },
-				{ "ProblemZak", "ProblemZak" },
-				{ "Obn", "CurWeekObn" },
-				{ "Zak", "CurWeekZak" },
+				{ "ProblemUpdates", "ProblemUpdates" },
+				{ "ProblemOrders", "ProblemOrders" },
+				{ "Obn", "CurWeekUpdates" },
+				{ "Zak", "CurWeekOrders" },
 				{ "RegionName", "RegionName" },
-				{ "Avtozakaz", "AvtozakazIs" },
-				{ "Addr", "CurWeekAddr" },
+				{ "AutoOrder", "AutoOrderIs" },
+				{ "Addr", "CurWeekAddresses" },
 			};
 			Regions = new ulong[]{ 1 };
 		}
@@ -425,14 +431,15 @@ Name varchar(50) ,
 RegionName varchar(50),
 UserCount INT,
 AddressCount INT,
-CurWeekObn INT,
-LastWeekObn INT,
-CurWeekZak INT,
-LastWeekZak INT,
-CurWeekAddr INT,
-LastWeekAddr INT,
-AvtozakazIs int not null default 0,
-AvtozakazCnt int
+CurWeekUpdates INT,
+LastWeekUpdates INT,
+CurWeekOrders INT,
+LastWeekOrders INT,
+CurWeekAddresses INT,
+LastWeekAddresses INT,
+AutoOrderIs int not null default 0,
+AutoOrderCnt int,
+AutoOrderCntNet int
 ) engine=MEMORY;";
 
 			var currentQuery = string.Empty;
@@ -486,44 +493,33 @@ AvtozakazCnt int
 
 			RowsCount = Convert.ToInt32(Session.CreateSQLQuery("select count(*) from Customers.updates;").UniqueResult());
 
-			var limitPart = string.Empty;
+			Session.CreateSQLQuery(@"update Customers.updates set AutoOrderIs = 2
+where AutoOrderIs = 1 and (AutoOrderCnt > 0 or AutoOrderCntNet > 0);").ExecuteUpdate();
 
+			var limitPart = string.Empty;
 			if (!forExport)
-				limitPart = string.Format("limit {0}, {1}", CurrentPage * PageSize, PageSize);
+				limitPart = $"limit {CurrentPage * PageSize}, {PageSize}";
 
 			var where = "";
-			if (Type == AnalysisReportType.Client && Avtozakaz.HasValue) {
-				switch (Avtozakaz.Value) {
-					case 1: // Не используют
-						where = "where up.AvtozakazIs = 1 and IFNULL(up.AvtozakazCnt,0) = 0 ";
-						break;
-					case 2: // Используют
-						where = "where up.AvtozakazIs = 1 and up.AvtozakazCnt > 0 ";
-						break;
-					default: // Не настроен
-						where = "where up.AvtozakazIs = 0 ";
-						break;
-				}
-			}
+			if (Type == AnalysisReportType.Client && AutoOrder.HasValue)
+					where = $"where up.AutoOrderIs = {AutoOrder.Value}";
 
 			var result = Session.CreateSQLQuery(string.Format(@"
 SELECT
 	up.Id, up.Name, up.RegionName, up.UserCount, up.AddressCount,
-	up.CurWeekObn, up.LastWeekObn,
-	IF (LastWeekObn > CurWeekObn, ROUND((LastWeekObn-CurWeekObn)*100/LastWeekObn), 0) ProblemObn,
-	up.CurWeekZak, up.LastWeekZak,
-	IF (LastWeekZak > CurWeekZak, ROUND((LastWeekZak-CurWeekZak)*100/LastWeekZak), 0) ProblemZak,
-	up.CurWeekAddr, up.LastWeekAddr,
-	IF (up.AvtozakazIs = 1 and up.AvtozakazCnt > 0, 2, up.AvtozakazIs) AvtozakazIs
+	up.CurWeekUpdates, up.LastWeekUpdates,
+	IF (LastWeekUpdates > CurWeekUpdates, ROUND((LastWeekUpdates-CurWeekUpdates)*100/LastWeekUpdates), 0) ProblemUpdates,
+	up.CurWeekOrders, up.LastWeekOrders,
+	IF (LastWeekOrders > CurWeekOrders, ROUND((LastWeekOrders-CurWeekOrders)*100/LastWeekOrders), 0) ProblemOrders,
+	up.CurWeekAddresses, up.LastWeekAddresses, up.AutoOrderIs
 FROM Customers.updates up
 {0}
 group by up.Id
 ORDER BY {1} {2} {3}", where, GetSortProperty(), SortDirection, limitPart))
 				.ToList<AnalysisOfWorkFiled>();
 
-			foreach (var analysisOfWorkFiled in result) {
+			foreach (var analysisOfWorkFiled in result)
 				analysisOfWorkFiled.ForSubQuery = ForSubQuery;
-			}
 
 			return result.Cast<BaseItemForTable>().ToList();
 		}

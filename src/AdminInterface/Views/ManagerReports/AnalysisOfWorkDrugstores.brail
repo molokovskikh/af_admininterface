@@ -64,7 +64,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	</tr>
 	<tr>
 		<td class="filter-label rigthText">Автозаказ<br/>
-			${FormHelper.Select("filter.Avtozakaz", filter.Avtozakaz, Avtozakaz, {
+			${FormHelper.Select("filter.AutoOrder", filter.AutoOrder, AutoOrder, {
 					@firstoption: "Все",
 					@firstoptionvalue: "",
 					@text: "Item2",

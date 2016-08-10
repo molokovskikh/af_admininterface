@@ -182,11 +182,9 @@ namespace AdminInterface.Controllers
 			var filter = BindFilter<AnalysisOfWorkDrugstoresFilter, BaseItemForTable>();
 			FindFilter(filter);
 			PropertyBag["AllRegions"] = Region.All();
-			PropertyBag["Avtozakaz"] = new List<Tuple<int, string>>() {
-				new Tuple<int, string>(0, "Не настроен"),
-				new Tuple<int, string>(1, "Не используют"),
-				new Tuple<int, string>(2, "Используют")
-			};
+			PropertyBag["AutoOrder"] = BindingHelper.GetDescriptionsDictionary(typeof(AutoOrderStatus))
+				.Select(p => new Tuple<string, string>(p.Key.ToString(), p.Value))
+				.ToList();
 			foreach (var item in (IList)PropertyBag["Items"]) {
 				((AnalysisOfWorkFiled)item).ReportType = AnalysisReportType.Client;
 			}
@@ -222,7 +220,7 @@ namespace AdminInterface.Controllers
 					PropertyBag["Items"] = resultAddress;
 					TextWriter writerAddress = new StringWriter();
 					BaseMailer.ViewEngineManager.Process("ManagerReports/SimpleTable", writerAddress, Context, this, ControllerContext);
-					bool zeroOrderFlag = ((AnalysisOfWorkFiled)resultAddress.First()).CurWeekZak == 0;
+					bool zeroOrderFlag = ((AnalysisOfWorkFiled)resultAddress.First()).CurWeekOrders == 0;
 					html += string.Format("<span class=\"{2}\"><b>{0}</b></span></br> {1} </br>", avaliableAddress.Name, writerAddress, zeroOrderFlag ? "adressNoOrder" : string.Empty);
 				}
 				html += "</div>";
