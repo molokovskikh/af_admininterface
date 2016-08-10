@@ -13,6 +13,16 @@
 				$("#price-processor-status").addClass("service-stoped");
 			$("#price-processor-status").removeClass("waiter");
 
+			var lastDownTime = new Date ("1/1/1900 " + "${LastDown}").getTime();
+			var lastFormTime = new Date ("1/1/1900 " + "${LastForm}").getTime();
+			var processTimeRange = 15*60*1000;
+			var startTimeControl = new Date ("1/1/1900 " + "5:00:00").getTime();
+
+			if ((lastDownTime > startTimeControl) && ((lastFormTime - lastDownTime) > processTimeRange)) {
+				$("#lastdown-status").addClass("service-stoped");
+				$("#lastform-status").addClass("service-stoped");
+			}
+
 			$("#price-processor-stat").removeClass("waiter");
 			if (data.IsPriceProcessorStatUnavailable) {
 				$("#price-processor-stat").addClass("service-stoped");
@@ -313,7 +323,7 @@
 						<abbr title="В скобках указано количество уникальных прайс-листов.">${DownCount}</abbr>
 					</td>
 					<td class="statistic-label">Последняя загрузка:</td>
-					<td class="statistic-value">
+					<td class="statistic-value" id="lastdown-status">
 						${LastDown}
 					</td>
 				</tr>
@@ -323,7 +333,7 @@
 						<abbr title="В скобках указано количество уникальных прайс-листов.">${FormCount}</abbr>
 					</td>
 					<td class="statistic-label">Последняя формализация:</td>
-					<td class="statistic-value">
+					<td class="statistic-value" id="lastform-status">
 						${LastForm}
 					</td>
 				</tr>
