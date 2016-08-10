@@ -18,6 +18,8 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using System.Linq;
 using System.Threading;
+using Castle.Core.Internal;
+using Microsoft.Ajax.Utilities;
 
 namespace AdminInterface.Controllers
 {
@@ -60,6 +62,16 @@ namespace AdminInterface.Controllers
 					value = dateTimeValue.ToLongTimeString();
 				}
 				PropertyBag[column.ColumnName] = value;
+			}
+
+			PropertyBag["WarningUpdateTime"] = false;
+			if (!PropertyBag["LastForm"].ToString().IsNullOrEmpty() && !PropertyBag["LastDown"].ToString().IsNullOrEmpty()) {
+				var lastForm = TimeSpan.Parse(PropertyBag["LastForm"].ToString());
+				var lastDown = TimeSpan.Parse(PropertyBag["LastDown"].ToString());
+				var processTimeRange = new TimeSpan(0,15,0);
+				var startTimeControl = new TimeSpan(5,0,0);
+				if ((lastDown > startTimeControl) && ((lastForm - lastDown) > processTimeRange))
+					PropertyBag["WarningUpdateTime"] = true;
 			}
 
 			Size("MaxMailSize");

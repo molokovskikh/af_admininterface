@@ -13,12 +13,7 @@
 				$("#price-processor-status").addClass("service-stoped");
 			$("#price-processor-status").removeClass("waiter");
 
-			var lastDownTime = new Date ("1/1/1900 " + "${LastDown}").getTime();
-			var lastFormTime = new Date ("1/1/1900 " + "${LastForm}").getTime();
-			var processTimeRange = 15*60*1000;
-			var startTimeControl = new Date ("1/1/1900 " + "5:00:00").getTime();
-
-			if ((lastDownTime > startTimeControl) && ((lastFormTime - lastDownTime) > processTimeRange)) {
+			if ('${WarningUpdateTime}' == 'True') {
 				$("#lastdown-status").addClass("service-stoped");
 				$("#lastform-status").addClass("service-stoped");
 			}
