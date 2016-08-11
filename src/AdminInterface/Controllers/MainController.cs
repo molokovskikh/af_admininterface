@@ -66,11 +66,12 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["WarningUpdateTime"] = false;
 			if (!PropertyBag["LastForm"].ToString().IsNullOrEmpty() && !PropertyBag["LastDown"].ToString().IsNullOrEmpty()) {
-				var lastForm = TimeSpan.Parse(PropertyBag["LastForm"].ToString());
-				var lastDown = TimeSpan.Parse(PropertyBag["LastDown"].ToString());
-				var processTimeRange = new TimeSpan(0,15,0);
-				var startTimeControl = new TimeSpan(5,0,0);
-				if ((lastDown > startTimeControl) && ((lastForm - lastDown) > processTimeRange))
+				var lastForm = DateTime.Parse("1/1/1900 " + PropertyBag["LastForm"]);
+				var lastDown = DateTime.Parse("1/1/1900 " + PropertyBag["LastDown"]);
+				var updTime = new DateTime(1900, 1, 1).Add((lastForm - lastDown));
+				var processTimeRange = new DateTime(1900, 1, 1, 0, 15, 0);
+				var startTimeControl = new DateTime(1900, 1, 1, 5, 0, 0);
+				if ((lastDown > startTimeControl) && (updTime > processTimeRange))
 					PropertyBag["WarningUpdateTime"] = true;
 			}
 
