@@ -202,3 +202,7 @@ table.tablelike-editor tr
 	display:block;
 	margin: 1em 0;
 }
+
+.select2-container {
+	min-width: 30em;
+}

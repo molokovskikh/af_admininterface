@@ -1,6 +1,10 @@
-﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+﻿${app.Asset("select2.js")}
+${app.Asset("Select2-locales/select2_locale_ru.js")}
+${app.Asset("select2.css")}
 
- <% component CaptureFor, {@id : @Title}: %>
+<% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
 	Кто не обновлялся с опред. даты
 <% end %>
 <div class="page_1_3_broken hintInfoBlock">
@@ -18,6 +22,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<tr>
 			<td class="filter-label">Регион</td>
 			<td>${FormHelper.Select("filter.Regions", filter.Regions, AllRegions, {
+					@class: "select2",
 					@firstoption: "Все",
 					@firstoptionvalue: "",
 					@multiple: "true",

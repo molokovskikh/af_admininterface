@@ -115,6 +115,7 @@ FROM customers.Users U
 	join customers.Addresses a on a.id = ua.AddressId
 	join usersettings.UserUpdateInfo uu on uu.userid = u.id
 	join customers.Clients c on c.id = u.ClientId and c.Status = 1
+		join Usersettings.RetClientsSet rcs on rcs.ClientCode = c.Id
 	join usersettings.AssignedPermissions ap1 on ap1.UserId = u.Id and ap1.PermissionId = 1
 	join farm.Regions reg on reg.RegionCode = c.RegionCode
 	left join Customers.AnalitFNetDatas nd on nd.UserId = u.Id
@@ -122,6 +123,8 @@ where uu.UpdateDate < :beginDate
 	and ifnull(nd.LastUpdateAt, '2000-01-01') < :beginDate
 	and u.Enabled = true
 	and c.RegionCode & :RegionCode > 0
+	and rcs.ServiceClient = 0
+	and rcs.OrderRegionMask & u.OrderRegionMask & :RegionCode > 0
 group by u.id
 having count(a.id) > 1
 
@@ -140,6 +143,7 @@ FROM customers.Users U
 	join customers.Addresses a on a.id = ua.AddressId
 	join usersettings.UserUpdateInfo uu on uu.userid = u.id
 	join customers.Clients c on c.id = u.ClientId and c.Status = 1
+		join Usersettings.RetClientsSet rcs on rcs.ClientCode = c.Id
 	left join accessright.regionaladmins reg on reg.UserName = c.Registrant
 	join usersettings.AssignedPermissions ap1 on ap1.UserId = u.Id and ap1.PermissionId = 1
 	join farm.Regions reg on reg.RegionCode = c.RegionCode
@@ -148,6 +152,8 @@ where uu.UpdateDate < :beginDate
 	and ifnull(nd.LastUpdateAt, '2000-01-01') < :beginDate
 	and u.Enabled = true
 	and c.RegionCode & :RegionCode > 0
+	and rcs.ServiceClient = 0
+	and rcs.OrderRegionMask & u.OrderRegionMask & :RegionCode > 0
 	and
 	u.id in
 	(

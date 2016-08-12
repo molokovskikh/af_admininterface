@@ -85,6 +85,9 @@
 	}
 
 	setupCalendar();
+	if (window.Select2 !== undefined) {
+		$("select.select2").select2();
+	}
 });
 
 function joinRowHighlighter() {
