@@ -160,14 +160,10 @@ delete from Billing.Accounts where Type = 0;")
 			var filter = new AnalysisOfWorkDrugstoresFilter
 			{
 				Session = session,
-				Regions = new ulong[] { client.HomeRegion.Id },
-				AutoOrder = (int)AutoOrderStatus.NotUsed,
 				ObjectId = client.Id
 			};
 
 			var data = filter.Find();
-			Assert.AreEqual(data.Count, 1);
-
 			var row = (AnalysisOfWorkFiled)data[0];
 			Assert.AreEqual(row.AddressCount, "2");
 		}
