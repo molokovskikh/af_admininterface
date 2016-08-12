@@ -396,11 +396,11 @@ where u.id = au.Id;
 				{ "AddressCount", "AddressCount" },
 				{ "ProblemUpdates", "ProblemUpdates" },
 				{ "ProblemOrders", "ProblemOrders" },
-				{ "Obn", "CurWeekUpdates" },
-				{ "Zak", "CurWeekSum" },
+				{ "Updates", "CurWeekUpdates" },
+				{ "Orders", "CurWeekSum" },
 				{ "RegionName", "RegionName" },
 				{ "AutoOrder", "AutoOrderIs" },
-				{ "Addr", "CurWeekAddresses" },
+				{ "Addresses", "CurWeekAddresses" },
 			};
 			Regions = new ulong[]{ 1 };
 		}
