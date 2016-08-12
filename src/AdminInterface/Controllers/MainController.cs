@@ -56,23 +56,29 @@ namespace AdminInterface.Controllers
 			foreach (var pair in data.ToKeyValuePairs()) {
 				var column = pair.Key;
 				var value = pair.Value;
-				value = TryToFixBrokenDateTimeValue(value);
-				if (value != DBNull.Value && column.DataType == typeof(DateTime)) {
-					var dateTimeValue = (DateTime)value;
-					value = dateTimeValue.ToLongTimeString();
+				if (column.ToString() != "LastDown" && column.ToString() != "LastForm") {
+					value = TryToFixBrokenDateTimeValue(value);
+					if (value != DBNull.Value && column.DataType == typeof(DateTime)) {
+						var dateTimeValue = (DateTime)value;
+						value = dateTimeValue.ToLongTimeString();
+					}
 				}
 				PropertyBag[column.ColumnName] = value;
 			}
 
 			PropertyBag["WarningUpdateTime"] = false;
 			if (!PropertyBag["LastForm"].ToString().IsNullOrEmpty() && !PropertyBag["LastDown"].ToString().IsNullOrEmpty()) {
-				var lastForm = DateTime.Parse("1/1/1900 " + PropertyBag["LastForm"]);
-				var lastDown = DateTime.Parse("1/1/1900 " + PropertyBag["LastDown"]);
-				var updTime = new DateTime(1900, 1, 1).Add((lastForm - lastDown));
-				var processTimeRange = new DateTime(1900, 1, 1, 0, 15, 0);
-				var startTimeControl = new DateTime(1900, 1, 1, 5, 0, 0);
+				var lastForm = DateTime.Parse(PropertyBag["LastForm"].ToString());
+				var lastDown = DateTime.Parse(PropertyBag["LastDown"].ToString());
+				var updTime = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day).Add((lastForm - lastDown));
+				var processTimeRange = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day, 0, 15, 0);
+				var startTimeControl = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day, 5, 0, 0);
 				if ((lastDown > startTimeControl) && (updTime > processTimeRange))
 					PropertyBag["WarningUpdateTime"] = true;
+				if (lastForm.ToLongDateString() == DateTime.Today.ToLongDateString()) {
+					PropertyBag["LastDown"] = lastDown.ToLongTimeString();
+					PropertyBag["LastForm"] = lastForm.ToLongTimeString();
+				}
 			}
 
 			Size("MaxMailSize");
