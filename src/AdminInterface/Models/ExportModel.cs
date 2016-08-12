@@ -304,7 +304,7 @@ namespace AdminInterface.Models
 			ExcelHelper.Write(ws, row, 0, "Регион:", false);
 			string regionName;
 			if (filter.Regions != null && filter.Regions.Any())
-				regionName = ArHelper.WithSession(s => filter.GetRegionNames(s));
+				regionName = filter.GetRegionNames();
 			else {
 				regionName = "Все";
 			}
@@ -338,7 +338,7 @@ namespace AdminInterface.Models
 			if (filter.Suppliers != null && filter.Suppliers.Any())
 			{
 				ws.Merge(row, 0, row, 3);
-				var supplierName = ArHelper.WithSession(s => filter.GetSupplierNames(s));
+				var supplierName = filter.GetSupplierNames();
 				ExcelHelper.Write(ws, row, 0, "Те, у кого нет заказов на поставщиков: " + supplierName, false);
 				row++;
 			}
@@ -353,14 +353,8 @@ namespace AdminInterface.Models
 			UpdatedAndDidNotDoOrders(ws, row);
 			row++;
 
-			var reportData = ArHelper.WithSession(s => {
-				filter.Session = s;
-				var result = filter.Find(true);
-				foreach (var updatedAndDidNotDoOrdersField in result) {
-					updatedAndDidNotDoOrdersField.ForExport = true;
-				}
-				return result;
-			});
+			var reportData = filter.Find(true);
+			reportData.Each(x => x.ForExport = true);
 
 			foreach (var item in reportData) {
 				ExcelHelper.Write(ws, row, colShift + 0, item.ClientId, true);
@@ -401,7 +395,7 @@ namespace AdminInterface.Models
 			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
 			string regionName;
 			if (filter.Regions != null && filter.Regions.Any())
-				regionName = ArHelper.WithSession(s => filter.GetRegionNames(s));
+				regionName = filter.GetRegionNames();
 			else
 			{
 				regionName = "Все";
@@ -423,16 +417,10 @@ namespace AdminInterface.Models
 			else
 				ExcelHelper.Write(ws, 3, 1, "За " + filter.LastPeriod.Begin.ToString("dd.MM.yyyy"), false);
 
-			var reportData = ArHelper.WithSession(s => {
-				filter.Session = s;
-				var result = filter.Find(true);
-				foreach (var updatedAndDidNotDoOrdersField in result) {
-					((AnalysisOfWorkFiled)updatedAndDidNotDoOrdersField).ForExport = true;
-				}
-				return result;
-			});
+			var reportData = filter.Find(true).Cast<AnalysisOfWorkFiled>().ToList();
+			reportData.Each(x => x.ForExport = true);
 
-			foreach (AnalysisOfWorkFiled item in reportData) {
+			foreach (var item in reportData) {
 				ExcelHelper.Write(ws, row, colShift + 0, item.Id, true);
 				ExcelHelper.Write(ws, row, colShift + 1, item.Name, true);
 				ExcelHelper.Write(ws, row, colShift + 2, item.UserCount, true);
@@ -472,7 +460,7 @@ namespace AdminInterface.Models
 			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
 			string regionName;
 			if (filter.Regions != null && filter.Regions.Any())
-				regionName = ArHelper.WithSession(s => filter.GetRegionNames(s));
+				regionName = filter.GetRegionNames();
 			else {
 				regionName = "Все";
 			}
@@ -482,7 +470,7 @@ namespace AdminInterface.Models
 			ExcelHelper.Write(ws, 2, 0, "Нет обновлений с:", false);
 			ExcelHelper.Write(ws, 2, 1, filter.BeginDate.ToString("dd.MM.yyyy"), false);
 
-			var reportData = ArHelper.WithSession(s => filter.SqlQuery2(s, true)).ToList();
+			var reportData = filter.Find(true);
 
 			foreach (var item in reportData) {
 				ExcelHelper.Write(ws, row, colShift + 0, item.ClientId, true);

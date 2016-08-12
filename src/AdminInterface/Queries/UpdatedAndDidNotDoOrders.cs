@@ -148,19 +148,19 @@ namespace AdminInterface.ManagerReportsFilters
 			SortBy = "ClientName";
 		}
 
-		public string GetRegionNames(ISession session)
+		public string GetRegionNames()
 		{
 			var result = "";
 			if (Regions != null && Regions.Any())
-				result = session.Query<Region>().Where(x => Regions.Contains(x.Id)).Select(x => x.Name).OrderBy(x => x).ToList().Implode();
+				result = Session.Query<Region>().Where(x => Regions.Contains(x.Id)).Select(x => x.Name).OrderBy(x => x).ToList().Implode();
 			return result;
 		}
 
-		public string GetSupplierNames(ISession session)
+		public string GetSupplierNames()
 		{
 			var result = "";
 			if (Suppliers != null && Suppliers.Any())
-				result = session.Query<Supplier>().Where(x => Suppliers.Contains(x.Id)).Select(x => x.Name + " - " + x.HomeRegion.Name).OrderBy(x => x).ToList().Implode();
+				result = Session.Query<Supplier>().Where(x => Suppliers.Contains(x.Id)).Select(x => x.Name + " - " + x.HomeRegion.Name).OrderBy(x => x).ToList().Implode();
 			return result;
 		}
 

@@ -29,6 +29,7 @@ namespace Integration
 			session.Save(client);
 			user = client.Users.First();
 			filter = new UpdatedAndDidNotDoOrdersFilter();
+			filter.Session = session;
 			Flush();
 		}
 
@@ -48,7 +49,6 @@ namespace Integration
 			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
 			filter.UpdatePeriod.End = DateTime.Now.AddDays(-3);
 			filter.NoOrders = true;
-			filter.Session = session;
 			session.Save(user);
 			Flush();
 			var result = filter.Find();
@@ -68,7 +68,6 @@ namespace Integration
 			filter.UpdatePeriod.End = DateTime.Now;
 			filter.Regions = new [] { region.Id };
 			filter.SupplierDisabled = price.Supplier.Disabled;
-			filter.Session = session;
 			var order = new ClientOrder { Client = client, User = user, WriteTime = DateTime.Now.AddDays(-2), Region = region, Price = price };
 			session.Save(order);
 			session.Save(user);
@@ -82,7 +81,6 @@ namespace Integration
 		{
 			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
 			filter.UpdatePeriod.End = DateTime.Now;
-			filter.Session = session;
 			session.Save(user);
 			var region = session.Query<Region>().First();
 			var order = new ClientOrder { Client = client, User = user, WriteTime = DateTime.Now.AddDays(-2), Region = region };

@@ -9,6 +9,7 @@ using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support;
 using Test.Support.log4net;
+using AdminInterface.Queries;
 
 namespace Integration
 {
@@ -101,9 +102,9 @@ delete from Billing.Accounts where Type = 0;")
 
 			Flush();
 
-			var filter = new WhoWasNotUpdatedFilter { BeginDate = DateTime.Now.AddDays(-1), Regions = new ulong[] { client.HomeRegion.Id } };
+			var filter = new WhoWasNotUpdatedFilter {Session = session, BeginDate = DateTime.Now.AddDays(-1), Regions = new ulong[] { client.HomeRegion.Id } };
 
-			var data = filter.SqlQuery2(session);
+			var data = filter.Find();
 			Assert.AreEqual(data.Count, 4);
 		}
 
@@ -122,9 +123,9 @@ delete from Billing.Accounts where Type = 0;")
 
 			Flush();
 
-			var filter = new WhoWasNotUpdatedFilter { BeginDate = DateTime.Now.AddDays(-1) };
+			var filter = new WhoWasNotUpdatedFilter { Session = session, BeginDate = DateTime.Now.AddDays(-1) };
 
-			var data = filter.SqlQuery2(session);
+			var data = filter.Find();
 			Assert.AreEqual(data.Count, 1);
 			Assert.That(data[0].UserName, Is.EqualTo("user3"));
 		}
@@ -144,13 +145,31 @@ delete from Billing.Accounts where Type = 0;")
 
 			Flush();
 
-			var filter = new WhoWasNotUpdatedFilter { BeginDate = DateTime.Now.AddDays(-1) };
+			var filter = new WhoWasNotUpdatedFilter { Session = session, BeginDate = DateTime.Now.AddDays(-1) };
 
-			var data = filter.SqlQuery2(session).Select(d => d.UserName).ToList();
+			var data = filter.Find().Select(d => d.UserName).ToList();
 			Assert.AreEqual(data.Count, 3);
 			Assert.IsTrue(data.Contains("user"));
 			Assert.IsTrue(data.Contains("user1"));
 			Assert.IsTrue(data.Contains("user2"));
+		}
+
+		[Test]
+		public void Analysis_Of_Work_Drugstores_Filter_Test()
+		{
+			var filter = new AnalysisOfWorkDrugstoresFilter
+			{
+				Session = session,
+				Regions = new ulong[] { client.HomeRegion.Id },
+				AutoOrder = (int)AutoOrderStatus.NotUsed,
+				ObjectId = client.Id
+			};
+
+			var data = filter.Find();
+			Assert.AreEqual(data.Count, 1);
+
+			var row = (AnalysisOfWorkFiled)data[0];
+			Assert.AreEqual(row.AddressCount, "2");
 		}
 	}
 }

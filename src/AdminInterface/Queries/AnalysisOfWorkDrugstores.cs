@@ -100,13 +100,13 @@ namespace AdminInterface.Queries
 			get { return string.Format("{0}/{1}", LastWeekUpdates, CurWeekUpdates); }
 		}
 
-		public int CurWeekOrders { get; set; }
-		public int LastWeekOrders { get; set; }
+		public int CurWeekSum { get; set; }
+		public int LastWeekSum { get; set; }
 
 		[Display(Name = "Заказы (Старый/Новый)", Order = 7)]
 		public string Orders
 		{
-			get { return string.Format("{0}/{1}", LastWeekOrders.ToString("C"), CurWeekOrders.ToString("C")); }
+			get { return string.Format("{0}/{1}", LastWeekSum.ToString("C"), CurWeekSum.ToString("C")); }
 		}
 
 		[Display(Name = "Падение обновлений %", Order = 6)]
@@ -208,13 +208,34 @@ WHERE
 	AND oh1.RegionCode & :regionCode > 0
  group by oh1.clientcode;
 
+DROP TEMPORARY TABLE IF EXISTS orders.AutoOrderCntFirst;
+CREATE TEMPORARY TABLE orders.AutoOrderCntFirst (INDEX idx(ClientId) USING HASH) engine MEMORY
+SELECT u.ClientId, COUNT(u.id) as AutoOrderCnt
+	FROM logs.analitfupdates au,
+	customers.users u
+	WHERE au.requesttime BETWEEN :FistPeriodStart AND :FistPeriodEnd
+	AND au.userid = u.id
+	AND au.COMMIT = 1
+	AND au.updatetype IN (10)
+group by u.ClientId;
+
+DROP TEMPORARY TABLE IF EXISTS orders.AutoOrderCntNetFirst;
+CREATE TEMPORARY TABLE orders.AutoOrderCntNetFirst (INDEX idx(ClientId) USING HASH) engine MEMORY
+SELECT u.ClientId, COUNT(u.id) as AutoOrderCntNet
+	FROM logs.RequestLogs au,
+	customers.users u
+WHERE au.CreatedOn BETWEEN :FistPeriodStart AND :FistPeriodEnd
+	AND au.UserId = u.id
+	AND au.IsCompleted = 1
+	AND (au.UpdateType = 'BatchController' or au.UpdateType = 'SmartOrder')
+group by u.ClientId;
 
 insert into Customers.Updates
 SELECT cd.id,
 cd.name,
 reg.Region as RegionName,
-count(u.Id) as UserCount,
-count(a.Id) as AddressCount,
+count(distinct u.Id) as UserCount,
+count(distinct a.Id) as AddressCount,
 (SELECT COUNT(o.id)
 	FROM logs.analitfupdates au1,
 	customers.users O
@@ -233,35 +254,21 @@ count(a.Id) as AddressCount,
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
 ) LastWeekUpdates,
-osf.ClientSum as CurWeekOrders,
-osl.ClientSum as LastWeekOrders,
+osf.ClientSum as CurWeekSum,
+osl.ClientSum as LastWeekSum,
 osf.AddressCnt as CurWeekAddresses,
 osl.AddressCnt as LastWeekAddresses,
 IFNULL(sr.AssortimentPriceCode,4662) <> 4662 as AutoOrderIs,
-(SELECT COUNT(o.id)
-	FROM logs.analitfupdates au3,
-	customers.users O
-	WHERE requesttime BETWEEN :FistPeriodStart AND :FistPeriodEnd
-	AND au3.userid =o.id
-	AND o.clientid=cd.id
-	AND COMMIT = 1
-	AND updatetype IN (10)
-) as AutoOrderCnt,
-(SELECT COUNT(o.id)
-	FROM logs.RequestLogs au4,
-	customers.users O
-	WHERE au4.CreatedOn BETWEEN :FistPeriodStart AND :FistPeriodEnd
-	AND au4.UserId =o.id
-	AND o.clientid=cd.id
-	AND au4.IsCompleted = 1
-	AND (au4.UpdateType = 'BatchController' or au4.UpdateType = 'SmartOrder')
-) as AutoOrderCntNet
+aof.AutoOrderCnt,
+aofNet.AutoOrderCntNet
 
 FROM customers.Clients Cd
 	join usersettings.RetClientsSet Rcs on rcs.clientcode = cd.id
 	join farm.Regions reg on reg.RegionCode = Cd.regioncode
 	left join orders.OrdersSumFirst osf on osf.ClientId = cd.Id
 	left join orders.OrdersSumLast osl on osl.ClientId = cd.Id
+	left join orders.AutoOrderCntFirst aof on aof.ClientId = cd.Id
+	left join orders.AutoOrderCntNetFirst aofNet on aofNet.ClientId = cd.Id
 	left join ordersendrules.smart_order_rules sr on sr.Id = rcs.SmartOrderRuleId
 	left join Customers.Users u on u.ClientId = cd.id
 	left join Customers.Addresses a on a.ClientId = cd.id
@@ -273,7 +280,7 @@ WHERE
 	AND rcs.invisibleonfirm = 0
 group by cd.id;";
 
-		public string UserTypeSqlPart = @"insert into Customers.Updates (Id, Name, CurWeekUpdates, LastWeekUpdates, CurWeekOrders, LastWeekOrders)
+		public string UserTypeSqlPart = @"insert into Customers.Updates (Id, Name, CurWeekUpdates, LastWeekUpdates, CurWeekSum, LastWeekSum)
 SELECT u.id,
 u.name,
 (SELECT COUNT(au1.Updateid)
@@ -297,7 +304,7 @@ u.name,
 	AND ol1.orderid = oh1.rowid
 	AND oh1.UserId = u.id
 	AND oh1.RegionCode & :regionCode > 0
-) CurWeekOrders,
+) CurWeekSum,
 (SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh2,
 	orders.orderslist ol2
@@ -305,7 +312,7 @@ u.name,
 	AND ol2.orderid = oh2.rowid
 	AND oh2.UserId = u.id
 	AND oh2.RegionCode & :regionCode > 0
-) LastWeekOrders
+) LastWeekSum
 FROM customers.Users u
 WHERE
 u.WorkRegionMask & :regionCode > 0
@@ -341,8 +348,8 @@ DROP TEMPORARY TABLE IF EXISTS Customers.AddressesUpdates;
 
 CREATE TEMPORARY TABLE Customers.AddressesUpdates (
 Id INT unsigned,
-CurWeekOrders INT,
-LastWeekOrders INT) engine=MEMORY;
+CurWeekSum INT,
+LastWeekSum INT) engine=MEMORY;
 
 insert into Customers.AddressesUpdates
 SELECT a.id,
@@ -353,7 +360,7 @@ SELECT a.id,
 	AND ol1.orderid = oh1.rowid
 	AND oh1.AddressId = a.id
 	AND oh1.RegionCode & :regionCode > 0
-) CurWeekOrders,
+) CurWeekSum,
 (SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh2,
 	orders.orderslist ol2
@@ -361,7 +368,7 @@ SELECT a.id,
 	AND ol2.orderid = oh2.rowid
 	AND oh2.AddressId = a.id
 	AND oh2.RegionCode & :regionCode > 0
-) LastWeekOrders
+) LastWeekSum
 FROM customers.Addresses a
 WHERE
 1=1
@@ -369,8 +376,8 @@ WHERE
 
 update Customers.Updates u, Customers.AddressesUpdates au
 set
-u.CurWeekOrders = au.CurWeekOrders,
-u.LastWeekOrders = au.LastWeekOrders
+u.CurWeekSum = au.CurWeekSum,
+u.LastWeekSum = au.LastWeekSum
 where u.id = au.Id;
 ";
 
@@ -390,7 +397,7 @@ where u.id = au.Id;
 				{ "ProblemUpdates", "ProblemUpdates" },
 				{ "ProblemOrders", "ProblemOrders" },
 				{ "Obn", "CurWeekUpdates" },
-				{ "Zak", "CurWeekOrders" },
+				{ "Zak", "CurWeekSum" },
 				{ "RegionName", "RegionName" },
 				{ "AutoOrder", "AutoOrderIs" },
 				{ "Addr", "CurWeekAddresses" },
@@ -403,11 +410,11 @@ where u.id = au.Id;
 			PageSize = pageSize;
 		}
 
-		public string GetRegionNames(ISession session)
+		public string GetRegionNames()
 		{
 			var result = "";
 			if (Regions != null && Regions.Any())
-				result = session.Query<Region>().Where(x => Regions.Contains(x.Id)).Select(x => x.Name).OrderBy(x => x).ToList().Implode();
+				result = Session.Query<Region>().Where(x => Regions.Contains(x.Id)).Select(x => x.Name).OrderBy(x => x).ToList().Implode();
 			return result;
 		}
 
@@ -433,8 +440,8 @@ UserCount INT,
 AddressCount INT,
 CurWeekUpdates INT,
 LastWeekUpdates INT,
-CurWeekOrders INT,
-LastWeekOrders INT,
+CurWeekSum INT,
+LastWeekSum INT,
 CurWeekAddresses INT,
 LastWeekAddresses INT,
 AutoOrderIs int not null default 0,
@@ -509,8 +516,8 @@ SELECT
 	up.Id, up.Name, up.RegionName, up.UserCount, up.AddressCount,
 	up.CurWeekUpdates, up.LastWeekUpdates,
 	IF (LastWeekUpdates > CurWeekUpdates, ROUND((LastWeekUpdates-CurWeekUpdates)*100/LastWeekUpdates), 0) ProblemUpdates,
-	up.CurWeekOrders, up.LastWeekOrders,
-	IF (LastWeekOrders > CurWeekOrders, ROUND((LastWeekOrders-CurWeekOrders)*100/LastWeekOrders), 0) ProblemOrders,
+	up.CurWeekSum, up.LastWeekSum,
+	IF (LastWeekSum > CurWeekSum, ROUND((LastWeekSum-CurWeekSum)*100/LastWeekSum), 0) ProblemOrders,
 	up.CurWeekAddresses, up.LastWeekAddresses, up.AutoOrderIs
 FROM Customers.updates up
 {0}
