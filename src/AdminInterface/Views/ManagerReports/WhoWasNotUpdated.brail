@@ -23,8 +23,6 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<td class="filter-label">Регион</td>
 			<td>${FormHelper.Select("filter.Regions", filter.Regions, AllRegions, {
 					@class: "select2",
-					@firstoption: "Все",
-					@firstoptionvalue: "",
 					@multiple: "true",
 					@size: "6",
 					@text: "Name",
