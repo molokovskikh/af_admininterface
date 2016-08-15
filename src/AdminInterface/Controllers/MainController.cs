@@ -67,19 +67,7 @@ namespace AdminInterface.Controllers
 			}
 
 			PropertyBag["WarningUpdateTime"] = false;
-			if (!PropertyBag["LastForm"].ToString().IsNullOrEmpty() && !PropertyBag["LastDown"].ToString().IsNullOrEmpty()) {
-				var lastForm = DateTime.Parse(PropertyBag["LastForm"].ToString());
-				var lastDown = DateTime.Parse(PropertyBag["LastDown"].ToString());
-				var updTime = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day).Add((lastForm - lastDown));
-				var processTimeRange = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day, 0, 15, 0);
-				var startTimeControl = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day, 5, 0, 0);
-				if ((lastDown > startTimeControl) && (updTime > processTimeRange))
-					PropertyBag["WarningUpdateTime"] = true;
-				if (lastForm.ToLongDateString() == DateTime.Today.ToLongDateString()) {
-					PropertyBag["LastDown"] = lastDown.ToLongTimeString();
-					PropertyBag["LastForm"] = lastForm.ToLongTimeString();
-				}
-			}
+			CheckFormalizeTime();
 
 			Size("MaxMailSize");
 			Size("AvgMailSize");
@@ -215,6 +203,23 @@ namespace AdminInterface.Controllers
 		public void Stat(DateTime? from, DateTime? to)
 		{
 			Index(from, to, true);
+		}
+
+		private void CheckFormalizeTime()
+		{
+			if (!PropertyBag["LastForm"].ToString().IsNullOrEmpty() && !PropertyBag["LastDown"].ToString().IsNullOrEmpty()) {
+				var lastForm = DateTime.Parse(PropertyBag["LastForm"].ToString());
+				var lastDown = DateTime.Parse(PropertyBag["LastDown"].ToString());
+				var updTime = lastForm - lastDown;
+				var processTimeRange = new TimeSpan(0, 15, 0);
+				var startTimeControl = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day, 5, 0, 0);
+				if ((lastDown > startTimeControl) && (updTime > processTimeRange))
+					PropertyBag["WarningUpdateTime"] = true;
+				if (lastForm.ToLongDateString() == DateTime.Today.ToLongDateString()) {
+					PropertyBag["LastDown"] = lastDown.ToLongTimeString();
+					PropertyBag["LastForm"] = lastForm.ToLongTimeString();
+				}
+			}
 		}
 	}
 }
