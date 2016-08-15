@@ -1,8 +1,6 @@
 using System;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
-using Common.Web.Ui.ActiveRecordExtentions;
-using Common.Web.Ui.Helpers;
 using NHibernate;
 
 namespace AdminInterface.Models
@@ -22,7 +20,7 @@ namespace AdminInterface.Models
 
 		public static void MaintainIntersection(ISession session, string filter, Action<IQuery> prepare)
 		{
-			var query = session.CreateSQLQuery(String.Format(@"
+			var query = session.CreateSQLQuery($@"
 set @skip = 0;
 
 INSERT
@@ -66,13 +64,16 @@ FROM (Customers.Clients as drugstore, Customers.suppliers s)
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pd.pricecode AND pricesregionaldata.regioncode = regions.regioncode
 	LEFT JOIN Customers.Intersection i ON i.PriceId = pd.pricecode and i.RegionId = regions.regioncode and i.ClientId = drugstore.Id and i.LegalEntityId = le.Id
 	LEFT JOIN Customers.Intersection parent ON parent.PriceId = pd.pricecode and parent.RegionId = regions.regioncode and parent.ClientId = drugstore.Id
-	LEFT JOIN pricesdata as rootPrice on rootPrice.PriceCode = (select min(pricecode) from pricesdata as p where p.firmcode = s.Id)
+	LEFT JOIN (
+			select min(pricecode) as PriceCode, FirmCode
+			from pricesdata
+			group by FirmCode
+		) as rootPrice on rootPrice.FirmCode = s.Id
 		LEFT JOIN Customers.intersection as rootIntersection on rootIntersection.PriceId = rootPrice.PriceCode and rootIntersection.RegionId = Regions.RegionCode and rootIntersection.ClientId = drugstore.Id
 			and rootIntersection.LegalEntityId = le.Id
 WHERE i.Id IS NULL
-	{0}
-group by pd.pricecode, regions.regioncode, drugstore.Id, le.Id;
-", filter));
+	{filter}
+group by pd.pricecode, regions.regioncode, drugstore.Id, le.Id;");
 			prepare(query);
 			query.SetFlushMode(FlushMode.Always);
 			query.ExecuteUpdate();
