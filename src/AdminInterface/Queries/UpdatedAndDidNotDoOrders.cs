@@ -111,8 +111,6 @@ namespace AdminInterface.ManagerReportsFilters
 
 		public uint[] Suppliers { get; set; }
 
-		public bool? SupplierDisabled { get; set; }
-
 		public DatePeriod UpdatePeriod { get; set; }
 
 		[Description("Сумма заказов не более")]
@@ -172,13 +170,9 @@ namespace AdminInterface.ManagerReportsFilters
 			var sb = new StringBuilder();
 
 			var regionMask = SecurityContext.Administrator.RegionMask;
-			if (Regions != null && Regions.Any())
-			{
-				ulong mask = 0;
-				foreach (var region in Regions)
-					mask |= region;
-				regionMask &= mask;
-			}
+			if (Regions?.Any() == true)
+				regionMask &= Regions.Aggregate(0ul, (current, region) => current | region);
+
 			query.SetParameter("regionMask", regionMask);
 			query.SetParameter("updateDateStart", UpdatePeriod.Begin);
 			query.SetParameter("updateDateEnd", UpdatePeriod.End);
@@ -225,16 +219,66 @@ having IFNULL(SUM(ol.cost),0) < :sumPerAddress; ");
 				query.SetParameter("sumPerAddress", Sum.Value);
 			}
 
-			sb.Append(@"select usr.ClientId, usr.ClientName, usr.RegionName, usr.UserId, usr.UserName, usr.Registrant, usr.UpdateDate, usr.LastOrderDate,
-count(distinct senb.Id) as EnabledSupCnt,
-count(distinct sdsb.Id) as DisabledSupCnt,
-group_concat(distinct sdsb.Name ORDER BY sdsb.Name separator ', ') as DisabledSupName
+			sb.Append(@"
+create temporary table SuppliersStat (
+	UserId int unsigned not null,
+	EnabledSupCnt int not null,
+	DisabledSupCnt int not null,
+	DisabledSuppliers varchar(255),
+	primary key(UserId)
+) engine = memory;
+
+insert into SuppliersStat(UserId, EnabledSupCnt, DisabledSupCnt, DisabledSuppliers)
+select d.UserId,
+	sum(not d.DisabledByUser) as EnabledSupCnt,
+	sum(d.DisabledByUser) as DisabledSupCnt,
+	d.DisabledSuppliers
+from (
+	SELECT u.Id as UserId,
+		supplier.Id as SupplierId,
+		if(up.UserId is null, 1, 0) as DisabledByUser,
+		group_concat(if(up.UserId is null, supplier.Name, null)) as DisabledSuppliers
+	FROM Customers.Users u
+		join usr on usr.UserId = u.Id
+		join Customers.Intersection i on i.ClientId = u.ClientId and i.AgencyEnabled = 1
+		JOIN Customers.Clients drugstore ON drugstore.Id = i.ClientId
+		JOIN usersettings.RetClientsSet r ON r.clientcode = drugstore.Id
+		JOIN usersettings.PricesData pd ON pd.pricecode = i.PriceId
+		JOIN Customers.Suppliers supplier ON supplier.Id = pd.firmcode
+			JOIN usersettings.RegionalData rd ON rd.RegionCode = i.RegionId AND rd.FirmCode = pd.firmcode
+		JOIN usersettings.PricesRegionalData prd ON prd.regioncode = i.RegionId AND prd.pricecode = pd.pricecode
+		left join Customers.UserPrices up on up.PriceId = i.PriceId and up.UserId = ifnull(u.InheritPricesFrom, u.Id) and up.RegionId = i.RegionId
+	WHERE supplier.Disabled = 0
+			and (supplier.RegionMask & i.RegionId) > 0
+			AND (drugstore.maskregion & i.RegionId & u.WorkRegionMask) > 0
+			AND (r.WorkRegionMask & i.RegionId) > 0
+			AND pd.agencyenabled = 1
+			AND pd.enabled = 1
+			AND pd.pricetype <> 1
+			AND prd.enabled = 1
+			AND if(not r.ServiceClient, supplier.Id != 234, 1)
+			and i.AvailableForClient = 1
+	group by u.Id, supplier.Id
+) as d
+group by d.UserId;
+
+select usr.ClientId,
+	usr.ClientName,
+	usr.RegionName,
+	usr.UserId,
+	usr.UserName,
+	usr.Registrant,
+	usr.UpdateDate,
+	usr.LastOrderDate,
+	ss.EnabledSupCnt,
+	ss.DisabledSupCnt,
+	DisabledSuppliers as DisabledSupName
 from usr
-left join orders.OrdersHead oh on (oh.`regioncode` & :regionMask > 0) and oh.UserId = usr.UserId and oh.`WriteTime` > :updateDateStart and oh.`WriteTime` < :updateDateEnd
-left join usersettings.pricesdata pd on pd.PriceCode = oh.PriceCode
-left join customers.Suppliers s on s.Id = pd.FirmCode
-left join customers.Suppliers senb on senb.Id = pd.FirmCode and senb.Disabled = 0
-left join customers.Suppliers sdsb on sdsb.Id = pd.FirmCode and sdsb.Disabled = 1 ");
+	join SuppliersStat ss on ss.UserId = usr.UserId
+	left join orders.OrdersHead oh on (oh.`regioncode` & :regionMask > 0) and oh.UserId = usr.UserId and oh.`WriteTime` > :updateDateStart and oh.`WriteTime` < :updateDateEnd
+		left join usersettings.pricesdata pd on pd.PriceCode = oh.PriceCode
+			left join customers.Suppliers s on s.Id = pd.FirmCode
+");
 
 			if (Sum.HasValue && Sum.Value > 0)
 				sb.AppendLine("join sa on sa.UserId = usr.UserId ");
@@ -243,10 +287,6 @@ left join customers.Suppliers sdsb on sdsb.Id = pd.FirmCode and sdsb.Disabled = 
 			if (Suppliers != null && Suppliers.Any()) {
 				whre.Add("IFNULL(s.Id,0) not in (:suppliers) ");
 				query.SetParameter("suppliers", Suppliers.Implode());
-			}
-			if (SupplierDisabled.HasValue) {
-				whre.Add("s.Disabled = :supplierDisabled ");
-				query.SetParameter("supplierDisabled", Convert.ToInt32(SupplierDisabled.Value));
 			}
 			if (whre.Count > 0)
 				sb.AppendLine($"where {whre.Implode(" and ")} ");
@@ -259,7 +299,10 @@ left join customers.Suppliers sdsb on sdsb.Id = pd.FirmCode and sdsb.Disabled = 
 			query.Sql = sb.ToString();
 			var result = query.GetSqlQuery(Session).ToList<UpdatedAndDidNotDoOrdersField>();
 
-			Session.CreateSQLQuery("DROP TEMPORARY TABLE IF EXISTS usr; DROP TEMPORARY TABLE IF EXISTS sa;").ExecuteUpdate();
+			Session.CreateSQLQuery(@"DROP TEMPORARY TABLE IF EXISTS usr;
+DROP TEMPORARY TABLE IF EXISTS sa;
+DROP TEMPORARY TABLE IF EXISTS SuppliersStat;")
+				.ExecuteUpdate();
 
 			RowsCount = result.Count;
 			if (forExport)

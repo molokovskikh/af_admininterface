@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
-using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.NHibernateExtentions;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using Test.Support;
-using Test.Support.log4net;
 
 namespace Integration
 {
@@ -29,17 +25,13 @@ namespace Integration
 			session.Save(client);
 			user = client.Users.First();
 			filter = new UpdatedAndDidNotDoOrdersFilter();
-			Flush();
 		}
 
 		[TearDown]
 		public void Down()
 		{
-			foreach (var user1 in client.Users) {
-				session.Delete(user1);
-			}
+			session.DeleteEach(client.Users);
 			session.Delete(client);
-			Flush();
 		}
 
 		[Test]
@@ -67,7 +59,6 @@ namespace Integration
 			var price = session.Query<Price>().First();
 			filter.UpdatePeriod.End = DateTime.Now;
 			filter.Regions = new [] { region.Id };
-			filter.SupplierDisabled = price.Supplier.Disabled;
 			filter.Session = session;
 			var order = new ClientOrder { Client = client, User = user, WriteTime = DateTime.Now.AddDays(-2), Region = region, Price = price };
 			session.Save(order);
