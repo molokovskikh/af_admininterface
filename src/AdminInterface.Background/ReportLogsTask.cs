@@ -35,7 +35,7 @@ where l.LogTime >= :begin and l.PayerId is not null")
 			var payerIds = allowChanges.Concat(payerChanges).Distinct().ToArray();
 
 			foreach (var payerId in payerIds) {
-				var payer = Payer.Find(payerId);
+				var payer = Session.Load<Payer>(payerId);
 				payer.UpdatePaymentSum();
 				Session.Save(payer);
 			}
