@@ -44,7 +44,7 @@ namespace Integration.ForTesting
 
 			client.Payers.Each(p => p.Clients.Add(client));
 
-			client.Payers.Each(p => p.Save());
+			client.Payers.Each(p => session.Save(p));
 			session.Save(client);
 			client.Users.Each(u => u.Setup(session));
 			session.Flush();
@@ -89,9 +89,9 @@ namespace Integration.ForTesting
 			payer.Addresses.Each(a => a.Accounting.BeAccounted = true);
 			session.Save(client);
 			payer.Recipient = session.Query<Recipient>().First();
-			payer.SaveAndFlush();
+			session.Save(payer);
 			session.Flush();
-			payer.Refresh();
+			session.Refresh(payer);
 			return payer;
 		}
 
@@ -114,7 +114,7 @@ namespace Integration.ForTesting
 			client.Users[0].Name += client.Users[0].Id;
 			session.Save(client.Users[0]);
 			client.Addresses[0].Value += client.Addresses[0].Id;
-			client.Addresses[0].Save();
+			session.Save(client.Addresses[0]);
 			client.Name += client.Id;
 			session.Save(client);
 			session.Flush();

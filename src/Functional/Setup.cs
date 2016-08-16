@@ -22,6 +22,8 @@ namespace Functional
 			IntegrationFixture2.Factory = ActiveRecordMediator.GetSessionFactoryHolder()
 				.GetSessionFactory(typeof(ActiveRecordBase));
 			_webServer = WatinSetup.StartServer();
+			SeleniumFixture.WebDir = WatinSetup.WebDir;
+			SeleniumFixture.WebRoot = WatinSetup.WebRoot;
 			SeleniumFixture.WebPort = WatinSetup.WebPort;
 			SeleniumFixture.GlobalSetup();
 		}

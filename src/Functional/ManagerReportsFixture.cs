@@ -4,12 +4,8 @@ using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Functional.ForTesting;
-using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using Test.Support.Selenium;
-using Test.Support.Web;
-using WatiN.Core;
 
 namespace Functional
 {
