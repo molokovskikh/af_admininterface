@@ -69,7 +69,7 @@ namespace Integration
 			var price = session.Query<Price>().First();
 			filter.UpdatePeriod.End = DateTime.Now;
 			filter.Regions = new [] { region.Id };
-			var order = new ClientOrder(user, price) { WriteTime = DateTime.Now.AddDays(-2) };
+			var order = new ClientOrder(user, price) { WriteTime = DateTime.Now.AddDays(-100) };
 			session.Save(order);
 			session.Save(user);
 			Flush();
