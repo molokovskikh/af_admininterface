@@ -315,16 +315,6 @@ namespace AdminInterface.Models
 				ExcelHelper.Write(ws, row, 1, "За " + filter.UpdatePeriod.Begin.ToString("dd.MM.yyyy"), false);
 			row++; // 3
 
-			if (filter.SupplierDisabled.HasValue)
-			{
-				ws.Merge(row, 0, row, 3);
-				if (filter.SupplierDisabled.Value)
-					ExcelHelper.Write(ws, row, 0, "Только по отключенным поставщикам", false);
-				else
-					ExcelHelper.Write(ws, row, 0, "Только по включенным поставщикам", false);
-				row++;
-			}
-
 			if (filter.Sum.HasValue) {
 				ws.Merge(row, 0, row, 3);
 				ExcelHelper.Write(ws, row, 0, "Сумма заказов на адрес не более: " + filter.Sum.Value, false);

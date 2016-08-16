@@ -71,6 +71,7 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IntersectionTask.cs" />
     <Compile Include="InvoicePartTask.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="SendInvoiceTask.cs" />
