@@ -40,8 +40,7 @@ namespace Integration.ForTesting
 			client.Settings.OrderRegionMask = homeRegion.Id;
 			session.Query<DefaultValues>().First().Apply(client);
 
-			if (action != null)
-				action(client);
+			action?.Invoke(client);
 
 			client.Payers.Each(p => p.Clients.Add(client));
 
@@ -249,8 +248,7 @@ namespace Integration.ForTesting
 			var user = new User(supplier.Payer, supplier);
 			user.AssignDefaultPermission(session);
 			user.Setup(session);
-			if (action != null)
-				action(supplier);
+			action?.Invoke(supplier);
 			return supplier;
 		}
 

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Web;
+using AdminInterface.Helpers;
 using AdminInterface.Security;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -13,13 +14,14 @@ using NHibernate;
 using NHibernate.Linq;
 using Common.Tools;
 using AdminInterface.Models.Suppliers;
-using NHibernate.Criterion;
+using ExcelLibrary.SpreadSheet;
 
 namespace AdminInterface.ManagerReportsFilters
 {
 	public class UpdatedAndDidNotDoOrdersField : BaseItemForTable
 	{
 		private string _clientId;
+		public string InnerUserId;
 
 		[Display(Name = "Код клиента", Order = 0)]
 		public string ClientId
@@ -50,18 +52,16 @@ namespace AdminInterface.ManagerReportsFilters
 		[Display(Name = "Регион", Order = 4)]
 		public string RegionName { get; set; }
 
-		private string _userId;
-
 		[Display(Name = "Код пользователя", Order = 2)]
 		public string UserId
 		{
 			get
 			{
 				if (ForExport)
-					return _userId;
-				return AppHelper.LinkToNamed(_userId, "Users", parameters: new { @params = new { Id = _userId } });
+					return InnerUserId;
+				return AppHelper.LinkToNamed(InnerUserId, "Users", parameters: new { @params = new { Id = InnerUserId } });
 			}
-			set { _userId = value; }
+			set { InnerUserId = value; }
 		}
 
 		private string _userName;
@@ -73,7 +73,7 @@ namespace AdminInterface.ManagerReportsFilters
 			{
 				if (ForExport)
 					return _userName;
-				return AppHelper.LinkToNamed(_userName, "Users", parameters: new { @params = new { Id = _userId } });
+				return AppHelper.LinkToNamed(_userName, "Users", parameters: new { @params = new { Id = InnerUserId } });
 			}
 			set { _userName = value; }
 		}
@@ -96,13 +96,13 @@ namespace AdminInterface.ManagerReportsFilters
 		[Display(Name = "Список отключенных", Order = 10)]
 		public string DisabledSupName { get; set; }
 
+		[Display(Name = "Нет заказов на поставщиков", Order = 11)]
+		public string NoOrderSuppliers { get; set; }
+
 		public bool ForExport;
 
 		[Style]
-		public virtual bool IsOldUserUpdate
-		{
-			get { return (!string.IsNullOrEmpty(UpdateDate) && DateTime.Now.Subtract(DateTime.Parse(UpdateDate)).Days > 7); }
-		}
+		public virtual bool IsOldUserUpdate => (!string.IsNullOrEmpty(UpdateDate) && DateTime.Now.Subtract(DateTime.Parse(UpdateDate)).Days > 7);
 	}
 
 	public class UpdatedAndDidNotDoOrdersFilter : PaginableSortable, IFiltrable<UpdatedAndDidNotDoOrdersField>
@@ -115,9 +115,6 @@ namespace AdminInterface.ManagerReportsFilters
 
 		[Description("Сумма заказов не более")]
 		public decimal? Sum { get; set; }
-
-		[Description("Кто не делал заказы вообще")]
-		public bool NoOrders { get; set; }
 
 		public IList<UpdatedAndDidNotDoOrdersField> Find()
 		{
@@ -177,7 +174,7 @@ namespace AdminInterface.ManagerReportsFilters
 			query.SetParameter("updateDateStart", UpdatePeriod.Begin);
 			query.SetParameter("updateDateEnd", UpdatePeriod.End);
 
-			sb.Append(@"DROP TEMPORARY TABLE IF EXISTS usr;
+			sb.AppendLine(@"DROP TEMPORARY TABLE IF EXISTS usr;
 CREATE TEMPORARY TABLE usr (INDEX idx(UserId) USING HASH) ENGINE MEMORY
 select
 	c.id as ClientId,
@@ -189,26 +186,31 @@ select
 	uu.UpdateDate as UpdateDate,
 	max(oh.`WriteTime`) as LastOrderDate
 from customers.Clients C
-join customers.Users u on u.ClientId = c.id and u.PayerId <> 921 and u.OrderRegionMask > 0 and u.SubmitOrders = 0
+join customers.Users u on u.ClientId = c.id
+	join usersettings.RetClientsSet rcs on rcs.ClientCode = c.Id
 join usersettings.AssignedPermissions ap on ap.UserId = u.Id
 join Customers.UserAddresses ua on ua.UserId = u.Id
 join usersettings.UserUpdateInfo uu on uu.UserId = u.id
 join farm.Regions reg on reg.RegionCode = c.RegionCode
 left join accessright.regionaladmins reg on reg.UserName = c.Registrant
-left join usersettings.RetClientsSet rcs on rcs.ClientCode = c.Id
 left join orders.OrdersHead oh on (oh.`regioncode` & :regionMask > 0) and oh.UserId = u.id
 where
 	(c.regioncode & :regionMask > 0)
+	and c.Status = 1
 	and uu.`Updatedate` > :updateDateStart
 	and uu.`Updatedate` < :updateDateEnd
 	and rcs.InvisibleOnFirm = 0
 	and rcs.ServiceClient = 0
-	and ap.PermissionId = 1
+	and u.Enabled = 1
+	and u.PayerId <> 921
+	and rcs.OrderRegionMask & u.OrderRegionMask & :regionMask > 0
+	and u.SubmitOrders = 0
+	and ap.PermissionId in (1, 81)
 group by u.id; ");
 
 			// вычисление суммы заказов на адрес
 			if (Sum.HasValue && Sum.Value > 0) {
-				sb.Append(@"DROP TEMPORARY TABLE IF EXISTS sa;
+				sb.AppendLine(@"DROP TEMPORARY TABLE IF EXISTS sa;
 CREATE TEMPORARY TABLE sa (INDEX idx(UserId) USING HASH) ENGINE MEMORY
 select distinct usr.UserId
 from usr
@@ -219,7 +221,61 @@ having IFNULL(SUM(ol.cost),0) < :sumPerAddress; ");
 				query.SetParameter("sumPerAddress", Sum.Value);
 			}
 
-			sb.Append(@"
+			sb.AppendLine(@"
+drop temporary table if exists NoOrders;
+create temporary table NoOrders (
+	UserId int unsigned not null,
+	Suppliers varchar(255),
+	primary key (UserId)
+) engine = memory;
+");
+			if (Suppliers?.Any() == true) {
+				sb.AppendLine(@"
+drop temporary table if exists TargetSuppliers;
+create temporary table TargetSuppliers (
+	SupplierId int unsigned,
+	primary key (SupplierId)
+) engine = memory;
+");
+				for(var i = 0; i < Suppliers.Length; i++) {
+					sb.AppendLine($"insert into TargetSuppliers(SupplierId) values (:supplier{i});");
+					query.SetParameter($"supplier{i}", Suppliers[i]);
+				}
+
+				sb.AppendLine(@"
+insert into NoOrders(UserId, Suppliers)
+select d.UserId, group_concat(d.Name)
+from (
+		select usr.UserId, s.Name
+		from (usr, TargetSuppliers ts)
+			join Customers.Suppliers s on s.Id = ts.SupplierId
+				join Usersettings.PricesData pd on pd.FirmCode = s.Id
+			left outer join orders.OrdersHead oh on (oh.`regioncode` & :regionMask > 0)
+				and oh.UserId = usr.UserId
+				and oh.`WriteTime` > :updateDateStart
+				and oh.`WriteTime` < :updateDateEnd
+				and pd.PriceCode = oh.PriceCode
+		group by usr.UserId, s.Id
+		having count(oh.RowId) = 0
+	) as d
+group by d.UserId;");
+			} else {
+				sb.AppendLine(@"
+insert into NoOrders(UserId)
+select usr.UserId
+from usr
+	left outer join orders.OrdersHead oh on (oh.`regioncode` & :regionMask > 0)
+		and oh.UserId = usr.UserId
+		and oh.`WriteTime` > :updateDateStart
+		and oh.`WriteTime` < :updateDateEnd
+group by usr.UserId
+having count(oh.RowId) = 0;");
+			}
+			var join = "";
+			if (Sum.HasValue && Sum.Value > 0)
+				join = "join sa on sa.UserId = usr.UserId ";
+
+			sb.AppendLine($@"
 create temporary table SuppliersStat (
 	UserId int unsigned not null,
 	EnabledSupCnt int not null,
@@ -272,35 +328,23 @@ select usr.ClientId,
 	usr.LastOrderDate,
 	ss.EnabledSupCnt,
 	ss.DisabledSupCnt,
-	DisabledSuppliers as DisabledSupName
+	DisabledSuppliers as DisabledSupName,
+	no.Suppliers as NoOrderSuppliers
 from usr
 	join SuppliersStat ss on ss.UserId = usr.UserId
-	left join orders.OrdersHead oh on (oh.`regioncode` & :regionMask > 0) and oh.UserId = usr.UserId and oh.`WriteTime` > :updateDateStart and oh.`WriteTime` < :updateDateEnd
-		left join usersettings.pricesdata pd on pd.PriceCode = oh.PriceCode
-			left join customers.Suppliers s on s.Id = pd.FirmCode
-");
-
-			if (Sum.HasValue && Sum.Value > 0)
-				sb.AppendLine("join sa on sa.UserId = usr.UserId ");
-
-			var whre = new List<string>();
-			if (Suppliers != null && Suppliers.Any()) {
-				whre.Add("IFNULL(s.Id,0) not in (:suppliers) ");
-				query.SetParameter("suppliers", Suppliers.Implode());
-			}
-			if (whre.Count > 0)
-				sb.AppendLine($"where {whre.Implode(" and ")} ");
-
-			sb.AppendLine("group by usr.UserId ");
-			if (NoOrders)
-				sb.AppendLine("having COUNT(oh.RowID) = 0 ");
-			sb.AppendLine($"order by {SortBy} {SortDirection};");
+	join NoOrders no on no.UserId = usr.UserId
+	{join}
+group by usr.UserId
+order by {SortBy} {SortDirection}
+;");
 
 			query.Sql = sb.ToString();
 			var result = query.GetSqlQuery(Session).ToList<UpdatedAndDidNotDoOrdersField>();
 
 			Session.CreateSQLQuery(@"DROP TEMPORARY TABLE IF EXISTS usr;
 DROP TEMPORARY TABLE IF EXISTS sa;
+drop temporary table if exists NoOrders;
+drop temporary table if exists TargetSuppliers;
 DROP TEMPORARY TABLE IF EXISTS SuppliersStat;")
 				.ExecuteUpdate();
 
@@ -308,6 +352,111 @@ DROP TEMPORARY TABLE IF EXISTS SuppliersStat;")
 			if (forExport)
 				return result.ToList();
 			return result.Skip(CurrentPage * PageSize).Take(PageSize).ToList();
+		}
+
+		public byte[] Excel()
+		{
+			var wb = new Workbook();
+			var ws = new Worksheet("Кто обновлялся и не делал заказы");
+
+			var row = 0;
+			var colShift = 0;
+
+			ws.Merge(row, 0, row, 6);
+			ExcelHelper.WriteHeader1(ws, row, 0, "Кто обновлялся и не делал заказы", false, true);
+			row++; // 1
+
+			ws.Merge(row, 1, row, 2);
+			ExcelHelper.Write(ws, row, 0, "Регион:", false);
+			string regionName;
+			if (Regions != null && Regions.Any())
+				regionName = GetRegionNames(Session);
+			else {
+				regionName = "Все";
+			}
+			ExcelHelper.Write(ws, row, 1, regionName, false);
+			row++; // 2
+
+			ws.Merge(row, 1, row, 2);
+			ExcelHelper.Write(ws, row, 0, "Период:", false);
+			if (UpdatePeriod.Begin != UpdatePeriod.End)
+				ExcelHelper.Write(ws, row, 1,
+					"С " + UpdatePeriod.Begin.ToString("dd.MM.yyyy") + " по " + UpdatePeriod.End.ToString("dd.MM.yyyy"), false);
+			else
+				ExcelHelper.Write(ws, row, 1, "За " + UpdatePeriod.Begin.ToString("dd.MM.yyyy"), false);
+			row++; // 3
+
+			if (Sum.HasValue) {
+				ws.Merge(row, 0, row, 3);
+				ExcelHelper.Write(ws, row, 0, "Сумма заказов на адрес не более: " + Sum.Value, false);
+				row++;
+			}
+
+			if (Suppliers != null && Suppliers.Any()) {
+				ws.Merge(row, 0, row, 3);
+				var supplierName = GetSupplierNames(Session);
+				ExcelHelper.Write(ws, row, 0, "Те, у кого нет заказов на поставщиков: " + supplierName, false);
+				row++;
+			}
+
+			if (NoOrders) {
+				ws.Merge(row, 0, row, 3);
+				ExcelHelper.Write(ws, row, 0, "Те, кто не делал заказы вообще", false);
+				row++;
+			}
+
+			ExcelHelper.WriteHeader1(ws, row, 0, "Код клиента", true, true);
+			ExcelHelper.WriteHeader1(ws, row, 1, "Наименование клиента", true, true);
+			ExcelHelper.WriteHeader1(ws, row, 2, "Код пользователя", true, true);
+			ExcelHelper.WriteHeader1(ws, row, 3, "Комментарий пользователя", true, true);
+			ExcelHelper.WriteHeader1(ws, row, 4, "Регион", true, true);
+			ExcelHelper.WriteHeader1(ws, row, 5, "Регистратор", true, true);
+			ExcelHelper.WriteHeader1(ws, row, 6, "Дата обновления", true, true);
+			ExcelHelper.WriteHeader1(ws, row, 7, "Дата последнего заказа", true, true);
+			ExcelHelper.WriteHeader1(ws, row, 8, "Включенные поставщики", true, true);
+			ExcelHelper.WriteHeader1(ws, row, 9, "Отключенные поставщики", true, true);
+			ExcelHelper.WriteHeader1(ws, row, 10, "Список отключенных", true, true);
+			ExcelHelper.WriteHeader1(ws, row, 11, "Нет заказов на поставщиков", true, true);
+
+			ws.Cells.ColumnWidth[0] = 4000;
+			ws.Cells.ColumnWidth[1] = 12000;
+			ws.Cells.ColumnWidth[2] = 4000;
+			ws.Cells.ColumnWidth[3] = 12000;
+			ws.Cells.ColumnWidth[4] = 6000;
+			ws.Cells.ColumnWidth[5] = 8000;
+			ws.Cells.ColumnWidth[6] = 6000;
+			ws.Cells.ColumnWidth[7] = 6000;
+			ws.Cells.ColumnWidth[8] = 6000;
+			ws.Cells.ColumnWidth[9] = 6000;
+			ws.Cells.ColumnWidth[10] = 6000;
+			ws.Cells.ColumnWidth[11] = 6000;
+
+			ws.Cells.Rows[row].Height = 514;
+			row++;
+
+			var reportData = Find(true);
+			foreach (var item in reportData) {
+				item.ForExport = true;
+				ExcelHelper.Write(ws, row, colShift + 0, item.ClientId, true);
+				ExcelHelper.Write(ws, row, colShift + 1, item.ClientName, true);
+				ExcelHelper.Write(ws, row, colShift + 2, item.UserId, true);
+				ExcelHelper.Write(ws, row, colShift + 3, item.UserName, true);
+				ExcelHelper.Write(ws, row, colShift + 4, item.RegionName, true);
+				ExcelHelper.Write(ws, row, colShift + 5, item.Registrant, true);
+				ExcelHelper.Write(ws, row, colShift + 6, item.UpdateDate, true);
+				ExcelHelper.Write(ws, row, colShift + 7, item.LastOrderDate, true);
+				ExcelHelper.Write(ws, row, colShift + 8, item.EnabledSupCnt, true);
+				ExcelHelper.Write(ws, row, colShift + 9, item.DisabledSupCnt, true);
+				ExcelHelper.Write(ws, row, colShift + 10, item.DisabledSupName, true);
+				ExcelHelper.Write(ws, row, colShift + 11, item.NoOrderSuppliers, true);
+				row++;
+			}
+
+			wb.Worksheets.Add(ws);
+			var ms = new MemoryStream();
+			wb.Save(ms);
+
+			return ms.ToArray();
 		}
 	}
 }

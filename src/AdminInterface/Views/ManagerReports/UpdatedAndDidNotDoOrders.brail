@@ -37,11 +37,6 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 				@value: "Item1"})}</td>
 	</tr>
 	<tr>
-		<td class="filter-label">Кто не делал заказы вообще</td>
-		<td colspan=2>${FormHelper.CheckboxField("filter.NoOrders")}
-		</td>
-	</tr>
-	<tr>
 		<td class="filter-label">Сумма на адрес не более</td>
 		<td colspan=2>${FormHelper.TextField("filter.Sum")}</td>
 	</tr>

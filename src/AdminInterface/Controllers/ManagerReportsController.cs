@@ -123,9 +123,11 @@ namespace AdminInterface.Controllers
 
 		public void ExcelUpdatedAndDidNotDoOrders()
 		{
-			var filter = new UpdatedAndDidNotDoOrdersFilter();
+			var filter = new UpdatedAndDidNotDoOrdersFilter {
+				Session = DbSession
+			};
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
-			this.RenderFile("Кто_обновлялся_и_не_делал_заказы.xls", ExportModel.ExcelUpdatedAndDidNotDoOrders(filter));
+			this.RenderFile("Кто_обновлялся_и_не_делал_заказы.xls", filter.Excel());
 		}
 
 		public void ExcelAnalysisOfWorkDrugstores()

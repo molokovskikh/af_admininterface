@@ -70,6 +70,7 @@ from Customers.Users u
 		join Usersettings.RetClientsSet rcs on rcs.ClientCode = c.Id
 where ap.PermissionId in (1, 81)
 	and u.Enabled = 1
+	and u.PayerId <> 921
 	and c.Status = 1
 	and rcs.ServiceClient = 0
 	and rcs.InvisibleOnFirm = 0
