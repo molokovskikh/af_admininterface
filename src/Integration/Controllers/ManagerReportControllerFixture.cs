@@ -65,6 +65,7 @@ namespace Integration.Controllers
 		public void ExportWhoWasNotUpdatedFilterTest()
 		{
 			var filter = new WhoWasNotUpdatedFilter();
+			filter.Session = session;
 			var buf = ExportModel.ExcelWhoWasNotUpdated(filter);
 			var stream = new MemoryStream(buf);
 			var wb = Workbook.Load(stream);
@@ -88,6 +89,7 @@ namespace Integration.Controllers
 		public void ExportAnalysisOfWorkDrugstoresTest()
 		{
 			var filter = new AnalysisOfWorkDrugstoresFilter();
+			filter.Session = session;
 			var buf = ExportModel.ExcelAnalysisOfWorkDrugstores(filter);
 			var stream = new MemoryStream(buf);
 			var wb = Workbook.Load(stream);

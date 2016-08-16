@@ -24,8 +24,11 @@ namespace AdminInterface.ManagerReportsFilters
 		public string UserName { get; set; }
 	}
 
-	public class WhoWasNotUpdatedFilter : PaginableSortable
+	public class WhoWasNotUpdatedFilter : PaginableSortable, IFiltrable<WhoWasNotUpdatedField>
 	{
+		public ISession Session { get; set; }
+		public bool LoadDefault { get; set; }
+
 		public ulong[] Regions { get; set; }
 
 		[Description("Нет обновлений с")]
@@ -37,15 +40,20 @@ namespace AdminInterface.ManagerReportsFilters
 			SortBy = "ClientName";
 		}
 
-		public string GetRegionNames(ISession session)
+		public string GetRegionNames()
 		{
 			var result = "";
 			if (Regions != null && Regions.Any())
-				result = session.Query<Region>().Where(x => Regions.Contains(x.Id)).Select(x => x.Name).OrderBy(x => x).ToList().Implode();
+				result = Session.Query<Region>().Where(x => Regions.Contains(x.Id)).Select(x => x.Name).OrderBy(x => x).ToList().Implode();
 			return result;
 		}
 
-		public IList<WhoWasNotUpdatedField> SqlQuery2(ISession session, bool forExcel = false)
+		public IList<WhoWasNotUpdatedField> Find()
+		{
+			return Find(false);
+		}
+
+		public IList<WhoWasNotUpdatedField> Find(bool forExcel)
 		{
 			var regionMask = SecurityContext.Administrator.RegionMask;
 			if (Regions != null && Regions.Any()) {
@@ -55,7 +63,7 @@ namespace AdminInterface.ManagerReportsFilters
 				regionMask &= mask;
 			}
 
-			var result = session.CreateSQLQuery($@"
+			var result = Session.CreateSQLQuery($@"
 drop temporary table if exists Customers.UserSource;
 create temporary table Customers.UserSource (
 	UserId int unsigned,

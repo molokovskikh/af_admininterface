@@ -25,6 +25,8 @@ namespace Integration
 
 					var filter = new AnalysisOfWorkDrugstoresFilter(1000);
 					filter.Session = s;
+					filter.Regions = new ulong[] { client.HomeRegion.Id };
+					filter.AutoOrder = (int)AutoOrderStatus.NotUsed;
 					result = filter.Find();
 
 					var appHelper = new AppHelper(context);

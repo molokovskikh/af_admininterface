@@ -133,7 +133,7 @@ namespace Functional
 			session.Save(address);
 			Open("ManagerReports");
 			Click("Сравнительный анализ работы аптек");
-			Css("#filter_Region_Id").SelectByValue(client.HomeRegion.Id.ToString());
+			Css("#filter_Regions").SelectByValue(client.HomeRegion.Id.ToString());
 			Click("Показать");
 			Click("Код");
 			Click("Код");

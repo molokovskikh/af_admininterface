@@ -39,7 +39,6 @@ namespace Integration
 			filter = new UpdatedAndDidNotDoOrdersFilter {
 				Session = session
 			};
-
 		}
 
 		[TearDown]
