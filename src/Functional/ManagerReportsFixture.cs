@@ -59,13 +59,13 @@ namespace Functional
 		public void NoParsedWaybills()
 		{
 			var supplier = DataMother.CreateSupplier();
-			Save(supplier);
+			session.Save(supplier);
 			var client = DataMother.CreateClientAndUsers();
-			Save(client);
+			session.Save(client);
 			var documentLog = new DocumentReceiveLog(supplier);
 			documentLog.ForClient = client;
 			documentLog.LogTime = DateTime.Now;
-			Save(documentLog);
+			session.Save(documentLog);
 
 			Open("ManagerReports");
 			Click("Неразобранные накладные");
@@ -84,12 +84,12 @@ namespace Functional
 		public void NoParsedWaybillsReport()
 		{
 			var supplier = DataMother.CreateSupplier();
-			Save(supplier);
+			session.Save(supplier);
 			var client = DataMother.CreateClientAndUsers();
-			Save(client);
+			session.Save(client);
 			var documentLog = new DocumentReceiveLog(supplier);
 			documentLog.ForClient = client;
-			Save(documentLog);
+			session.Save(documentLog);
 
 			Open("ManagerReports");
 			Click("Отчет о состоянии неформализованных накладных по поставщикам");

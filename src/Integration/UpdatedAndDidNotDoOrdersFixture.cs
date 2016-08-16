@@ -53,7 +53,6 @@ namespace Integration
 		public void No_result_find_test()
 		{
 			filter.UpdatePeriod.End = DateTime.Now.AddDays(-3);
-			filter.NoOrders = true;
 			session.Save(user);
 			Flush();
 			var result = filter.Find();
@@ -77,18 +76,6 @@ namespace Integration
 			Flush();
 			var result = filter.Find();
 			Assert.AreEqual(result.Count, 1);
-		}
-
-		[Test]
-		public void No_result_if_correct_condition_and_order()
-		{
-			filter.UpdatePeriod.End = DateTime.Now;
-			session.Save(user);
-			var order = new ClientOrder(user, null) { WriteTime = DateTime.Now.AddDays(-2) };
-			session.Save(order);
-			Flush();
-			var result = filter.Find();
-			Assert.AreEqual(result.Count, 0);
 		}
 
 		[Test]

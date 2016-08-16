@@ -37,7 +37,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CassiniDev-lib">
+    <Reference Include="CassiniDev4-lib">
     </Reference>
     <Reference Include="Castle.ActiveRecord">
       <SpecificVersion>False</SpecificVersion>

@@ -399,12 +399,6 @@ DROP TEMPORARY TABLE IF EXISTS SuppliersStat;")
 				row++;
 			}
 
-			if (NoOrders) {
-				ws.Merge(row, 0, row, 3);
-				ExcelHelper.Write(ws, row, 0, "Те, кто не делал заказы вообще", false);
-				row++;
-			}
-
 			ExcelHelper.WriteHeader1(ws, row, 0, "Код клиента", true, true);
 			ExcelHelper.WriteHeader1(ws, row, 1, "Наименование клиента", true, true);
 			ExcelHelper.WriteHeader1(ws, row, 2, "Код пользователя", true, true);
