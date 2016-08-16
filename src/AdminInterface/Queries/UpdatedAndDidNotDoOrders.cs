@@ -21,7 +21,7 @@ namespace AdminInterface.ManagerReportsFilters
 	public class UpdatedAndDidNotDoOrdersField : BaseItemForTable
 	{
 		private string _clientId;
-		public string InnerUserId;
+		private string _userId;
 
 		[Display(Name = "Код клиента", Order = 0)]
 		public string ClientId
@@ -58,10 +58,10 @@ namespace AdminInterface.ManagerReportsFilters
 			get
 			{
 				if (ForExport)
-					return InnerUserId;
-				return AppHelper.LinkToNamed(InnerUserId, "Users", parameters: new { @params = new { Id = InnerUserId } });
+					return _userId;
+				return AppHelper.LinkToNamed(_userId, "Users", parameters: new { @params = new { Id = _userId } });
 			}
-			set { InnerUserId = value; }
+			set { _userId = value; }
 		}
 
 		private string _userName;
@@ -73,7 +73,7 @@ namespace AdminInterface.ManagerReportsFilters
 			{
 				if (ForExport)
 					return _userName;
-				return AppHelper.LinkToNamed(_userName, "Users", parameters: new { @params = new { Id = InnerUserId } });
+				return AppHelper.LinkToNamed(_userName, "Users", parameters: new { @params = new { Id = _userId } });
 			}
 			set { _userName = value; }
 		}

@@ -89,9 +89,10 @@ namespace Integration
 			session.Save(order);
 			filter.Suppliers = new []{ supplier1.Id, supplier2.Id };
 			session.Flush();
-			var result = filter.Find();
+			var result = filter.Find(true);
 			Assert.That(result.Count, Is.GreaterThan(0));
-			var item = result.FirstOrDefault(x => x.InnerUserId == user.Id.ToString());
+			result.Each(x => x.ForExport = true);
+			var item = result.FirstOrDefault(x => x.UserId == user.Id.ToString());
 			Assert.IsNotNull(item, $"не найдена запись для пользователя {user.Id}");
 			Assert.AreEqual(item.NoOrderSuppliers, supplier2.Name);
 		}
