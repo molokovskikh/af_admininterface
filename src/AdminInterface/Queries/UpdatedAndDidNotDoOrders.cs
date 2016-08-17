@@ -194,11 +194,19 @@ join usersettings.UserUpdateInfo uu on uu.UserId = u.id
 join farm.Regions reg on reg.RegionCode = c.RegionCode
 left join accessright.regionaladmins reg on reg.UserName = c.Registrant
 left join orders.OrdersHead oh on (oh.`regioncode` & :regionMask > 0) and oh.UserId = u.id
+	left join Customers.AnalitFNetDatas nd on nd.UserId = u.Id
 where
 	(c.regioncode & :regionMask > 0)
 	and c.Status = 1
-	and uu.`Updatedate` > :updateDateStart
-	and uu.`Updatedate` < :updateDateEnd
+	and ((
+				uu.`Updatedate` > :updateDateStart
+				and uu.`Updatedate` < :updateDateEnd
+			)
+			or (
+				ifnull(nd.LastUpdateAt, '2000-01-01') > :updateDateStart
+				and ifnull(nd.LastUpdateAt, '2000-01-01') < :updateDateEnd
+			)
+		)
 	and rcs.InvisibleOnFirm = 0
 	and rcs.ServiceClient = 0
 	and u.Enabled = 1
