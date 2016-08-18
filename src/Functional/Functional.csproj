@@ -37,7 +37,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CassiniDev-lib">
+    <Reference Include="CassiniDev4-lib">
     </Reference>
     <Reference Include="Castle.ActiveRecord">
       <SpecificVersion>False</SpecificVersion>
@@ -95,7 +95,7 @@
     <Reference Include="WebDriver">
       <HintPath>..\..\packages\Selenium.WebDriver.2.33.0\lib\net40\WebDriver.dll</HintPath>
     </Reference>
-    <Reference Include="WebDriver.Support, Version=2.48.1.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="WebDriver.Support" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Billing\BalanceOperationFixture.cs" />

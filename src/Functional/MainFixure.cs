@@ -115,7 +115,7 @@ namespace Functional
 		{
 			var client = DataMother.CreateTestClientWithUser();
 			var log = new PrgDataLog(client.Users.First(), "FileHandler");
-			Save(log);
+			session.Save(log);
 
 			Open();
 			Css("#updates-monitoring").Click();

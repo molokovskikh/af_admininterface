@@ -56,7 +56,7 @@ namespace Functional.Billing
 		public void View_all_users()
 		{
 			var user = client.AddUser(session, "test user for billing");
-			Save(user);
+			session.Save(user);
 
 			client.Users.Each(u => u.Enabled = false);
 			Refresh();

@@ -35,7 +35,7 @@ namespace Functional.Drugstore
 				s.FullName = "Поставщик для тестирования";
 				s.AddPrice("Ассортиментный прайс", PriceType.Assortment);
 			});
-			Save(supplier);
+			session.Save(supplier);
 			FlushAndCommit();
 
 			//отключаем

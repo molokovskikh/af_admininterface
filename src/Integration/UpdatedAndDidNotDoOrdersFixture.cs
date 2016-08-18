@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
-using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using Common.Tools;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.NHibernateExtentions;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using Test.Support;
 using Test.Support.log4net;
 
 namespace Integration
@@ -25,30 +23,35 @@ namespace Integration
 		[SetUp]
 		public void SetUp()
 		{
-			client = DataMother.CreateClientAndUsers();
+			client = DataMother.TestClient(x => {
+				x.AddUser(new User(x) {
+					Name = "test"
+				});
+				x.AddUser(new User(x) {
+					Name = "test"
+				});
+				var address = x.AddAddress("Тестовый адрес");
+				x.Users.Each(y => y.AvaliableAddresses.Add(address));
+			});
 			session.Save(client);
 			user = client.Users.First();
-			filter = new UpdatedAndDidNotDoOrdersFilter();
-			Flush();
+			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
+			filter = new UpdatedAndDidNotDoOrdersFilter {
+				Session = session
+			};
 		}
 
 		[TearDown]
 		public void Down()
 		{
-			foreach (var user1 in client.Users) {
-				session.Delete(user1);
-			}
+			session.DeleteEach(client.Users);
 			session.Delete(client);
-			Flush();
 		}
 
 		[Test]
 		public void No_result_find_test()
 		{
-			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
 			filter.UpdatePeriod.End = DateTime.Now.AddDays(-3);
-			filter.NoOrders = true;
-			filter.Session = session;
 			session.Save(user);
 			Flush();
 			var result = filter.Find();
@@ -58,7 +61,6 @@ namespace Integration
 		[Test]
 		public void Find_test_if_correct_condition()
 		{
-			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
 			user.AssignDefaultPermission(session);
 			var address = new Address(client) { Value = "123" };
 			session.Save(address);
@@ -67,9 +69,7 @@ namespace Integration
 			var price = session.Query<Price>().First();
 			filter.UpdatePeriod.End = DateTime.Now;
 			filter.Regions = new [] { region.Id };
-			filter.SupplierDisabled = price.Supplier.Disabled;
-			filter.Session = session;
-			var order = new ClientOrder { Client = client, User = user, WriteTime = DateTime.Now.AddDays(-2), Region = region, Price = price };
+			var order = new ClientOrder(user, price) { WriteTime = DateTime.Now.AddDays(-100) };
 			session.Save(order);
 			session.Save(user);
 			Flush();
@@ -78,18 +78,23 @@ namespace Integration
 		}
 
 		[Test]
-		public void No_result_if_correct_condition_and_order()
+		public void No_order_for_supplier()
 		{
-			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
-			filter.UpdatePeriod.End = DateTime.Now;
-			filter.Session = session;
-			session.Save(user);
-			var region = session.Query<Region>().First();
-			var order = new ClientOrder { Client = client, User = user, WriteTime = DateTime.Now.AddDays(-2), Region = region };
+			user.AssignDefaultPermission(session);
+			var supplier1 = DataMother.CreateSupplier(x => x.Name = Guid.NewGuid().ToString());
+			session.Save(supplier1);
+			var supplier2 = DataMother.CreateSupplier(x => x.Name = Guid.NewGuid().ToString());
+			session.Save(supplier2);
+			var order = new ClientOrder(user, supplier1.Prices[0]) { WriteTime = DateTime.Now.AddDays(-2) };
 			session.Save(order);
-			Flush();
-			var result = filter.Find();
-			Assert.AreEqual(result.Count, 0);
+			filter.Suppliers = new []{ supplier1.Id, supplier2.Id };
+			session.Flush();
+			var result = filter.Find(true);
+			Assert.That(result.Count, Is.GreaterThan(0));
+			result.Each(x => x.ForExport = true);
+			var item = result.FirstOrDefault(x => x.UserId == user.Id.ToString());
+			Assert.IsNotNull(item, $"не найдена запись для пользователя {user.Id}");
+			Assert.AreEqual(item.NoOrderSuppliers, supplier2.Name);
 		}
 	}
 }

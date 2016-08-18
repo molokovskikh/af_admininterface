@@ -1,6 +1,10 @@
-﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+﻿${app.Asset("select2.js")}
+${app.Asset("Select2-locales/select2_locale_ru.js")}
+${app.Asset("select2.css")}
 
- <% component CaptureFor, {@id : @Title}: %>
+<% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
 	Кто обновлялся и не делал заказы
 <% end %>
 <div class="page_1_3_broken hintInfoBlock">
@@ -17,8 +21,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	<tr>
 		<td class="filter-label">Регион</td>
 		<td colspan=2>${FormHelper.Select("filter.Regions", filter.Regions, AllRegions, {
-				@firstoption: "Все",
-				@firstoptionvalue: "",
+				@class: "select2",
 				@multiple: "true",
 				@size: "6",
 				@text: "Name",
@@ -27,26 +30,11 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	<tr>
 		<td class="filter-label">Нет заказов на поставщиков</td>
 		<td colspan=2>${FormHelper.Select("filter.Suppliers", filter.Suppliers, AllSuppliers, {
-				@firstoption: "Все",
-				@firstoptionvalue: "",
+				@class: "select2",
 				@multiple: "true",
 				@size: "6",
 				@text: "Item2",
 				@value: "Item1"})}</td>
-	</tr>
-	<tr>
-		<td class="filter-label">Состояние поставщиков</td>
-		<td colspan=2>${FormHelper.Select("filter.SupplierDisabled", filter.SupplierDisabled, SupplierDisabled, {
-				@firstoption: "Все",
-				@firstoptionvalue: "",
-				@text: "Item2",
-				@value: "Item1"})}
-		</td>
-	</tr>
-	<tr>
-		<td class="filter-label">Кто не делал заказы вообще</td>
-		<td colspan=2>${FormHelper.CheckboxField("filter.NoOrders")}
-		</td>
 	</tr>
 	<tr>
 		<td class="filter-label">Сумма на адрес не более</td>

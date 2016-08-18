@@ -447,7 +447,7 @@ select mup.UserId, mup.PriceId, mup.RegionId from
 		{
 			if (user.Payer == null) {
 				if (Payers.Count > 1)
-					throw new Exception(String.Format("У клиента более одного плательщика {0}", Payers.Implode()));
+					throw new Exception($"У клиента более одного плательщика {Payers.Implode()}");
 				user.Payer = Payers.Single();
 			}
 
