@@ -38,7 +38,8 @@ namespace AdminInterface.Controllers
 		{
 			RemoteServiceHelper.Try(() => { PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(Admin.UserName); });
 
-			if (from == null || to == null) {
+			if (from == null || to == null)
+			{
 				from = DateTime.Today;
 				to = DateTime.Today;
 			}
@@ -53,12 +54,15 @@ namespace AdminInterface.Controllers
 			BindObjectInstance(query, "query");
 
 			var data = query.Load(fromDate, toDate);
-			foreach (var pair in data.ToKeyValuePairs()) {
+			foreach (var pair in data.ToKeyValuePairs())
+			{
 				var column = pair.Key;
 				var value = pair.Value;
-				if (column.ToString() != "LastDown" && column.ToString() != "LastForm") {
+				if (column.ToString() != "LastDown" && column.ToString() != "LastForm")
+				{
 					value = TryToFixBrokenDateTimeValue(value);
-					if (value != DBNull.Value && column.DataType == typeof(DateTime)) {
+					if (value != DBNull.Value && column.DataType == typeof(DateTime))
+					{
 						var dateTimeValue = (DateTime)value;
 						value = dateTimeValue.ToLongTimeString();
 					}
@@ -66,8 +70,16 @@ namespace AdminInterface.Controllers
 				PropertyBag[column.ColumnName] = value;
 			}
 
+			var lastForm = DateTime.Parse(PropertyBag["LastForm"].ToString());
+			var lastDown = DateTime.Parse(PropertyBag["LastDown"].ToString());
 			PropertyBag["WarningUpdateTime"] = false;
-			CheckFormalizeTime();
+			PropertyBag["WarningUpdateTime"] = CheckFormalizeTime(lastDown, lastForm);
+
+			if (lastForm.ToLongDateString() == DateTime.Today.ToLongDateString())
+			{
+				PropertyBag["LastDown"] = lastDown.ToLongTimeString();
+				PropertyBag["LastForm"] = lastForm.ToLongTimeString();
+			}
 
 			Size("MaxMailSize");
 			Size("AvgMailSize");
@@ -99,7 +111,8 @@ namespace AdminInterface.Controllers
 				.GetServiceStatus(Config.OrderServiceHost, Config.OrderServiceName));
 			var priceProcessorStatus = BindingHelper.GetDescription(RemoteServiceHelper
 				.GetServiceStatus(Config.PriceServiceHost, Config.PriceServiceName));
-			return new {
+			return new
+			{
 				OrderProcStatus = orderProcStatus,
 				IsOrderProcUnavailable = RemoteServiceHelper.IsUnavailable(orderProcStatus),
 				PriceProcessorStatus = priceProcessorStatus,
@@ -159,22 +172,26 @@ namespace AdminInterface.Controllers
 			var defaults = Defaults;
 			NewSupplierMessage newSupplierMessage = new NewSupplierMessage();
 
-			if (IsPost) {
+			if (IsPost)
+			{
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 				BindObjectInstance(defaults, ParamStore.Form, "defaults");
-				if (IsValid(defaults)) {
+				if (IsValid(defaults))
+				{
 					newSupplierMessage.CreateEmlFile(defaults);
 					Notify("Сохранено");
 					RedirectToUrl(Request.UrlReferrer + pageTab);
 				}
-				else {
+				else
+				{
 					ActiveRecordMediator.Evict(defaults);
 					PropertyBag["Defaults"] = defaults;
 					PropertyBag["Formaters"] = OrderHandler.Formaters();
 					PropertyBag["Senders"] = OrderHandler.Senders();
 				}
 			}
-			else {
+			else
+			{
 				PropertyBag["Defaults"] = defaults;
 				PropertyBag["Formaters"] = OrderHandler.Formaters();
 				PropertyBag["Senders"] = OrderHandler.Senders();
@@ -186,7 +203,8 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 			var user = DbSession.Load<User>(id);
 			var addresses = new StringBuilder();
-			if (user.RootService is Client) {
+			if (user.RootService is Client)
+			{
 				foreach (var address in user.AvaliableAddresses)
 					addresses.AppendFormat("<div>{0}</div>", address.Name);
 				addresses.Append("  ");
@@ -205,21 +223,17 @@ namespace AdminInterface.Controllers
 			Index(from, to, true);
 		}
 
-		private void CheckFormalizeTime()
+		public static bool CheckFormalizeTime(DateTime lastDown, DateTime lastForm)
 		{
-			if (!PropertyBag["LastForm"].ToString().IsNullOrEmpty() && !PropertyBag["LastDown"].ToString().IsNullOrEmpty()) {
-				var lastForm = DateTime.Parse(PropertyBag["LastForm"].ToString());
-				var lastDown = DateTime.Parse(PropertyBag["LastDown"].ToString());
+			if (!lastDown.ToString().IsNullOrEmpty() && !lastForm.ToString().IsNullOrEmpty())
+			{
 				var updTime = lastForm - lastDown;
 				var processTimeRange = new TimeSpan(0, 15, 0);
 				var startTimeControl = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day, 5, 0, 0);
 				if ((lastDown > startTimeControl) && (updTime > processTimeRange))
-					PropertyBag["WarningUpdateTime"] = true;
-				if (lastForm.ToLongDateString() == DateTime.Today.ToLongDateString()) {
-					PropertyBag["LastDown"] = lastDown.ToLongTimeString();
-					PropertyBag["LastForm"] = lastForm.ToLongTimeString();
-				}
+					return true;
 			}
+			return false;
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Common.Tools;
@@ -9,7 +10,6 @@ using Common.Web.Ui.NHibernateExtentions;
 using Functional.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using OpenQA.Selenium;
 
 namespace Functional
 {
@@ -186,47 +186,10 @@ namespace Functional
 		[Test]
 		public void CheckFormalizeTimeTest()
 		{
-			var nowDate = DateTime.Now;
-			CreateDownloadPrice(nowDate);
-			CreateFormalizePrice(nowDate.AddMinutes(16));
-
-			Open();
-			var lastdownElem = browser.FindElement(By.XPath(ElemTempl("lastdown-status", "service-stoped")));
-			var lastformElem = browser.FindElement(By.XPath(ElemTempl("lastform-status", "service-stoped")));
-			Assert.IsNotNull(lastdownElem);
-			Assert.IsNotNull(lastformElem);
-			Assert.AreEqual(lastdownElem.Text, nowDate.ToLongTimeString());
-			Assert.AreEqual(lastformElem.Text, nowDate.AddMinutes(16).ToLongTimeString());
-
-			CreateDownloadPrice(nowDate.AddDays(-3));
-			CreateFormalizePrice(nowDate.AddDays(-3).AddMinutes(15));
-
-			Open(String.Format("?from={0}&to={1}", nowDate.AddDays(-3).ToShortDateString(), nowDate.AddDays(-3).ToShortDateString()));
-			lastdownElem = browser.FindElement(By.XPath(ElemTempl("lastdown-status")));
-			lastformElem = browser.FindElement(By.XPath(ElemTempl("lastform-status")));
-			Assert.IsNotNull(lastdownElem);
-			Assert.IsNotNull(lastformElem);
-			Assert.AreEqual(lastdownElem.Text, nowDate.AddDays(-3).ToString("yyyy-MM-dd HH:mm:ss"));
-			Assert.AreEqual(lastformElem.Text, nowDate.AddDays(-3).AddMinutes(15).ToString("yyyy-MM-dd HH:mm:ss"));
-		}
-
-		private string ElemTempl(string id, string alarmCss = "")
-		{
-			return String.Format("//td[contains(@class, 'statistic-value {0}') and contains(@id, '{1}')]", alarmCss, id);
-		}
-
-		private void CreateDownloadPrice(DateTime date)
-		{
-			session.CreateSQLQuery("insert into logs.downlogs(LogTime, ResultCode)" +
-				String.Format(" values('{0:yyyy-MM-dd HH:mm:ss}', 2)", date))
-				.ExecuteUpdate();
-		}
-
-		private void CreateFormalizePrice(DateTime date)
-		{
-			session.CreateSQLQuery("insert into logs.formlogs(LogTime, ResultId)" +
-				String.Format(" values('{0:yyyy-MM-dd HH:mm:ss}', 2)", date))
-				.ExecuteUpdate();
+			var nowDate = DateTime.Now.Date;
+			Assert.False(MainController.CheckFormalizeTime(nowDate.AddHours(4), nowDate.AddHours(4).AddMinutes(15).AddSeconds(1)));
+			Assert.False(MainController.CheckFormalizeTime(nowDate.AddHours(6), nowDate.AddHours(6).AddMinutes(15)));
+			Assert.True(MainController.CheckFormalizeTime(nowDate.AddHours(6), nowDate.AddHours(6).AddMinutes(15).AddSeconds(1)));
 		}
 	}
 }
