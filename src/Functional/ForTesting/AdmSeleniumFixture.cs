@@ -7,10 +7,12 @@ namespace Functional.ForTesting
 	public class AdmSeleniumFixture : SeleniumFixture
 	{
 		public DataMother DataMother;
+		public string DataRoot;
 
 		[SetUp]
 		public void AdmSeleniumSetup()
 		{
+			DataRoot = "../../../AdminInterface/Data/";
 			DataMother = new DataMother(session);
 		}
 	}

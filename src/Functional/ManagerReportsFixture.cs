@@ -4,12 +4,8 @@ using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Functional.ForTesting;
-using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using Test.Support.Selenium;
-using Test.Support.Web;
-using WatiN.Core;
 
 namespace Functional
 {
@@ -59,13 +55,13 @@ namespace Functional
 		public void NoParsedWaybills()
 		{
 			var supplier = DataMother.CreateSupplier();
-			Save(supplier);
+			session.Save(supplier);
 			var client = DataMother.CreateClientAndUsers();
-			Save(client);
+			session.Save(client);
 			var documentLog = new DocumentReceiveLog(supplier);
 			documentLog.ForClient = client;
 			documentLog.LogTime = DateTime.Now;
-			Save(documentLog);
+			session.Save(documentLog);
 
 			Open("ManagerReports");
 			Click("Неразобранные накладные");
@@ -84,12 +80,12 @@ namespace Functional
 		public void NoParsedWaybillsReport()
 		{
 			var supplier = DataMother.CreateSupplier();
-			Save(supplier);
+			session.Save(supplier);
 			var client = DataMother.CreateClientAndUsers();
-			Save(client);
+			session.Save(client);
 			var documentLog = new DocumentReceiveLog(supplier);
 			documentLog.ForClient = client;
-			Save(documentLog);
+			session.Save(documentLog);
 
 			Open("ManagerReports");
 			Click("Отчет о состоянии неформализованных накладных по поставщикам");
@@ -137,7 +133,7 @@ namespace Functional
 			session.Save(address);
 			Open("ManagerReports");
 			Click("Сравнительный анализ работы аптек");
-			Css("#filter_Region_Id").SelectByValue(client.HomeRegion.Id.ToString());
+			Css("#filter_Regions").SelectByValue(client.HomeRegion.Id.ToString());
 			Click("Показать");
 			Click("Код");
 			Click("Код");

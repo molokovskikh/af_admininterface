@@ -1,4 +1,8 @@
-﻿${app.Asset("ManagerReport.css")}
+﻿${app.Asset("select2.js")}
+${app.Asset("Select2-locales/select2_locale_ru.js")}
+${app.Asset("select2.css")}
+
+${app.Asset("ManagerReport.css")}
 ${app.JS("ManagerReport.js")}
  <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
@@ -63,8 +67,23 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		</td>
 	</tr>
 	<tr>
-		<td ></td>
-		<td class="filter-label rigthText">Регион ${app.Edit("filter.Region")}</td>
+		<td class="filter-label rigthText">Автозаказ<br/>
+			${FormHelper.Select("filter.AutoOrder", filter.AutoOrder, AutoOrder, {
+					@firstoption: "Все",
+					@firstoptionvalue: "",
+					@text: "Item2",
+					@value: "Item1"})}
+		</td>
+		<td class="filter-label rigthText">Регион<br/>
+			${FormHelper.Select("filter.Regions", filter.Regions, AllRegions, {
+					@class: "select2",
+					@firstoption: "Все",
+					@firstoptionvalue: "",
+					@multiple: "true",
+					@size: "6",
+					@text: "Name",
+					@value: "Id"})}
+		</td>
 	</tr>
 	<tr>
 		<td colspan=3 class="rigthText">
