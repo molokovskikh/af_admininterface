@@ -117,20 +117,24 @@ namespace AdminInterface.Controllers
 		public void ExcelWhoWasNotUpdated()
 		{
 			var filter = new WhoWasNotUpdatedFilter();
+			filter.Session = DbSession;
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			this.RenderFile("Кто_не_обновлялся_с_опред._даты.xls", ExportModel.ExcelWhoWasNotUpdated(filter));
 		}
 
 		public void ExcelUpdatedAndDidNotDoOrders()
 		{
-			var filter = new UpdatedAndDidNotDoOrdersFilter();
+			var filter = new UpdatedAndDidNotDoOrdersFilter {
+				Session = DbSession
+			};
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
-			this.RenderFile("Кто_обновлялся_и_не_делал_заказы.xls", ExportModel.ExcelUpdatedAndDidNotDoOrders(filter));
+			this.RenderFile("Кто_обновлялся_и_не_делал_заказы.xls", filter.Excel());
 		}
 
 		public void ExcelAnalysisOfWorkDrugstores()
 		{
 			var filter = new AnalysisOfWorkDrugstoresFilter();
+			filter.Session = DbSession;
 			BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			this.RenderFile("Сравнительный_анализ_работы_аптек.xls", ExportModel.ExcelAnalysisOfWorkDrugstores(filter));
 		}
@@ -143,12 +147,13 @@ namespace AdminInterface.Controllers
 			this.RenderFile("Мониторинг_выставления_условий_клиенту.xls", ExportModel.GetClientConditionsMonitoring(filter));
 		}
 
-		public void WhoWasNotUpdated([DataBind("filter")] WhoWasNotUpdatedFilter filter)
+		public void WhoWasNotUpdated()
 		{
+			var filter = BindFilter<WhoWasNotUpdatedFilter, WhoWasNotUpdatedField>();
 			PropertyBag["filter"] = filter;
 			PropertyBag["AllRegions"] = Region.All();
 			if (Request.ObtainParamsNode(ParamStore.Params).GetChildNode("filter") != null)
-				PropertyBag["Clients"] = filter.SqlQuery2(DbSession);
+				PropertyBag["Clients"] = filter.Find();
 			else
 				PropertyBag["Clients"] = new List<WhoWasNotUpdatedField>();
 		}
@@ -180,8 +185,11 @@ namespace AdminInterface.Controllers
 		public void AnalysisOfWorkDrugstores()
 		{
 			var filter = BindFilter<AnalysisOfWorkDrugstoresFilter, BaseItemForTable>();
-			filter.SetDefaultRegion();
 			FindFilter(filter);
+			PropertyBag["AllRegions"] = Region.All();
+			PropertyBag["AutoOrder"] = BindingHelper.GetDescriptionsDictionary(typeof(AutoOrderStatus))
+				.Select(p => new Tuple<string, string>(p.Key.ToString(), p.Value))
+				.ToList();
 			foreach (var item in (IList)PropertyBag["Items"]) {
 				((AnalysisOfWorkFiled)item).ReportType = AnalysisReportType.Client;
 			}
@@ -194,7 +202,7 @@ namespace AdminInterface.Controllers
 			var filter = BindFilter<AnalysisOfWorkDrugstoresFilter, BaseItemForTable>();
 			PropertyBag["filter"] = filter;
 			var thisClient = DbSession.Get<Client>(clientId);
-			var html = string.Format("<tr class=\"toggled\" id=\"toggledRow{0}\"><td colspan=9><div class=\"userInfoDivTable\">", clientId);
+			var html = string.Format("<tr class=\"toggled\" id=\"toggledRow{0}\"><td colspan=11><div class=\"userInfoDivTable\">", clientId);
 			html += string.Format("<b>Клиент: {0} </b><br/>", thisClient.Name);
 			html += "<div>";
 			foreach (var user in thisClient.Users) {
@@ -202,6 +210,7 @@ namespace AdminInterface.Controllers
 				filter.Type = AnalysisReportType.User;
 				filter.RenderHead = false;
 				var result = filter.Find();
+				result.Cast<AnalysisOfWorkFiled>().Each(r => r.ReportType = AnalysisReportType.User);
 				PropertyBag["Items"] = result;
 				TextWriter writer = new StringWriter();
 				BaseMailer.ViewEngineManager.Process("ManagerReports/SimpleTable", writer, Context, this, ControllerContext);
@@ -216,7 +225,7 @@ namespace AdminInterface.Controllers
 					PropertyBag["Items"] = resultAddress;
 					TextWriter writerAddress = new StringWriter();
 					BaseMailer.ViewEngineManager.Process("ManagerReports/SimpleTable", writerAddress, Context, this, ControllerContext);
-					bool zeroOrderFlag = ((AnalysisOfWorkFiled)resultAddress.First()).CurWeekZak == 0;
+					bool zeroOrderFlag = ((AnalysisOfWorkFiled)resultAddress.First()).CurWeekSum == 0;
 					html += string.Format("<span class=\"{2}\"><b>{0}</b></span></br> {1} </br>", avaliableAddress.Name, writerAddress, zeroOrderFlag ? "adressNoOrder" : string.Empty);
 				}
 				html += "</div>";

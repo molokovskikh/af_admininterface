@@ -11,6 +11,7 @@ using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Linq;
+using Common.Tools;
 
 namespace AdminInterface.Queries
 {
@@ -25,7 +26,7 @@ namespace AdminInterface.Queries
 			{
 				if (ForExport)
 					return _id;
-				return AppHelper.LinkToNamed(_id, ReportType.GetDescription(), parameters: new { @params = new { _id } });
+				return AppHelper.LinkToNamed(_id, ReportType.GetDescription(), parameters: new { @params = new { Id = _id } });
 			}
 			set { _id = value; }
 		}
@@ -40,7 +41,7 @@ namespace AdminInterface.Queries
 			{
 				if (ForExport)
 					return _name;
-				return AppHelper.LinkToNamed(_name, ReportType.GetDescription(), parameters: new { @params = new { _id } });
+				return AppHelper.LinkToNamed(_name, ReportType.GetDescription(), parameters: new { @params = new { Id = _id } });
 			}
 			set { _name = value; }
 		}
@@ -57,7 +58,7 @@ namespace AdminInterface.Queries
 				if (!ForSubQuery)
 					return string.Format("<a href=\"javascript:\" id=\"{1}\" onclick=\"GetAnalysInfo({1}, this, 'User')\">{0}</a>", _userCount, _id);
 				else {
-					return string.Empty;
+					return "-";
 				}
 			}
 			set { _userCount = value; }
@@ -70,40 +71,76 @@ namespace AdminInterface.Queries
 		{
 			get
 			{
-				if (!ForSubQuery)
-					return _addressCount;
-				else
-					return string.Empty;
+				if (ForSubQuery)
+					return "-";
+				return _addressCount;
 			}
 			set { _addressCount = value; }
 		}
 
+		private string _regionName;
+
 		[Display(Name = "Регион", Order = 4)]
-		public string RegionName { get; set; }
-
-		public int CurWeekObn { get; set; }
-		public int LastWeekObn { get; set; }
-
-		[Display(Name = "Обновления (Старый/Новый)", Order = 5)]
-		public string Obn
-		{
-			get { return string.Format("{0}/{1}", LastWeekObn, CurWeekObn); }
+		public string RegionName {
+			get
+			{
+				if (ForSubQuery)
+					return "-";
+				return _regionName;
+			}
+			set { _regionName = value; }
 		}
 
-		public int CurWeekZak { get; set; }
-		public int LastWeekZak { get; set; }
+		public int CurWeekUpdates { get; set; }
+		public int LastWeekUpdates { get; set; }
+
+		[Display(Name = "Обновления (Старый/Новый)", Order = 5)]
+		public string Updates
+		{
+			get { return string.Format("{0}/{1}", LastWeekUpdates, CurWeekUpdates); }
+		}
+
+		public int CurWeekSum { get; set; }
+		public int LastWeekSum { get; set; }
 
 		[Display(Name = "Заказы (Старый/Новый)", Order = 7)]
-		public string Zak
+		public string Orders
 		{
-			get { return string.Format("{0}/{1}", LastWeekZak.ToString("C"), CurWeekZak.ToString("C")); }
+			get { return string.Format("{0}/{1}", LastWeekSum.ToString("C"), CurWeekSum.ToString("C")); }
 		}
 
 		[Display(Name = "Падение обновлений %", Order = 6)]
-		public decimal ProblemObn { get; set; }
+		public decimal ProblemUpdates { get; set; }
 
 		[Display(Name = "Падение заказов %", Order = 8)]
-		public decimal ProblemZak { get; set; }
+		public decimal ProblemOrders { get; set; }
+
+		public int CurWeekAddresses { get; set; }
+		public int LastWeekAddresses { get; set; }
+
+		[Display(Name = "Адреса (Старый/Новый)", Order = 9)]
+		public string Addresses
+		{
+			get
+			{
+				if (ForSubQuery)
+					return "-";
+				return string.Format("{0}/{1}", LastWeekAddresses, CurWeekAddresses);
+			}
+		}
+
+		public AutoOrderStatus AutoOrderIs { get; set; }
+
+		[Display(Name = "Автозаказ", Order = 10)]
+		public string AutoOrder
+		{
+			get
+			{
+				if (ForSubQuery)
+					return "-";
+				return AutoOrderIs.GetDescription();
+			}
+		}
 
 		public bool ForSubQuery;
 		public AnalysisReportType ReportType;
@@ -117,15 +154,23 @@ namespace AdminInterface.Queries
 		[Description("Addresses")] Address
 	}
 
+	public enum AutoOrderStatus
+	{
+		[Description("Не настроен")] NotTuned,
+		[Description("Не используют")] NotUsed,
+		[Description("Используют")] Used
+	}
+
 	public class AnalysisOfWorkDrugstoresFilter : PaginableSortable, IFiltrable<BaseItemForTable>
 	{
-		public Region Region { get; set; }
+		public ulong[] Regions { get; set; }
 		public DatePeriod FistPeriod { get; set; }
 		public DatePeriod LastPeriod { get; set; }
 		public uint ObjectId { get; set; }
 		public AnalysisReportType Type { get; set; }
 		public bool ForSubQuery { get; set; }
 
+		public int? AutoOrder { get; set; }
 
 		public IList<BaseItemForTable> Find()
 		{
@@ -138,49 +183,59 @@ namespace AdminInterface.Queries
 		public string ClientTypeSqlPart = @"
 
 DROP TEMPORARY TABLE IF EXISTS orders.OrdersSumFirst;
-
-CREATE TEMPORARY TABLE orders.OrdersSumFirst (
-ClientId INT unsigned,
-ClientSum decimal(14,2)) engine=MEMORY;
-
-insert into orders.OrdersSumFirst
+CREATE TEMPORARY TABLE orders.OrdersSumFirst (INDEX idx(ClientId) USING HASH) engine MEMORY
 SELECT
-	oh1.clientcode,
-	ROUND(sum(cost*quantity),2)
-FROM
-	orders.ordershead oh1,
-	orders.orderslist ol1
+	oh1.clientcode as ClientId,
+	ROUND(sum(cost*quantity),2) as ClientSum,
+	COUNT(distinct oh1.AddressId) as AddressCnt
+FROM orders.ordershead oh1
+join orders.orderslist ol1 on ol1.orderid = oh1.rowid
 WHERE
 	writetime BETWEEN :FistPeriodStart AND :FistPeriodEnd
-	AND ol1.orderid = oh1.rowid
-	AND oh1.RegionCode = :regionCode
+	AND oh1.RegionCode & :regionCode > 0
  group by oh1.clientcode;
-
 
 DROP TEMPORARY TABLE IF EXISTS orders.OrdersSumLast;
-
-CREATE TEMPORARY TABLE orders.OrdersSumLast (
-ClientId INT unsigned,
-ClientSum decimal(14,2)) engine=MEMORY;
-
-insert into orders.OrdersSumLast
+CREATE TEMPORARY TABLE orders.OrdersSumLast (INDEX idx(ClientId) USING HASH) engine MEMORY
 SELECT
-	oh1.clientcode,
-	ROUND(sum(cost*quantity),2)
-FROM
-	orders.ordershead oh1,
-	orders.orderslist ol1
+	oh1.clientcode as ClientId,
+	ROUND(sum(cost*quantity),2) as ClientSum,
+	COUNT(distinct oh1.AddressId) as AddressCnt
+FROM orders.ordershead oh1
+join orders.orderslist ol1 on ol1.orderid = oh1.rowid
 WHERE
 	writetime BETWEEN :LastPeriodStart AND :LastPeriodEnd
-	AND ol1.orderid = oh1.rowid
-	AND oh1.RegionCode = :regionCode
+	AND oh1.RegionCode & :regionCode > 0
  group by oh1.clientcode;
 
+DROP TEMPORARY TABLE IF EXISTS orders.AutoOrderCntFirst;
+CREATE TEMPORARY TABLE orders.AutoOrderCntFirst (INDEX idx(ClientId) USING HASH) engine MEMORY
+SELECT u.ClientId, COUNT(u.id) as AutoOrderCnt
+	FROM logs.analitfupdates au,
+	customers.users u
+	WHERE au.requesttime BETWEEN :FistPeriodStart AND :FistPeriodEnd
+	AND au.userid = u.id
+	AND au.COMMIT = 1
+	AND au.updatetype IN (10)
+group by u.ClientId;
+
+DROP TEMPORARY TABLE IF EXISTS orders.AutoOrderCntNetFirst;
+CREATE TEMPORARY TABLE orders.AutoOrderCntNetFirst (INDEX idx(ClientId) USING HASH) engine MEMORY
+SELECT u.ClientId, COUNT(u.id) as AutoOrderCntNet
+	FROM logs.RequestLogs au,
+	customers.users u
+WHERE au.CreatedOn BETWEEN :FistPeriodStart AND :FistPeriodEnd
+	AND au.UserId = u.id
+	AND au.IsCompleted = 1
+	AND (au.UpdateType = 'BatchController' or au.UpdateType = 'SmartOrder')
+group by u.ClientId;
 
 insert into Customers.Updates
 SELECT cd.id,
 cd.name,
 reg.Region as RegionName,
+count(distinct u.Id) as UserCount,
+count(distinct a.Id) as AddressCount,
 (SELECT COUNT(o.id)
 	FROM logs.analitfupdates au1,
 	customers.users O
@@ -189,7 +244,7 @@ reg.Region as RegionName,
 	AND o.clientid=cd.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) as CurWeekObn,
+) as CurWeekUpdates,
 (SELECT COUNT(au2.Updateid)
 	FROM logs.analitfupdates au2,
 	customers.users O
@@ -198,97 +253,103 @@ reg.Region as RegionName,
 	AND o.clientid = cd.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) LastWeekObn,
-osf.ClientSum as CurWeekZak,
-osl.ClientSum as LastWeekZak
+) LastWeekUpdates,
+osf.ClientSum as CurWeekSum,
+osl.ClientSum as LastWeekSum,
+osf.AddressCnt as CurWeekAddresses,
+osl.AddressCnt as LastWeekAddresses,
+IFNULL(sr.AssortimentPriceCode,4662) <> 4662 as AutoOrderIs,
+aof.AutoOrderCnt,
+aofNet.AutoOrderCntNet
 
 FROM customers.Clients Cd
+	join usersettings.RetClientsSet Rcs on rcs.clientcode = cd.id
+	join farm.Regions reg on reg.RegionCode = Cd.regioncode
 	left join orders.OrdersSumFirst osf on osf.ClientId = cd.Id
 	left join orders.OrdersSumLast osl on osl.ClientId = cd.Id
-	left join usersettings.RetClientsSet Rcs on rcs.clientcode = cd.id
-	left join farm.Regions reg on reg.RegionCode = Cd.regioncode
+	left join orders.AutoOrderCntFirst aof on aof.ClientId = cd.Id
+	left join orders.AutoOrderCntNetFirst aofNet on aofNet.ClientId = cd.Id
+	left join ordersendrules.smart_order_rules sr on sr.Id = rcs.SmartOrderRuleId
+	left join Customers.Users u on u.ClientId = cd.id
+	left join Customers.Addresses a on a.ClientId = cd.id
 WHERE
 	cd.regioncode & :regionCode > 0
 	{0}
 	And cd.Status = 1
 	AND rcs.serviceclient = 0
-	AND rcs.invisibleonfirm = 0;";
+	AND rcs.invisibleonfirm = 0
+group by cd.id;";
 
-		public string UserTypeSqlPart = @"insert into Customers.Updates
+		public string UserTypeSqlPart = @"insert into Customers.Updates (Id, Name, CurWeekUpdates, LastWeekUpdates, CurWeekSum, LastWeekSum)
 SELECT u.id,
 u.name,
-reg.Region as RegionName,
 (SELECT COUNT(au1.Updateid)
 	FROM logs.analitfupdates au1
 	WHERE au1.requesttime BETWEEN :FistPeriodStart AND :FistPeriodEnd
 	AND au1.userid = u.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) as CurWeekObn,
+) as CurWeekUpdates,
 (SELECT COUNT(au2.Updateid)
 	FROM logs.analitfupdates au2
 	WHERE requesttime BETWEEN :LastPeriodStart AND :LastPeriodEnd
 	AND au2.userid = u.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) LastWeekObn,
+) LastWeekUpdates,
 (SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh1,
 	orders.orderslist ol1
 	WHERE writetime BETWEEN :FistPeriodStart AND :FistPeriodEnd
 	AND ol1.orderid = oh1.rowid
 	AND oh1.UserId = u.id
-	AND oh1.RegionCode = :regionCode
-) CurWeekZak,
+	AND oh1.RegionCode & :regionCode > 0
+) CurWeekSum,
 (SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh2,
 	orders.orderslist ol2
 	WHERE writetime BETWEEN :LastPeriodStart AND :LastPeriodEnd
 	AND ol2.orderid = oh2.rowid
 	AND oh2.UserId = u.id
-	AND oh2.RegionCode = :regionCode
-) LastWeekZak
+	AND oh2.RegionCode & :regionCode > 0
+) LastWeekSum
 FROM customers.Users u
-join farm.Regions reg on (reg.RegionCode & :regionCode) > 0
 WHERE
 u.WorkRegionMask & :regionCode > 0
 {0}
 ;";
 
-		public string AddressTypeSqlPart = @"insert into Customers.Updates (Id, Name, RegionName, CurWeekObn, LastWeekObn)
+		public string AddressTypeSqlPart = @"insert into Customers.Updates (Id, Name, CurWeekUpdates, LastWeekUpdates)
 SELECT a.Id,
 a.Address as Name,
-reg.Region as RegionName,
 (SELECT COUNT(au1.Updateid)
 	FROM logs.analitfupdates au1
 	WHERE au1.requesttime BETWEEN :FistPeriodStart AND :FistPeriodEnd
 	AND au1.userid = u.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) as CurWeekObn,
+) as CurWeekUpdates,
 (SELECT COUNT(au2.Updateid)
 	FROM logs.analitfupdates au2
 	WHERE requesttime BETWEEN :LastPeriodStart AND :LastPeriodEnd
 	AND au2.userid = u.id
 	AND COMMIT = 1
 	AND updatetype IN (1, 2)
-) LastWeekObn
+) LastWeekUpdates
 FROM customers.Addresses a
 join customers.UserAddresses ua on ua.AddressId = a.Id
 join customers.Users u on u.Id = ua.UserId and (u.WorkRegionMask & :regionCode) > 0
-left join farm.Regions reg on (reg.RegionCode & u.WorkRegionMask) > 0
 WHERE
 u.WorkRegionMask & :regionCode > 0
 {0}
-group by a.id
-;
+group by a.id;
 
 DROP TEMPORARY TABLE IF EXISTS Customers.AddressesUpdates;
 
 CREATE TEMPORARY TABLE Customers.AddressesUpdates (
 Id INT unsigned,
-CurWeekZak INT,
-LastWeekZak INT) engine=MEMORY;
+CurWeekSum INT,
+LastWeekSum INT) engine=MEMORY;
 
 insert into Customers.AddressesUpdates
 SELECT a.id,
@@ -298,16 +359,16 @@ SELECT a.id,
 	WHERE writetime BETWEEN :FistPeriodStart AND :FistPeriodEnd
 	AND ol1.orderid = oh1.rowid
 	AND oh1.AddressId = a.id
-	AND oh1.RegionCode = :regionCode
-) CurWeekZak,
+	AND oh1.RegionCode & :regionCode > 0
+) CurWeekSum,
 (SELECT ROUND(sum(cost*quantity), 2)
 	FROM orders.ordershead oh2,
 	orders.orderslist ol2
 	WHERE writetime BETWEEN :LastPeriodStart AND :LastPeriodEnd
 	AND ol2.orderid = oh2.rowid
 	AND oh2.AddressId = a.id
-	AND oh2.RegionCode = :regionCode
-) LastWeekZak
+	AND oh2.RegionCode & :regionCode > 0
+) LastWeekSum
 FROM customers.Addresses a
 WHERE
 1=1
@@ -315,8 +376,8 @@ WHERE
 
 update Customers.Updates u, Customers.AddressesUpdates au
 set
-u.CurWeekZak = au.CurWeekZak,
-u.LastWeekZak = au.LastWeekZak
+u.CurWeekSum = au.CurWeekSum,
+u.LastWeekSum = au.LastWeekSum
 where u.id = au.Id;
 ";
 
@@ -333,9 +394,15 @@ where u.id = au.Id;
 				{ "Name", "Name" },
 				{ "UserCount", "UserCount" },
 				{ "AddressCount", "AddressCount" },
-				{ "ProblemObn", "ProblemObn" },
-				{ "ProblemZak", "ProblemZak" },
+				{ "ProblemUpdates", "ProblemUpdates" },
+				{ "ProblemOrders", "ProblemOrders" },
+				{ "Updates", "CurWeekUpdates" },
+				{ "Orders", "CurWeekSum" },
+				{ "RegionName", "RegionName" },
+				{ "AutoOrder", "AutoOrderIs" },
+				{ "Addresses", "CurWeekAddresses" },
 			};
+			Regions = new ulong[]{ 1 };
 		}
 
 		public AnalysisOfWorkDrugstoresFilter(int pageSize) : this()
@@ -343,18 +410,24 @@ where u.id = au.Id;
 			PageSize = pageSize;
 		}
 
-		public void SetDefaultRegion()
+		public string GetRegionNames()
 		{
-			if (Region == null)
-				Region = Session.Query<Region>().First(r => r.Name == "Воронеж");
+			var result = "";
+			if (Regions != null && Regions.Any())
+				result = Session.Query<Region>().Where(x => Regions.Contains(x.Id)).Select(x => x.Name).OrderBy(x => x).ToList().Implode();
+			return result;
 		}
 
 		public void PrepareAggregatesData()
 		{
 			var regionMask = SecurityContext.Administrator.RegionMask;
-
-			if (Region != null)
-				regionMask &= Region.Id;
+			if (Regions != null && Regions.Any())
+			{
+				ulong mask = 0;
+				foreach (var region in Regions)
+					mask |= region;
+				regionMask &= mask;
+			}
 
 			string createTemporaryTablePart =
 				@"DROP TEMPORARY TABLE IF EXISTS Customers.Updates;
@@ -362,11 +435,19 @@ where u.id = au.Id;
 CREATE TEMPORARY TABLE Customers.Updates (
 Id INT unsigned,
 Name varchar(50) ,
-RegionName varchar(50) ,
-CurWeekObn INT,
-LastWeekObn INT,
-CurWeekZak INT,
-LastWeekZak INT) engine=MEMORY;";
+RegionName varchar(50),
+UserCount INT,
+AddressCount INT,
+CurWeekUpdates INT,
+LastWeekUpdates INT,
+CurWeekSum INT,
+LastWeekSum INT,
+CurWeekAddresses INT,
+LastWeekAddresses INT,
+AutoOrderIs int not null default 0,
+AutoOrderCnt int,
+AutoOrderCntNet int
+) engine=MEMORY;";
 
 			var currentQuery = string.Empty;
 
@@ -419,31 +500,33 @@ LastWeekZak INT) engine=MEMORY;";
 
 			RowsCount = Convert.ToInt32(Session.CreateSQLQuery("select count(*) from Customers.updates;").UniqueResult());
 
-			var limitPart = string.Empty;
+			Session.CreateSQLQuery(@"update Customers.updates set AutoOrderIs = 2
+where AutoOrderIs = 1 and (AutoOrderCnt > 0 or AutoOrderCntNet > 0);").ExecuteUpdate();
 
+			var limitPart = string.Empty;
 			if (!forExport)
-				limitPart = string.Format("limit {0}, {1}", CurrentPage * PageSize, PageSize);
+				limitPart = $"limit {CurrentPage * PageSize}, {PageSize}";
+
+			var where = "";
+			if (Type == AnalysisReportType.Client && AutoOrder.HasValue)
+					where = $"where up.AutoOrderIs = {AutoOrder.Value}";
 
 			var result = Session.CreateSQLQuery(string.Format(@"
 SELECT
-	Id,
-	Name,
-	RegionName,
-	(select count(u.Id) from Customers.Users u where u.ClientId = up.Id) as UserCount,
-	(select count(a.Id) from Customers.Addresses a where a.ClientId = up.Id) as AddressCount,
-	CurWeekObn,
-	LastWeekObn,
-	IF (CurWeekObn - LastWeekObn < 0 , ( IF (CurWeekObn <> 0, ROUND((LastWeekObn-CurWeekObn)*100/LastWeekObn), 100) ) ,0) ProblemObn,
-	CurWeekZak,
-	LastWeekZak,
-	IF (CurWeekZak - LastWeekZak < 0 , ( IF (CurWeekZak <> 0, ROUND((LastWeekZak-CurWeekZak)*100/LastWeekZak), 100 ) ) ,0) ProblemZak
+	up.Id, up.Name, up.RegionName, up.UserCount, up.AddressCount,
+	up.CurWeekUpdates, up.LastWeekUpdates,
+	IF (LastWeekUpdates > CurWeekUpdates, ROUND((LastWeekUpdates-CurWeekUpdates)*100/LastWeekUpdates), 0) ProblemUpdates,
+	up.CurWeekSum, up.LastWeekSum,
+	IF (LastWeekSum > CurWeekSum, ROUND((LastWeekSum-CurWeekSum)*100/LastWeekSum), 0) ProblemOrders,
+	up.CurWeekAddresses, up.LastWeekAddresses, up.AutoOrderIs
 FROM Customers.updates up
-ORDER BY {0} {1} {2}", SortBy, SortDirection, limitPart))
+{0}
+group by up.Id
+ORDER BY {1} {2} {3}", where, GetSortProperty(), SortDirection, limitPart))
 				.ToList<AnalysisOfWorkFiled>();
 
-			foreach (var analysisOfWorkFiled in result) {
+			foreach (var analysisOfWorkFiled in result)
 				analysisOfWorkFiled.ForSubQuery = ForSubQuery;
-			}
 
 			return result.Cast<BaseItemForTable>().ToList();
 		}

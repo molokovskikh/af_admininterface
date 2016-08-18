@@ -65,6 +65,7 @@ namespace Integration.Controllers
 		public void ExportWhoWasNotUpdatedFilterTest()
 		{
 			var filter = new WhoWasNotUpdatedFilter();
+			filter.Session = session;
 			var buf = ExportModel.ExcelWhoWasNotUpdated(filter);
 			var stream = new MemoryStream(buf);
 			var wb = Workbook.Load(stream);
@@ -75,9 +76,10 @@ namespace Integration.Controllers
 		[Test]
 		public void ExportUpdatedAndDidNotDoOrdersFilterTest()
 		{
-			var filter = new UpdatedAndDidNotDoOrdersFilter();
-			var buf = ExportModel.ExcelUpdatedAndDidNotDoOrders(filter);
-			var stream = new MemoryStream(buf);
+			var filter = new UpdatedAndDidNotDoOrdersFilter {
+				Session = session
+			};
+			var stream = new MemoryStream(filter.Excel());
 			var wb = Workbook.Load(stream);
 			var ws = wb.Worksheets.First();
 			Assert.That(ws.Name, Is.StringContaining("Кто обновлялся и не делал заказы"));
@@ -87,6 +89,7 @@ namespace Integration.Controllers
 		public void ExportAnalysisOfWorkDrugstoresTest()
 		{
 			var filter = new AnalysisOfWorkDrugstoresFilter();
+			filter.Session = session;
 			var buf = ExportModel.ExcelAnalysisOfWorkDrugstores(filter);
 			var stream = new MemoryStream(buf);
 			var wb = Workbook.Load(stream);
