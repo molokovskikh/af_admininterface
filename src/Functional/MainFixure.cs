@@ -119,10 +119,8 @@ namespace Functional
 
 			Open();
 			Css("#updates-monitoring").Click();
-			WaitHelper.WaitOrFail(10.Second(), () => GlobalDriver.WindowHandles.Count > 1, "Не удалось дождаться окна");
+			OpenedWindow("Обновляющиеся клиенты");
 
-			var handle = GlobalDriver.WindowHandles.First(x => x != GlobalDriver.CurrentWindowHandle);
-			GlobalDriver.SwitchTo().Window(handle);
 			AssertText("Обновляющиеся клиенты");
 			AssertText("FileHandler");
 		}

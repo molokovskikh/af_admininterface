@@ -218,9 +218,9 @@ namespace Functional.Drugstore
 			browser.Button(Find.ById("RegisterButton")).Click();
 			var client = GetRegistredClient();
 
-			Assert.That(client.GetIntersectionCount(), Is.GreaterThan(0));
+			Assert.That(client.GetIntersectionCount(session), Is.GreaterThan(0));
 			Assert.That(client.Users.Count, Is.GreaterThan(0));
-			Assert.That(client.Users[0].GetUserPriceCount(), Is.GreaterThan(0));
+			Assert.That(client.Users[0].GetUserPriceCount(session), Is.GreaterThan(0));
 		}
 
 		[Test]

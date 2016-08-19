@@ -1,10 +1,6 @@
 ﻿using System.Linq;
 using AdminInterface.Models;
-using Castle.ActiveRecord;
-using Common.Web.Ui.ActiveRecordExtentions;
-using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
-using NHibernate;
 using NUnit.Framework;
 
 namespace Integration.Models
@@ -32,12 +28,7 @@ where UserId = :id")
 				.List();
 
 			Assert.That(prices, Is.Not.Empty);
-			session.CreateSQLQuery(@"
-delete from Customers.UserPrices
-where UserId = :userId and priceId = :priceId")
-				.SetParameter("userId", parent.Id)
-				.SetParameter("priceId", prices.Cast<uint>().First())
-				.ExecuteUpdate();
+			parent.DisablePrice(session, prices.Cast<uint>().First());
 
 			child.InheritPricesFrom = parent;
 			session.SaveOrUpdate(parent);

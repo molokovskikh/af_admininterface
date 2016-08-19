@@ -62,13 +62,6 @@ namespace Functional.Drugstore
 			AssertText("тестовый адрес");
 		}
 
-		private void OpenedWindow(string text)
-		{
-			Assert.That(browser.WindowHandles.Count, Is.GreaterThan(1));
-			browser.SwitchTo().Window(browser.WindowHandles.Last());
-			WaitForText(text);
-		}
-
 		[Test]
 		public void Resend_document()
 		{
@@ -128,7 +121,7 @@ namespace Functional.Drugstore
 			WaitAjax();
 			Click("123");
 			WaitForText("Сопоставлен с");
-			AssertText("Сопоставлен с \"testCatalog\"");
+			AssertText("Сопоставлен с \"testCatName testForm\"");
 			AssertText("По производителю с \"testProducer\"");
 		}
 
