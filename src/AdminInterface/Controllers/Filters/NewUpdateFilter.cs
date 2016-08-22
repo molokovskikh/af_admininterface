@@ -50,22 +50,18 @@ namespace AdminInterface.Controllers.Filters
 					.Where(x => x.CreatedOn > BeginDate && x.CreatedOn < EndDate.AddDays(1))
 					.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
 
-			if (User != null)
-			{
+			if (User != null) {
 				logQuery = logQuery.Where(i => i.User == User);
 				requestQuery = requestQuery.Where(i => i.User == User);
 			}
-			else if (Client != null)
-			{
+			else if (Client != null) {
 				logQuery = logQuery.Where(i => i.User.Client == Client);
 				requestQuery = requestQuery.Where(i => i.User.Client == Client);
 			}
-			if (ErrorType == 1)
-			{
+			if (ErrorType == 1) {
 				requestQuery = session.Query<RequestLog>().Where(i => i.ErrorType == 1);
 			}
-			else if (ErrorType == 0)
-			{
+			else if (ErrorType == 0) {
 				requestQuery = session.Query<RequestLog>()
 					.Where(i => i.IsCompleted && !i.IsFaulted && i.UpdateType == "MainController" && i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
 					.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));

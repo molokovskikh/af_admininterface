@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Common.Web.Ui.NHibernateExtentions;
 using Functional.ForTesting;
-using NHibernate;
 using NUnit.Framework;
 
 namespace Functional
@@ -13,35 +12,50 @@ namespace Functional
 	[TestFixture]
 	public class NewUpdateLogFixture : AdmSeleniumFixture
 	{
-		[Test]
-		public void  TrySortStatisticAnalitFNet()
-		{
-			var client = DataMother.CreateTestClientWithUser();
-			IEnumerable<RequestLog> updateLog = new List<RequestLog>();
+		private Client client;
+		private IEnumerable<RequestLog> updateLog = new List<RequestLog>();
 
-			for (int i = 0; i < 2; i++) {
-				updateLog = updateLog.Concat(new[] { new RequestLog(client.Users.First())
-					{
-						CreatedOn = DateTime.Now.AddDays(-i*2),
+		[SetUp]
+		public void Setup()
+		{
+			client = DataMother.CreateTestClientWithUser();
+			for (int i = 0; i < 4; i++) {
+				updateLog = updateLog.Concat(new[] { new RequestLog(client.Users.First()) {
+						CreatedOn = DateTime.Now.AddHours(-i*2),
 						Version = "1.11",
 						IsCompleted = true,
 						UpdateType = "MainController",
-						ErrorType = 0
+						ErrorType = (i % 2 == 0) ?  0 : 1
 					}
 				});
 			}
 
 			session.SaveEach(updateLog);
+			CommitAndContinue();
+		}
 
-			Open(String.Format(
-				"Logs/NewUpdateLog?filter.BeginDate={0}&filter.EndDate={1}&filter.ErrorType=0",
-				DateTime.Now.AddDays(-2),
-				DateTime.Now
-				));
+		[Test]
+		public void  TrySortStatisticAnalitFNet()
+		{
+			Open("Logs/NewUpdateLog?filter.ErrorType=0");
 			AssertText("История обновлений AnalitF.net");
 
+			TrySortDate();
+		}
+
+		[Test]
+		public void TrySortAnalitFNetClient()
+		{
+			Open(client);
+			Click("История обновлений Analitf-net");
+			OpenedWindow(String.Format("История обновлений AnalitF.net клиента {0}", client.Name));
+
+			TrySortDate();
+		}
+
+		private void TrySortDate()
+		{
 			var dates = browser.FindElementsByCssSelector("td[class='NotCommitedUpdate']");
-			Assert.That(updateLog.First().CreatedOn.ToString(), Is.EqualTo(dates.First().Text));
 			Assert.That(dates.First().Text, Is.GreaterThanOrEqualTo(dates.ElementAt(1).Text));
 
 			Click("Дата");

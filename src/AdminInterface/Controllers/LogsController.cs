@@ -229,6 +229,10 @@ join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId =
 		public void UpdateLog(UpdateType? updateType, ulong? regionMask, uint? clientCode, uint? userId,
 			DateTime beginDate, DateTime endDate)
 		{
+			SetSmartBinder(AutoLoadBehavior.NullIfInvalidKey);
+			//по умолчанию биндер будет пытаться проверить наши обекты, в данном контексте делать этого не следует
+			Binder.Validator = null;
+
 			var filter = new UpdateFilter();
 			filter.BeginDate = beginDate;
 			filter.EndDate = endDate;

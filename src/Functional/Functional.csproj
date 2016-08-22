@@ -157,6 +157,7 @@
     <Compile Include="UpdateLogFixture.cs" />
     <Compile Include="Drugstore\UserFixture.cs" />
     <Compile Include="Drugstore\UserSearchFixture.cs" />
+    <Compile Include="UpdateLogSorting.cs" />
     <Compile Include="UserFixture.cs" />
     <Compile Include="UserSeleniumFixture.cs" />
   </ItemGroup>
