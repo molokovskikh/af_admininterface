@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Common.Web.Ui.NHibernateExtentions;
@@ -21,7 +22,7 @@ namespace Functional
 			client = DataMother.CreateTestClientWithUser();
 			for (int i = 0; i < 4; i++) {
 				updateLog = updateLog.Concat(new[] { new RequestLog(client.Users.First()) {
-						CreatedOn = DateTime.Now.AddHours(-i*2),
+						CreatedOn = DateTime.Now.AddSeconds(-i*2),
 						Version = "1.11",
 						IsCompleted = true,
 						UpdateType = "MainController",
@@ -37,30 +38,41 @@ namespace Functional
 		[Test]
 		public void  TrySortStatisticAnalitFNet()
 		{
-			Open("Logs/NewUpdateLog?filter.ErrorType=0");
-			AssertText("История обновлений AnalitF.net");
+			var filter = new NewUpdateFilter();
 
-			TrySortDate();
+			filter.ErrorType = 0;
+			TrySortDate(filter);
 		}
 
 		[Test]
-		public void TrySortAnalitFNetClient()
+		public void TrySortAnalitFNetClientAndUser()
 		{
-			Open(client);
-			Click("История обновлений Analitf-net");
-			OpenedWindow(String.Format("История обновлений AnalitF.net клиента {0}", client.Name));
+			var filter = new NewUpdateFilter();
 
-			TrySortDate();
+			filter.Client = client;
+			TrySortDate(filter);
+
+			filter.User = client.Users.First();
+			TrySortDate(filter);
 		}
 
-		private void TrySortDate()
+		private void TrySortDate(NewUpdateFilter filter, bool sum = false)
 		{
-			var dates = browser.FindElementsByCssSelector("td[class='NotCommitedUpdate']");
-			Assert.That(dates.First().Text, Is.GreaterThanOrEqualTo(dates.ElementAt(1).Text));
-
-			Click("Дата");
-			dates = browser.FindElementsByCssSelector("td[class='NotCommitedUpdate']");
-			Assert.That(dates.First().Text, Is.LessThanOrEqualTo(dates.ElementAt(1).Text));
+			var logs = filter.Find(session);
+			var count = logs.Count - 1;
+			if (filter.SortDirection == "Desc") {
+				for (int i = 0; i < count; i++) {
+					Assert.That(logs[i].CreatedOn, Is.GreaterThanOrEqualTo(logs[i++].CreatedOn));
+				}
+			} else {
+				for (int i = 0; i < count; i++) {
+					Assert.That(logs[i].CreatedOn, Is.LessThanOrEqualTo(logs[i++].CreatedOn));
+				}
+			}
+			if (!sum) {
+				filter.SortDirection = filter.SortDirection == "Desc" ? "Asc" : "Desc";
+				TrySortDate(filter, true);
+			}
 		}
 	}
 }
