@@ -18,8 +18,6 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using System.Linq;
 using System.Threading;
-using Castle.Core.Internal;
-using Microsoft.Ajax.Utilities;
 
 namespace AdminInterface.Controllers
 {
@@ -56,29 +54,12 @@ namespace AdminInterface.Controllers
 			foreach (var pair in data.ToKeyValuePairs()) {
 				var column = pair.Key;
 				var value = pair.Value;
-				if (column.ToString() != "LastDown" && column.ToString() != "LastForm") {
-					value = TryToFixBrokenDateTimeValue(value);
-					if (value != DBNull.Value && column.DataType == typeof(DateTime)) {
-						var dateTimeValue = (DateTime)value;
-						value = dateTimeValue.ToLongTimeString();
-					}
+				value = TryToFixBrokenDateTimeValue(value);
+				if (value != DBNull.Value && column.DataType == typeof(DateTime)) {
+					var dateTimeValue = (DateTime)value;
+					value = dateTimeValue.ToLongTimeString();
 				}
 				PropertyBag[column.ColumnName] = value;
-			}
-
-			PropertyBag["WarningUpdateTime"] = false;
-			if (!PropertyBag["LastForm"].ToString().IsNullOrEmpty() && !PropertyBag["LastDown"].ToString().IsNullOrEmpty()) {
-				var lastForm = DateTime.Parse(PropertyBag["LastForm"].ToString());
-				var lastDown = DateTime.Parse(PropertyBag["LastDown"].ToString());
-				var updTime = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day).Add((lastForm - lastDown));
-				var processTimeRange = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day, 0, 15, 0);
-				var startTimeControl = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day, 5, 0, 0);
-				if ((lastDown > startTimeControl) && (updTime > processTimeRange))
-					PropertyBag["WarningUpdateTime"] = true;
-				if (lastForm.ToLongDateString() == DateTime.Today.ToLongDateString()) {
-					PropertyBag["LastDown"] = lastDown.ToLongTimeString();
-					PropertyBag["LastForm"] = lastForm.ToLongTimeString();
-				}
 			}
 
 			Size("MaxMailSize");
