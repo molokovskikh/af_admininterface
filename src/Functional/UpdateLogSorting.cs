@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Common.Web.Ui.NHibernateExtentions;
@@ -35,16 +36,30 @@ namespace Functional
 			session.SaveEach(updateLog);
 			CommitAndContinue();
 
-			Open(client);
-			Click("История обновлений");
-			OpenedWindow(String.Format("История обновлений клиента {0}", client.Name));
+			var filter = new UpdateFilter();
 
-			var dates = browser.FindElementsByCssSelector("td[class='NotCommitedUpdate']");
-			Assert.That(dates.First().Text, Is.GreaterThanOrEqualTo(dates.ElementAt(1).Text));
+			filter.Client = client;
+			TrySortDate(filter);
+		}
 
-			Click("Дата");
-			dates = browser.FindElementsByCssSelector("td[class='NotCommitedUpdate']");
-			Assert.That(dates.First().Text, Is.LessThanOrEqualTo(dates.ElementAt(1).Text));
+		private void TrySortDate(UpdateFilter filter, bool sum = false)
+		{
+			filter.BeginDate = DateTime.Now.Date.AddDays(-4);
+			var logs = filter.Find(session);
+			var count = logs.Count - 1;
+			if (filter.SortDirection == "Desc") {
+				for (int i = 0; i < count; i++) {
+					Assert.That(logs[i].RequestTime, Is.GreaterThanOrEqualTo(logs[i++].RequestTime));
+				}
+			} else {
+				for (int i = 0; i < count; i++) {
+					Assert.That(logs[i].RequestTime, Is.LessThanOrEqualTo(logs[i++].RequestTime));
+				}
+			}
+			if (!sum) {
+				filter.SortDirection = filter.SortDirection == "Desc" ? "Asc" : "Desc";
+				TrySortDate(filter, true);
+			}
 		}
 	}
 }
