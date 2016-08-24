@@ -36,6 +36,7 @@ namespace Integration
 			session.Save(client);
 			user = client.Users.First();
 			user.UserUpdateInfo.UpdateDate = DateTime.Now.AddDays(-2);
+			user.AssignDefaultPermission(session);
 			filter = new UpdatedAndDidNotDoOrdersFilter {
 				Session = session
 			};
@@ -61,7 +62,6 @@ namespace Integration
 		[Test]
 		public void Find_test_if_correct_condition()
 		{
-			user.AssignDefaultPermission(session);
 			var address = new Address(client) { Value = "123" };
 			session.Save(address);
 			user.AvaliableAddresses.Add(address);
@@ -78,9 +78,24 @@ namespace Integration
 		}
 
 		[Test]
+		public void Disabled_suppliers()
+		{
+			var supplier = DataMother.CreateSupplier(x => x.Name = Guid.NewGuid().ToString());
+			session.Save(supplier);
+			Maintainer.MaintainIntersection(supplier, session);
+			user.DisablePrice(session, supplier.Prices[0].Id);
+
+			var result = filter.Find(true);
+			Assert.That(result.Count, Is.GreaterThan(0));
+			result.Each(x => x.ForExport = true);
+			var item = result.FirstOrDefault(x => x.UserId == user.Id.ToString());
+			Assert.IsNotNull(item, $"не найдена запись для пользователя {user.Id}");
+			Assert.AreEqual(item.DisabledSupName, supplier.Name);
+		}
+
+		[Test]
 		public void No_order_for_supplier()
 		{
-			user.AssignDefaultPermission(session);
 			var supplier1 = DataMother.CreateSupplier(x => x.Name = Guid.NewGuid().ToString());
 			session.Save(supplier1);
 			var supplier2 = DataMother.CreateSupplier(x => x.Name = Guid.NewGuid().ToString());
