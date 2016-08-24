@@ -22,7 +22,7 @@ namespace Functional
 			client = DataMother.CreateTestClientWithUser();
 			for (int i = 0; i < 4; i++) {
 				updateLog = updateLog.Concat(new[] { new RequestLog(client.Users.First()) {
-						CreatedOn = DateTime.Now.AddSeconds(-i*2),
+						CreatedOn = DateTime.Now.AddDays(-i),
 						Version = "1.11",
 						IsCompleted = true,
 						UpdateType = "MainController",
@@ -58,6 +58,7 @@ namespace Functional
 
 		private void TrySortDate(NewUpdateFilter filter, bool sum = false)
 		{
+			filter.BeginDate = DateTime.Now.Date.AddDays(-4);
 			var logs = filter.Find(session);
 			var count = logs.Count - 1;
 			if (filter.SortDirection == "Desc") {
