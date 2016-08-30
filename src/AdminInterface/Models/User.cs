@@ -568,6 +568,23 @@ namespace AdminInterface.Models
 			}
 		}
 
+		public virtual void AssignPermission(ISession session, IEnumerable<UserPermission> permissions)
+		{
+			var availability = UserPermissionAvailability.Supplier;
+			if (Client != null)
+				availability = UserPermissionAvailability.Drugstore;
+
+			var defaultPermissions = UserPermission.DefaultPermissions(session, availability);
+			var permissionForDrugstore = UserPermission.FindPermissionsForDrugstore(session);
+			permissions = permissions.Concat(defaultPermissions.Except(permissionForDrugstore))
+				.Distinct()
+				.Except(AssignedPermissions)
+				.ToArray();
+			foreach (var permission in permissions) {
+				AssignedPermissions.Add(permission);
+			}
+		}
+
 		public virtual bool IsLocked
 		{
 			get
