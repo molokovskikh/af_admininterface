@@ -5,13 +5,13 @@ using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Common.Web.Ui.NHibernateExtentions;
-using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 
-namespace Functional
+namespace Integration
 {
 	[TestFixture]
-	public class NewUpdateLogFixture : AdmSeleniumFixture
+	public class NewUpdateLogFixture : AdmIntegrationFixture
 	{
 		private Client client;
 		private IEnumerable<RequestLog> updateLog = new List<RequestLog>();
@@ -32,11 +32,11 @@ namespace Functional
 			}
 
 			session.SaveEach(updateLog);
-			CommitAndContinue();
+			Flush();
 		}
 
 		[Test]
-		public void  TrySortStatisticAnalitFNet()
+		public void TrySortStatisticAnalitFNet()
 		{
 			var filter = new NewUpdateFilter();
 

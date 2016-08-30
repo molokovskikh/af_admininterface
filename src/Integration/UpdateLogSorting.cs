@@ -5,13 +5,13 @@ using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Common.Web.Ui.NHibernateExtentions;
-using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 
-namespace Functional
+namespace Integration
 {
 	[TestFixture]
-	public class UpdateLogSorting : AdmSeleniumFixture
+	public class UpdateLogSorting : AdmIntegrationFixture
 	{
 		[Test]
 		public void SortColumns()
@@ -19,10 +19,8 @@ namespace Functional
 			Client client = DataMother.CreateTestClientWithUser();
 			IEnumerable<UpdateLogEntity> updateLog = new List<UpdateLogEntity>();
 
-			for (int i = 0; i < 2; i++)
-			{
-				updateLog = updateLog.Concat(new[] { new UpdateLogEntity(client.Users.First())
-					{
+			for (int i = 0; i < 2; i++) {
+				updateLog = updateLog.Concat(new[] { new UpdateLogEntity(client.Users.First()) {
 						RequestTime = DateTime.Now.AddHours(-i*2),
 						UpdateType = (UpdateType)i,
 						ResultSize = (uint)i,
@@ -34,7 +32,7 @@ namespace Functional
 			}
 
 			session.SaveEach(updateLog);
-			CommitAndContinue();
+			Flush();
 
 			var filter = new UpdateFilter();
 

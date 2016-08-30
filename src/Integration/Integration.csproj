@@ -115,6 +115,7 @@
     <Compile Include="Helpers\ADHelperFixture.cs" />
     <Compile Include="AnalysisOfWorkDrugstoresFixture.cs" />
     <Compile Include="Helpers\AppHelperFixture.cs" />
+    <Compile Include="NewUpdateLogFixture.cs" />
     <Compile Include="Queries\ClientConditionsMonitoringFilterFixture.cs" />
     <Compile Include="ClientFixture.cs" />
     <Compile Include="Controllers\AccountControllerFixture.cs" />
@@ -196,6 +197,7 @@
     <Compile Include="SetupFixture.cs" />
     <Compile Include="Tasks\WarnFixture.cs" />
     <Compile Include="UpdatedAndDidNotDoOrdersFixture.cs" />
+    <Compile Include="UpdateLogSorting.cs" />
     <Compile Include="WhoWasNotUpdatedFilterFixture.cs" />
   </ItemGroup>
   <ItemGroup>
