@@ -36,12 +36,12 @@
 				</th>
 				<% if filter.ShowRegion(): %>
 				<th>
-					${app.Sortable("Регион", "Region")}
+					Регион
 				</th>
 				<% end %>
 				<% if filter.ShowClient(): %>
 				<th>
-					${app.Sortable("Клиент", "Client")}
+					Клиент
 				</th>
 				<% end %>
 				<% if filter.ShowUpdateType(): %>
@@ -72,7 +72,7 @@
 					${app.Sortable("Сервер", "LocalHost")}
 				</th>
 				<th>
-					${app.Sortable("Дополнительно", "Addition")}
+					Дополнительно
 				</th>
 				<% if filter.ShowLog(): %>
 				<th>Лог</th>
