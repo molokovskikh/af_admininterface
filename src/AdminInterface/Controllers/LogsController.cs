@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
+using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Logs;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
@@ -112,6 +113,8 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			var line = DbSession.Load<DocumentLine>(id);
+			var files = line.Certificate.Files.Select(x => x.CertificateSourceId).Distinct();
+			PropertyBag["certificatesSource"] = DbSession.Query<CertificateSource>().Select(x => new { x.Id, x.Name }).Where(x => files.Contains(x.Id.ToString()))/*.ForEach(x => x.Id == files.ForEach(x => x))*/;
 			var query = DbSession.CreateSQLQuery(String.Format(@"select value from catalogs.propertyvalues pv
 join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId = {0}", line.CatalogProduct.Id));
 			var properties = String.Join(", ", query.List<string>());
