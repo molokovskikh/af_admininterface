@@ -18,6 +18,8 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using System.Linq;
 using System.Threading;
+using Castle.Core.Internal;
+using Microsoft.Ajax.Utilities;
 
 namespace AdminInterface.Controllers
 {
@@ -56,13 +58,27 @@ namespace AdminInterface.Controllers
 			{
 				var column = pair.Key;
 				var value = pair.Value;
-				value = TryToFixBrokenDateTimeValue(value);
-				if (value != DBNull.Value && column.DataType == typeof(DateTime))
+				if (column.ToString() != "LastDown" && column.ToString() != "LastForm")
 				{
-					var dateTimeValue = (DateTime)value;
-					value = dateTimeValue.ToLongTimeString();
+					value = TryToFixBrokenDateTimeValue(value);
+					if (value != DBNull.Value && column.DataType == typeof(DateTime))
+					{
+						var dateTimeValue = (DateTime)value;
+						value = dateTimeValue.ToLongTimeString();
+					}
 				}
 				PropertyBag[column.ColumnName] = value;
+			}
+
+			var lastForm = DateTime.Parse(PropertyBag["LastForm"].ToString());
+			var lastDown = DateTime.Parse(PropertyBag["LastDown"].ToString());
+			PropertyBag["WarningUpdateTime"] = false;
+			PropertyBag["WarningUpdateTime"] = CheckFormalizeTime(lastDown, lastForm);
+
+			if (lastForm.ToLongDateString() == DateTime.Today.ToLongDateString())
+			{
+				PropertyBag["LastDown"] = lastDown.ToLongTimeString();
+				PropertyBag["LastForm"] = lastForm.ToLongTimeString();
 			}
 
 			Size("MaxMailSize");
@@ -205,6 +221,19 @@ namespace AdminInterface.Controllers
 		public void Stat(DateTime? from, DateTime? to)
 		{
 			Index(from, to, true);
+		}
+
+		public static bool CheckFormalizeTime(DateTime lastDown, DateTime lastForm)
+		{
+			if (!lastDown.ToString().IsNullOrEmpty() && !lastForm.ToString().IsNullOrEmpty())
+			{
+				var updTime = lastForm - lastDown;
+				var processTimeRange = new TimeSpan(0, 15, 0);
+				var startTimeControl = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day, 5, 0, 0);
+				if ((lastDown > startTimeControl) && (updTime > processTimeRange))
+					return true;
+			}
+			return false;
 		}
 	}
 }
