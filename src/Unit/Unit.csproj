@@ -51,6 +51,10 @@
     <Reference Include="Castle.Core">
       <HintPath>..\..\lib\Castle.Core.dll</HintPath>
     </Reference>
+	<Reference Include="Castle.MonoRail.ActiveRecordSupport">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Castle.MonoRail.ActiveRecordSupport.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.MonoRail.Framework">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle.MonoRail.Framework.dll</HintPath>
@@ -90,6 +94,7 @@
     <Compile Include="Helpers\StylerFixture.cs" />
     <Compile Include="Jobs\SendPaymentNotificationFixture.cs" />
     <Compile Include="LogTest.cs" />
+    <Compile Include="MainFixture.cs" />
     <Compile Include="Models\AccountFixture.cs" />
     <Compile Include="Models\ActFixture.cs" />
     <Compile Include="Models\AdministratorFixture.cs" />
