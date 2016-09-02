@@ -117,14 +117,14 @@ namespace Integration.Models
 		public void Ignore_new_prices_for_user()
 		{
 			client.Settings.IgnoreNewPriceForUser = true;
-			var pricesCount = user.GetUserPriceCount();
+			var pricesCount = user.GetUserPriceCount(session);
 			var supplier = DataMother.CreateSupplier();
 			Save(supplier);
 
 			Flush();
 
 			client.MaintainIntersection(session);
-			var newPricesCount = user.GetUserPriceCount();
+			var newPricesCount = user.GetUserPriceCount(session);
 			Assert.That(newPricesCount, Is.EqualTo(pricesCount));
 		}
 

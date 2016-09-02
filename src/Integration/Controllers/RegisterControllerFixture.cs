@@ -127,8 +127,8 @@ namespace Integration.Controllers
 			Assert.That(org.FullName, Is.EqualTo(registredPayer.JuridicalName));
 			Assert.That(registredClient.Addresses[0].LegalEntity, Is.EqualTo(org));
 
-			var intersectionCount = registredClient.GetIntersectionCount();
-			var userPriceCount = registredUser.GetUserPriceCount();
+			var intersectionCount = registredClient.GetIntersectionCount(session);
+			var userPriceCount = registredUser.GetUserPriceCount(session);
 			var user = registredClient.Users.First();
 			Assert.That(user.Accounting, Is.Not.Null);
 			Assert.That(intersectionCount, Is.GreaterThan(0));

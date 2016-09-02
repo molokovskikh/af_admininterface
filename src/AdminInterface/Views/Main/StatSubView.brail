@@ -313,7 +313,7 @@
 						<abbr title="В скобках указано количество уникальных прайс-листов.">${DownCount}</abbr>
 					</td>
 					<td class="statistic-label">Последняя загрузка:</td>
-					<td class="statistic-value ${"service-stoped" if WarningUpdateTime == true}" id="lastdown-status">
+					<td class="statistic-value">
 						${LastDown}
 					</td>
 				</tr>
@@ -323,7 +323,7 @@
 						<abbr title="В скобках указано количество уникальных прайс-листов.">${FormCount}</abbr>
 					</td>
 					<td class="statistic-label">Последняя формализация:</td>
-					<td class="statistic-value ${"service-stoped" if WarningUpdateTime == true}" id="lastform-status">
+					<td class="statistic-value">
 						${LastForm}
 					</td>
 				</tr>

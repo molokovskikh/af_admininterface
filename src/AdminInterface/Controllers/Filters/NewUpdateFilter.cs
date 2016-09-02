@@ -7,6 +7,7 @@ using Common.Tools;
 using Common.Web.Ui.Helpers;
 using NHibernate;
 using NHibernate.Linq;
+using System.Linq.Dynamic;
 
 namespace AdminInterface.Controllers.Filters
 {
@@ -23,6 +24,18 @@ namespace AdminInterface.Controllers.Filters
 		{
 			BeginDate = DateTime.Today;
 			EndDate = DateTime.Today.AddDays(1);
+			SortBy = "CreatedOn";
+			SortDirection = "Desc";
+			SortKeyMap = new Dictionary<string, string> {
+				{ "User", "User" },
+				{ "CreatedOn", "CreatedOn" },
+				{ "UpdateType", "UpdateType" },
+				{ "Size", "Size" },
+				{ "Version", "Version" },
+				{ "RemoteHost", "RemoteHost" },
+				{ "LocalHost", "LocalHost" },
+				{ "OSVersion", "OSVersion" },
+			};
 		}
 
 		/// <summary>
@@ -31,28 +44,32 @@ namespace AdminInterface.Controllers.Filters
 		/// <returns></returns>
 		public IList<RequestLog> Find(ISession session)
 		{
-			var logQuery = session.Query<ClientAppLog>();
-			var requestQuery = session.Query<RequestLog>();
+			var logQuery = session.Query<ClientAppLog>()
+					.Where(x => x.CreatedOn > BeginDate && x.CreatedOn < EndDate.AddDays(1));
+			var requestQuery = session.Query<RequestLog>()
+					.Where(x => x.CreatedOn > BeginDate && x.CreatedOn < EndDate.AddDays(1))
+					.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
+
 			if (User != null) {
-				logQuery = session.Query<ClientAppLog>().Where(i => i.User == User);
-				requestQuery = session.Query<RequestLog>().Where(i => i.User == User);
+				logQuery = logQuery.Where(i => i.User == User);
+				requestQuery = requestQuery.Where(i => i.User == User);
 			}
 			else if (Client != null) {
-				logQuery = session.Query<ClientAppLog>().Where(i => i.User.Client == Client);
-				requestQuery = session.Query<RequestLog>().Where(i => i.User.Client == Client);
+				logQuery = logQuery.Where(i => i.User.Client == Client);
+				requestQuery = requestQuery.Where(i => i.User.Client == Client);
 			}
 			if (ErrorType == 1) {
 				requestQuery = session.Query<RequestLog>().Where(i => i.ErrorType == 1);
-			} else if (ErrorType == 0) {
-				requestQuery = session.Query<RequestLog>().Where(i => i.IsCompleted && !i.IsFaulted && i.UpdateType == "MainController");
+			}
+			else if (ErrorType == 0) {
+				requestQuery = session.Query<RequestLog>()
+					.Where(i => i.IsCompleted && !i.IsFaulted && i.UpdateType == "MainController" && i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
+					.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
 			}
 
-			var logs = logQuery.Where(i => i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1)).ToList();
+			var logs = logQuery.ToList();
 
-			var results = requestQuery
-				.Where(i => i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
-				.OrderByDescending(r => r.CreatedOn)
-				.ToList();
+			var results = requestQuery.ToList();
 
 			var connectedLogs = logs
 				.Where(l => l.RequestToken != null && results.Any(x => x.RequestToken == l.RequestToken))

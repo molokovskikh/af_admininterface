@@ -152,11 +152,6 @@
 						DataMember="RegionSettings" OnRowCreated="RegionalSettingsGrid_RowCreated">
 						<Columns>
 							<asp:BoundField DataField="Region" HeaderText="Регион" />
-							<asp:TemplateField HeaderText="Включен">
-								<ItemTemplate>
-									<asp:CheckBox ID="EnabledCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("Enabled")) %>' />
-								</ItemTemplate>
-							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Склад">
 								<ItemTemplate>
 									<asp:CheckBox ID="StorageCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("Storage")) %>' />
@@ -194,9 +189,9 @@
 					Настройка отправки заказов
 				</h3>
 				<div class="ContentBlock">
-					<asp:GridView id="OrderSendRules" runat="server" AutoGenerateColumns="false" 
+					<asp:GridView id="OrderSendRules" runat="server" AutoGenerateColumns="false"
 						DataMember="OrderSendConfig"
-						onrowcommand="OrderSettings_RowCommand" 
+						onrowcommand="OrderSettings_RowCommand"
 						onrowdeleting="OrderSettings_RowDeleting" onrowdatabound="OrderSettings_RowDataBound">
 						<EmptyDataTemplate>
 							<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить настройку отправки заказа" />

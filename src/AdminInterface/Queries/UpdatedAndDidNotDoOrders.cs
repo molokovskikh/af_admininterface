@@ -183,7 +183,7 @@ select
 	u.Id as UserId,
 	u.Name as UserName,
 	if (reg.ManagerName is not null, reg.ManagerName, c.Registrant) as Registrant,
-	uu.UpdateDate as UpdateDate,
+	if(uu.UpdateDate > ifnull(nd.LastUpdateAt, '2000-01-01'), uu.UpdateDate, ifnull(nd.LastUpdateAt, '2000-01-01'))  as UpdateDate,
 	max(oh.`WriteTime`) as LastOrderDate
 from customers.Clients C
 join customers.Users u on u.ClientId = c.id
@@ -296,12 +296,12 @@ insert into SuppliersStat(UserId, EnabledSupCnt, DisabledSupCnt, DisabledSupplie
 select d.UserId,
 	sum(not d.DisabledByUser) as EnabledSupCnt,
 	sum(d.DisabledByUser) as DisabledSupCnt,
-	d.DisabledSuppliers
+	group_concat(d.DisabledSupplier) DisabledSuppliers
 from (
 	SELECT u.Id as UserId,
 		supplier.Id as SupplierId,
 		if(up.UserId is null, 1, 0) as DisabledByUser,
-		group_concat(if(up.UserId is null, supplier.Name, null)) as DisabledSuppliers
+		if(up.UserId is null, supplier.Name, null) as DisabledSupplier
 	FROM Customers.Users u
 		join usr on usr.UserId = u.Id
 		join Customers.Intersection i on i.ClientId = u.ClientId and i.AgencyEnabled = 1

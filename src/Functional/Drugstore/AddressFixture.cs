@@ -82,8 +82,8 @@ namespace Functional.Drugstore
 			var address = client.Addresses.First();
 			Assert.That(address.Value, Is.EqualTo("тестовый адрес"));
 
-			var intersectionCount = client.GetIntersectionCount();
-			var addressIntersectionCount = address.GetAddressIntersectionCount();
+			var intersectionCount = client.GetIntersectionCount(session);
+			var addressIntersectionCount = address.GetAddressIntersectionCount(session);
 
 			Assert.That(intersectionCount, Is.GreaterThan(0), "не создали записей в Intersection, проверрь создание пользователя Client.MaintainIntersection");
 			Assert.That(addressIntersectionCount, Is.GreaterThan(0), "не создали записей в AddressIntersection, адрес не будет доступен в клиентском интерфейсе");
@@ -226,7 +226,7 @@ namespace Functional.Drugstore
 			var newClient = DataMother.CreateTestClientWithAddressAndUser();
 			var user = oldClient.Users[0];
 			var address = oldClient.Addresses[0];
-			var oldCountAddressIntersectionEntries = address.GetAddressIntersectionCount();
+			var oldCountAddressIntersectionEntries = address.GetAddressIntersectionCount(session);
 
 			Open(oldClient.Addresses[0]);
 			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
@@ -235,7 +235,7 @@ namespace Functional.Drugstore
 			ClickButton("Переместить");
 			AssertText("Адрес доставки успешно перемещен");
 
-			var newCountAddressInterSectionEntries = address.GetAddressIntersectionCount();
+			var newCountAddressInterSectionEntries = address.GetAddressIntersectionCount(session);
 
 			Assert.That(oldCountAddressIntersectionEntries, Is.EqualTo(newCountAddressInterSectionEntries));
 			Assert.That(GetCountAddressIntersectionEntriesForClient(address.Id, oldClient.Id), Is.EqualTo(0));
@@ -244,7 +244,7 @@ namespace Functional.Drugstore
 
 		private uint GetCountAddressIntersectionEntriesForClient(uint addressId, uint clientId)
 		{
-			return Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(@"
+			return Convert.ToUInt32(session.CreateSQLQuery(@"
 SELECT COUNT(*)
 FROM Customers.AddressIntersection AS ai
 	JOIN Customers.Intersection AS i ON i.ClientId = :ClientId AND ai.IntersectionId = i.Id
@@ -252,7 +252,7 @@ WHERE AddressId = :AddressId
 ")
 				.SetParameter("AddressId", addressId)
 				.SetParameter("ClientId", clientId)
-				.UniqueResult()));
+				.UniqueResult());
 		}
 
 		[Test]

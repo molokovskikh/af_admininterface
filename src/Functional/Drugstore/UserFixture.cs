@@ -195,8 +195,8 @@ namespace Functional.Drugstore
 			Assert.That(user.Name, Is.EqualTo("test"));
 			Assert.That(user.UserUpdateInfo, Is.Not.Null);
 
-			var userPriceCount = user.GetUserPriceCount();
-			var intersecionCount = client.GetIntersectionCount();
+			var userPriceCount = user.GetUserPriceCount(session);
+			var intersecionCount = client.GetIntersectionCount(session);
 
 			Assert.That(userPriceCount, Is.GreaterThan(0), "не создали записей в UserPrices, у пользователя ни один прайс не включен");
 			Assert.That(userPriceCount, Is.EqualTo(intersecionCount), "не совпадает кол-во записей в intersection и в UserPrices для данного клиента");
@@ -593,7 +593,7 @@ namespace Functional.Drugstore
 			Assert.That(createdAddress.AvaliableForUsers.Count, Is.EqualTo(1));
 			Assert.IsTrue(createdAddress.AvaliableFor(createdUser));
 
-			Assert.That(createdAddress.GetAddressIntersectionCount(), Is.GreaterThan(0), "Не найдено записей в AddressIntersection");
+			Assert.That(createdAddress.GetAddressIntersectionCount(session), Is.GreaterThan(0), "Не найдено записей в AddressIntersection");
 		}
 
 		private void RegisterUserWithAddress(Client client, IElementContainer browser)
@@ -766,7 +766,7 @@ namespace Functional.Drugstore
 			var maskRegion = 1UL | 16UL;
 			var newClient = DataMother.CreateTestClientWithAddressAndUser(maskRegion);
 
-			var oldCountUserPrices = user.GetUserPriceCount();
+			var oldCountUserPrices = user.GetUserPriceCount(session);
 
 			Open(user, "edit");
 			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
@@ -775,7 +775,7 @@ namespace Functional.Drugstore
 			ClickButton("Переместить");
 			AssertText("Пользователь успешно перемещен");
 
-			var newCountUserPricesEntries = user.GetUserPriceCount();
+			var newCountUserPricesEntries = user.GetUserPriceCount(session);
 			Assert.That(oldCountUserPrices, Is.LessThan(newCountUserPricesEntries));
 
 			Assert.That(GetCountUserPricesForRegion(user.Id, 16UL), Is.GreaterThan(0));
@@ -783,7 +783,7 @@ namespace Functional.Drugstore
 
 		private uint GetCountUserPricesForRegion(uint userId, ulong regionId)
 		{
-			return Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(@"
+			return Convert.ToUInt32(session.CreateSQLQuery(@"
 SELECT COUNT(*)
 FROM
 	Customers.UserPrices
@@ -791,7 +791,7 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 ")
 				.SetParameter("UserId", userId)
 				.SetParameter("RegionId", regionId)
-				.UniqueResult()));
+				.UniqueResult());
 		}
 
 		[Test]
