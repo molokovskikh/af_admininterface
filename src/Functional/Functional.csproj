@@ -43,6 +43,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle.ActiveRecord.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.MonoRail.ActiveRecordSupport, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="Castle.MonoRail.Framework">
       <HintPath>..\..\lib\Castle.MonoRail.Framework.dll</HintPath>
     </Reference>

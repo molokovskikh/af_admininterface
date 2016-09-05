@@ -18,6 +18,8 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using System.Linq;
 using System.Threading;
+using Castle.Core.Internal;
+using Microsoft.Ajax.Utilities;
 
 namespace AdminInterface.Controllers
 {
@@ -36,7 +38,8 @@ namespace AdminInterface.Controllers
 		{
 			RemoteServiceHelper.Try(() => { PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(Admin.UserName); });
 
-			if (from == null || to == null) {
+			if (from == null || to == null)
+			{
 				from = DateTime.Today;
 				to = DateTime.Today;
 			}
@@ -54,12 +57,27 @@ namespace AdminInterface.Controllers
 			foreach (var pair in data.ToKeyValuePairs()) {
 				var column = pair.Key;
 				var value = pair.Value;
-				value = TryToFixBrokenDateTimeValue(value);
-				if (value != DBNull.Value && column.DataType == typeof(DateTime)) {
-					var dateTimeValue = (DateTime)value;
-					value = dateTimeValue.ToLongTimeString();
+				if (column.ToString() != "LastDown" && column.ToString() != "LastForm") {
+					value = TryToFixBrokenDateTimeValue(value);
+					if (value != DBNull.Value && column.DataType == typeof(DateTime)) {
+						var dateTimeValue = (DateTime)value;
+						value = dateTimeValue.ToLongTimeString();
+					}
 				}
 				PropertyBag[column.ColumnName] = value;
+			}
+
+			PropertyBag["WarningUpdateTime"] = false;
+			if (PropertyBag["LastForm"] != DBNull.Value && PropertyBag["LastDown"] != DBNull.Value) {
+				var lastForm = DateTime.Parse(PropertyBag["LastForm"].ToString());
+				var lastDown = DateTime.Parse(PropertyBag["LastDown"].ToString());
+
+				PropertyBag["WarningUpdateTime"] = CheckFormalizeTime(lastDown, lastForm);
+
+				if (lastForm.ToLongDateString() == DateTime.Today.ToLongDateString()) {
+					PropertyBag["LastDown"] = lastDown.ToLongTimeString();
+					PropertyBag["LastForm"] = lastForm.ToLongTimeString();
+				}
 			}
 
 			Size("MaxMailSize");
@@ -92,7 +110,8 @@ namespace AdminInterface.Controllers
 				.GetServiceStatus(Config.OrderServiceHost, Config.OrderServiceName));
 			var priceProcessorStatus = BindingHelper.GetDescription(RemoteServiceHelper
 				.GetServiceStatus(Config.PriceServiceHost, Config.PriceServiceName));
-			return new {
+			return new
+			{
 				OrderProcStatus = orderProcStatus,
 				IsOrderProcUnavailable = RemoteServiceHelper.IsUnavailable(orderProcStatus),
 				PriceProcessorStatus = priceProcessorStatus,
@@ -152,22 +171,26 @@ namespace AdminInterface.Controllers
 			var defaults = Defaults;
 			NewSupplierMessage newSupplierMessage = new NewSupplierMessage();
 
-			if (IsPost) {
+			if (IsPost)
+			{
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 				BindObjectInstance(defaults, ParamStore.Form, "defaults");
-				if (IsValid(defaults)) {
+				if (IsValid(defaults))
+				{
 					newSupplierMessage.CreateEmlFile(defaults);
 					Notify("Сохранено");
 					RedirectToUrl(Request.UrlReferrer + pageTab);
 				}
-				else {
+				else
+				{
 					ActiveRecordMediator.Evict(defaults);
 					PropertyBag["Defaults"] = defaults;
 					PropertyBag["Formaters"] = OrderHandler.Formaters();
 					PropertyBag["Senders"] = OrderHandler.Senders();
 				}
 			}
-			else {
+			else
+			{
 				PropertyBag["Defaults"] = defaults;
 				PropertyBag["Formaters"] = OrderHandler.Formaters();
 				PropertyBag["Senders"] = OrderHandler.Senders();
@@ -179,7 +202,8 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 			var user = DbSession.Load<User>(id);
 			var addresses = new StringBuilder();
-			if (user.RootService is Client) {
+			if (user.RootService is Client)
+			{
 				foreach (var address in user.AvaliableAddresses)
 					addresses.AppendFormat("<div>{0}</div>", address.Name);
 				addresses.Append("  ");
@@ -196,6 +220,19 @@ namespace AdminInterface.Controllers
 		public void Stat(DateTime? from, DateTime? to)
 		{
 			Index(from, to, true);
+		}
+
+		public static bool CheckFormalizeTime(DateTime lastDown, DateTime lastForm)
+		{
+			if (!lastDown.ToString().IsNullOrEmpty() && !lastForm.ToString().IsNullOrEmpty())
+			{
+				var updTime = lastForm - lastDown;
+				var processTimeRange = new TimeSpan(0, 15, 0);
+				var startTimeControl = new DateTime(lastDown.Year, lastDown.Month, lastDown.Day, 5, 0, 0);
+				if ((lastDown > startTimeControl) && (updTime > processTimeRange))
+					return true;
+			}
+			return false;
 		}
 	}
 }

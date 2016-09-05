@@ -1,4 +1,4 @@
-﻿<% uriTemplate = "${siteroot}/Logs/UpdateLog?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${?query.Region.Id}" %>
+﻿﻿<% uriTemplate = "${siteroot}/Logs/UpdateLog?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${?query.Region.Id}" %>
 <% logRoot = "${siteroot}/Logs/NewUpdateLog?filter.BeginDate=${FromDate}&filter.EndDate=${ToDate.AddDays(1)}&filter.RegionMask=${?query.Region.Id}" %>
 
 <script>
@@ -313,7 +313,7 @@
 						<abbr title="В скобках указано количество уникальных прайс-листов.">${DownCount}</abbr>
 					</td>
 					<td class="statistic-label">Последняя загрузка:</td>
-					<td class="statistic-value">
+					<td class="statistic-value ${"service-stoped" if WarningUpdateTime == true}" id="lastdown-status">
 						${LastDown}
 					</td>
 				</tr>
@@ -323,7 +323,7 @@
 						<abbr title="В скобках указано количество уникальных прайс-листов.">${FormCount}</abbr>
 					</td>
 					<td class="statistic-label">Последняя формализация:</td>
-					<td class="statistic-value">
+					<td class="statistic-value ${"service-stoped" if WarningUpdateTime == true}" id="lastform-status">
 						${LastForm}
 					</td>
 				</tr>
