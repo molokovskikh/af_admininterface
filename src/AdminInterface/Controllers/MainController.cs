@@ -54,15 +54,12 @@ namespace AdminInterface.Controllers
 			BindObjectInstance(query, "query");
 
 			var data = query.Load(fromDate, toDate);
-			foreach (var pair in data.ToKeyValuePairs())
-			{
+			foreach (var pair in data.ToKeyValuePairs()) {
 				var column = pair.Key;
 				var value = pair.Value;
-				if (column.ToString() != "LastDown" && column.ToString() != "LastForm")
-				{
+				if (column.ToString() != "LastDown" && column.ToString() != "LastForm") {
 					value = TryToFixBrokenDateTimeValue(value);
-					if (value != DBNull.Value && column.DataType == typeof(DateTime))
-					{
+					if (value != DBNull.Value && column.DataType == typeof(DateTime)) {
 						var dateTimeValue = (DateTime)value;
 						value = dateTimeValue.ToLongTimeString();
 					}
@@ -70,15 +67,17 @@ namespace AdminInterface.Controllers
 				PropertyBag[column.ColumnName] = value;
 			}
 
-			var lastForm = DateTime.Parse(PropertyBag["LastForm"].ToString());
-			var lastDown = DateTime.Parse(PropertyBag["LastDown"].ToString());
 			PropertyBag["WarningUpdateTime"] = false;
-			PropertyBag["WarningUpdateTime"] = CheckFormalizeTime(lastDown, lastForm);
+			if (PropertyBag["LastForm"] != DBNull.Value && PropertyBag["LastDown"] != DBNull.Value) {
+				var lastForm = DateTime.Parse(PropertyBag["LastForm"].ToString());
+				var lastDown = DateTime.Parse(PropertyBag["LastDown"].ToString());
 
-			if (lastForm.ToLongDateString() == DateTime.Today.ToLongDateString())
-			{
-				PropertyBag["LastDown"] = lastDown.ToLongTimeString();
-				PropertyBag["LastForm"] = lastForm.ToLongTimeString();
+				PropertyBag["WarningUpdateTime"] = CheckFormalizeTime(lastDown, lastForm);
+
+				if (lastForm.ToLongDateString() == DateTime.Today.ToLongDateString()) {
+					PropertyBag["LastDown"] = lastDown.ToLongTimeString();
+					PropertyBag["LastForm"] = lastForm.ToLongTimeString();
+				}
 			}
 
 			Size("MaxMailSize");
