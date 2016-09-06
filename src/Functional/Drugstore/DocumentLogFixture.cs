@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Models;
@@ -148,9 +149,16 @@ namespace Functional.Drugstore
 			var log = DataMother.CreateTestDocumentLog(supplier, client);
 			var document = DataMother.CreateTestDocument(supplier, client, log);
 			var line = document.Lines[0];
+			//Добавим CertificateSource т.к. изменилась выборка для сертификатов - теперь необходим еще Id источника для CertificateFile
+			var newCertificate = new CertificateSource {
+				Name = "Test_Source",
+				SourceClassName = "Test_class_Name"
+			};
+			session.Save(newCertificate);
+
 			line.CatalogProduct = DataMother.Product();
 			line.Product = line.CatalogProduct.Catalog.Name;
-			line.Certificate = DataMother.Certificate(line.CatalogProduct.Catalog);
+			line.Certificate = DataMother.Certificate(line.CatalogProduct.Catalog, newCertificate.Id.ToString());
 			session.Save(line);
 
 			var dir = Directory.CreateDirectory(Path.Combine(DataRoot, "Certificates"));
@@ -165,6 +173,8 @@ namespace Functional.Drugstore
 			Click(line.Product);
 			WaitForText(filename);
 			AssertText(filename);
+
+			session.Delete(newCertificate);
 		}
 	}
 }

@@ -291,7 +291,7 @@ namespace Integration.ForTesting
 			return product;
 		}
 
-		public Certificate Certificate(Catalog catalog)
+		public Certificate Certificate(Catalog catalog, string certificateSource = null)
 		{
 			var serial = DateTime.Today.ToShortDateString();
 
@@ -300,6 +300,7 @@ namespace Integration.ForTesting
 				Product = catalog
 			};
 			var certificateFile = new CertificateFile {
+				CertificateSourceId = certificateSource,
 				Extension = ".tif"
 			};
 			certificate.Files.Add(certificateFile);

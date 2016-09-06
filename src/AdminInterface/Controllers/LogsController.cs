@@ -113,8 +113,11 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			var line = DbSession.Load<DocumentLine>(id);
-			var files = line.Certificate.Files.Select(x => x.CertificateSourceId).Distinct();
-			PropertyBag["certificatesSource"] = DbSession.Query<CertificateSource>().Select(x => new { x.Id, x.Name }).Where(x => files.Contains(x.Id.ToString()))/*.ForEach(x => x.Id == files.ForEach(x => x))*/;
+			if (line.Certificate != null) {
+				var files = line.Certificate.Files.Select(x => x.CertificateSourceId).Distinct();
+				PropertyBag["certificatesSource"] = DbSession.Query<CertificateSource>().Select(x => new { x.Id, x.Name }).Where(x => files.Contains(x.Id.ToString()));
+			}
+
 			var query = DbSession.CreateSQLQuery(String.Format(@"select value from catalogs.propertyvalues pv
 join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId = {0}", line.CatalogProduct.Id));
 			var properties = String.Join(", ", query.List<string>());
