@@ -5,6 +5,7 @@ using System.Net.Mail;
 using System.Text;
 using AdminInterface.Models;
 using AdminInterface.Models.Audit;
+using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Integration.ForTesting;
@@ -101,6 +102,19 @@ namespace Integration
 			Flush();
 
 			Assert.That(messages.Count, Is.EqualTo(1));
+		}
+
+		[Test]
+		public void ClientAssignedPermissionTest()
+		{
+			var permissions = UserPermission.FindPermissionsForDrugstore(session).Where(i => i.Id == 69 || i.Id == 81);
+			if (user != null && permissions != null) {
+				permissions = permissions.Select(i => session.Load<UserPermission>(i.Id)).ToArray();
+				user.AssignPermission(session, permissions);
+			}
+			foreach (var permission in permissions) {
+				Assert.That(user.AssignedPermissions.ToList(), Contains.Item(permission));
+			}
 		}
 	}
 }
