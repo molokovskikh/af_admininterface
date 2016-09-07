@@ -59,7 +59,8 @@ namespace AdminInterface.Controllers.Filters
 				requestQuery = requestQuery.Where(i => i.User.Client == Client);
 			}
 			if (ErrorType == 1) {
-				requestQuery = session.Query<RequestLog>().Where(i => i.ErrorType == 1);
+				requestQuery = session.Query<RequestLog>().Where(i => i.ErrorType == 1&& i.CreatedOn > BeginDate && i.CreatedOn < EndDate.AddDays(1))
+					.OrderBy(string.Format("{0} {1}", SortBy, SortDirection));
 			}
 			else if (ErrorType == 0) {
 				requestQuery = session.Query<RequestLog>()
