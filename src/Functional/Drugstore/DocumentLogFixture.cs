@@ -151,9 +151,11 @@ namespace Functional.Drugstore
 			var line = document.Lines[0];
 			//Добавим CertificateSource т.к. изменилась выборка для сертификатов - теперь необходим еще Id источника для CertificateFile
 			var newCertificate = new CertificateSource {
+				Supplier = supplier,
 				Name = "Test_Source",
 				SourceClassName = "Test_class_Name"
 			};
+			supplier.CertificateSource = newCertificate;
 			session.Save(newCertificate);
 
 			line.CatalogProduct = DataMother.Product();

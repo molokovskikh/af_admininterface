@@ -29,16 +29,6 @@
 							<a href="Certificate?id=${file.Id}">${file.Filename}</a>
 							<% end %>
 						<% end %>
-					<% else: %>
-						<% for certSource in certificatesSource: %>
- 							${certSource.Name}:
- 							<% for file in line.Certificate.Files: %>
- 								<% if certSource.Id.ToString() == file.CertificateSourceId: %>
- 								<a href="Certificate?id=${file.Id}">${file.Filename}</a>
- 								<% end %>
- 							<% end %>
- 							<br/>
- 						<% end %>
 					<% end %>
 				</p>
 				<% else: %>
