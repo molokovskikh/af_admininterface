@@ -114,9 +114,16 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			var line = DbSession.Load<DocumentLine>(id);
-			var supplier = DbSession.Query<Supplier>().Where(x => x.Id == filterSupplierId).First();
-			if (line.Certificate != null && supplier != null) {
-				PropertyBag["certificatesSource"] = supplier.CertificateSource;
+			if (line.Certificate != null) {
+				if (filterSupplierId != null) {
+					PropertyBag["certificatesSource"] = DbSession.Query<Supplier>().Where(x => x.Id == filterSupplierId).First().CertificateSource;
+				}
+				else {
+					var files = line.Certificate.Files.Select(x => x.CertificateSourceId).Distinct();
+					PropertyBag["certificatesSource"] = DbSession.Query<CertificateSource>()
+						.Select(x => new {x.Id, x.Name})
+						.Where(x => files.Contains(x.Id.ToString()));
+				}
 			}
 
 			var query = DbSession.CreateSQLQuery(String.Format(@"select value from catalogs.propertyvalues pv
