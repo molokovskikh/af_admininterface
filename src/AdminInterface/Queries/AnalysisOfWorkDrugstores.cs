@@ -217,6 +217,8 @@ SELECT u.ClientId, COUNT(u.id) as AutoOrderCnt
 	AND au.userid = u.id
 	AND au.COMMIT = 1
 	AND au.updatetype IN (10)
+	and u.Enabled = 1
+	and u.WorkRegionMask & :regionCode > 0
 group by u.ClientId;
 
 DROP TEMPORARY TABLE IF EXISTS orders.AutoOrderCntNetFirst;
@@ -228,7 +230,33 @@ WHERE au.CreatedOn BETWEEN :FistPeriodStart AND :FistPeriodEnd
 	AND au.UserId = u.id
 	AND au.IsCompleted = 1
 	AND (au.UpdateType = 'BatchController' or au.UpdateType = 'SmartOrder')
+	and u.Enabled = 1
+	and u.WorkRegionMask & :regionCode > 0
 group by u.ClientId;
+
+drop temporary table if exists orders.CurWeekUpdates;
+create temporary table orders.CurWeekUpdates (INDEX idx(ClientId) USING HASH) engine MEMORY
+select u.ClientId, COUNT(au.UpdateId) as CurWeekUpdates
+from logs.analitfupdates au
+join customers.users u on u.id = au.userid
+where au.requesttime between :FistPeriodStart and :FistPeriodEnd
+and au.Commit = 1
+and au.updatetype in (1, 2)
+and u.Enabled = 1
+and u.WorkRegionMask & :regionCode > 0
+group by u.clientid;
+
+drop temporary table if exists orders.LastWeekUpdates;
+create temporary table orders.LastWeekUpdates (INDEX idx(ClientId) USING HASH) engine MEMORY
+select u.ClientId, COUNT(au.UpdateId) as LastWeekUpdates
+from logs.analitfupdates au
+join customers.users u on u.id = au.userid
+where au.requesttime between :LastPeriodStart AND :LastPeriodEnd
+and au.Commit = 1
+and au.updatetype in (1, 2)
+and u.Enabled = 1
+and u.WorkRegionMask & :regionCode > 0
+group by u.clientid;
 
 insert into Customers.Updates
 SELECT cd.id,
@@ -236,24 +264,8 @@ cd.name,
 reg.Region as RegionName,
 count(distinct u.Id) as UserCount,
 count(distinct a.Id) as AddressCount,
-(SELECT COUNT(o.id)
-	FROM logs.analitfupdates au1,
-	customers.users O
-	WHERE requesttime BETWEEN :FistPeriodStart AND :FistPeriodEnd
-	AND au1.userid =o.id
-	AND o.clientid=cd.id
-	AND COMMIT = 1
-	AND updatetype IN (1, 2)
-) as CurWeekUpdates,
-(SELECT COUNT(au2.Updateid)
-	FROM logs.analitfupdates au2,
-	customers.users O
-	WHERE requesttime BETWEEN :LastPeriodStart AND :LastPeriodEnd
-	AND au2.userid = o.id
-	AND o.clientid = cd.id
-	AND COMMIT = 1
-	AND updatetype IN (1, 2)
-) LastWeekUpdates,
+cwu.CurWeekUpdates,
+lwu.LastWeekUpdates,
 osf.ClientSum as CurWeekSum,
 osl.ClientSum as LastWeekSum,
 osf.AddressCnt as CurWeekAddresses,
@@ -269,9 +281,11 @@ FROM customers.Clients Cd
 	left join orders.OrdersSumLast osl on osl.ClientId = cd.Id
 	left join orders.AutoOrderCntFirst aof on aof.ClientId = cd.Id
 	left join orders.AutoOrderCntNetFirst aofNet on aofNet.ClientId = cd.Id
+	left join orders.CurWeekUpdates cwu on cwu.ClientId = cd.Id
+	left join orders.LastWeekUpdates lwu on lwu.ClientId = cd.Id
 	left join ordersendrules.smart_order_rules sr on sr.Id = rcs.SmartOrderRuleId
-	left join Customers.Users u on u.ClientId = cd.id
-	left join Customers.Addresses a on a.ClientId = cd.id
+	left join Customers.Users u on u.ClientId = cd.id and u.Enabled = 1
+	left join Customers.Addresses a on a.ClientId = cd.id and a.Enabled = 1
 WHERE
 	cd.regioncode & :regionCode > 0
 	{0}
@@ -498,18 +512,19 @@ AutoOrderCntNet int
 		{
 			PrepareAggregatesData();
 
-			RowsCount = Convert.ToInt32(Session.CreateSQLQuery("select count(*) from Customers.updates;").UniqueResult());
-
 			Session.CreateSQLQuery(@"update Customers.updates set AutoOrderIs = 2
 where AutoOrderIs = 1 and (AutoOrderCnt > 0 or AutoOrderCntNet > 0);").ExecuteUpdate();
+
+			var where = "";
+			if (Type == AnalysisReportType.Client && AutoOrder.HasValue)
+				where = $"where up.AutoOrderIs = {AutoOrder.Value}";
+
+			RowsCount = Convert.ToInt32(Session.CreateSQLQuery($"select count(*) from Customers.updates up {where};").UniqueResult());
 
 			var limitPart = string.Empty;
 			if (!forExport)
 				limitPart = $"limit {CurrentPage * PageSize}, {PageSize}";
 
-			var where = "";
-			if (Type == AnalysisReportType.Client && AutoOrder.HasValue)
-					where = $"where up.AutoOrderIs = {AutoOrder.Value}";
 
 			var result = Session.CreateSQLQuery(string.Format(@"
 SELECT
