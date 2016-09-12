@@ -5,6 +5,7 @@ using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
@@ -113,9 +114,9 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			var line = DbSession.Load<DocumentLine>(id);
-			if (line.Certificate != null) {
-				var files = line.Certificate.Files.Select(x => x.CertificateSourceId).Distinct();
-				PropertyBag["certificatesSource"] = DbSession.Query<CertificateSource>().Select(x => new { x.Id, x.Name }).Where(x => files.Contains(x.Id.ToString()));
+			var supplier = DbSession.Query<Supplier>().Where(x => x.Id == filterSupplierId).First();
+			if (line.Certificate != null && supplier != null) {
+				PropertyBag["certificatesSource"] = supplier.CertificateSource;
 			}
 
 			var query = DbSession.CreateSQLQuery(String.Format(@"select value from catalogs.propertyvalues pv
