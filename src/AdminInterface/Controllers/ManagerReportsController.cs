@@ -205,7 +205,7 @@ namespace AdminInterface.Controllers
 			var html = string.Format("<tr class=\"toggled\" id=\"toggledRow{0}\"><td colspan=11><div class=\"userInfoDivTable\">", clientId);
 			html += string.Format("<b>Клиент: {0} </b><br/>", thisClient.Name);
 			html += "<div>";
-			foreach (var user in thisClient.Users) {
+			foreach (var user in thisClient.Users.Where(x => x.Enabled)) {
 				filter.ObjectId = user.Id;
 				filter.Type = AnalysisReportType.User;
 				filter.RenderHead = false;
