@@ -164,7 +164,12 @@ delete from Billing.Accounts where Type = 0;")
 				AutoOrder = (int)AutoOrderStatus.NotUsed
 			};
 
-			// при установке фильтра Не используют автозаказ результат находится
+			// настроен ли у клиента автозаказ
+			var price = client.Settings.SmartOrderRules.AssortimentPriceCode;
+			if (price == null || price.Id == 4662)
+				filter.AutoOrder = (int)AutoOrderStatus.NotTuned;
+
+			// при установке фильтра результат находится
 			var data = filter.Find();
 			var row = (AnalysisOfWorkFiled)data[0];
 			Assert.IsTrue(row.UserCount.Contains(">4<"));
@@ -183,7 +188,7 @@ delete from Billing.Accounts where Type = 0;")
 			Assert.IsTrue(row.UserCount.Contains(">3<"));
 			Assert.AreEqual(row.AddressCount, "1");
 
-			// при изменении фильтра на Используют автозаказ - фильтрация
+			// при изменении фильтра результат не находится
 			filter.AutoOrder = (int)AutoOrderStatus.Used;
 			data = filter.Find();
 			Assert.AreEqual(data.Count, 0);
