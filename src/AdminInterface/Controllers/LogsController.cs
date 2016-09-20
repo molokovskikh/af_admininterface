@@ -114,10 +114,10 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			var line = DbSession.Load<DocumentLine>(id);
-			var testSupp = DbSession.Query<Supplier>().Where(x => x.Id == filterSupplierId);
+			var certificateSupplier = DbSession.Load<FullDocument>(line.Document.Id).Supplier;
 			PropertyBag["certificatesSource"] = null;
-			if (line.Certificate != null && filterSupplierId != null) {
-				PropertyBag["certificatesSource"] = DbSession.Query<Supplier>().Where(x => x.Id == filterSupplierId).First().CertificateSource;
+			if (line.Certificate != null && certificateSupplier != null) {
+				PropertyBag["certificatesSource"] = DbSession.Query<Supplier>().Where(x => x.Id == certificateSupplier.Id).First().CertificateSource;
 			}
 
 			var query = DbSession.CreateSQLQuery(String.Format(@"select value from catalogs.propertyvalues pv

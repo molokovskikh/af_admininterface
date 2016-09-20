@@ -23,11 +23,9 @@
 				<% if line.Certificate and line.Certificate.Files: %>
 				<p>
 					<strong>Сертификаты:</strong><br>
-					<% if filterSupplierId: %>
-						<% for file in line.Certificate.Files: %>
-							<% if certificatesSource.Id.ToString() == file.CertificateSourceId: %>
-							<a href="Certificate?id=${file.Id}">${file.Filename}</a>
-							<% end %>
+					<% for file in line.Certificate.Files: %>
+						<% if certificatesSource.Id.ToString() == file.CertificateSourceId: %>
+						<a href="Certificate?id=${file.Id}">${file.Filename}</a>
 						<% end %>
 					<% end %>
 				</p>
