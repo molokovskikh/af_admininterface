@@ -160,12 +160,38 @@ delete from Billing.Accounts where Type = 0;")
 			var filter = new AnalysisOfWorkDrugstoresFilter
 			{
 				Session = session,
-				ObjectId = client.Id
+				ObjectId = client.Id,
+				AutoOrder = (int)AutoOrderStatus.NotUsed
 			};
 
+			// настроен ли у клиента автозаказ
+			var price = client.Settings.SmartOrderRules.AssortimentPriceCode;
+			if (price == null || price.Id == 4662)
+				filter.AutoOrder = (int)AutoOrderStatus.NotTuned;
+
+			// при установке фильтра результат находится
 			var data = filter.Find();
 			var row = (AnalysisOfWorkFiled)data[0];
+			Assert.IsTrue(row.UserCount.Contains(">4<"));
 			Assert.AreEqual(row.AddressCount, "2");
+
+			// отключенные пользователи и адреса не попадают в отчет
+			user3.Enabled = false;
+			session.Save(user3);
+			address2.Enabled = false;
+			session.Save(address2);
+
+			Flush();
+
+			data = filter.Find();
+			row = (AnalysisOfWorkFiled)data[0];
+			Assert.IsTrue(row.UserCount.Contains(">3<"));
+			Assert.AreEqual(row.AddressCount, "1");
+
+			// при изменении фильтра результат не находится
+			filter.AutoOrder = (int)AutoOrderStatus.Used;
+			data = filter.Find();
+			Assert.AreEqual(data.Count, 0);
 		}
 	}
 }
