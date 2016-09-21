@@ -11,6 +11,7 @@ using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
@@ -114,10 +115,14 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			var line = DbSession.Load<DocumentLine>(id);
-			var certificateSupplier = DbSession.Load<FullDocument>(line.Document.Id).Supplier;
-			PropertyBag["certificatesSource"] = null;
-			if (line.Certificate != null && certificateSupplier != null) {
-				PropertyBag["certificatesSource"] = DbSession.Query<Supplier>().Where(x => x.Id == certificateSupplier.Id).First().CertificateSource;
+			CertificateSource certificatesSource;
+			PropertyBag["certificates"] = null;
+			if (line.Certificate?.Files != null) {
+				certificatesSource = filterSupplierId != null 
+					? DbSession.Query<Supplier>().First(x => x.Id == filterSupplierId).CertificateSource 
+					: DbSession.Query<Supplier>().First(x => x.Id == DbSession.Load<FullDocument>(line.Document.Id).Supplier.Id).CertificateSource;
+
+				PropertyBag["certificates"] = line.Certificate.Files.Where(x => x.CertificateSourceId == certificatesSource.Id.ToString()).ToList();
 			}
 
 			var query = DbSession.CreateSQLQuery(String.Format(@"select value from catalogs.propertyvalues pv
