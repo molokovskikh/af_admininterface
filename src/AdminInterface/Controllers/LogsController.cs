@@ -115,13 +115,9 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			var line = DbSession.Load<DocumentLine>(id);
-			CertificateSource certificatesSource;
+			var certificatesSource = DbSession.Load<FullDocument>(line.Document.Id).Supplier.CertificateSource;
 			PropertyBag["certificates"] = null;
 			if (line.Certificate?.Files != null) {
-				certificatesSource = filterSupplierId != null 
-					? DbSession.Query<Supplier>().First(x => x.Id == filterSupplierId).CertificateSource 
-					: DbSession.Query<Supplier>().First(x => x.Id == DbSession.Load<FullDocument>(line.Document.Id).Supplier.Id).CertificateSource;
-
 				PropertyBag["certificates"] = line.Certificate.Files.Where(x => x.CertificateSourceId == certificatesSource.Id.ToString()).ToList();
 			}
 

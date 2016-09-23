@@ -20,7 +20,7 @@
 				</tr>
 				</table>
 				<% end %>
-				<% if certificates: %>
+				<% if certificates and (certificates.Count > 0): %>
 				<p>
 					<strong>Сертификаты:</strong><br>
 					<% for file in certificates: %>
