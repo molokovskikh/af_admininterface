@@ -20,11 +20,11 @@
 				</tr>
 				</table>
 				<% end %>
-				<% if line.Certificate and line.Certificate.Files: %>
+				<% if certificates and (certificates.Count > 0): %>
 				<p>
 					<strong>Сертификаты:</strong><br>
-					<% for file in line.Certificate.Files: %>
-					<a href="Certificate?id=${file.Id}">${file.Filename}</a>
+					<% for file in certificates: %>
+						<a href="Certificate?id=${file.Id}">${file.Filename}</a>
 					<% end %>
 				</p>
 				<% else: %>

@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
+using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
@@ -112,6 +115,12 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			var line = DbSession.Load<DocumentLine>(id);
+			var certificatesSource = DbSession.Load<FullDocument>(line.Document.Id).Supplier.CertificateSource;
+			PropertyBag["certificates"] = null;
+			if (line.Certificate?.Files != null) {
+				PropertyBag["certificates"] = line.Certificate.Files.Where(x => x.CertificateSourceId == certificatesSource.Id.ToString()).ToList();
+			}
+
 			var query = DbSession.CreateSQLQuery(String.Format(@"select value from catalogs.propertyvalues pv
 join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId = {0}", line.CatalogProduct.Id));
 			var properties = String.Join(", ", query.List<string>());
