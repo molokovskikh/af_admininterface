@@ -32,7 +32,7 @@ namespace AdminInterface.Models.Logs
 		//Обновления для нового приложения
 		[Description("Отсутствует")] NoType = 0,
 		[Description("Загрузка накладных")] Waybills = 40,
-		[Description("Загрузка накладных")] WaybillsСontroller = 41,
+		[Description("Загрузка истории накладных")] WaybillsController = 41,
 		[Description("Загрузка истории заказов")] HistoryController = 42,
 		[Description("Автозаказ")] SmartOrder = 43,
 		[Description("Автозаказ")] BatchController = 44,
