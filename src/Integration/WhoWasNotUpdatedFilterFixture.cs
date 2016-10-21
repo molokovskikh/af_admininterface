@@ -193,5 +193,20 @@ delete from Billing.Accounts where Type = 0;")
 			data = filter.Find();
 			Assert.AreEqual(data.Count, 0);
 		}
+
+		[Test]
+		public void Exclude_users()
+		{
+			//исключаем из отчета пользователя
+			user1.ExcludeFromManagerReports = true;
+
+			session.Save(user1);
+			Flush();
+
+			var filter = new WhoWasNotUpdatedFilter { Session = session, BeginDate = DateTime.Now.AddDays(-3) };
+
+			var data = filter.Find();
+			Assert.AreEqual(data.Count, 3);
+		}
 	}
 }

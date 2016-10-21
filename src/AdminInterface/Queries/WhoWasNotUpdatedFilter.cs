@@ -79,6 +79,7 @@ from Customers.Users u
 where ap.PermissionId in (1, 81)
 	and u.Enabled = 1
 	and u.PayerId <> 921
+	and u.ExcludeFromManagerReports = 0
 	and c.Status = 1
 	and rcs.ServiceClient = 0
 	and rcs.InvisibleOnFirm = 0
