@@ -47,6 +47,7 @@ ${app.Asset("UserScripts.js")}
 				@text: @LoginAndName})}
 			${app.Label("user.InheritPricesFrom")}<br>
 			${app.Edit("user.DoNotCheckWellBeing")}<br>
+			${app.Edit("user.ExcludeFromManagerReports")}<br>
 		</div>
 
 		<div class=block>

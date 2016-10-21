@@ -269,6 +269,9 @@ namespace AdminInterface.Models
 		[Property, Description("Проверять УИН приложения"), Auditable]
 		public virtual bool CheckClientToken { get; set; }
 
+		[Property, Description("Исключить из отчетов менеджеров"), Auditable]
+		public virtual bool ExcludeFromManagerReports { get; set; }
+
 		[BelongsTo("ClientId", /*NotNull = true, */Lazy = FetchWhen.OnInvoke), Description("Клиент"), Auditable]
 		public virtual Client Client { get; set; }
 
