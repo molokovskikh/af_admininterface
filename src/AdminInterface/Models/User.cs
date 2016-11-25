@@ -72,6 +72,9 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual string ClientTokenV2 { get; set; }
 
+		[Property]
+		public virtual string ClientVersion { get; set; }
+
 		[OneToOne]
 		public virtual User User { get; set; }
 

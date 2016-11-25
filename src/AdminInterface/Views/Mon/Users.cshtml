@@ -15,6 +15,7 @@
 			<th>Дата создания</th>
 			<th>Пользователь</th>
 			<th>Версия</th>
+			<th>Текущая версия</th>
 			<th>Примечание</th>
 		</tr>
 		</thead>
@@ -26,6 +27,7 @@
 					<a href="~/Users/@item.User.Id/Edit">@item.User.Name</a>
 				</td>
 				<td>@item.Version</td>
+				<td>@item.User.AFNetConfig.ClientVersion</td>
 				<td>@item.ErrorDescription</td>
 			</tr>
 			}

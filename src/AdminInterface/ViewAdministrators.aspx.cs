@@ -8,6 +8,8 @@ using AdminInterface.Mailers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Models;
+using Common.Tools;
+using SortDirection = System.Web.UI.WebControls.SortDirection;
 
 public partial class ViewAdministrators : Page
 {
@@ -112,7 +114,7 @@ public partial class ViewAdministrators : Page
 
 	protected bool GetDeleteBlockButtonVisibiliti(string login)
 	{
-		if (login == "Boss" || login == "michail")
+		if (login.Match("BossYA") || login == "michail")
 			return false;
 		return true;
 	}
