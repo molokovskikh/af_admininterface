@@ -20,6 +20,7 @@ namespace AdminInterface.ManagerReportsFilters
 	{
 		public string Registrant { get; set; }
 		public string UpdateDate { get; set; }
+		public string LastUpdateDate { get; set; }
 		public uint UserId { get; set; }
 		public string UserName { get; set; }
 	}
@@ -135,7 +136,8 @@ SELECT
 	u.Id as UserId,
 	u.Name as UserName,
 	c.Registrant as Registrant,
-	uu.UpdateDate as UpdateDate
+	uu.UpdateDate as UpdateDate,
+	IF(uu.UpdateDate < ad.AFTime, ad.AFTime, ad.AFNetTime) as LastUpdateDate
 FROM customers.Users U
 	join Customers.UserSource us on us.UserId = u.Id
 	join customers.UserAddresses ua on ua.UserId = u.id
@@ -143,6 +145,7 @@ FROM customers.Users U
 	join usersettings.UserUpdateInfo uu on uu.userid = u.id
 	join customers.Clients c on c.id = u.ClientId and c.Status = 1
 	join farm.Regions reg on reg.RegionCode = c.RegionCode
+	join logs.authorizationdates ad on ad.UserId = u.Id
 	left join Customers.AnalitFNetDatas nd on nd.UserId = u.Id
 where uu.UpdateDate < :beginDate
 	and ifnull(nd.LastUpdateAt, '2000-01-01') < :beginDate
@@ -159,13 +162,15 @@ SELECT
 	u.Id as UserId,
 	u.Name as UserName,
 	if (reg.ManagerName is not null, reg.ManagerName, c.Registrant) as Registrant,
-	uu.UpdateDate as UpdateDate
+	uu.UpdateDate as UpdateDate,
+	IF(uu.UpdateDate < ad.AFTime, ad.AFTime, ad.AFNetTime) as LastUpdateDate
 FROM customers.Users U
 	join Customers.UserSource2 us on us.UserId = u.Id
 	join customers.UserAddresses ua on ua.UserId = u.id
 	join customers.Addresses a on a.id = ua.AddressId
 	join usersettings.UserUpdateInfo uu on uu.userid = u.id
 	join customers.Clients c on c.id = u.ClientId and c.Status = 1
+	join logs.authorizationdates ad on ad.UserId = u.Id
 	left join accessright.regionaladmins reg on reg.UserName = c.Registrant
 	join farm.Regions reg on reg.RegionCode = c.RegionCode
 	left join Customers.AnalitFNetDatas nd on nd.UserId = u.Id
