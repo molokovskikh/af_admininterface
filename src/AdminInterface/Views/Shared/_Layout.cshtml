@@ -1,4 +1,5 @@
 ﻿<!DOCTYPE html>
+@using Common.Tools
 
 <html>
 <head>
@@ -8,6 +9,19 @@
 	<script type='text/javascript' src='~/Assets/Javascripts/jquery-ui-i18n.js'></script>
 	<link type='text/css' rel='stylesheet' href='~/Assets/Stylesheets/themes/base/jquery.ui.all.css'>	@RenderSection("scripts", required: false)</head>
 <body>
-@RenderBody()
+<div class="container-fluid">
+	@if(TempData.ContainsKey("Message")) {
+		var clazz = "alert-success";
+		var message = (Message)TempData["Message"];
+		if (message.IsError) {
+			clazz = "alert-danger";
+		}
+		if (message.IsWarning) {
+			clazz = "alert-warning";
+		}
+		<div class="alert @clazz">@message.MessageText</div>
+	}
+	@RenderBody()
+</div>
 </body>
 </html>

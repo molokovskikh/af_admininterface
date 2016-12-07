@@ -1,11 +1,14 @@
 ﻿using System.Linq;
+using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
+using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
+	[Secure(PermissionType.ManageSuppliers)]
 	public class SpecialHandlersController : AdminInterfaceController
 	{
 		public SpecialHandlersController()
