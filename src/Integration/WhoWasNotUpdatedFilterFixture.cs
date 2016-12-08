@@ -213,15 +213,31 @@ delete from Billing.Accounts where Type = 0;")
 		[Test]
 		public void LastVersionUpdate()
 		{
-			user.Logs.AFTime = DateTime.Now.AddDays(-2);
-			user.Logs.AFNetTime = DateTime.Now.AddDays(-2).AddMinutes(10);
-			user.UserUpdateInfo.UpdateDate = user.Logs.AFTime.Value;
+			user.Logs.AFTime = DateTime.Now.AddDays(-2).AddHours(-1);
 
 			session.Save(user);
 			Flush();
 
 			var filter = new WhoWasNotUpdatedFilter { Session = session, BeginDate = DateTime.Now.AddDays(-1) };
 			var data = filter.Find().Where(d => d.UserName == "user").ToList();
+
+			Assert.AreEqual(data.First().LastUpdateDate, user.Logs.AFTime.Value.ToString("dd.MM.yyyy HH:mm"));
+
+			user.Logs.AFTime = null;
+			user.Logs.AFNetTime = DateTime.Now.AddDays(-2).AddHours(-1).AddMinutes(10);
+
+			session.Save(user);
+			Flush();
+
+			data = filter.Find().Where(d => d.UserName == "user").ToList();
+			Assert.AreEqual(data.First().LastUpdateDate, user.Logs.AFNetTime.Value.ToString("dd.MM.yyyy HH:mm"));
+
+			user.Logs.AFTime = DateTime.Now.AddDays(-2).AddHours(-1);
+
+			session.Save(user);
+			Flush();
+
+			data = filter.Find().Where(d => d.UserName == "user").ToList();
 
 			Assert.AreEqual(data.First().LastUpdateDate, user.Logs.AFNetTime.Value.ToString("dd.MM.yyyy HH:mm"));
 		}

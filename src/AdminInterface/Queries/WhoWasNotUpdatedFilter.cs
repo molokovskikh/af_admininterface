@@ -137,7 +137,12 @@ SELECT
 	u.Name as UserName,
 	c.Registrant as Registrant,
 	uu.UpdateDate as UpdateDate,
-	IF(ad.AFTime < ad.AFNetTime, ad.AFNetTime, ad.AFTime) as LastUpdateDate
+	IF(ad.AFTime is not null and ad.AFNetTime is null, ad.AFTime,
+		IF(ad.AFTime is null and ad.AFNetTime is not null, ad.AFNetTime,
+			IF(ad.AFTime < ad.AFNetTime, ad.AFNetTime, ad.AFTime
+			)
+		)
+	) as LastUpdateDate
 FROM customers.Users U
 	join Customers.UserSource us on us.UserId = u.Id
 	join customers.UserAddresses ua on ua.UserId = u.id
@@ -163,7 +168,12 @@ SELECT
 	u.Name as UserName,
 	if (reg.ManagerName is not null, reg.ManagerName, c.Registrant) as Registrant,
 	uu.UpdateDate as UpdateDate,
-	IF(ad.AFTime < ad.AFNetTime, ad.AFNetTime, ad.AFTime) as LastUpdateDate
+	IF(ad.AFTime is not null and ad.AFNetTime is null, ad.AFTime,
+		IF(ad.AFTime is null and ad.AFNetTime is not null, ad.AFNetTime,
+			IF(ad.AFTime < ad.AFNetTime, ad.AFNetTime, ad.AFTime
+			)
+		)
+	) as LastUpdateDate
 FROM customers.Users U
 	join Customers.UserSource2 us on us.UserId = u.Id
 	join customers.UserAddresses ua on ua.UserId = u.id
