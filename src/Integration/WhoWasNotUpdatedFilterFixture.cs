@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
-using AdminInterface.Models.Logs;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -208,22 +207,6 @@ delete from Billing.Accounts where Type = 0;")
 
 			var data = filter.Find();
 			Assert.AreEqual(data.Count, 3);
-		}
-
-		[Test]
-		public void LastVersionUpdate()
-		{
-			user.Logs.AFTime = DateTime.Now.AddDays(-2);
-			user.Logs.AFNetTime = DateTime.Now.AddDays(-2).AddMinutes(10);
-			user.UserUpdateInfo.UpdateDate = user.Logs.AFTime.Value;
-
-			session.Save(user);
-			Flush();
-
-			var filter = new WhoWasNotUpdatedFilter { Session = session, BeginDate = DateTime.Now.AddDays(-1) };
-			var data = filter.Find().Where(d => d.UserName == "user").ToList();
-
-			Assert.AreEqual(data.First().LastUpdateDate, user.Logs.AFNetTime.Value.ToString("dd.MM.yyyy HH:mm"));
 		}
 	}
 }

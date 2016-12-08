@@ -9,7 +9,7 @@
 			<th>${app.Sortable("Комментарий пользователя", "UserName")}</th>
 			<th>${app.Sortable("Регион", "RegionName")}</th>
 			<th>${app.Sortable("Регистратор", "Registrant")}</th>
-			<th>${app.Sortable("Дата обновления", "LastUpdateDate")}</th>
+			<th>${app.Sortable("Дата обновления", "UpdateDate")}</th>
 		</tr>
 	</thead>
 <%end %>
@@ -32,7 +32,7 @@
 			<td>${item.RegionName}</td>
 			<td>${item.Registrant}</td>
 			<td class="${app.Style(item)}">
-				${item.LastUpdateDate}
+				${item.UpdateDate}
 			</td>
 		</tr>
 		<%end %>
