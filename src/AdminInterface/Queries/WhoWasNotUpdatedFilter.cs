@@ -20,7 +20,6 @@ namespace AdminInterface.ManagerReportsFilters
 	{
 		public string Registrant { get; set; }
 		public string UpdateDate { get; set; }
-		public string LastUpdateDate { get; set; }
 		public uint UserId { get; set; }
 		public string UserName { get; set; }
 	}
