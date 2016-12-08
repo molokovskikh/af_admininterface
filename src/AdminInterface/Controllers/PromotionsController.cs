@@ -346,6 +346,40 @@ namespace AdminInterface.Controllers
 			else
 				ActiveRecordMediator.Evict(promotion);
 		}
+		/// <summary>
+		//отправка уведомления о новой промо-акции
+		/// </summary>
+		/// <param name="promotion"></param>
+		void SendNotificationAboutNewPromotion(SupplierPromotion promotion)
+		{
+			try {
+				var mailFrom = ConfigurationManager.AppSettings["NewPromotionNotifier"];
+				var sender = new DefaultSmtpSender(ConfigurationManager.AppSettings["SmtpServer"]);
+				var message = new MailMessage();
+				message.Subject = "Новая промо-акция";
+				message.From = new MailAddress(mailFrom);
+				message.To.Add(new MailAddress(mailFrom));
+				message.BodyEncoding = Encoding.UTF8;
+				message.HeadersEncoding = Encoding.UTF8;
+				message.Body =
+					string.Format(@"Добавлена новая промо-акция.
+Поставщик : {0}
+Акция     : '{1}' ({2})
+Период    : с {3} по {4}
+Время     : {5}
+Ip-адрес  : {6}", promotion.PromotionOwnerSupplier.Name, promotion.Name, promotion.Id,
+						promotion.Begin.ToShortDateString(), promotion.End.ToShortDateString(),
+						DateTime.Now.ToString("dd.MM.yyyy HH:mm"), HttpContext.Current?.Request?.UserHostAddress);
+#if !DEBUG
+				sender.Send(message);
+#endif
+			} catch (Exception e) {
+#if DEBUG
+				throw;
+#endif
+				log.Error(String.Format("Ошибка при отправке уведомления о новой промо-акции {0}", promotion.Id), e);
+			}
+		}
 
 		void SendMailFromModerator(List<string> contacts, string subject, string body)
 		{
@@ -468,6 +502,8 @@ namespace AdminInterface.Controllers
 
 					promotion.UpdateStatus();
 					DbSession.Save(promotion);
+					//отправка уведомления о новой промо-акции
+					SendNotificationAboutNewPromotion(promotion);
 
 					if (file != null && file.ContentLength > 0) {
 						var newLocalPromoFile = GetPromoFile(promotion);

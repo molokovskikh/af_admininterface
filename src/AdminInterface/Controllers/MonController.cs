@@ -116,7 +116,7 @@ namespace AdminInterface.Controllers
 		}
 	}
 
-	public class MonController : Controller
+	public class MvcController : Controller
 	{
 		protected ISession DbSession;
 
@@ -132,6 +132,14 @@ namespace AdminInterface.Controllers
 			sessionHolder.ReleaseSession(DbSession);
 		}
 
+		protected void Notify(string text)
+		{
+			TempData["Message"] = Message.Notify(text);
+		}
+	}
+
+	public class MonController : MvcController
+	{
 		public ActionResult Index()
 		{
 			var begin = DateTime.Today;

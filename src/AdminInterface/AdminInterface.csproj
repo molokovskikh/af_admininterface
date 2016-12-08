@@ -112,8 +112,12 @@
       <HintPath>..\..\lib\LumiSoft.Net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.ReportViewer.Common, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.ReportViewer.WinForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.ReportViewer.Common, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Reporting.WinForms.v11.1.0.0.0\lib\Microsoft.ReportViewer.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Reporting.WinForms.v11.1.0.0.0\lib\Microsoft.ReportViewer.WinForms.DLL</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
@@ -225,6 +229,7 @@
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\NewSupplierAttachmentsController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
+    <Compile Include="Controllers\ParserController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Helpers\NewSupplierMessage.cs" />
@@ -235,6 +240,7 @@
     <Compile Include="Models\Logs\ClientAppLog.cs" />
     <Compile Include="Models\Logs\RequestLog.cs" />
     <Compile Include="Models\Markup.cs" />
+    <Compile Include="Models\Parser.cs" />
     <Compile Include="Models\ProducerSynonym.cs" />
     <Compile Include="Models\ProductSynonym.cs" />
     <Compile Include="Models\Redmine.cs" />
@@ -643,6 +649,8 @@
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Orders\Make.brail" />
+    <Content Include="Views\Parser\Index.cshtml" />
+    <Content Include="Views\Parser\Edit.cshtml" />
     <None Include="Views\Prices\Edit.brail" />
     <Content Include="Views\Settings\Terms.brail" />
     <None Include="Views\Shared\DisplayTemplates\RegistrationInfo.brail" />
