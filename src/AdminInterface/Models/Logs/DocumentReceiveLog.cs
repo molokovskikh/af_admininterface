@@ -99,6 +99,9 @@ namespace AdminInterface.Models.Logs
 		[BelongsTo("AddressId")]
 		public virtual Address Address { get; set; }
 
+		[OneToOne(PropertyRef = "Enabled")]
+		public virtual Address AddressEnabled { get; set; }
+
 		[OneToOne(PropertyRef = "Log")]
 		public virtual FullDocument Document { get; set; }
 

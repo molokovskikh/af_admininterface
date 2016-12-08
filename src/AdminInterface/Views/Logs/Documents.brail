@@ -101,7 +101,7 @@ ${app.EndFormFor("filter")}
 				<% end %>
 				<td>${app.LinkTo(log.Supplier, @Suppliers, log.SupplierId)}</td>
 				<td>${app.LinkTo(log.Client, @Clients, log.ClientId)}</td>
-				<td>${log.Address}</td>
+				<td class="${'disabled' if not log.AddressEnabled}">${log.Address}</td>
 				<td class="${'DocumentNotParsed' if not log.DocumentId and log.SendUpdateId}">
 					<% if log.DocumentId: %>
 						<a id="ShowDocumentDetailsLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, 'ShowDocumentDetails?documentLogId=${log.Id}&supplierId=<% if filter.Supplier: %>${filter.Supplier.Id}<% end %>', 'DocumentDetails');">
