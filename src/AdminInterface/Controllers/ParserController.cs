@@ -15,8 +15,9 @@ namespace AdminInterface.Controllers
 	{
 		public ActionResult Index(uint supplierId)
 		{
-			ViewBag.Parsers = DbSession.Query<Parser>().OrderBy(x => x.Name).ToList();
-			ViewBag.Supplier = DbSession.Load<Supplier>(supplierId);
+			var supplier = DbSession.Load<Supplier>(supplierId);
+			ViewBag.Parsers = DbSession.Query<Parser>().Where(x => x.Supplier == supplier).OrderBy(x => x.Name).ToList();
+			ViewBag.Supplier = supplier;
 			return View();
 		}
 

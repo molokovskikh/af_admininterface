@@ -132,13 +132,13 @@ namespace AdminInterface.Controllers
 			var logMessage = new StringBuilder();
 			oldSource.ForEach(s => {
 				s.Suppliers.Remove(supplier);
-				logMessage.AppendLine(string.Format("Удален источник сертификатов {0}", s.GetName()));
+				logMessage.AppendLine($"Удален источник сертификатов {s.GetName()}");
 				DbSession.Save(s);
 			});
 			if (sertificateSourceId > 0) {
 				var sertSource = DbSession.Load<CertificateSource>(sertificateSourceId);
 				sertSource.Suppliers.Add(supplier);
-				logMessage.AppendLine(string.Format("Установлен источник сертификатов {0}", sertSource.GetName()));
+				logMessage.AppendLine($"Установлен источник сертификатов {sertSource.GetName()}");
 				DbSession.Save(sertSource);
 			}
 			Notify("Сохранено");
