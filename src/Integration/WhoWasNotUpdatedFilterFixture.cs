@@ -213,7 +213,7 @@ delete from Billing.Accounts where Type = 0;")
 		[Test]
 		public void LastVersionUpdate()
 		{
-			user.Logs.AFTime = DateTime.Now.AddDays(-2).AddHours(-1);
+			user.Logs.AFTime = DateTime.Now.AddDays(-2);
 
 			session.Save(user);
 			Flush();
@@ -224,7 +224,7 @@ delete from Billing.Accounts where Type = 0;")
 			Assert.AreEqual(data.First().LastUpdateDate, user.Logs.AFTime.Value.ToString("dd.MM.yyyy HH:mm"));
 
 			user.Logs.AFTime = null;
-			user.Logs.AFNetTime = DateTime.Now.AddDays(-2).AddHours(-1).AddMinutes(10);
+			user.Logs.AFNetTime = DateTime.Now.AddDays(-2).AddMinutes(10);
 
 			session.Save(user);
 			Flush();
@@ -232,7 +232,7 @@ delete from Billing.Accounts where Type = 0;")
 			data = filter.Find().Where(d => d.UserName == "user").ToList();
 			Assert.AreEqual(data.First().LastUpdateDate, user.Logs.AFNetTime.Value.ToString("dd.MM.yyyy HH:mm"));
 
-			user.Logs.AFTime = DateTime.Now.AddDays(-2).AddHours(-1);
+			user.Logs.AFTime = DateTime.Now.AddDays(-2);
 
 			session.Save(user);
 			Flush();
