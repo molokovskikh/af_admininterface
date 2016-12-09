@@ -145,6 +145,7 @@ FROM customers.Users U
 	join usersettings.UserUpdateInfo uu on uu.userid = u.id
 	join customers.Clients c on c.id = u.ClientId and c.Status = 1
 	join farm.Regions reg on reg.RegionCode = c.RegionCode
+	join logs.authorizationdates ad on ad.UserId = u.Id
 	left join Customers.AnalitFNetDatas nd on nd.UserId = u.Id
 where uu.UpdateDate < :beginDate
 	and ifnull(nd.LastUpdateAt, '2000-01-01') < :beginDate
@@ -169,6 +170,7 @@ FROM customers.Users U
 	join customers.Addresses a on a.id = ua.AddressId
 	join usersettings.UserUpdateInfo uu on uu.userid = u.id
 	join customers.Clients c on c.id = u.ClientId and c.Status = 1
+	join logs.authorizationdates ad on ad.UserId = u.Id
 	left join accessright.regionaladmins reg on reg.UserName = c.Registrant
 	join farm.Regions reg on reg.RegionCode = c.RegionCode
 	left join Customers.AnalitFNetDatas nd on nd.UserId = u.Id
