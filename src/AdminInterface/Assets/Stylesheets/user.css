@@ -84,6 +84,11 @@ div.LegendMarker.SingleUser
 	background-color: #BBFFB6;
 }
 
+table.DataTable td.disabled
+{
+	background-color: #ff9d5b;
+}
+
 #user_Name
 {
 	width: 60%;

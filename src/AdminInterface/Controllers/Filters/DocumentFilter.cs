@@ -160,6 +160,7 @@ namespace AdminInterface.Controllers.Filters
 				.Add(Projections.Property("fc.Name").As("Client"))
 				.Add(Projections.Property("fc.Id").As("ClientId"))
 				.Add(Projections.Property("a.Value").As("Address"))
+				.Add(Projections.Property("a.Enabled").As("AddressEnabled"))
 				.Add(Projections.Property("fs.HomeRegion").As("RegionName"));
 			if(!OnlyNoParsed && !StatMode) {
 				projection.Add(Projections.Property("u.Login").As("Login"))
@@ -206,6 +207,7 @@ namespace AdminInterface.Controllers.Filters
 		public string Client { get; set; }
 		public string ClientId { get; set; }
 		public string Address { get; set; }
+		public bool AddressEnabled { get; set; }
 		public string Login { get; set; }
 		public string LoginId { get; set; }
 		public DateTime? RequestTime { get; set; }

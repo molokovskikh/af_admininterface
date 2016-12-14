@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using AdminInterface.ManagerReportsFilters;
 using AdminInterface.Models;
-using AdminInterface.Models.Logs;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
