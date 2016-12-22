@@ -40,12 +40,6 @@ Global(
 	AdditionalAssemblies : ("Common.Web.UI",)
 )
 
-#если мы запускаем тесты на сервере не надо загружать проект что бы
-#не блокировать библиотеки
-task @ready:
-	unless Configuration.IsDefined(@notInteractive):
-		Engine.Execute("LoadProject")
-
 task @default, [@Build]
 
 task @Build, [@BuildWebSite, @BuildBackground, @BuildPrinter,@CopyJWidgets]
