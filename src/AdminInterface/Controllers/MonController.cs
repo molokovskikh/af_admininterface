@@ -11,6 +11,7 @@ using Castle.ActiveRecord;
 using Common.MySql;
 using Common.Tools;
 using Common.Web.Ui.Controllers;
+using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
 using NHibernate;
 using NHibernate.Linq;
@@ -113,28 +114,6 @@ namespace AdminInterface.Controllers
 				errors.Each(x => x.Text = regex.Replace(x.Text, "<var>"));
 			}
 			return errors;
-		}
-	}
-
-	public class MvcController : Controller
-	{
-		protected ISession DbSession;
-
-		protected override void OnActionExecuting(ActionExecutingContext filterContext)
-		{
-			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
-			DbSession = sessionHolder.CreateSession(typeof(ActiveRecordBase));
-		}
-
-		protected override void OnResultExecuted(ResultExecutedContext filterContext)
-		{
-			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
-			sessionHolder.ReleaseSession(DbSession);
-		}
-
-		protected void Notify(string text)
-		{
-			TempData["Message"] = Message.Notify(text);
 		}
 	}
 
