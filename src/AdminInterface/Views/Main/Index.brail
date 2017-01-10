@@ -35,6 +35,9 @@
 							<% end %>
 						</li>
 						<li>
+							<a href="${siteroot}/SmsSender">Внутренние sms-сообщения</a>
+						</li>
+						<li>
 							<a href="${siteroot}/SmapRejector/Show">Отклоненные сообщения</a>
 						</li>
 						<li>

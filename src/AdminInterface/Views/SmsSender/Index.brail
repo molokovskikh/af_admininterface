@@ -1,0 +1,30 @@
+﻿<% component CaptureFor, {@id : @Title}: %>
+	Отправка sms-сообщений
+<% end %>
+<% component Bubble, {@bredcrumbs : []} %>
+
+<div class="block">
+	<table class="DataTable">
+		<thead>
+			<tr>
+				<th style="width: 400px;">Сотрудник</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<%for i, item in enumerate(usersList): %>
+				<tr>
+					<td> 
+							<strong>${item.Name}</strong> ( ${item.UserName} )
+					</td>
+					<td>
+						<form method="get" action="${siteroot}/SmsSender/MessagesList">
+							<input name="id" type="hidden" value="${item.Id}" />
+							<input type="submit" value="список сообщений" title='${item.Name} ( ${item.UserName} )'>
+						</form>
+					</td>
+				</tr>
+			<%end%>
+		</tbody>
+	</table>
+</div>

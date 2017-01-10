@@ -232,11 +232,13 @@
     <Compile Include="Controllers\ParserController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
+    <Compile Include="Controllers\SmsSenderController.cs" />
     <Compile Include="Helpers\NewSupplierMessage.cs" />
     <Compile Include="Initializers\Seed.cs" />
     <Compile Include="Models\AFNet\BinChannel.cs" />
     <Compile Include="Models\Core.cs" />
     <Compile Include="Models\CostOptimization.cs" />
+    <Compile Include="Models\InnerSmsMessage.cs" />
     <Compile Include="Models\Logs\ClientAppLog.cs" />
     <Compile Include="Models\Logs\RequestLog.cs" />
     <Compile Include="Models\Markup.cs" />
@@ -657,6 +659,15 @@
     <Content Include="Views\Shared\EditorTemplates\TableFormBlock.brail" />
     <None Include="Views\Shared\EditorTemplates\TimeSpan.brail" />
     <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\SmsSender\MessagesList.brail">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Views\SmsSender\Info.brail">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Views\SmsSender\Add.brail">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Views\SpecialHandlers\Index.brail" />
     <None Include="Views\SpecialHandlers\New.brail" />
     <None Include="Views\SpecialHandlers\Edit.brail" />
@@ -728,6 +739,9 @@
     <None Include="Views\Templates\Settings.brail" />
     <None Include="Views\Templates\Users.brail" />
     <Content Include="Views\UserSearch\BatchEdit.brail" />
+    <Content Include="Views\SmsSender\Index.brail">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Views\Users\ShowUsers.brail" />
     <None Include="Views\Users\SupplierSettings.brail" />
     <Content Include="Web.test.config">
