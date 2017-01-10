@@ -1,0 +1,41 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Информация о сообщении № ${messageData.Id}
+<% end %>
+<% component Bubble, {"bredcrumbs" : [("Отправка sms-сообщений", "${siteroot}/SmsSender"), ("Список sms-сообщений сотрудника", "${siteroot}/SmsSender/MessagesList?id=${messageData.UserTo.Id}"), ("Информация о сообщении", "")], "pageTitle":"Информация о сообщении"} %>
+
+
+	<h2>Информация о сообщении № ${messageData.Id}</h2>
+<div class="block">
+	<table class="DataTable" style="max-width: 500px;">
+		<tbody>
+			<tr>
+				<td><strong>Получатель:</strong></td>
+				<td>
+					<strong>${messageData.UserTo.Name}</strong> ( ${messageData.UserTo.UserName} )
+				</td>
+			</tr>
+			<tr>
+				<td><strong>Отправитель:</strong></td>
+				<td>
+					<strong>${messageData.UserFrom.Name}</strong> ( ${messageData.UserFrom.UserName} )
+				</td>
+			</tr>
+			<tr>
+				<td><strong>Номер отправки:</strong></td>
+				<td>${messageData.SmsIdFormat}</td>
+			</tr>
+			<tr>
+				<td><strong>Время отправки:</strong></td>
+				<td>${messageData.Date}</td>
+			</tr>
+			<tr>
+				<td><strong>Номер:</strong></td>
+				<td>${messageData.TargetAddress}</td>
+			</tr>
+			<tr>
+				<td><strong>Содержание:</strong></td>
+				<td>${messageData.Message}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

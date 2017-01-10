@@ -1,0 +1,45 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Новое сообщение
+<% end %>
+<% component Bubble, {"bredcrumbs" : [("Отправка sms-сообщений", "${siteroot}/SmsSender"), ("Список sms-сообщений сотрудника", "${siteroot}/SmsSender/MessagesList?id=${messageData.UserTo.Id}"), ("Новое сообщение", "")], "pageTitle":"Новое сообщение"} %>
+
+<h2>Новое сообщение</h2>
+<div class="block">
+	<form method="post" action="${siteroot}/SmsSender/Add" enctype="multipart/form-data">
+		<input name="id" type="hidden" value="${messageData.Id}" />
+		<table class="DataTable" style="max-width: 500px;">
+			<tbody>
+				<tr>
+					<td><strong>Получатель:</strong></td>
+					<td>
+						<strong>${messageData.UserTo.Name}</strong> ( ${messageData.UserTo.UserName} )
+					</td>
+				</tr>
+				<tr>
+					<td><strong>Отправитель:</strong></td>
+					<td>
+						<strong>${messageData.UserFrom.Name}</strong> ( ${messageData.UserFrom.UserName} )
+					</td>
+				</tr>
+				<tr>
+					<td><strong>Номер*:</strong></td>
+					<td>
+						${FormHelper.TextFieldValue("address", messageData.TargetAddress, {"style" : "width: 99%"})}
+					</td>
+				</tr>
+				<tr>
+					<td><strong>Содержание*:</strong></td>
+					<td style="width:400px;">
+						${FormHelper.TextAreaValue("message", messageData.Message, {"rows":"8", "style" : "width: 99%"})}
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<input type="submit" value="Отправить" />
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+</div>
