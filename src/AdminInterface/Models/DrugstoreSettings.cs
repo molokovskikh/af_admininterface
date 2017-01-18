@@ -66,6 +66,9 @@ namespace AdminInterface.Models
 		[OneToOne]
 		public virtual Client Client { get; set; }
 
+		[Property, Description("Включить складской учет"), Auditable]
+		public virtual bool IsStockEnabled { get; set; }
+
 		[Property, Description("Не доставлять заказы поставщикам"), Auditable]
 		public virtual bool ServiceClient { get; set; }
 

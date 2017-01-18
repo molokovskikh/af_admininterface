@@ -92,6 +92,9 @@ ${app.Asset("smart.order.settings.js")}
 							${app.Edit("drugstore.CheckWeeklyOrdersSum")}<br>
 							${app.Label("drugstore.MaxWeeklyOrdersSum")}
 							${app.Edit("drugstore.MaxWeeklyOrdersSum")}
+
+							<h4>AnalitF.net</h4>
+							${app.Edit("drugstore.IsStockEnabled")}<br>
 						</td>
 					</tr>
 				</table>
