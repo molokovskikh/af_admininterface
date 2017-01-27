@@ -2,6 +2,38 @@
 
 <script type='text/javascript' src='~/Assets/Javascripts/editable.js'></script>
 
+<script type="text/javascript" src="/Assets/Javascripts/select2.js"></script>
+<script type="text/javascript" src="/Assets/Javascripts/Select2-locales/select2_locale_ru.js"></script>
+<link type="text/css" rel="stylesheet" href="/Assets/Stylesheets/select2.css">
+
+<script type='text/javascript'>
+
+    function registerEditable(offset, eventAfterAdding) {
+        $("table.editable").on('click', "tr input[type=button].add, tr a.add", function() {
+            var table = $(this).parents("table:first");
+            var body = table.find("tbody").get(0);
+            var row = table.data("template")(table);
+
+            if (typeof offset == "undefined") {
+                offset = 1;
+            }
+            var maxIndex = $(body).children("tr").length + offset;
+            //нужно обновить id тк оно может быть задано для jquery валидатора он использует
+            //id для того что бы поддерживать связи
+            row.find("input,textarea,select").each(function() {
+                if (this.id)
+                    this.id = this.id.replace(/\d+/, maxIndex);
+                this.name = this.name.replace(/\d+/, maxIndex);
+            });
+            row.appendTo(body);
+            eventAfterAdding(row);
+        });
+
+        $("table.editable").on('click', "tr input[type=button].delete, tr a.delete", function() {
+            $($(this).parents("tr").get(0)).remove();
+        });
+    }
+</script>
 @{
 	var title = "Редактирование правила разбора";
 	if (Model.Id == 0) {
@@ -35,15 +67,19 @@
 
 <script>
 	$(function () {
-		$("#mapping").data("template", function () { return $("<tr></tr>").html($("#row-template").html()); })
-		registerEditable(0);
-	})
+		$("select").select2({ width: '300px' });
+        $("#mapping").data("template", function () { return $("<tr></tr>").html($("#row-template").html()); })
+        registerEditable(0, function (row) {
+        	$(row).find("select.select2").select2({ width: '300px' });
+        	console.log("event edded");
+        });
+    })
 </script>
 
 <script type="text/html" id="row-template">
 	<td><input class="delete" type="button" value="Удалить"></td>
 	<td>@Html.TextBox("Lines[0].Src")</td>
-	<td>@Html.DropDownList("Lines[0].Dst", Model.Fields(""))</td>
+	<td>@Html.DropDownList("Lines[0].Dst", Model.Fields(""), new { @class = "select2" })</td>
 </script>
 
 <div>
