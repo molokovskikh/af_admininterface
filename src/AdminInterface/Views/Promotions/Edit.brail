@@ -18,6 +18,19 @@
 	vertical-align: top;
 	}
 </style>
+<script>
+function deleteFileStateUpdate(){
+						var deleteCheck = $("[name='deleteOnSave']");
+						if($(deleteCheck).val() == 'false'){
+						$(deleteCheck).val('true');
+						 $('.noFileCheck').html("отменить удаление");
+						  $(".fileUpload").attr("style","display:none;");
+							}else{
+							$(deleteCheck).val('false'); $('.noFileCheck').html("удалить файл");
+							 $(".fileUpload").removeAttr("style");
+							 }
+						}
+</script>
 
 <form id="PromotionFormEditor" method=post enctype="multipart/form-data">
 <% if promotion.Id: %>
@@ -75,7 +88,7 @@
 				<td class="DisplayName">Отключена АналитФармация:</td>
 				<td>${app.Edit("promotion.AgencyDisabled")}</td>
 			</tr>
-		<% end %>  
+		<% end %>
 		<tr>
 			<td class="DisplayName">Аннотация:</td>
 			<td>
@@ -118,12 +131,16 @@
 			<td>
 				<% if promotion.Id: %>
 					<% if promotion.PromoFile: %>
-					<a href="${siteroot}/Promotions/GetPromoFile?Id=${promotion.Id}" target="_blank">${promotion.PromoFile}</a>
+					<input type='hidden' name='deleteOnSave' value='false' />
+					<p>
+						<a href="${siteroot}/Promotions/GetPromoFile?Id=${promotion.Id}" target="_blank">${promotion.PromoFile}</a>
+					  <button type='button'  class='noFileCheck' onclick='deleteFileStateUpdate()'>удалить файл</button>
+					</p>
 					<% else: %>
-					&lt;не установлен&gt;
+					<p>&lt;не установлен&gt;</p>
 					<% end %>
 				<% end %>
-				<div class="block">
+				<div class="block fileUpload">
 					<label>Выберете файл для загрузки в форматах ${allowedExtentions}</label><br>
 					<input type=file name="inputfile"><br>
 				</div>
@@ -131,7 +148,7 @@
 		</tr>
 	</table>
 	<input type=submit value=Сохранить>
-</form> 
+</form>
 	<% if ( promotion.Id != 0 ) : %>
 			${app.Asset("PromotionDialog.js")}
 			<script type="text/javascript">
@@ -147,32 +164,32 @@
 
 			<form method=post action="${siteroot}/Promotions/ChangeModeration" enctype="multipart/form-data">
 				<input name=id type=hidden value='${promotion.Id}'>
-				<div style="padding-top: 10px;">	
+				<div style="padding-top: 10px;">
 				<% if promotion.Moderated == false : %>
-				
+
 				<% if isOverdued == false : %>
-				<input name=buttonText type=submit value='Подтвердить'>	
-				<% else: %> 
-				<input name=buttonText type=button value='Подтвердить' disabled>	
-				<% end %> 
+				<input name=buttonText type=submit value='Подтвердить'>
+				<% else: %>
+				<input name=buttonText type=button value='Подтвердить' disabled>
+				<% end %>
 				<input name=buttonText type=submit value='Отказать'>
 					<div style="padding-top: 10px; margin-left: 100px;">
 						<label style="padding-top: 10px;">Причина отказа:</label>
 						<br/>
 				<% if isOverdued == false : %>
 						<textarea style="margin-top: 10px;" rows="4" cols="50" name="reason"></textarea>
-				<% else: %> 
+				<% else: %>
 						<textarea style="margin-top: 10px;" rows="4" cols="50" name="reason">Истекли сроки акции.</textarea>
-				<% end %> 
-					</div> 	
-				<% else: %> 
+				<% end %>
+					</div>
+				<% else: %>
 				<input name=buttonText type=submit  value='Отменить подтверждение Промоакции'>
 						<div style="padding-top: 10px;">
 							<label style="padding-top: 10px;">Причина отмены:</label>
 							<br/>
 							<textarea style="margin-top: 10px;" rows="4" cols="50" name="reason"></textarea>
-						</div> 	
-				<% end %> 
-					</div> 
+						</div>
+				<% end %>
+					</div>
 			</form>
-<% end %> 
+<% end %>

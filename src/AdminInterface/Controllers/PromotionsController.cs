@@ -294,9 +294,7 @@ namespace AdminInterface.Controllers
 			RedirectToReferrer();
 		}
 
-		public void Edit(
-			uint id,
-			[DataBind("PromoRegions")] ulong[] promoRegions)
+		public void Edit(uint id, [DataBind("PromoRegions")] ulong[] promoRegions, bool deleteOnSave = false)
 		{
 			PropertyBag["allowedExtentions"] = GetAllowedExtentions();
 			Binder.Validator = Validator;
@@ -316,28 +314,35 @@ namespace AdminInterface.Controllers
 				promotion.UpdateStatus();
 
 				if (IsValid(promotion)) {
-					var file = Request.Files["inputfile"] as HttpPostedFile;
-					if (file != null && file.ContentLength > 0) {
-						if (!IsAllowedExtention(Path.GetExtension(file.FileName))) {
-							Error("Выбранный файл имеет недопустимый формат.");
-							return;
-						}
-
+					if (deleteOnSave) {
 						var oldLocalPromoFile = GetPromoFile(promotion);
 						if (File.Exists(oldLocalPromoFile))
 							File.Delete(oldLocalPromoFile);
+						promotion.PromoFile = null;
+					} else {
+						var file = Request.Files["inputfile"] as HttpPostedFile;
+						if (file != null && file.ContentLength > 0) {
+							if (!IsAllowedExtention(Path.GetExtension(file.FileName))) {
+								Error("Выбранный файл имеет недопустимый формат.");
+								return;
+							}
 
-						promotion.PromoFile = file.FileName;
+							var oldLocalPromoFile = GetPromoFile(promotion);
+							if (File.Exists(oldLocalPromoFile))
+								File.Delete(oldLocalPromoFile);
 
-						var newLocalPromoFile = GetPromoFile(promotion);
-						using (var newFile = File.Create(newLocalPromoFile)) {
-							file.InputStream.CopyTo(newFile);
+							promotion.PromoFile = file.FileName;
+
+							var newLocalPromoFile = GetPromoFile(promotion);
+							using (var newFile = File.Create(newLocalPromoFile)) {
+								file.InputStream.CopyTo(newFile);
+							}
 						}
 					}
 
 					promotion.UpdateStatus();
 					DbSession.Update(promotion);
-
+					SendNotificationAboutUpdatePromotion(promotion);
 					RedirectToAction("Index");
 				}
 				else
@@ -378,6 +383,41 @@ Ip-адрес  : {6}", promotion.PromotionOwnerSupplier.Name, promotion.Name, pr
 				throw;
 #endif
 				log.Error(String.Format("Ошибка при отправке уведомления о новой промо-акции {0}", promotion.Id), e);
+			}
+		}
+
+		/// <summary>
+		//отправка уведомления о новой промо-акции
+		/// </summary>
+		/// <param name="promotion"></param>
+		void SendNotificationAboutUpdatePromotion(SupplierPromotion promotion)
+		{
+			try {
+				var mailFrom = ConfigurationManager.AppSettings["NewPromotionNotifier"];
+				var sender = new DefaultSmtpSender(ConfigurationManager.AppSettings["SmtpServer"]);
+				var message = new MailMessage();
+				message.Subject = "Обновлена промо-акция";
+				message.From = new MailAddress(mailFrom);
+				message.To.Add(new MailAddress(mailFrom));
+				message.BodyEncoding = Encoding.UTF8;
+				message.HeadersEncoding = Encoding.UTF8;
+				message.Body =
+					string.Format(@"Обновлена промо-акция.
+Поставщик : {0}
+Акция     : '{1}' ({2})
+Период    : с {3} по {4}
+Время     : {5}
+Ip-адрес  : {6}", promotion.PromotionOwnerSupplier.Name, promotion.Name, promotion.Id,
+						promotion.Begin.ToShortDateString(), promotion.End.ToShortDateString(),
+						DateTime.Now.ToString("dd.MM.yyyy HH:mm"), HttpContext.Current?.Request?.UserHostAddress);
+#if !DEBUG
+				sender.Send(message);
+#endif
+			} catch (Exception e) {
+#if DEBUG
+				throw;
+#endif
+				log.Error(String.Format("Ошибка при отправке уведомления об обновлении промо-акции {0}", promotion.Id), e);
 			}
 		}
 
