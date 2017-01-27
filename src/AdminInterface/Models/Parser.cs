@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Web.Mvc;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
@@ -46,12 +47,12 @@ namespace AdminInterface.Models
 				//шапка
 				new SelectListItem {
 					Text = "Номер накладной",
-					Value = "Header_DocumentDate",
+					Value = "Header_ProviderDocumentId",
 					Group = headerGroup
 				},
 				new SelectListItem {
 					Text = "Дата накладной",
-					Value = "Header_ProviderDocumentId",
+					Value = "Header_DocumentDate",
 					Group = headerGroup
 				},
 
@@ -355,6 +356,7 @@ namespace AdminInterface.Models
 				},
 			};
 			items.Each(x => x.Selected = x.Value == selected);
+			items = items.OrderBy(s => s.Group.Name).ThenBy(s => s.Text).ToList();
 			return items;
 		}
 	}
