@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Common.Web.Ui.Models;
 using Functional.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using WatiN.Core;
 
@@ -14,6 +16,7 @@ namespace Functional
 		private PromotionOwnerSupplier _supplier;
 		private Catalog _catalog;
 		private SupplierPromotion _promotion;
+		private SupplierPromotion _promotionWithFile;
 		private SupplierPromotion _promotionNotModerated;
 
 		private PromotionOwnerSupplier CreateSupplier()
@@ -45,7 +48,7 @@ limit 1")
 			return session.Load<Catalog>(catalogId);
 		}
 
-		private SupplierPromotion CreatePromotion(PromotionOwnerSupplier supplier, Catalog catalog, bool moderated = true)
+		private SupplierPromotion CreatePromotion(PromotionOwnerSupplier supplier, Catalog catalog, bool moderated = true, bool withFile = false)
 		{
 			var supplierPromotion = new SupplierPromotion {
 				Enabled = true,
@@ -57,6 +60,8 @@ limit 1")
 				Moderated = moderated,
 				Catalogs = new List<Catalog> { catalog }
 			};
+			if (withFile)
+			supplierPromotion.PromoFile =  "testName.jpg";
 			supplierPromotion.UpdateStatus();
 			session.Save(supplierPromotion);
 			return supplierPromotion;
@@ -75,6 +80,7 @@ limit 1")
 			_supplier = CreateSupplier();
 			_catalog = FindFirstFreeCatalog();
 			_promotion = CreatePromotion(_supplier, _catalog);
+			_promotionWithFile = CreatePromotion(_supplier, _catalog, withFile: true);
 			_promotionNotModerated = CreatePromotion(_supplier, _catalog, false);
 			Open();
 			Click("Промо-акции");
@@ -291,6 +297,8 @@ limit 1")
 			AssertText("Редактирование акции №" + _promotion.Id);
 			AssertText(_promotion.Name);
 			AssertText(_promotion.PromotionOwnerSupplier.Name);
+			//нет загруженного файла
+			AssertText("не установлен");
 
 			browser.CheckBox(Find.ByName("promotion.Enabled")).Click();
 			browser.CheckBox(Find.ByName("promotion.AgencyDisabled")).Click();
@@ -306,6 +314,33 @@ limit 1")
 			Assert.That(_promotion.Enabled, Is.False);
 			Assert.That(_promotion.AgencyDisabled, Is.True);
 			Assert.That(_promotion.Annotation, Is.EqualTo("новое крутое описание"));
+		}
+
+		[Test(Description = "редактирование акции")]
+		public void EditPromotionFileRemoveCheck()
+		{
+			Open($"Promotions/Edit?id={_promotionWithFile.Id}");
+
+			AssertText("Редактирование акции №" + _promotionWithFile.Id);
+			AssertText(_promotionWithFile.Name);
+			AssertText(_promotionWithFile.PromotionOwnerSupplier.Name);
+			//нет загруженного файла
+
+			browser.CheckBox(Find.ByName("promotion.Enabled")).Click();
+			browser.CheckBox(Find.ByName("promotion.AgencyDisabled")).Click();
+			browser.TextField(Find.ByName("promotion.Annotation")).TypeText("новое крутое описание");
+
+			//есть загруженный файл
+			AssertText(_promotionWithFile.PromoFile);
+
+			ClickButton("Сохранить");
+			Click("Да");
+
+			AssertText("Список акций");
+			RowPromotionNotExists(_promotionWithFile);
+
+			RefreshPromotion(_promotionWithFile);
+			session.Refresh(_promotionWithFile);
 		}
 
 		[Test(Description = "проверяем создание новой акции")]
