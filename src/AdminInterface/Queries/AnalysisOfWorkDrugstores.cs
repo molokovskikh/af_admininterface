@@ -145,6 +145,13 @@ namespace AdminInterface.Queries
 		public bool ForSubQuery;
 		public AnalysisReportType ReportType;
 		public bool ForExport;
+
+		public uint GetClientId()
+		{
+			uint result = 0;
+			uint.TryParse(_id ?? "", out result);
+			return result;
+		}
 	}
 
 	public enum AnalysisReportType
@@ -236,25 +243,43 @@ group by u.ClientId;
 
 drop temporary table if exists orders.CurWeekUpdates;
 create temporary table orders.CurWeekUpdates (INDEX idx(ClientId) USING HASH) engine MEMORY
-select u.ClientId, COUNT(au.UpdateId) as CurWeekUpdates
-from logs.analitfupdates au
-join customers.users u on u.id = au.userid
-where au.requesttime between :FistPeriodStart and :FistPeriodEnd
-and au.Commit = 1
-and au.updatetype in (1, 2)
-and u.Enabled = 1
+select u.ClientId, COUNT(au.UpdateId) + COUNT(reql.RequestToken)  as CurWeekUpdates
+from customers.users u
+right join
+(SELECT * FROM logs.analitfupdates as an WHERE
+an.requesttime between :FistPeriodStart AND :FistPeriodEnd
+and an.Commit = 1
+and an.updatetype in (1, 2)
+) as au on au.userid = u.id
+right join
+(SELECT * FROM logs.RequestLogs as re WHERE
+re.CreatedOn between :FistPeriodStart AND :FistPeriodEnd
+and re.IsCompleted = 1
+and re.IsFaulted = 0
+and re.UpdateType = 'MainController'
+) as reql ON reql.UserId =  u.Id
+where u.Enabled = 1
 and u.WorkRegionMask & :regionCode > 0
 group by u.clientid;
 
 drop temporary table if exists orders.LastWeekUpdates;
 create temporary table orders.LastWeekUpdates (INDEX idx(ClientId) USING HASH) engine MEMORY
-select u.ClientId, COUNT(au.UpdateId) as LastWeekUpdates
-from logs.analitfupdates au
-join customers.users u on u.id = au.userid
-where au.requesttime between :LastPeriodStart AND :LastPeriodEnd
-and au.Commit = 1
-and au.updatetype in (1, 2)
-and u.Enabled = 1
+select u.ClientId, COUNT(au.UpdateId) + COUNT(reql.RequestToken)  as LastWeekUpdates
+from customers.users u
+right join
+(SELECT * FROM logs.analitfupdates as an WHERE
+an.requesttime between :LastPeriodStart AND :LastPeriodEnd
+and an.Commit = 1
+and an.updatetype in (1, 2)
+) as au on au.userid = u.id
+right join
+(SELECT * FROM logs.RequestLogs as re WHERE
+re.CreatedOn between :LastPeriodStart AND :LastPeriodEnd
+and re.IsCompleted = 1
+and re.IsFaulted = 0
+and re.UpdateType = 'MainController'
+) as reql ON reql.UserId =  u.Id
+where u.Enabled = 1
 and u.WorkRegionMask & :regionCode > 0
 group by u.clientid;
 
@@ -292,7 +317,9 @@ WHERE
 	And cd.Status = 1
 	AND rcs.serviceclient = 0
 	AND rcs.invisibleonfirm = 0
-group by cd.id;";
+group by cd.id
+HAVING UserCount > 0
+;";
 
 		public string UserTypeSqlPart = @"insert into Customers.Updates (Id, Name, CurWeekUpdates, LastWeekUpdates, CurWeekSum, LastWeekSum)
 SELECT u.id,
@@ -508,7 +535,7 @@ AutoOrderCntNet int
 			query.ExecuteUpdate();
 		}
 
-		public IList<BaseItemForTable> Find(bool forExport)
+		public IList<AnalysisOfWorkFiled> GetResult(bool forExport)
 		{
 			PrepareAggregatesData();
 
@@ -519,11 +546,12 @@ where AutoOrderIs = 1 and (AutoOrderCnt > 0 or AutoOrderCntNet > 0);").ExecuteUp
 			if (Type == AnalysisReportType.Client && AutoOrder.HasValue)
 				where = $"where up.AutoOrderIs = {AutoOrder.Value}";
 
-			RowsCount = Convert.ToInt32(Session.CreateSQLQuery($"select count(*) from Customers.updates up {where};").UniqueResult());
+			RowsCount =
+				Convert.ToInt32(Session.CreateSQLQuery($"select count(*) from Customers.updates up {where};").UniqueResult());
 
 			var limitPart = string.Empty;
 			if (!forExport)
-				limitPart = $"limit {CurrentPage * PageSize}, {PageSize}";
+				limitPart = $"limit {CurrentPage*PageSize}, {PageSize}";
 
 
 			var result = Session.CreateSQLQuery(string.Format(@"
@@ -539,6 +567,13 @@ FROM Customers.updates up
 group by up.Id
 ORDER BY {1} {2} {3}", where, GetSortProperty(), SortDirection, limitPart))
 				.ToList<AnalysisOfWorkFiled>();
+
+			return result;
+		}
+
+		public IList<BaseItemForTable> Find(bool forExport)
+		{
+			var result = GetResult(forExport);
 
 			foreach (var analysisOfWorkFiled in result)
 				analysisOfWorkFiled.ForSubQuery = ForSubQuery;
