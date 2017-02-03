@@ -187,6 +187,7 @@
     <Compile Include="Queries\UpdateOrdersFixture.cs" />
     <Compile Include="RegionalBaseCostsFixture.cs" />
     <Compile Include="Queries\BaseFiltersFixture.cs" />
+    <Compile Include="BeAccountedUpdateFixture.cs" />
     <Compile Include="SendPremoderatedPomotionListFixture.cs" />
     <Compile Include="Tasks\InvoicePartTaskFixture.cs" />
     <Compile Include="Tasks\SendInvoiceTaskFixture.cs" />

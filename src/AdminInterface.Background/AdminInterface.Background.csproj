@@ -74,6 +74,7 @@
     <Compile Include="IntersectionTask.cs" />
     <Compile Include="InvoicePartTask.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="BeAccountedUpdate.cs" />
     <Compile Include="SendInvoiceTask.cs" />
     <Compile Include="ReportLogsTask.cs" />
     <Compile Include="ReportTask.cs" />
