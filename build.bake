@@ -68,7 +68,7 @@ task @DeployPrinter:
 	return if Globals.Environment == @Test
 
 	Globals.Project = @Printer
-	Globals.DeployTo = """\\adc.analit.net\Inforoom\Apps\Printer"""
+	Globals.DeployTo = """\\adc.analit.net\inforoom\secondQueue\Apps\Printer"""
 	Engine.Tasks.First({t| t.Name == "WebDeploy"}).Executed = false
 	Engine.Execute("WebDeploy")
 
