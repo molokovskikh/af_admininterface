@@ -245,13 +245,13 @@ drop temporary table if exists orders.CurWeekUpdates;
 create temporary table orders.CurWeekUpdates (INDEX idx(ClientId) USING HASH) engine MEMORY
 select u.ClientId, COUNT(au.UpdateId) + COUNT(reql.RequestToken)  as CurWeekUpdates
 from customers.users u
-right join
+left join
 (SELECT * FROM logs.analitfupdates as an WHERE
 an.requesttime between :FistPeriodStart AND :FistPeriodEnd
 and an.Commit = 1
 and an.updatetype in (1, 2)
 ) as au on au.userid = u.id
-right join
+left join
 (SELECT * FROM logs.RequestLogs as re WHERE
 re.CreatedOn between :FistPeriodStart AND :FistPeriodEnd
 and re.IsCompleted = 1
@@ -260,19 +260,20 @@ and re.UpdateType = 'MainController'
 ) as reql ON reql.UserId =  u.Id
 where u.Enabled = 1
 and u.WorkRegionMask & :regionCode > 0
-group by u.clientid;
+group by u.clientid
+HAVING ClientId IS NOT NULL AND CurWeekUpdates > 0;
 
 drop temporary table if exists orders.LastWeekUpdates;
 create temporary table orders.LastWeekUpdates (INDEX idx(ClientId) USING HASH) engine MEMORY
 select u.ClientId, COUNT(au.UpdateId) + COUNT(reql.RequestToken)  as LastWeekUpdates
 from customers.users u
-right join
+left join
 (SELECT * FROM logs.analitfupdates as an WHERE
 an.requesttime between :LastPeriodStart AND :LastPeriodEnd
 and an.Commit = 1
 and an.updatetype in (1, 2)
 ) as au on au.userid = u.id
-right join
+left join
 (SELECT * FROM logs.RequestLogs as re WHERE
 re.CreatedOn between :LastPeriodStart AND :LastPeriodEnd
 and re.IsCompleted = 1
@@ -281,7 +282,8 @@ and re.UpdateType = 'MainController'
 ) as reql ON reql.UserId =  u.Id
 where u.Enabled = 1
 and u.WorkRegionMask & :regionCode > 0
-group by u.clientid;
+group by u.clientid
+HAVING ClientId IS NOT NULL AND LastWeekUpdates > 0;
 
 insert into Customers.Updates
 SELECT cd.id,
