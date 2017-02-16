@@ -350,6 +350,11 @@ namespace AdminInterface.Models
 					Group = lineGroup,
 				},
 				new SelectListItem {
+					Text = "Номер заказа",
+					Value = "OrderId",
+					Group = lineGroup,
+				},
+				new SelectListItem {
 					Text = "Код ОКДП",
 					Value = "CodeOKDP",
 					Group = lineGroup,
