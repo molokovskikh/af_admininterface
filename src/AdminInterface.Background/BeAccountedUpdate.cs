@@ -24,7 +24,7 @@ namespace AdminInterface.Background
 
 			if (SystemTime.Now() >= runTime && SystemTime.Now() < runTime.AddMinutes(30)) {
 				var allResult = Session.Query<Account>().Where(a =>
-					a.BeAccounted && a.FreePeriodEnd != null && a.FreePeriodEnd < SystemTime.Now()).ToList();
+					a.BeAccounted && a.Payment > 0 && a.IsFree && a.FreePeriodEnd != null && a.FreePeriodEnd < SystemTime.Now()).ToList();
 				foreach (var item in allResult) {
 					item.BeAccounted = false;
 					Session.Save(item);
