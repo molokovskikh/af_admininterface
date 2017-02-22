@@ -1,0 +1,47 @@
+﻿@model AdminInterface.Controllers.BuilderController.DocViewModel
+@{
+  var title = "Создание истории документов";
+}
+
+<ol class="breadcrumb">
+	<li>
+		<a href="~/">Главная</a>
+	</li>
+	<li>
+		<a href="~/Users/Search">Поиск пользователей</a>
+	</li>
+	<li>
+		<a href="~/Clients/@ViewBag.User.Client.Id">@ViewBag.User.Client.Name</a>
+	</li>
+	<li>
+		<a href="~/Users/@ViewBag.User.Id">@ViewBag.User.Login</a>
+	</li>
+	<li class="active">@title</li>
+</ol>
+
+<h1>@title</h1>
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new {@class = "form-horizontal"})) {
+	@Html.Hidden("userId", (object) ViewBag.User.Id)
+	<div class="form-group">
+		<div class="col-sm-offset-3 col-sm-3" style="width: auto">
+			<label>Начало</label>
+			@Html.HiddenFor(x => x.Begin)
+			<div class="calendar"></div>
+			@Html.ValidationMessageFor(x => x.Begin)
+		</div>
+
+		<div class="col-sm-3" style="width: auto">
+			<label>Окончание</label>
+			@Html.HiddenFor(x => x.End)
+			<div class="calendar"></div>
+			@Html.ValidationMessageFor(x => x.End)
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-3 col-sm-9">
+			<button type="submit" class="btn btn-default">Сформировать</button>
+		</div>
+	</div>
+}

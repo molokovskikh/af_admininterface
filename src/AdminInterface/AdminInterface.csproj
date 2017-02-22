@@ -218,6 +218,7 @@
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\BalanceOperationsController.cs" />
+    <Compile Include="Controllers\BuilderController.cs" />
     <Compile Include="Controllers\Filters\NewUpdateFilter.cs" />
     <Compile Include="Controllers\MailForSupplierController.cs" />
     <Compile Include="Controllers\CostOptimizationController.cs" />
@@ -617,6 +618,8 @@
     <None Include="Views\BalanceOperations\Show.brail" />
     <Content Include="Views\Billing\AdditionalSupplierInfo.brail" />
     <Content Include="Views\CostOptimization\Index.brail" />
+    <Content Include="Views\Builder\Docs.cshtml" />
+    <Content Include="Views\Builder\Inventory.cshtml" />
     <None Include="Views\LegalEntity\Show.brail" />
     <Content Include="Views\Logs\Converted.brail" />
     <Content Include="Views\Logs\ShowStatDetails.brail">

@@ -37,6 +37,8 @@
 			<li><a href="${siteroot}/Logs/Documents?filter.User.Id=${user.Id}" target="_blank">История документов</a></li>
 			<li><a href="${siteroot}/Logs/Orders?filter.User.Id=${user.Id}" target="_blank">История заказов</a></li>
 			<li><a href="${siteroot}/Users/${user.Id}/SearchOffers" target="_blank">Поиск предложений</a></li>
+			<li><a href="${siteroot}/Builder/Docs?userId=${user.Id}" target="_blank">Создать историю документов</a></li>
+			<li><a href="${siteroot}/Builder/Inventory?userId=${user.Id}" target="_blank">Создать складские остатки</a></li>
 			<li>
 				${app.LinkTo("История минипочты", @Mails, @Index, {"filter.User.Id": user.Id, @attributes: {"target": "_blank"}})}
 			</li>

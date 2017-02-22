@@ -52,18 +52,3 @@
 	}
 	</tbody>
 </table>
-
-@section scripts {
-	<script type="text/javascript">
-		$(function () {
-			$.datepicker.setDefaults($.datepicker.regional['ru']);			$(".calendar").each(function () {
-				var value = $(this).siblings("input[type=hidden]");
-				$(this).datepicker({
-					defaultDate: value.val().split(/\s/)[0],
-					dateFormat: "dd.mm.yy",
-					altField: value
-				});
-			});
-		});
-	</script>
-}

@@ -7,7 +7,27 @@
 	<script type='text/javascript' src='~/Assets/Javascripts/jquery-1.9.1.js'></script>
 	<script type='text/javascript' src='~/Assets/Javascripts/jquery-ui-1.10.2.js'></script>
 	<script type='text/javascript' src='~/Assets/Javascripts/jquery-ui-i18n.js'></script>
-	<link type='text/css' rel='stylesheet' href='~/Assets/Stylesheets/themes/base/jquery.ui.all.css'>	@RenderSection("scripts", required: false)</head>
+	<link type='text/css' rel='stylesheet' href='~/Assets/Stylesheets/themes/base/jquery.ui.all.css'>
+	@RenderSection("scripts", required: false)
+	<style>
+			.field-validation-error {
+					color: red;
+					clear:  both;
+					display: block;
+			}
+	</style>
+	<script type="text/javascript">
+		$(function () {
+			$.datepicker.setDefaults($.datepicker.regional['ru']);			$(".calendar").each(function () {
+				var value = $(this).siblings("input[type=hidden]");
+				$(this).datepicker({
+					defaultDate: value.val().split(/\s/)[0],
+					dateFormat: "dd.mm.yy",
+					altField: value
+				});
+			});
+		});
+	</script></head>
 <body>
 <div class="container-fluid">
 	@if(TempData.ContainsKey("Message")) {
