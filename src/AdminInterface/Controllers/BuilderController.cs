@@ -110,7 +110,7 @@ select db.Id,
 	dh.AddressId,
 	db.ProductId,
 	p.CatalogId,
-	db.Product,
+	IFNULL(c.Name, db.Product),
 	db.ProducerId,
 	db.Producer,
 	db.Country,
@@ -139,6 +139,7 @@ from Customers.UserAddresses ua
 		join Documents.DocumentHeaders dh on dh.Addressid = a.Id
 			join Documents.DocumentBodies db on db.DocumentId = dh.Id
 				left join Catalogs.Products p on p.Id = db.ProductId
+				left join Catalogs.Catalog c on c.Id = p.CatalogId
 				left join Inventory.Stocks s on s.WaybillLineId = db.Id
 where ua.UserId = :userId
 	and a.Enabled = 1
