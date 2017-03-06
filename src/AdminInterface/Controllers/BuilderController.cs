@@ -103,7 +103,10 @@ insert into Inventory.Stocks(WaybillLineId,
 	Certificates,
 	Barcode,
 	CountryCode,
-	RetailCost
+	RetailCost,
+	WaybillNumber,
+	SupplierId,
+	SupplierFullName
 )
 select db.Id,
 	:status,
@@ -133,13 +136,17 @@ select db.Id,
 	db.Certificates,
 	db.EAN13 as Barcode,
 	db.CountryCode,
-	round(db.SupplierCost + db.SupplierCost * :markup, 2) as RetailCost
+	round(db.SupplierCost + db.SupplierCost * :markup, 2) as RetailCost,
+	dh.ProviderDocumentId,
+	dh.FirmCode,
+	sp.FullName
 from Customers.UserAddresses ua
 	join Customers.Addresses a on a.Id = ua.AddressId
 		join Documents.DocumentHeaders dh on dh.Addressid = a.Id
 			join Documents.DocumentBodies db on db.DocumentId = dh.Id
 				left join Catalogs.Products p on p.Id = db.ProductId
 				left join Catalogs.Catalog c on c.Id = p.CatalogId
+				left join Customers.Suppliers sp on sp.Id = dh.FirmCode
 				left join Inventory.Stocks s on s.WaybillLineId = db.Id
 where ua.UserId = :userId
 	and a.Enabled = 1
