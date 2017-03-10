@@ -151,6 +151,7 @@
     <Compile Include="SmapRejectorSeleniumFixture.cs" />
     <Compile Include="Suppliers\BillingFixture.cs" />
     <Compile Include="Suppliers\EditRegionalInfoFixture.cs" />
+    <Compile Include="Suppliers\RejectParserFixture.cs" />
     <Compile Include="Suppliers\PriceFixture.cs" />
     <Compile Include="Suppliers\SpecialHandlers.cs" />
     <Compile Include="Suppliers\SupplierFixture.cs" />

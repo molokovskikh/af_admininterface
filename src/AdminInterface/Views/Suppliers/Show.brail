@@ -65,6 +65,9 @@ ${app.Asset("ClientsShow.css")}
 				<li>
 					${app.LinkTo("Разбор накладных", @Parser, @Index, {"supplierId": supplier.Id})}
 				</li>
+				<li>
+					${app.LinkTo("Разбор отказов", @RejectParser, @Index, {"supplierId": supplier.Id})}
+				</li>
 			</ul>
 		</div>
 
