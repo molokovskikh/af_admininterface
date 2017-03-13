@@ -230,6 +230,7 @@
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\NewSupplierAttachmentsController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
+    <Compile Include="Controllers\RejectParserController.cs" />
     <Compile Include="Controllers\ParserController.cs" />
     <Compile Include="Controllers\PricesController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
@@ -243,6 +244,7 @@
     <Compile Include="Models\Logs\ClientAppLog.cs" />
     <Compile Include="Models\Logs\RequestLog.cs" />
     <Compile Include="Models\Markup.cs" />
+    <Compile Include="Models\RejectParser.cs" />
     <Compile Include="Models\Parser.cs" />
     <Compile Include="Models\ProducerSynonym.cs" />
     <Compile Include="Models\ProductSynonym.cs" />
@@ -656,6 +658,8 @@
     <None Include="Views\Orders\Make.brail" />
     <Content Include="Views\Parser\Index.cshtml" />
     <Content Include="Views\Parser\Edit.cshtml" />
+    <Content Include="Views\RejectParser\Edit.cshtml" />
+    <Content Include="Views\RejectParser\Index.cshtml" />
     <None Include="Views\Prices\Edit.brail" />
     <Content Include="Views\Settings\Terms.brail" />
     <None Include="Views\Shared\DisplayTemplates\RegistrationInfo.brail" />

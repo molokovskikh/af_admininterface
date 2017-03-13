@@ -1,0 +1,100 @@
+﻿@model AdminInterface.Models.RejectParser
+
+<script type='text/javascript' src='~/Assets/Javascripts/editable.js'></script>
+
+@{
+  var title = "Редактирование правила разбора";
+  if (Model.Id == 0)
+  {
+      title = "Добавление правила";
+  }
+}
+
+
+<ol class="breadcrumb">
+    <li>
+        <a href="~/">Главная</a>
+    </li>
+    <li>
+        <a href="~/Users/Search">Поиск пользователей</a>
+    </li>
+    <li>
+        <a href="~/Suppliers/@ViewBag.Supplier.Id">@ViewBag.Supplier.Name</a>
+    </li>
+    <li class="active">
+        @Html.ActionLink("Настройка разбора отказов", "Index", new { supplierId = ViewBag.Supplier.Id })
+    </li>
+    <li class="active">@title</li>
+</ol>
+
+<h1>@title</h1>
+
+<script>
+	$(function () {
+		$("#mapping").data("template", function () { return $("<tr></tr>").html($("#row-template").html()); })
+		registerEditable(0);
+	})
+</script>
+
+<script type="text/html" id="row-template">
+    <td><input class="delete" type="button" value="Удалить"></td>
+    <td>@Html.TextBox("Lines[0].Src")</td>
+    <td>@Html.DropDownList("Lines[0].Dst", Model.Fields(""))</td>
+</script>
+
+<div>
+    @{
+      object routeValues = new { parserId = Model.Id };
+      if (Model.Id == 0)
+      {
+          routeValues = new { supplierId = Model.Supplier.Id };
+      }
+    }
+    @using (Html.BeginForm(routeValues))
+    {
+    @Html.HiddenFor(model => model.Id)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Name)
+        @Html.EditorFor(model => model.Name)
+        @Html.ValidationMessageFor(model => model.Name)
+    </div>
+
+    <table class="table editable" id="mapping">
+        <thead>
+            <tr>
+                <th>
+                    <input class="add" type="button" value="Добавить">
+                </th>
+                <th>
+                    Поле отказа
+                </th>
+                <th>
+                    Поле базы данных
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.Lines.Count; i++)
+            {
+            <tr>
+                <td>
+                    <input class="delete" type="button" value="Удалить">
+                </td>
+                <td>
+                    @Html.HiddenFor(model => model.Lines[i].Id)
+                    @Html.EditorFor(model => model.Lines[i].Src)
+                    @Html.ValidationMessageFor(model => model.Lines[i].Src)
+                </td>
+
+                <td>
+                    @Html.DropDownListFor(model => model.Lines[i].Dst, Model.Fields(Model.Lines[i].Dst))
+                    @Html.ValidationMessageFor(model => model.Lines[i].Dst)
+                </td>
+            </tr>}
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-default">Сохранить</button>
+    }
+</div>

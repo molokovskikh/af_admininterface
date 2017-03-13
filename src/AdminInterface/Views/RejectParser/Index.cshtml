@@ -1,0 +1,39 @@
+﻿<ol class="breadcrumb">
+	<li>
+		<a href="~/">Главная</a>
+	</li>
+	<li>
+		<a href="~/Users/Search">Поиск пользователей</a>
+	</li>
+	<li>
+		<a href="~/Suppliers/@ViewBag.Supplier.Id">@ViewBag.Supplier.Name</a>
+	</li>
+	<li class="active">Настройка разбора отказов</li>
+</ol>
+
+<h1>Настройка разбора отказов</h1>
+
+<div>
+	@Html.ActionLink("Добавить", "Add", new { supplierId = @ViewBag.Supplier.Id })
+</div>
+
+<table class="table">
+	<thead>
+	<tr>
+		<th></th>
+		<th>Название</th>
+	</tr>
+	</thead>
+	<tbody>
+		@foreach(var parser in ViewBag.Parsers) {
+			<tr>
+				<td>
+					@Html.ActionLink("Удалить", "Delete", new {parserId = parser.Id})
+				</td>
+				<td>
+					@Html.ActionLink((string)@parser.Name, "Edit", new {parserId = parser.Id})
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
