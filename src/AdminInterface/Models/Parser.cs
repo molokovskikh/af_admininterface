@@ -359,6 +359,21 @@ namespace AdminInterface.Models
 					Value = "CodeOKDP",
 					Group = lineGroup,
 				},
+				new SelectListItem {
+					Text = "Имя файла образа сертификата",
+					Value = "CertificateFilename",
+					Group = lineGroup,
+				},
+				new SelectListItem {
+					Text = "Имя файла образа протокола",
+					Value = "ProtocolFilemame",
+					Group = lineGroup,
+				},
+				new SelectListItem {
+					Text = "Имя файла образа паспорта",
+					Value = "PassportFilename",
+					Group = lineGroup,
+				},
 			};
 			items.Each(x => x.Selected = x.Value == selected);
 			items = items.OrderBy(s => s.Group.Name).ThenBy(s => s.Text).ToList();
