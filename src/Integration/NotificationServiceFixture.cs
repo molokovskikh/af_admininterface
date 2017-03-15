@@ -60,10 +60,25 @@ namespace Integration
 		[Test]
 		public void Get_email_price_date_test()
 		{
+			//триггер на Обновлении PriceItem - PriceItemBeforeUpdate, постоянно обновляет дату текущим временем, поэтому ноужно вставлять "просроченную" дату.
+			_email = Guid.NewGuid().ToString().Replace("-", string.Empty) + "@analit.net";
+
+			_supplier = DataMother.CreateSupplier();
+			_supplier.ContactGroupOwner.Group(ContactGroupType.ClientManagers).AddContact(ContactType.Email, _email);
+
+			Save(_supplier);
+
 			var item = _supplier.Prices.First().Costs.First().PriceItem;
-			item.PriceDate = DateTime.MinValue;
-			Save(item);
+			var itemCosts = _supplier.Prices.First().Costs.First(); var newpPriceItem = new PriceItem()
+			{ DownloadLogs = item.DownloadLogs, FormRule = item.FormRule, PriceDate = DateTime.MinValue, Source = item.Source };
+			itemCosts.PriceItem = newpPriceItem;
+			Save(itemCosts);
+
+			_defaults = session.Query<DefaultValues>().First();
+			_service = new NotificationService(session, _defaults);
+			_client = DataMother.TestClient();
 			Flush();
+
 			var emails = _service.GetEmailsForNotification(_client);
 			Assert.IsFalse(emails.Contains(_email));
 		}
