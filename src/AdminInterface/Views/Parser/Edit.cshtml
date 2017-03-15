@@ -1,6 +1,7 @@
 ﻿@model AdminInterface.Models.Parser
 
 <script type='text/javascript' src='~/Assets/Javascripts/editable.js'></script>
+<script type='text/javascript' src='@Url.Content("~/Assets/Javascripts/ParserRulesEditor.js")'></script>
 
 @{
   var title = "Редактирование правила разбора";
@@ -33,6 +34,7 @@
 	$(function () {
 		$("#mapping").data("template", function () { return $("<tr></tr>").html($("#row-template").html()); })
 		registerEditable(0);
+		mappingFix.runForLines();
 	})
 </script>
 

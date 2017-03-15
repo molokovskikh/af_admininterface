@@ -535,6 +535,7 @@
     <Content Include="Assets\Javascripts\MainSettings.js" />
     <Content Include="Assets\Javascripts\MiniMail.js" />
     <Content Include="Assets\Javascripts\order.delivery.group.editor.coffee" />
+    <Content Include="Assets\Javascripts\ParserRulesEditor.js" />
     <Content Include="Assets\Javascripts\payer-send-message.coffee" />
     <Content Include="Assets\Javascripts\Payments.js" />
     <Content Include="Assets\Javascripts\PromotionDialog.js" />

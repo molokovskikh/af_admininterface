@@ -1,6 +1,7 @@
 ﻿@model AdminInterface.Models.RejectParser
 
 <script type='text/javascript' src='~/Assets/Javascripts/editable.js'></script>
+<script type='text/javascript' src='@Url.Content("~/Assets/Javascripts/ParserRulesEditor.js")'></script>
 
 @{
   var title = "Редактирование правила разбора";
@@ -30,10 +31,11 @@
 <h1>@title</h1>
 
 <script>
-	$(function () {
-		$("#mapping").data("template", function () { return $("<tr></tr>").html($("#row-template").html()); })
-		registerEditable(0);
-	})
+    $(function() {
+        $("#mapping").data("template", function() { return $("<tr></tr>").html($("#row-template").html()); });
+        registerEditable(0);
+        mappingFix.runForLines();
+    })
 </script>
 
 <script type="text/html" id="row-template">

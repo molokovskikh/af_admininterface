@@ -51,14 +51,22 @@ namespace Functional.Suppliers
 			AssertText("Добавление правила");
 			Css("[name='Name']").TypeText(ruleName);
 			Click("Добавить");
-			Css("[name='Lines[0].Src']").TypeText(ruleColumn);
+			Css("[name='Lines[0].Src']").TypeText(ruleColumn + "_1");
 			Css("[name='Lines[0].Dst']").SelectByValue(ruleProperty);
+			Click("Добавить");
+			Css("[name='Lines[1].Src']").TypeText(ruleColumn);
+			Css("[name='Lines[1].Dst']").SelectByValue(ruleProperty);
+			Click("Добавить");
+			Css("[name='Lines[2].Src']").TypeText(ruleColumn + "_2");
+			Css("[name='Lines[2].Dst']").SelectByValue(ruleProperty);
+			Click("Сохранить");
+			Click("Удалить");
 			Click("Сохранить");
 
 			var listToCheck = session.Query<AdminInterface.Models.RejectParser>().Where(s => s.Supplier.Id == supplier.Id).ToList();
 			var itemToCheck = listToCheck.FirstOrDefault();
 			Assert.AreEqual(1, listToCheck.Count);
-			Assert.AreEqual(1, itemToCheck.Lines.Count);
+			Assert.AreEqual(2, itemToCheck.Lines.Count);
 			Assert.AreEqual(ruleName, itemToCheck.Name);
 			Assert.AreEqual(ruleColumn, itemToCheck.Lines.First().Src);
 			Assert.AreEqual(ruleProperty, itemToCheck.Lines.First().Dst);
