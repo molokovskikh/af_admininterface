@@ -51,8 +51,8 @@ from (
 	where a.Enabled = 1
 		and ua.UserId = :userId
 		and sl.Id is null
-		and l.WriteTime > :begin
-		and l.WriteTime < :end
+		and l.LogTime > :begin
+		and l.LogTime < :end
 ) as d")
 						.SetParameter("begin", model.Begin)
 						.SetParameter("end", model.End.AddDays(1))

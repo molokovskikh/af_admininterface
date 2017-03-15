@@ -22,6 +22,7 @@ namespace Integration
 			Global.Config.RegisterListEmail = "kvasovtest@analit.net";
 
 			ForTest.InitialzeAR();
+			IntegrationFixture2.Factory = ActiveRecordMediator.GetSessionFactoryHolder().GetSessionFactory(typeof(ActiveRecordBase));
 		}
 	}
 }
