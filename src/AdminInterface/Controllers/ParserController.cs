@@ -55,6 +55,7 @@ namespace AdminInterface.Controllers
 		private ActionResult Update(Parser model, Parser target)
 		{
 			model.Name = target.Name;
+			model.Encoding = target.Encoding;
 			model.Lines.RemoveEach(model.Lines.Where(x => !target.Lines.Any(y => y.Id == x.Id)));
 			model.Lines.Each(x => {
 				var src = target.Lines.First(y => y.Id == x.Id);

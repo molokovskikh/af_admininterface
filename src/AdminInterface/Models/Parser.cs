@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,9 +10,24 @@ using Common.Tools;
 
 namespace AdminInterface.Models
 {
+	public enum EncodingEnum
+	{
+		Default,
+		UTF8,
+		UTF7,
+		CP1251,
+		CP866
+	}
+
 	[ActiveRecord(Schema = "Customers")]
 	public class Parser
 	{
+		public Parser(Supplier supplier, EncodingEnum encoding) : 
+			this(supplier)
+		{
+			Encoding = encoding;
+		}
+
 		public Parser(Supplier supplier)
 			: this()
 		{
@@ -28,6 +44,10 @@ namespace AdminInterface.Models
 
 		[Property, DisplayName("Название"), Required]
 		public virtual string Name { get; set; }
+
+		[Property, DisplayName("Кодировка"), Required]
+		public virtual EncodingEnum Encoding { get; set; }
+
 
 		[BelongsTo]
 		public virtual Supplier Supplier { get; set; }
@@ -362,6 +382,40 @@ namespace AdminInterface.Models
 			};
 			items.Each(x => x.Selected = x.Value == selected);
 			items = items.OrderBy(s => s.Group.Name).ThenBy(s => s.Text).ToList();
+			return items;
+		}
+
+		public List<SelectListItem> Encodings ()
+		{
+			var items = new List<SelectListItem> {
+
+				new SelectListItem {
+					Text = "По умолчанию",
+					Value = EncodingEnum.Default.ToString(),
+				},
+
+				new SelectListItem {
+					Text = "UTF-8",
+					Value = EncodingEnum.UTF8.ToString(),
+				},
+
+				new SelectListItem {
+					Text = "UTF-7",
+					Value = EncodingEnum.UTF7.ToString(),
+				},
+
+				new SelectListItem {
+					Text = "CP1251",
+					Value = EncodingEnum.CP1251.ToString(),
+				},
+
+				new SelectListItem {
+					Text = "CP866",
+					Value = EncodingEnum.CP866.ToString(),
+				},
+
+			};
+
 			return items;
 		}
 	}
