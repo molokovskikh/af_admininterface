@@ -1,1 +1,1 @@
-﻿<% OutputSubView("/Documents/ShowDocumentDetails") %>
+﻿<% OutputSubView("${ShowDetails}") %>

@@ -104,6 +104,9 @@ namespace AdminInterface.Models.Logs
 		[OneToOne(PropertyRef = "Log")]
 		public virtual FullDocument Document { get; set; }
 
+		[OneToOne(PropertyRef = "Log")]
+		public virtual RejectHeader Reject { get; set; }
+
 		[BelongsTo("SendUpdateId")]
 		public virtual UpdateLogEntity SendUpdateLogEntity { get; set; }
 

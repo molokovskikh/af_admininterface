@@ -11,7 +11,7 @@ using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
-using Common.Tools;
+using Dapper;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
@@ -53,8 +53,117 @@ namespace AdminInterface.Controllers
 					filter.StatMode = clientUsers.Count > 1;
 				}
 			}
+			var sqlFormat = @"
+    SELECT
+        document_logs.RowId as Id,
+        document_logs.LogTime as LogTime,
+        document_logs.DocumentType as DocumentType,
+        document_logs.FileName as FileName,
+        document_logs.Addition as Addition,
+        document_logs.DocumentSize as DocumentSize,
+        analitFUpdates.UpdateId as SendUpdateId,          
+        documentHeaders.ProviderDocumentId as ProviderDocumentId,
+        documentHeaders.DocumentDate as DocumentDate, 
+        
+       IFNULL(documentHeaders.Id,IFNULL(reject.Id,NULL)) as DocumentId,
+       IFNULL(documentHeaders.WriteTime,IFNULL(reject.WriteTime,NULL))   as DocumentWriteTime,
+       IFNULL(documentHeaders.Parser,IFNULL(reject.Parser,NULL))   as Parser,
+        
+        services.Name as Supplier,
+        suppliers.Id as SupplierId,
+        servClients.Name as Client,
+        clients.Id as ClientId,
+        addresses.Address as Address,
+        addresses.Enabled as AddressEnabled,
+        services.HomeRegion as RegionName,
+        users.Login as Login,
+        users.Id as LoginId,
+        logsAnalitFUpdates.RequestTime as RequestTime,
+        documentSendLogs.Id DeliveredId,
+        documentSendLogs.FileDelivered as FileDelivered,
+        documentSendLogs.DocumentDelivered as DocumentDelivered,
+        documentSendLogs.SendDate as SendDate 
+    FROM
+        Logs.Document_logs document_logs 
+    inner join
+        Customers.Suppliers suppliers 
+            on document_logs.FirmCode=suppliers.Id 
+    left outer join
+        Customers.Services services 
+            on suppliers.Id=services.Id 
+    left outer join
+        Customers.Clients clients 
+            on document_logs.ClientCode=clients.Id 
+    left outer join
+        Customers.Services servClients 
+            on clients.Id=servClients.Id 
+    left outer join
+        Customers.Addresses addresses 
+            on document_logs.AddressId=addresses.Id 
+    left outer join
+        logs.AnalitFUpdates analitFUpdates 
+            on document_logs.SendUpdateId=analitFUpdates.UpdateId 
+    left outer join
+        Logs.DocumentSendLogs documentSendLogs 
+            on document_logs.RowId=documentSendLogs.DocumentId 
+    left outer join
+        Customers.Users users 
+            on documentSendLogs.UserId=users.Id 
+    left outer join
+        logs.AnalitFUpdates logsAnalitFUpdates 
+            on documentSendLogs.UpdateId=logsAnalitFUpdates.UpdateId 
+    left outer join
+        documents.DocumentHeaders documentHeaders 
+            on document_logs.RowId=documentHeaders.DownloadId 
+    left outer join
+        documents.rejectheaders reject 
+            on document_logs.RowId=reject.DownloadId  
+    WHERE
+        document_logs.LogTime >= @LogTimeBegin 
+        and document_logs.LogTime <= @LogTimeEnd 
+        {0}
+    ORDER BY
+        LogTime desc; 
+";
+
+
 			PropertyBag["filter"] = filter;
-			PropertyBag["logEntities"] = filter.Find(DbSession);
+
+			// если выставлен флаг только не разобранные накладные, используем фильтр, иначе sql прямой запрос
+			if (filter.OnlyNoParsed) {
+				PropertyBag["logEntities"] = filter.Find(DbSession);
+			} else {
+				var documentLogList = new List<DocumentLog>();
+				if (filter.Supplier != null) {
+					documentLogList =
+						DbSession.Connection.Query<DocumentLog>(string.Format(sqlFormat, "and document_logs.FirmCode = @SupplierId "),
+							new {
+								@LogTimeBegin = filter.Period.Begin,
+								@LogTimeEnd = filter.Period.End.AddDays(1).AddSeconds(-1),
+								@SupplierId = filter.Supplier.Id
+							}).ToList();
+				}
+				if (filter.Client != null) {
+					documentLogList =
+						DbSession.Connection.Query<DocumentLog>(string.Format(sqlFormat, "and document_logs.ClientCode = @ClientId "),
+							new {
+								@LogTimeBegin = filter.Period.Begin,
+								@LogTimeEnd = filter.Period.End.AddDays(1).AddSeconds(-1),
+								@ClientId = filter.Client.Id
+							}).ToList();
+				}
+				if (filter.User != null) {
+					documentLogList =
+						DbSession.Connection.Query<DocumentLog>(string.Format(sqlFormat, "and documentSendLogs.UserId = @UserId "),
+							new {
+								@LogTimeBegin = filter.Period.Begin,
+								@LogTimeEnd = filter.Period.End.AddDays(1).AddSeconds(-1),
+								@UserId = filter.User.Id
+							}).ToList();
+				}
+				PropertyBag["logEntities"] = documentLogList;
+			}
+
 		}
 
 		public void DocumentsToExcel([DataBind("filter")] DocumentFilter filter)
@@ -100,6 +209,11 @@ namespace AdminInterface.Controllers
 			PropertyBag["detailDocumentLogs"] = detailDocumentLogs;
 		}
 
+		public void ShowRejectDetails(uint documentLogId, uint? supplierId)
+		{
+			ShowDocumentDetails(documentLogId, supplierId);
+		}
+
 		public void ShowDocumentDetails(uint documentLogId, uint? supplierId)
 		{
 			CancelLayout();
@@ -107,9 +221,28 @@ namespace AdminInterface.Controllers
 			var documentLog = DbSession.Load<DocumentReceiveLog>(documentLogId);
 			PropertyBag["documentLogId"] = documentLogId;
 			PropertyBag["documentLog"] = documentLog;
+			PropertyBag["ShowDetails"] = documentLog.DocumentType == DocumentType.Waybill
+				? "/Documents/ShowDocumentDetails"
+				: "ShowRejectDetails";
 			PropertyBag["filterSupplierId"] = supplierId;
 		}
 
+		public void CertificatesForReject(uint id, uint? clientId, uint? filterSupplierId)
+		{
+			CancelLayout();
+
+			var line = DbSession.Load<RejectLine>(id);
+			PropertyBag["certificates"] = null;
+			var query = DbSession.CreateSQLQuery(String.Format(@"select value from catalogs.propertyvalues pv
+join catalogs.productproperties p on p.PropertyValueId = pv.Id and p.ProductId = {0}", line.ProductEntity.Id));
+			var properties = String.Join(", ", query.List<string>());
+			if (!String.IsNullOrEmpty(properties)) {
+				PropertyBag["productProperties"] = ", " + properties;
+			}
+			PropertyBag["line"] = line;
+			PropertyBag["clientId"] = clientId;
+			PropertyBag["filterSupplierId"] = filterSupplierId;
+		}
 		public void Certificates(uint id, uint? clientId, uint? filterSupplierId)
 		{
 			CancelLayout();

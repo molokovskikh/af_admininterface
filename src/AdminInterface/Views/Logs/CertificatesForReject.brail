@@ -1,0 +1,28 @@
+﻿<tr class=details>
+	<td />
+	<td colspan="100">
+		<div id="Certificates${line.Id}">
+			<% if line.ProductEntity: %>
+				Сопоставлен с "${line.ProductEntity.Catalog.Name}${?productProperties}" (ProductID: ${line.ProductEntity.Id})<br>
+				<%if line.ProducerEntity: %>
+				По производителю с "${line.ProducerEntity.Name}" (ProducerID: ${line.ProducerEntity.Id})
+				<%end%>
+				<% if not filterSupplierId: %>
+				<br/>
+				<br/>
+				<table>
+				<tr>
+				<td>
+				<a href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${line.Id}, 'Converted?id=${line.Id}&clientId=${clientId}', 'Converted');">
+										Сконвертировать по ассортиментному ПЛ
+				</a>
+				</td>
+				</tr>
+				</table>
+				<% end %>
+			<% else: %>
+				Позиция не сопоставлена
+			<% end %>
+		</div>
+	</td>
+</tr>

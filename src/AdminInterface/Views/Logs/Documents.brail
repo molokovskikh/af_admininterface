@@ -29,7 +29,7 @@ ${app.ExportLink("Выгрузить в Excel", @DocumentsToExcel, filter)}
 ${app.EndFormFor("filter")}
 
 <div class=block>
-	Всего документов ${filter.RowsCount}
+	Всего документов ${logEntities.Count}
 </div>
 
 <form method=post action="${siteroot}/Logs/Resend?statMode=${filter.StatMode}">

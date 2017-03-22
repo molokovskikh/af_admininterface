@@ -1,16 +1,20 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AdminInterface.Controllers;
+using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support;
+using DocumentType = AdminInterface.Models.Logs.DocumentType;
 using PriceType = AdminInterface.Models.Suppliers.PriceType;
 
 namespace Integration.Controllers
@@ -42,6 +46,7 @@ namespace Integration.Controllers
 				Address = _address,
 			};
 			session.Save(_document);
+
 
 			referer = "http://ya.ru";
 			_controller = new LogsController();
@@ -149,6 +154,74 @@ namespace Integration.Controllers
 
 			var savedLog = session.Load<DocumentSendLog>(sendLog.Id);
 			Assert.That(savedLog.Committed, Is.False);
+		}
+
+		[Test]
+		public void filterDocument()
+		{
+			var catalogName = new TestCatalogName { Name = "testName" };
+			var catalogForm = new TestCatalogForm { Form = "testForm" };
+			session.Save(catalogForm);
+			session.Save(catalogName);
+			var catalog = new Catalog { Name = "testCatalog", NameId = catalogName.Id, FormId = catalogForm.Id };
+			_product = new Product(catalog);
+			_producer = new Producer { Name = "testProducer" };
+			session.Save(catalog);
+			session.Save(_product);
+			session.Save(_producer);
+			session.Flush();
+
+			_document = new DocumentReceiveLog(_supplier)
+			{
+				FileName = "test.sst",
+				ForClient = _client,
+				Address = _address,
+				DocumentType = DocumentType.Reject,
+				Reject = new RejectHeader(),
+			};
+			session.Save(_document);
+
+			var reject = new RejectHeader()
+			{
+				Address = _address,
+				Lines = new List<RejectLine>(),
+				Log = _document,
+				Parser = "TestParser",
+				Supplier = _supplier,
+				WriteTime = SystemTime.Now()
+			};
+			reject.Lines.Add(new RejectLine() {
+				Code = "testCode",
+				CodeCr = "testCodeCr",
+				Cost = 777,
+				Header = reject,
+				OrderId = 333,
+				Ordered = 111,
+				Producer = _producer.Name,
+				ProducerEntity = _producer,
+				Product = _product.Catalog.Name,
+				ProductEntity = _product,
+				Rejected = 10
+			});
+			session.Save(reject);
+			_document.Reject = reject;
+			session.Save(_document);
+
+			var sendLog = new DocumentSendLog(_user, _document) { Committed = true };
+			session.Save(sendLog);
+			session.Flush();
+
+			_controller.Documents(new DocumentFilter() {Supplier = _supplier });
+			var items = _controller.PropertyBag["logEntities"] as IList<DocumentLog>;
+			Assert.AreEqual(1, items.Count(s=>s.DocumentType == DocumentType.Waybill) );
+			Assert.AreEqual(1, items.Count(s => s.DocumentType == DocumentType.Reject));
+
+			var rejectFromDocument = items.First(s => s.DocumentType == DocumentType.Reject);
+			Assert.AreEqual("test.sst", rejectFromDocument.FileName);
+			Assert.AreEqual(_address.Name, rejectFromDocument.Address);
+			Assert.AreEqual("TestParser", rejectFromDocument.Parser);
+			Assert.AreEqual(_client.Id.ToString(), rejectFromDocument.ClientId);
+			Assert.AreEqual(_supplier.Id.ToString(), rejectFromDocument.SupplierId);
 		}
 	}
 }
