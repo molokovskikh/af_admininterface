@@ -1,0 +1,48 @@
+﻿<tr class=details>
+	<td />
+	<td colspan="100">
+		<div id="DocumentDetails${documentLog.Id}">
+			<table class="DataTable" style="width:100%;">
+				<% if (documentLog.Reject != null): %>
+					<thead>
+						<tr>
+							<th>Код товара</th>
+							<th>Наименование</th>
+							<th>Производитель</th>
+							<th>Идентификатор заказа</th>
+							<th>Количество по заказу</th>
+							<th>Количество по отказу</th>
+							<th>Стоимость</th>
+						</tr>
+					</thead>
+					<% for i,docLine in enumerate(documentLog.Reject.Lines): %>
+						<tr class="${ViewHelper.GetRowStyle(i)}">
+							<td>${docLine.Code}</td>
+							<td>
+								<% if not IsDefined(@disabledCertificateLink) and docLine.ProductEntity : %>
+									<a href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${docLine.Id}, 'CertificatesForReject?id=${docLine.Id}&clientId=<% if documentLog.ForClient: %>${documentLog.ForClient.Id}<% end %>&filterSupplierId=${?filterSupplierId}', 'Certificates');">
+										!{docLine.Product}
+									</a>
+								<% else: %>
+								!{docLine.Product}
+								<% end %>
+							</td>
+							<td>!{docLine.Producer}</td>
+							<td>
+								<% if docLine.OrderId > 0 : %>
+							<a href="javascript:void(0);" onclick="return ShowDownloadResult(this, !{docLine.OrderId}, '${siteroot}/Orders/Details?id=!{docLine.OrderId}', 'details');">!{docLine.OrderId}</a>
+								<% end %>
+							</td>
+							<td>!{docLine.Ordered}</td>
+							<td>!{docLine.Rejected}</td>
+							<td>${ViewHelper.CostFormat(docLine.Cost, 2)}</td>
+						</tr>
+					<% end %>
+				<% else: %>
+					<tr style="text-align: center;"><td>Документ не разобран</td></tr>
+				<% end %>
+			</table>
+			<br />
+		</div>
+	</td>
+</tr>

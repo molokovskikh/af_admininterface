@@ -96,6 +96,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle.MonoRail.Views.Brail.dll</HintPath>
     </Reference>
+    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Dapper.1.50.2\lib\net45\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="ExcelLibrary">
       <HintPath>..\..\lib\ExcelLibrary\ExcelLibrary.dll</HintPath>
     </Reference>
@@ -244,6 +248,7 @@
     <Compile Include="Models\Logs\ClientAppLog.cs" />
     <Compile Include="Models\Logs\RequestLog.cs" />
     <Compile Include="Models\Markup.cs" />
+    <Compile Include="Models\RejectHeader.cs" />
     <Compile Include="Models\RejectParser.cs" />
     <Compile Include="Models\Parser.cs" />
     <Compile Include="Models\ProducerSynonym.cs" />
@@ -629,7 +634,9 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Logs\NewUpdateLog.brail" />
+    <Content Include="Views\Logs\CertificatesForReject.brail" />
     <None Include="Views\Logs\OrdersTable.brail" />
+    <Content Include="Views\Logs\ShowRejectDetails.brail" />
     <None Include="Views\Logs\Statistics.brail" />
     <Content Include="Views\Mail\DeletePayer.brail" />
     <Content Include="Views\MailsModering\ShowMails.brail" />
