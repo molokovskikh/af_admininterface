@@ -64,6 +64,7 @@ namespace AdminInterface.Models
 				Name = "Строка"
 			};
 			var items = new List<SelectListItem> {
+
 				//шапка
 				new SelectListItem {
 					Text = "Номер накладной",

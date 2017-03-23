@@ -60,16 +60,16 @@
     {
     @Html.HiddenFor(model => model.Id)
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.Name)
-        @Html.EditorFor(model => model.Name)
-        @Html.ValidationMessageFor(model => model.Name)
-	    <br/>
-	    <br/>
-		@Html.LabelFor(model => model.Encoding)
-		@Html.DropDownListFor(model => model.Encoding, Model.Encodings())
-		@Html.ValidationMessageFor(model => model.Encoding)
-    </div>
+		<div class="form-group">
+			@Html.LabelFor(model => model.Name)
+			@Html.EditorFor(model => model.Name)
+			@Html.ValidationMessageFor(model => model.Name)
+		</div>
+		<div class="form-group">
+			@Html.LabelFor(model => model.Encoding)
+			@Html.DropDownListFor(model => model.Encoding, Model.Encodings())
+			@Html.ValidationMessageFor(model => model.Encoding)
+		</div>
 
     <table class="table editable" id="mapping">
         <thead>
