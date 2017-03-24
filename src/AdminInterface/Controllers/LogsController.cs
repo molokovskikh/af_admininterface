@@ -47,9 +47,9 @@ namespace AdminInterface.Controllers
 
 		public void Documents([ARDataBind("filter", AutoLoadBehavior.NullIfInvalidKey)] DocumentFilter filter)
 		{
-			if(filter.Client != null) {
+			if (filter.Client != null) {
 				var clientUsers = DbSession.Load<Client>(filter.Client.Id).Users;
-				if(clientUsers != null) {
+				if (clientUsers != null) {
 					filter.StatMode = clientUsers.Count > 1;
 				}
 			}
@@ -75,14 +75,9 @@ namespace AdminInterface.Controllers
         clients.Id as ClientId,
         addresses.Address as Address,
         addresses.Enabled as AddressEnabled,
-        services.HomeRegion as RegionName,
-        users.Login as Login,
-        users.Id as LoginId,
-        logsAnalitFUpdates.RequestTime as RequestTime,
-        documentSendLogs.Id DeliveredId,
-        documentSendLogs.FileDelivered as FileDelivered,
-        documentSendLogs.DocumentDelivered as DocumentDelivered,
-        documentSendLogs.SendDate as SendDate 
+        services.HomeRegion as RegionName
+{0}
+
     FROM
         Logs.Document_logs document_logs 
     inner join
@@ -103,15 +98,7 @@ namespace AdminInterface.Controllers
     left outer join
         logs.AnalitFUpdates analitFUpdates 
             on document_logs.SendUpdateId=analitFUpdates.UpdateId 
-    left outer join
-        Logs.DocumentSendLogs documentSendLogs 
-            on document_logs.RowId=documentSendLogs.DocumentId 
-    left outer join
-        Customers.Users users 
-            on documentSendLogs.UserId=users.Id 
-    left outer join
-        logs.AnalitFUpdates logsAnalitFUpdates 
-            on documentSendLogs.UpdateId=logsAnalitFUpdates.UpdateId 
+{1}
     left outer join
         documents.DocumentHeaders documentHeaders 
             on document_logs.RowId=documentHeaders.DownloadId 
@@ -121,7 +108,7 @@ namespace AdminInterface.Controllers
     WHERE
         document_logs.LogTime >= @LogTimeBegin 
         and document_logs.LogTime <= @LogTimeEnd 
-        {0}
+{2}
     ORDER BY
         LogTime desc; 
 ";
@@ -129,14 +116,42 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["filter"] = filter;
 
-			// если выставлен флаг только не разобранные накладные, используем фильтр, иначе sql прямой запрос
+			var statModeFrom = "";
+			var statModeSelect = "";
+
+			if (!filter.StatMode) {
+				statModeSelect = @",
+        users.Login as Login,
+        users.Id as LoginId,
+        logsAnalitFUpdates.RequestTime as RequestTime,
+        documentSendLogs.Id DeliveredId,
+        documentSendLogs.FileDelivered as FileDelivered,
+        documentSendLogs.DocumentDelivered as DocumentDelivered,
+        documentSendLogs.SendDate as SendDate 
+";
+
+				statModeFrom = @"
+    left outer join
+        Logs.DocumentSendLogs documentSendLogs 
+            on document_logs.RowId=documentSendLogs.DocumentId 
+    left outer join
+        Customers.Users users 
+            on documentSendLogs.UserId=users.Id 
+    left outer join
+        logs.AnalitFUpdates logsAnalitFUpdates 
+            on documentSendLogs.UpdateId=logsAnalitFUpdates.UpdateId 
+";
+			}
+
+			// если выставлен флаг "только не разобранные накладные" (OnlyNoParsed, для соответствующей страницы), используем фильтр, иначе sql прямой запрос
 			if (filter.OnlyNoParsed) {
 				PropertyBag["logEntities"] = filter.Find(DbSession);
 			} else {
 				var documentLogList = new List<DocumentLog>();
 				if (filter.Supplier != null) {
 					documentLogList =
-						DbSession.Connection.Query<DocumentLog>(string.Format(sqlFormat, "and document_logs.FirmCode = @SupplierId "),
+						DbSession.Connection.Query<DocumentLog>(
+							string.Format(sqlFormat, statModeSelect, statModeFrom, "and document_logs.FirmCode = @SupplierId "),
 							new {
 								@LogTimeBegin = filter.Period.Begin,
 								@LogTimeEnd = filter.Period.End.AddDays(1).AddSeconds(-1),
@@ -145,7 +160,8 @@ namespace AdminInterface.Controllers
 				}
 				if (filter.Client != null) {
 					documentLogList =
-						DbSession.Connection.Query<DocumentLog>(string.Format(sqlFormat, "and document_logs.ClientCode = @ClientId "),
+						DbSession.Connection.Query<DocumentLog>(
+							string.Format(sqlFormat, statModeSelect, statModeFrom, "and document_logs.ClientCode = @ClientId "),
 							new {
 								@LogTimeBegin = filter.Period.Begin,
 								@LogTimeEnd = filter.Period.End.AddDays(1).AddSeconds(-1),
@@ -154,7 +170,8 @@ namespace AdminInterface.Controllers
 				}
 				if (filter.User != null) {
 					documentLogList =
-						DbSession.Connection.Query<DocumentLog>(string.Format(sqlFormat, "and documentSendLogs.UserId = @UserId "),
+						DbSession.Connection.Query<DocumentLog>(
+							string.Format(sqlFormat, statModeSelect, statModeFrom, "and documentSendLogs.UserId = @UserId "),
 							new {
 								@LogTimeBegin = filter.Period.Begin,
 								@LogTimeEnd = filter.Period.End.AddDays(1).AddSeconds(-1),
@@ -163,7 +180,6 @@ namespace AdminInterface.Controllers
 				}
 				PropertyBag["logEntities"] = documentLogList;
 			}
-
 		}
 
 		public void DocumentsToExcel([DataBind("filter")] DocumentFilter filter)
