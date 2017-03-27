@@ -81,11 +81,21 @@ ${app.Asset("UserScripts.js")}
 				Права в программе АналитФармация
 			</h3>
 			<h4>
+				Права доступа
+			</h4>
+			<div>
+				<% for i, permission in enumerate(AccessPermissions): %>
+					<input type=checkbox name=user.AssignedPermissions[${i + Permissions.Length}].Id value=${permission.Id} ${"checked" if user.IsPermissionAssigned(permission)}>
+					${permission.Name}
+					<br>
+				<% end %>
+			</div>
+			<h4>
 				Выгрузка в Excel
 			</h4>
 			<div>
 				<% for i, permission in enumerate(ExcelPermissions): %>
-					<input type=checkbox name=user.AssignedPermissions[${i + Permissions.Length}].Id value=${permission.Id} ${"checked" if user.IsPermissionAssigned(permission)}>
+					<input type=checkbox name=user.AssignedPermissions[${i + AccessPermissions.Length + Permissions.Length}].Id value=${permission.Id} ${"checked" if user.IsPermissionAssigned(permission)}>
 					${permission.Name}
 					<br>
 				<% end %>
@@ -95,7 +105,7 @@ ${app.Asset("UserScripts.js")}
 			</h4>
 			<div>
 				<% for i, permission in enumerate(PrintPermissions): %>
-					<input type=checkbox name=user.AssignedPermissions[${i+ Permissions.Length + ExcelPermissions.Length}].Id value=${permission.Id} ${"checked" if user.IsPermissionAssigned(permission)}>
+					<input type=checkbox name=user.AssignedPermissions[${i+ AccessPermissions.Length + Permissions.Length + ExcelPermissions.Length}].Id value=${permission.Id} ${"checked" if user.IsPermissionAssigned(permission)}>
 					${permission.Name}
 					<br>
 				<% end %>

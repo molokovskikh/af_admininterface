@@ -657,7 +657,10 @@ namespace AdminInterface.Controllers
 				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(DbSession, setting.OrderRegionMask);
 				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(DbSession, user.Client.MaskRegion);
 				PropertyBag["permissions"] = UserPermission.FindPermissionsForDrugstore(DbSession);
-				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel);
+				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel)
+					.Where(r => r.Shortcut != "ORDR" && r.Shortcut != "CASH" && r.Shortcut != "STCK").ToArray();
+				PropertyBag["AccessPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel)
+					.Where(r => r.Shortcut == "ORDR" || r.Shortcut == "CASH" || r.Shortcut == "STCK").ToArray();
 				PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint);
 				if (user.AFNetConfig != null)
 					user.AFNetConfig.Channels = BinChannel.Load(DbSession, user);
