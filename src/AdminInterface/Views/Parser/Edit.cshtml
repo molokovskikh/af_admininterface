@@ -1,4 +1,5 @@
-﻿@model AdminInterface.Models.Parser
+﻿@using AdminInterface.Models
+@model AdminInterface.Models.Parser
 
 <script type='text/javascript' src='~/Assets/Javascripts/editable.js'></script>
 <script type='text/javascript' src='@Url.Content("~/Assets/Javascripts/ParserRulesEditor.js")'></script>
@@ -56,11 +57,16 @@
     {
     @Html.HiddenFor(model => model.Id)
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.Name)
-        @Html.EditorFor(model => model.Name)
-        @Html.ValidationMessageFor(model => model.Name)
-    </div>
+		<div class="form-group">
+			@Html.LabelFor(model => model.Name)
+			@Html.EditorFor(model => model.Name)
+			@Html.ValidationMessageFor(model => model.Name)
+		</div>
+		<div class="form-group">
+			@Html.LabelFor(model => model.Encoding)
+			@Html.DropDownListFor(model => model.Encoding, Model.Encodings())
+			@Html.ValidationMessageFor(model => model.Encoding)
+		</div>
 
     <table class="table editable" id="mapping">
         <thead>
