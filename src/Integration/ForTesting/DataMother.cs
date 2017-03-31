@@ -143,6 +143,13 @@ namespace Integration.ForTesting
 			return documentLogEntity;
 		}
 
+		public FullDocument CreateTestDocument(Supplier supplier, Client client)
+		{
+			var log = new DocumentReceiveLog(supplier, client.Addresses[0]);
+			session.Save(log);
+			return CreateTestDocument(supplier, client, log);
+		}
+
 		public FullDocument CreateTestDocument(Supplier supplier, Client client, DocumentReceiveLog documentLogEntity)
 		{
 			var document = new FullDocument {

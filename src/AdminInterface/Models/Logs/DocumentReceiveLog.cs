@@ -87,6 +87,17 @@ namespace AdminInterface.Models.Logs
 			DocumentType = DocumentType.Waybill;
 		}
 
+		public DocumentReceiveLog(Supplier supplier, Address address)
+			: this(supplier)
+		{
+			FromSupplier = supplier;
+			LogTime = DateTime.Now;
+			DocumentType = DocumentType.Waybill;
+			Address = address;
+			ForClient = address.Client;
+		}
+
+
 		[PrimaryKey("RowId")]
 		public virtual uint Id { get; set; }
 

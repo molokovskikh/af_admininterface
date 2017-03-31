@@ -26,25 +26,36 @@ namespace Integration.Controllers
 		}
 
 		private DataMother DataMother;
+		private BuilderController controller;
 
 		[SetUp]
 		public void ControllerSetup()
 		{
 			DataMother = new DataMother(session);
 			ForTest.InitializeMailer();
-		}
-
-		[Test]
-		public void Docs()
-		{
-			var controller = new BuilderController();
-			var client = DataMother.CreateTestClientWithUser();
+			controller = new BuilderController();
 			controller.DbSession = session;
 			var context = new StubContext();
 			context.StubRequest.StubHttpMethod = "POST";
 			controller.ControllerContext = new ControllerContext(context, new RouteData(), controller);
 			controller.ValueProvider = new FormCollection().ToValueProvider();
+
+		}
+
+		[Test]
+		public void Docs()
+		{
+			var client = DataMother.CreateTestClientWithUser();
 			controller.Docs(client.Users[0].Id);
+		}
+
+		[Test]
+		public void Inventory()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var supplier = DataMother.CreateSupplier();
+			DataMother.CreateTestDocument(supplier, client);
+			controller.Inventory(client.Users[0].Id);
 		}
 	}
 }

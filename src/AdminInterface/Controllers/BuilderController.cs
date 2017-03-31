@@ -59,7 +59,7 @@ from (
 						.SetParameter("userId", userId)
 						.ExecuteUpdate();
 					if (docsCount > 0)
-						Notify($"Доступно к загрузке новый документов {docsCount}");
+						Notify($"Доступно к загрузке новых документов {docsCount}");
 					else
 						Warn("Документов не найдено");
 					return RedirectToAction(nameof(Docs), new { userId });
@@ -75,6 +75,23 @@ from (
 			if (IsPost) {
 				if (TryUpdateModel(model)) {
 					var count = DbSession.CreateSQLQuery(@"
+drop temporary table if exists Customers.WaybillsToProcess;
+create temporary table Customers.WaybillsToProcess engine=memory
+select dh.DownloadId as Id
+from Customers.UserAddresses ua
+	join Customers.Addresses a on a.Id = ua.AddressId
+		join Documents.DocumentHeaders dh on dh.Addressid = a.Id
+		left join Inventory.StockedWaybills sw on sw.DownloadId = dh.DownloadId
+where ua.UserId = :userId
+	and a.Enabled = 1
+	and sw.Id is null
+	and dh.WriteTime > :begin
+	and dh.WriteTime < :end;
+
+insert into Inventory.StockedWaybills(DownloadId, ClientTimestamp)
+select Id, now()
+from Customers.WaybillsToProcess;
+
 insert into Inventory.Stocks(WaybillLineId,
 	Status,
 	AddressId,
@@ -103,13 +120,13 @@ insert into Inventory.Stocks(WaybillLineId,
 	Certificates,
 	Barcode,
 	CountryCode,
-	RetailCost,
 	WaybillNumber,
 	SupplierId,
-	SupplierFullName
+	SupplierFullName,
+	WaybillId
 )
 select db.Id,
-	:status,
+	:inTransit,
 	dh.AddressId,
 	db.ProductId,
 	p.CatalogId,
@@ -136,32 +153,36 @@ select db.Id,
 	db.Certificates,
 	db.EAN13 as Barcode,
 	db.CountryCode,
-	round(db.SupplierCost + db.SupplierCost * :markup, 2) as RetailCost,
 	dh.ProviderDocumentId,
 	dh.FirmCode,
-	sp.FullName
-from Customers.UserAddresses ua
-	join Customers.Addresses a on a.Id = ua.AddressId
-		join Documents.DocumentHeaders dh on dh.Addressid = a.Id
-			join Documents.DocumentBodies db on db.DocumentId = dh.Id
-				left join Catalogs.Products p on p.Id = db.ProductId
-				left join Catalogs.Catalog c on c.Id = p.CatalogId
-				left join Customers.Suppliers sp on sp.Id = dh.FirmCode
-				left join Inventory.Stocks s on s.WaybillLineId = db.Id
-where ua.UserId = :userId
-	and a.Enabled = 1
-	and s.Id is null
-	and db.SupplierCost is not null
-	and dh.WriteTime > :begin
-	and dh.WriteTime < :end")
+	sp.FullName,
+	dh.DownloadId
+from Documents.DocumentHeaders dh
+	join Customers.WaybillsToProcess wp on wp.Id = dh.Id
+	join Documents.DocumentBodies db on db.DocumentId = dh.Id
+		left join Catalogs.Products p on p.Id = db.ProductId
+		left join Catalogs.Catalog c on c.Id = p.CatalogId
+		left join Customers.Suppliers sp on sp.Id = dh.FirmCode
+		left join Inventory.Stocks s on s.WaybillLineId = db.Id
+where s.Id is null;
+
+update Inventory.Stocks s
+join Customers.WaybillsToProcess sw on sw.Id = s.WaybillId
+set RetailCost = round(s.SupplierCost + s.SupplierCost * :markup, 2),
+	RetailMarkup = :markup,
+	Status = :available
+where s.Status = :inTransit;
+
+select ROW_COUNT();")
 						.SetParameter("begin", model.Begin)
 						.SetParameter("end", model.End.AddDays(1))
 						.SetParameter("userId", userId)
 						.SetParameter("markup", model.Markup)
 						//Available
-						.SetParameter("status", 0)
-						.ExecuteUpdate();
-					if (count > 0)
+						.SetParameter("available", 0)
+						.SetParameter("inTransit", 1)
+						.UniqueResult();
+					if (Convert.ToInt32(count) > 0)
 						Notify($"Создано складских остатков {count}");
 					else
 						Warn("Складских остатков не создано");
