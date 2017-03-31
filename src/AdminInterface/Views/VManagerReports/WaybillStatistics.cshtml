@@ -1,0 +1,91 @@
+﻿@using AdminInterface.ViewModels
+@using Common.Tools
+@using Common.Tools.Calendar
+@using AdminInterface.ViewModels.Reports;
+@model ReportTable<WaybillStatisticsFilter,WaybillStatisticsData>
+@{
+      var title = "Статистика накладных";
+    ViewBag.Title = title;
+}
+
+<h2>
+    @ViewBag.Title
+</h2>
+@using (Html.BeginForm("WaybillStatistics", "VManagerReports",FormMethod.Get)) {
+    @Html.Hidden("clientId", Model.TableFilter.ClientId)
+    @Html.HiddenFor(s => Model.TablePaginator.PageSizeCurrentIndex)
+    <table class="CenterBlock">
+        <tbody>
+        <tr>
+            <td valign="top" class="filter-label">Выберите период:</td>
+
+            <td>
+                @Html.Partial("partials/_datePeriodPicker", new Tuple<HtmlString, HtmlString>(Html.Hidden("TableFilter.DateBegin", Model.TableFilter.DateBegin.ToString("yyyy-MM-dd"), new {@id = "beginDate"}),
+                    Html.Hidden("TableFilter.DateEnd", Model.TableFilter.DateEnd.ToString("yyyy-MM-dd"), new {@id = "endDate"})))
+            </td>
+        </tr>
+    <tr>
+        <td valign="top" class="filter-label"></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td style="text-align: right;" colspan="2">
+            <input type="submit" value="Показать">
+        </td>
+    </tr>
+    </tbody>
+</table>
+}
+<br/>
+
+<div class="block">
+
+    @if (Model.TableData.Count > 0) {
+        <span>Всего строк @Model.TablePaginator.TotalItems</span>
+        <br/>
+        <table class="DataTable">
+            <thead>
+            <tr class="NoHighLightRow">
+                <th colspan="@Model.GetColumsNumber()">
+                    <div class="mvc-paginator">
+                        @Html.Partial("partials/_tablePaginator", Model.TablePaginator)
+                    </div>
+                </th>
+            </tr>
+            @Html.Partial("partials/_tableHead", Model.TableHead)
+            </thead>
+            <tbody>
+            @{
+                var indexForIE = 1;
+                foreach (var item in Model.TableData) {
+                    indexForIE += 1;
+                    <tr class="@(indexForIE%2 == 0 ? "EvenRow" : "OddRow")">
+                        <td><a href="@Url.Content("~/Suppliers")/@item.SupplierId">@item.SupplierName</a></td>
+                        <td><a href="@Url.Content("~/Clients")/@item.ClientId">@item.ClientName</a></td>
+                        <td>@item.SupplierOrdersNumber</td>
+                        <td>@item.WaybillsTotalNumber</td>
+                        <td>@item.WaybillsParsedNumber</td>
+                    </tr>
+                }
+            }
+
+            <tr>
+                <td colspan="@Model.GetColumsNumber()">
+                    <div class="mvc-paginator">
+                        @Html.Partial("partials/_tablePaginator", Model.TablePaginator)
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    } else {
+        <table class="DataTable">
+            <tbody>
+            <tr class="EmptyData">
+                <td>Ничего не найдено</td>
+            </tr>
+            </tbody>
+        </table>
+    }
+</div>

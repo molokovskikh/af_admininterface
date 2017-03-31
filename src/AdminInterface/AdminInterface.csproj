@@ -230,6 +230,8 @@
     <Compile Include="Controllers\Filters\StatisticsFilter.cs" />
     <Compile Include="Controllers\MailsModeringController.cs" />
     <Compile Include="Controllers\MonController.cs" />
+    <Compile Include="Controllers\MVC\BaseMvController.cs" />
+    <Compile Include="Controllers\MVC\VManagerReportsController.cs" />
     <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\NewSupplierAttachmentsController.cs" />
@@ -524,6 +526,13 @@
     <Compile Include="ViewAdministrators.aspx.designer.cs">
       <DependentUpon>ViewAdministrators.aspx</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\PageNavigation.cs" />
+    <Compile Include="ViewModels\Reports\WaybillStatisticsData.cs" />
+    <Compile Include="ViewModels\Reports\ATableFilter.cs" />
+    <Compile Include="ViewModels\ReportTable.cs" />
+    <Compile Include="ViewModels\TableViews.cs" />
+    <Compile Include="ViewModels\SelectItemList.cs" />
+    <Compile Include="ViewModels\DatePeriod.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\WebApp\base.css" />
@@ -558,6 +567,7 @@
     <Content Include="Assets\Stylesheets\billing.css" />
     <Content Include="Assets\Stylesheets\ClientsShow.css" />
     <Content Include="Assets\Stylesheets\contact-editor.css" />
+    <Content Include="Assets\Stylesheets\default-mvc.css" />
     <Content Include="Assets\Stylesheets\Documents.css" />
     <Content Include="Assets\Stylesheets\MonitoringOrder.css" />
     <Content Include="Assets\Stylesheets\News.css" />
@@ -606,6 +616,7 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="Assets\Javascripts\calendar.MVCsetup.js" />
     <None Include="Scripts\jquery-1.7-vsdoc.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -617,6 +628,12 @@
     <Content Include="ViewAdministrators.aspx" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\VManagerReports\WaybillStatistics.cshtml" />
+    <Content Include="Views\VManagerReports\partials\_datePeriodPicker.cshtml" />
+    <Content Include="Views\VManagerReports\partials\_pageNavigation.cshtml" />
+    <Content Include="Views\VManagerReports\partials\_tableHead.cshtml" />
+    <Content Include="Views\VManagerReports\partials\_tablePaginator.cshtml" />
+    <Content Include="Views\VManagerReports\partials\_tableItemsPerPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />

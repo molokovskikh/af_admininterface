@@ -1,33 +1,100 @@
 ﻿<!DOCTYPE html>
 @using Common.Tools
+@{
+    var classicStyle = ViewBag.ClassicStyle ?? false;
+}
 
 <html>
 <head>
-	@Styles.Render("~/Content/css")
-	<script type='text/javascript' src='~/Assets/Javascripts/jquery-1.9.1.js'></script>
-	<script type='text/javascript' src='~/Assets/Javascripts/jquery-ui-1.10.2.js'></script>
-	<script type='text/javascript' src='~/Assets/Javascripts/jquery-ui-i18n.js'></script>
-	<link type='text/css' rel='stylesheet' href='~/Assets/Stylesheets/themes/base/jquery.ui.all.css'>
-	@RenderSection("scripts", required: false)
-	<style>
-			.field-validation-error {
-					color: red;
-					clear:  both;
-					display: block;
-			}
-	</style>
-	<script type="text/javascript">
-		$(function () {
-			$.datepicker.setDefaults($.datepicker.regional['ru']);			$(".calendar").each(function () {
-				var value = $(this).siblings("input[type=hidden]");
-				$(this).datepicker({
-					defaultDate: value.val().split(/\s/)[0],
-					dateFormat: "dd.mm.yy",
-					altField: value
-				});
-			});
-		});
-	</script></head>
+
+    <title>@ViewBag.Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+    @if (!classicStyle) {	//если это не классический интерфейс, а bootstrap
+        @Styles.Render("~/Content/css")
+    }
+    <script type='text/javascript' src='~/Assets/Javascripts/jquery-1.9.1.js'></script>
+    <script type='text/javascript' src='~/Assets/Javascripts/jquery-ui-1.10.2.js'></script>
+    <script type='text/javascript' src='~/Assets/Javascripts/jquery-ui-i18n.js'></script>
+    <link type='text/css' rel='stylesheet' href='~/Assets/Stylesheets/themes/base/jquery.ui.all.css'>
+    @RenderSection("scripts", required: false)
+    <style>
+        .field-validation-error {
+            color: red;
+            clear: both;
+            display: block;
+        }
+    </style>
+
+    @* Стили из для классического интерфейса *@
+    @if (classicStyle) {
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/jquery-1.9.1.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/underscore.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/backbone.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/jquery-ui-1.10.2.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/knockout-3.2.0.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/search.editor.js")"></script>
+
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/confirmation.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/input-dependency.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/details.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/UserCommon.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/editable.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/checkbox.all.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/autosubmit.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/calendar.MVCsetup.js")"></script>
+
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/themes/base/jquery.ui.all.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/filter.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/search.editor.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/User.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/Table.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/calendar-blue.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/Billing.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/ValidationStyles.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/Highlight.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/Common.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/Contacts.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/form.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/columns.css")">
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/default-mvc.css")">
+
+        <link type="text/css" rel="stylesheet" href="@Url.Content("~/App_Themes/Main/Main.css")">
+
+        <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/jquery.maskedinput.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/JavaScript/calendar.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/JavaScript/calendar-ru_win_.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/JavaScript/calendar-setup.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/JavaScript/date-ru-RU.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/JavaScript/jquery.contact.validation.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/JavaScript/Common.js")"></script>
+    } else {
+        <script type="text/javascript">
+            $(function() {
+                $.datepicker.setDefaults($.datepicker.regional['ru']);
+                $(".calendar").each(function() {
+                    var value = $(this).siblings("input[type=hidden]");
+                    $(this).datepicker({
+                        defaultDate: value.val().split(/\s/)[0],
+                        dateFormat: "dd.mm.yy",
+                        altField: value
+                    });
+                });
+            });
+        </script>
+    }
+
+    @* select2 *@
+    <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/jquery.validate.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/localization/messages_ru.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/globalize/globalize.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/jquery.validate.globalize.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/select2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/Javascripts/Select2-locales/select2_locale_ru.js")"></script>
+    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Assets/Stylesheets/select2.css")">
+
+</head>
 <body>
 <div class="container-fluid">
 	@if(TempData.ContainsKey("Message")) {
@@ -41,6 +108,7 @@
 		}
 		<div class="alert @clazz">@message.MessageText</div>
 	}
+
 	@RenderBody()
 </div>
 </body>
