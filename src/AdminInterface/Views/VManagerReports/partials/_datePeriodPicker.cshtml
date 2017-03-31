@@ -1,0 +1,26 @@
+﻿@model Tuple<HtmlString,HtmlString>
+<div style="text-align: center;">
+    @Html.Raw(Model.Item1)
+    @Html.Raw(Model.Item2)
+    <table class="CenterBlock">
+        <tbody>
+        <tr>
+            <td>
+                <strong>C</strong>
+            </td>
+            <td>
+                <strong>По</strong>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="calendar" id="beginDateCalendarHolder"></div>
+            </td>
+            <td>
+                <div class="calendar" id="endDateCalendarHolder"></div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+               

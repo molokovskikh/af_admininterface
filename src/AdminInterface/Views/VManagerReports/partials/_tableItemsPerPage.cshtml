@@ -1,0 +1,23 @@
+﻿@using Common.Web.Ui.Helpers
+@model AdminInterface.ViewModels.TablePaginator
+
+
+@functions {
+
+    string CreateLink(int i)
+    {
+        if (Model.PageSizeCurrentIndex != i)
+            return "<a href=\"" + ViewHelper.GetUrlWithReplacedParams(Request.Url.ToString().Replace(" ", ""), "PageSize", i.ToString(), "CurrentPage", "0") + "\">" + Model.PageSizes[i] + "</a>";
+        else
+            return "<span class=\"CurrentPage\">" + Model.PageSizes[i] + "</span>";
+    }
+
+}
+
+<div class="NoHighLightRow">
+    <div>
+        @for (int i = 0; i < Model.PageSizes.Length; i++) {
+            @Html.Raw(CreateLink(i))
+        }
+    </div>
+</div>

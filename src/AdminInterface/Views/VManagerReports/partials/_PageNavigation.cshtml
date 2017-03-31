@@ -1,0 +1,22 @@
+﻿@model AdminInterface.ViewModels.PageNavigation[]
+
+<div class="Navigation">
+    <ul id="breadcrumb">
+        <li>
+            <a title="Административный интерфейс" href="~/">
+                <img class="home" src="~/images/home.png" alt="Административный интерфейс">
+            </a>
+        </li>
+        @for (int i = 0; i < Model.Length; i++) {
+            <li>
+                @if (i != Model.Length - 1) {
+                    <a href="@Model[i].Href">@Model[i].Html</a>
+                    <span>&gt;</span>
+                } else {
+                    @Model[i].Html
+                }
+            </li>
+        }
+    </ul>
+</div>
+

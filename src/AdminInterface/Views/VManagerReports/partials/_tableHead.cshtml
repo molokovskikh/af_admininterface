@@ -1,0 +1,25 @@
+﻿@using Common.Web.Ui.Helpers
+@model AdminInterface.ViewModels.TableHead
+@{
+    var headers = Model.Headers;
+    var sortOrder = Model.SortOrder;
+  //  var rowsCount = Model.RowsCount;
+}
+<tr class="NoHighLightRow">
+    @for (int i = 0; i < headers.Length; i++) {
+        if (i + 1 != sortOrder) {
+            if (-(i + 1) != sortOrder) {
+                <th>
+                    <a href="@ViewHelper.GetUrlWithReplacedParams(Request.Url.ToString(), "SortOrder", (i + 1).ToString(), "CurrentPage", "0")" class="sort">@headers[i]</a>
+                </th>
+            } else {
+                <th>
+                    <a href="@ViewHelper.GetUrlWithReplacedParams(Request.Url.ToString(), "SortOrder", (i + 1).ToString(), "CurrentPage", "0")" class="sort asc">@headers[i]</a>
+                </th>
+            }
+        } else {
+            <th>
+                <a href="@ViewHelper.GetUrlWithReplacedParams(Request.Url.ToString(), "SortOrder", (-(i + 1)).ToString(), "CurrentPage", "0")" class="sort desc">@headers[i]</a>
+            </th>}
+    }
+</tr>

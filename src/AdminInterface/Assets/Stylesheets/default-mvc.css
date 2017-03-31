@@ -1,0 +1,9 @@
+﻿.width-100 {
+	width: 100% !important;
+}
+.mvc-paginator a,.mvc-paginator span{
+	padding-left: 4px;
+}
+.mvc-paginator .Paginator a,.mvc-paginator .Paginator span{
+    font-weight: normal;
+}
