@@ -142,11 +142,11 @@ namespace AdminInterface.Controllers
 			}
 			user.UseFtpGateway = true;
 #if !DEBUG
-			//создаем папку 
+			//создаем папку
 			var root = ConfigurationManager.AppSettings["FtpUserFolder"]+ user.Login;
 			var username = String.Format(@"ANALIT\{0}", user.Login);
 			Directory.CreateDirectory(root);
-			
+
 			//раздаем права на папку
 			var rootDirectorySecurity = Directory.GetAccessControl(root);
 			var rule =
@@ -657,11 +657,11 @@ namespace AdminInterface.Controllers
 				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(DbSession, setting.OrderRegionMask);
 				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(DbSession, user.Client.MaskRegion);
 				PropertyBag["permissions"] = UserPermission.FindPermissionsForDrugstore(DbSession);
-				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel)
-					.Where(r => r.Shortcut != "ORDR" && r.Shortcut != "CASH" && r.Shortcut != "STCK").ToArray();
-				PropertyBag["AccessPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel)
+				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel);
+				PropertyBag["AccessPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint)
 					.Where(r => r.Shortcut == "ORDR" || r.Shortcut == "CASH" || r.Shortcut == "STCK").ToArray();
-				PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint);
+				PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint)
+					.Where(r => r.Shortcut != "ORDR" && r.Shortcut != "CASH" && r.Shortcut != "STCK").ToArray();
 				if (user.AFNetConfig != null)
 					user.AFNetConfig.Channels = BinChannel.Load(DbSession, user);
 				RenderView("DrugstoreSettings");
