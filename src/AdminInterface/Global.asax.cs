@@ -1,14 +1,13 @@
 using System;
-using System.IO;
-using System.Web;
+using System.ComponentModel;
+using System.Reflection;
+using System.Web.Mvc;
+using System.Web.Optimization;
 using AdminInterface.Helpers;
 using AdminInterface.Security;
-using System.Reflection;
-using System.Web.Optimization;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
-using log4net;
 
 namespace AdminInterface
 {
@@ -40,6 +39,24 @@ namespace AdminInterface
 		public string PriceServiceName { get; set; }
 	}
 
+	public class TrimModelBinder : DefaultModelBinder
+	{
+		protected override void SetProperty(ControllerContext controllerContext,
+			ModelBindingContext bindingContext,
+			PropertyDescriptor propertyDescriptor, object value)
+		{
+			if (propertyDescriptor.PropertyType == typeof(string)) {
+				var stringValue = (string) value;
+				if (!string.IsNullOrWhiteSpace(stringValue))
+					value = stringValue.Trim();
+				else
+					value = null;
+			}
+
+			base.SetProperty(controllerContext, bindingContext, propertyDescriptor, value);
+		}
+	}
+
 	public class Global : WebApplication
 	{
 		public static AppConfig Config = new AppConfig();
@@ -63,8 +80,8 @@ namespace AdminInterface
 				BundleTable.Bundles.Add(new StyleBundle("~/Content/css")
 					.Include("~/Content/bootstrap.css"));
 
-			}
-			catch (Exception ex) {
+				ModelBinders.Binders.DefaultBinder = new TrimModelBinder();
+			} catch (Exception ex) {
 				Log.Fatal("Ошибка при запуске Административного интерфейса", ex);
 			}
 		}
