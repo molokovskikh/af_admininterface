@@ -90,11 +90,15 @@ namespace AdminInterface
 		{
 			var exception = Server.GetLastError();
 			if (exception.InnerException is NotAuthorizedException) {
+				Log.Warn("Ошибка доступа", exception);
 				Server.Transfer("~/Rescue/NotAuthorized.aspx");
+				Server.ClearError();
 				return;
 			}
 			if (exception.InnerException is NotHavePermissionException) {
+				Log.Warn("Ошибка доступа", exception);
 				Server.Transfer("~/Rescue/NotAllowed.aspx");
+				Server.ClearError();
 				return;
 			}
 
