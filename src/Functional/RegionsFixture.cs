@@ -67,23 +67,5 @@ namespace Functional
 			Assert.That(savedMarkup.Begin, Is.EqualTo(150));
 			Assert.That(savedMarkup.End, Is.EqualTo(170));
 		}
-
-		[Test]
-		public void NewMarkupsTest()
-		{
-			Open("Main/Index");
-			ClickLink("Регионы");
-			AssertText("Регионы");
-			Click("Курск");
-
-			var suppliersMarkup = session.Query<Markup>().Where(m => m.RegionId == 4 && m.Type == 0).ToList();
-			var drugstoreMarkup = session.Query<Markup>().Where(m => m.RegionId == 4 && m.Type == 1).ToList();
-			Assert.That(suppliersMarkup.Count, Is.EqualTo(3));
-			Assert.That(drugstoreMarkup.Count, Is.EqualTo(3));
-			foreach (var limit in MarkupLimits.markupLimits) {
-				Assert.That(suppliersMarkup.Any(m => m.Begin == limit.Begin));
-				Assert.That(drugstoreMarkup.Any(m => m.End == limit.End));
-			}
-		}
 	}
 }

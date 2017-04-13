@@ -69,6 +69,45 @@ namespace Functional.Billing
 				Assert.That(checkBox.GetAttribute("Checked"), Is.Null);
 			}
 		}
+
+		[Test, NUnit.Framework.Description("Проверка фильтрации записей в статистике вкл./откл. по пользователю")]
+		public void FilterLogMessagesByUser()
+		{
+			AddUsersAdnAddresses(client, 3);
+			Refresh();
+
+			Css("#UserListHeader a").Click();
+			// Проверяем, что логины пользователей - это ссылки
+			foreach (var usr in client.Users) {
+				var el = browser.FindElementById($"UserLink{usr.Id}");
+				Assert.IsNotNull(el);
+				Assert.AreEqual(el.Text, usr.Login);
+			}
+
+			// Кликаем по логину одного из пользователей
+			var user = client.Users[2];
+			ClickLink(user.Login);
+			// В таблице статистики вкл./откл. должны остаться видимыми только строки, относящиеся к выбранному пользователю
+			// остальные строки должны быть невидимы
+			var logRows = browser.FindElementsByName("tr").Where(x => x.GetAttribute("id")?.Contains("logRow") == true);
+			foreach (var row in logRows) {
+				if (row.GetAttribute("id").Equals("logRowUserLog" + user.Id))
+					Assert.That(row.GetCssValue("display"), Is.Not.StringContaining("none"));
+				else
+					Assert.That(row.GetCssValue("display"), Is.StringContaining("none"));
+			}
+			//Логин-ссылка должна должна получить класс который сделает ее жирной
+			Assert.That(browser.FindElementById("UserLink" + user.Id).GetAttribute("class"), Is.StringContaining("current-filter"));
+		}
+
+		private void AddUsersAdnAddresses(Client client, int countUsers)
+		{
+			for (var i = 0; i < countUsers; i++) {
+				client.AddUser(session, "user");
+				var address = client.AddAddress("address");
+				session.Save(address);
+			}
+		}
 	}
 
 	public class BillingFixture : FunctionalFixture
@@ -606,32 +645,6 @@ namespace Functional.Billing
 				Assert.IsFalse(messageBody.Exists);
 				AssertText("Сообщение удалено");
 			}
-		}
-
-		[Test, NUnit.Framework.Description("Проверка фильтрации записей в статистике вкл./откл. по пользователю")]
-		public void FilterLogMessagesByUser()
-		{
-			AddUsersAdnAddresses(client, 3);
-			Refresh();
-
-			// Проверяем, что логины пользователей - это ссылки
-			foreach (var usr in client.Users)
-				Assert.IsTrue(browser.Link(Find.ByText(usr.Login)).Exists, usr.Login);
-
-			// Кликаем по логину одного из пользователей
-			var user = client.Users[2];
-			ClickLink(user.Login);
-			// В таблице статистики вкл./откл. должны остаться видимыми только строки, относящиеся к выбранному пользователю
-			// остальные строки должны быть невидимы
-			var logRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("logRow"));
-			foreach (TableRow row in logRows) {
-				if (row.Id.Equals("logRowUserLog" + user.Id))
-					Assert.That(row.Style.Display, Is.Not.StringContaining("none"));
-				else
-					Assert.That(row.Style.Display, Is.StringContaining("none"));
-			}
-			//Логин-ссылка должна должна получить класс который сделает ее жирной
-			Assert.That(browser.Link("UserLink" + user.Id).ClassName, Is.StringContaining("current-filter"));
 		}
 
 		[Test, NUnit.Framework.Description("Проверка, что по клику на логин, этот пользователь выбирается в выпадающем списке 'Сообщение для пользователя:'")]
