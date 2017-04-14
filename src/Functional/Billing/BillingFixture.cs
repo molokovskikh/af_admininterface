@@ -449,7 +449,7 @@ namespace Functional.Billing
 		private void AddUsersAdnAddresses(Client client, int countUsers)
 		{
 			for (var i = 0; i < countUsers; i++) {
-				client.AddUser(session, "user");
+				client.AddUser(session, "user", $"user{i}");
 				var address = client.AddAddress("address");
 				session.Save(address);
 			}

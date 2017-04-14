@@ -254,7 +254,10 @@ namespace AdminInterface.Controllers
 			}
 			PropertyBag["user"] = user;
 			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel);
-			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint);
+			PropertyBag["AccessPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint)
+				.Where(r => r.Shortcut == "ORDR" || r.Shortcut == "CASH" || r.Shortcut == "STCK").ToArray();
+			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint)
+				.Where(r => r.Shortcut != "ORDR" && r.Shortcut != "CASH" && r.Shortcut != "STCK").ToArray();
 			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;

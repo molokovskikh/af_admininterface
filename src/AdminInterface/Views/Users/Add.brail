@@ -175,18 +175,36 @@
 				Права в программе АналитФармация
 			</h3>
 			<h4>
-				Выгрузка в Excel
+				Права доступа
 			</h4>
 			<div style="padding-top: 1px;">
 			<% if IsDefined(@UseDefPermession) :%>
-				<% for i, permission in enumerate(ExcelPermissions): %>
+				<% for i, permission in enumerate(AccessPermissions): %>
 					<input type=checkbox name=user.AssignedPermissions[${i + Permissions.Length}].Id value=${permission.Id} ${"checked" if permission.AssignDefaultValue}>
 					${permission.Name}
 					<br>
 				<% end %>
 			<% else: %>
-			<% for i, permission in enumerate(ExcelPermissions): %>
+				<% for i, permission in enumerate(AccessPermissions): %>
 					<input type=checkbox name=user.AssignedPermissions[${i + Permissions.Length}].Id value=${permission.Id} ${"checked" if user.UserHasPermission(permission.Id)}>
+					${permission.Name}
+					<br>
+				<% end %>
+			<% end %>
+			</div>
+			<h4>
+				Выгрузка в Excel
+			</h4>
+			<div>
+			<% if IsDefined(@UseDefPermession) :%>
+				<% for i, permission in enumerate(ExcelPermissions): %>
+					<input type=checkbox name=user.AssignedPermissions[${i + Permissions.Length + AccessPermissions.Length}].Id value=${permission.Id} ${"checked" if permission.AssignDefaultValue}>
+					${permission.Name}
+					<br>
+				<% end %>
+			<% else: %>
+			<% for i, permission in enumerate(ExcelPermissions): %>
+					<input type=checkbox name=user.AssignedPermissions[${i + Permissions.Length + AccessPermissions.Length}].Id value=${permission.Id} ${"checked" if user.UserHasPermission(permission.Id)}>
 					${permission.Name}
 					<br>
 				<% end %>
@@ -198,13 +216,13 @@
 			<div>
 			<% if IsDefined(@UseDefPermession) :%>
 				<% for i, permission in enumerate(PrintPermissions): %>
-					<input type=checkbox name=user.AssignedPermissions[${i+ Permissions.Length + ExcelPermissions.Length}].Id value=${permission.Id} ${"checked" if permission.AssignDefaultValue}>
+					<input type=checkbox name=user.AssignedPermissions[${i+ Permissions.Length + AccessPermissions.Length + ExcelPermissions.Length}].Id value=${permission.Id} ${"checked" if permission.AssignDefaultValue}>
 					${permission.Name}
 					<br>
 				<% end %>
 			<% else: %>
 			<% for i, permission in enumerate(PrintPermissions): %>
-					<input type=checkbox name=user.AssignedPermissions[${i+ Permissions.Length + ExcelPermissions.Length}].Id value=${permission.Id} ${"checked" if  user.UserHasPermission(permission.Id)}>
+					<input type=checkbox name=user.AssignedPermissions[${i+ Permissions.Length + AccessPermissions.Length + ExcelPermissions.Length}].Id value=${permission.Id} ${"checked" if  user.UserHasPermission(permission.Id)}>
 					${permission.Name}
 					<br>
 				<% end %>
