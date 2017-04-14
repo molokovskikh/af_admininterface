@@ -76,7 +76,11 @@ from (
 				if (TryUpdateModel(model)) {
 					var count = DbSession.CreateSQLQuery(@"
 drop temporary table if exists Customers.WaybillsToProcess;
-create temporary table Customers.WaybillsToProcess engine=memory
+create temporary table Customers.WaybillsToProcess (
+	Id int unsigned not null,
+	primary key(Id)
+) engine=memory;
+insert into Customers.WaybillsToProcess(Id)
 select dh.DownloadId as Id
 from Customers.UserAddresses ua
 	join Customers.Addresses a on a.Id = ua.AddressId
