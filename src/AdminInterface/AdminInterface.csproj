@@ -120,8 +120,8 @@
       <HintPath>..\..\packages\Microsoft.Reporting.WinForms.v11.1.0.0.0\lib\Microsoft.ReportViewer.Common.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ReportViewer.WinForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Reporting.WinForms.v11.1.0.0.0\lib\Microsoft.ReportViewer.WinForms.DLL</HintPath>
-    </Reference>
+       <HintPath>..\..\packages\Microsoft.Reporting.WinForms.v11.1.0.0.0\lib\Microsoft.ReportViewer.WinForms.DLL</HintPath>
+     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
@@ -250,6 +250,7 @@
     <Compile Include="Models\Logs\ClientAppLog.cs" />
     <Compile Include="Models\Logs\RequestLog.cs" />
     <Compile Include="Models\Markup.cs" />
+    <Compile Include="Models\MarkupGlobalConfig.cs" />
     <Compile Include="Models\RejectHeader.cs" />
     <Compile Include="Models\RejectParser.cs" />
     <Compile Include="Models\Parser.cs" />
@@ -526,6 +527,7 @@
     <Compile Include="ViewAdministrators.aspx.designer.cs">
       <DependentUpon>ViewAdministrators.aspx</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\MarkupSynchronizationView.cs" />
     <Compile Include="ViewModels\PageNavigation.cs" />
     <Compile Include="ViewModels\Reports\WaybillStatisticsData.cs" />
     <Compile Include="ViewModels\Reports\ATableFilter.cs" />

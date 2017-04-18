@@ -18,6 +18,7 @@ using AdminInterface.NHibernateExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
 using AdminInterface.Services;
+using AdminInterface.ViewModels;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
@@ -268,6 +269,7 @@ where Phone like :phone")
 			PropertyBag["regions"] = regions;
 			PropertyBag["drugstore"] = drugstore;
 			PropertyBag["encodings"] = SmartOrderRules.PosibleEncodings;
+			PropertyBag["markupsSynchronization"] = new MarkupsSynchronizationView {ViewMarkupsSynchronization = client.MarkupsSynchronization};
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -275,7 +277,7 @@ where Phone like :phone")
 			[ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
 			[ARDataBind("drugstore.SmartOrderRules", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] SmartOrderRules smartOrderRules,
 			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "drugstore.OfferMatrixExcludes")] DrugstoreSettings drugstore,
-			[DataBind("regionSettings")] RegionSettings[] regionSettings,
+			[DataBind("regionSettings")] RegionSettings[] regionSettings, [DataBind("markupsSynchronization")]MarkupsSynchronizationView markupsSynchronization,
 			ulong homeRegion)
 		{
 			Admin.CheckClientPermission(client);
@@ -290,7 +292,6 @@ where Phone like :phone")
 			var oldMaskRegion = client.MaskRegion;
 			client.HomeRegion = DbSession.Load<Region>(homeRegion);
 			client.UpdateRegionSettings(regionSettings);
-
 			if (!IsValid(client)) {
 				Settings(client.Id);
 				PropertyBag["client"] = client;
@@ -312,7 +313,21 @@ where Phone like :phone")
 				Warning("Вы сняли опцию \"Не подключать новые прайсы 'Административно'\", целесообразно отправить всем поставщикам повторное уведомление о регистрации. Данные сохранены.");
 			}
 			drugstore.BeforeSave();
+
+			markupsSynchronization.UpdateSynchronizationIfNeeds(DbSession, client)?.ForEach(s => {
+				DbSession.Save(s);
+				var audit = new AuditRecord(client)
+				{
+					ObjectId = s.Id,
+					IsHtml = true,
+					Name = MarkupGlobalConfig.GetTypeDescription(s.Type),
+					MessageType = LogMessageType.System,
+					Message = $"<strong>Добавлены</strong> 'настройки наценок': <br/>{s.GetLogState()}"
+				};
+				DbSession.Save(audit);
+			});
 			DbSession.Save(client);
+
 			DbSession.Save(drugstore);
 			DbSession.Flush();
 			if (oldMaskRegion != client.MaskRegion)

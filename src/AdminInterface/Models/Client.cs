@@ -120,6 +120,9 @@ namespace AdminInterface.Models
 			}
 		}
 
+		[Property, Description("Синхронизация наценок"), Auditable]
+		public virtual bool MarkupsSynchronization { get; set; }
+
 		[Style]
 		public override bool Disabled
 		{

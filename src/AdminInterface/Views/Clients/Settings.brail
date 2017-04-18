@@ -95,6 +95,7 @@ ${app.Asset("smart.order.settings.js")}
 
 							<h4>AnalitF.net</h4>
 							${app.Edit("drugstore.IsStockEnabled")}<br>
+							${app.Edit("markupsSynchronization.ViewMarkupsSynchronization")}<br>
 						</td>
 					</tr>
 				</table>

@@ -116,5 +116,13 @@ namespace Integration
 				Assert.That(user.AssignedPermissions.ToList(), Contains.Item(permission));
 			}
 		}
+
+		[Test]
+		public void ClientMarkupsSynchronization()
+		{
+			var defaultItems = MarkupGlobalConfig.Defaults(user.Client);
+			Assert.IsNotNull(defaultItems);
+			Assert.IsTrue(defaultItems.Count == 6);
+		}
 	}
 }
